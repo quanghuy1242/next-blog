@@ -7,12 +7,12 @@ import Header from '../../components/header'
 import PostHeader from '../../components/post-header'
 import SectionSeparator from '../../components/section-separator'
 import Layout from '../../components/layout'
-import { getAllPostsWithSlug, getPostAndMorePosts } from '../../lib/api'
+import { getPostAndMorePosts } from '../../lib/api'
 import PostTitle from '../../components/post-title'
 import Head from 'next/head'
-import { CMS_NAME } from '../../lib/constants'
 import markdownToHtml from '../../lib/markdownToHtml'
 import { renderMetaTags } from 'react-datocms'; 
+import Avatar from '../../components/avatar'
 
 export default function Post({ post, morePosts, preview }) {
   const router = useRouter()
@@ -21,9 +21,9 @@ export default function Post({ post, morePosts, preview }) {
   }
   return (
     <Layout preview={preview}>
-      <Container>
-        <Header />
-        {router.isFallback ? (
+      <Header />
+      <div className="mt-16" />
+      {router.isFallback ? (
           <PostTitle>Loading…</PostTitle>
         ) : (
           <>
@@ -35,15 +35,19 @@ export default function Post({ post, morePosts, preview }) {
                 title={post.title}
                 coverImage={post.coverImage}
                 date={post.date}
-                author={post.author}
               />
-              <PostBody content={post.content} />
+              <Container>
+                <PostBody content={post.content} author={post.author} />
+              </Container>
             </article>
             <SectionSeparator />
-            {morePosts.length > 0 && <MoreStories posts={morePosts} />}
+            <Container>
+              <div className="max-w-2xl mx-auto">
+                {morePosts.length > 0 && <MoreStories posts={morePosts} colNum={2} hasTitle={true} />}
+              </div>
+            </Container>
           </>
         )}
-      </Container>
     </Layout>
   )
 }
