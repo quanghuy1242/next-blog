@@ -43,7 +43,7 @@ export default function Post({ post, morePosts, preview }) {
             <SectionSeparator />
             <Container>
               <div className="max-w-2xl mx-auto">
-                {morePosts.length > 0 && <MoreStories posts={morePosts} colNum={2} hasTitle={true} />}
+                {morePosts.length > 0 && <MoreStories posts={morePosts} hasMoreCol={false} hasTitle={true} />}
               </div>
             </Container>
           </>
