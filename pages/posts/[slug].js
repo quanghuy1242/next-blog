@@ -48,7 +48,7 @@ export default function Post({ post, morePosts, preview }) {
   )
 }
 
-export async function getStaticProps({ params, preview = null }) {
+export async function getServerSideProps({ params, preview = null }) {
   const data = await getPostAndMorePosts(params.slug, preview)
   const content = await markdownToHtml(data?.post?.content || '')
 
@@ -61,13 +61,5 @@ export async function getStaticProps({ params, preview = null }) {
       },
       morePosts: data?.morePosts,
     },
-  }
-}
-
-export async function getStaticPaths() {
-  const allPosts = await getAllPostsWithSlug()
-  return {
-    paths: allPosts?.map(post => `/posts/${post.slug}`) || [],
-    fallback: true,
   }
 }
