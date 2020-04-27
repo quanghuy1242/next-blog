@@ -12,7 +12,7 @@ import PostTitle from '../../components/post-title'
 import Head from 'next/head'
 import { CMS_NAME } from '../../lib/constants'
 import markdownToHtml from '../../lib/markdownToHtml'
-import { renderMetaTags } from 'react-datocms';
+import { renderMetaTags } from 'react-datocms'; 
 
 export default function Post({ post, morePosts, preview }) {
   const router = useRouter()
