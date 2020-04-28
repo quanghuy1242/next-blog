@@ -1,15 +1,8 @@
 import { HOME_OG_IMAGE_URL } from '../lib/constants';
 
-export default function Banner({
-  title,
-  coverImage,
-  date,
-  excerpt,
-  author,
-  slug,
-}) {
+export default function Banner() {
   return <div
-    className="h-banner mt-16 bg-cover bg-bottom flex flex-col justify-center items-center text-white text-center"
+    className="h-banner bg-cover bg-bottom flex flex-col justify-center items-center text-white text-center"
     style={{ backgroundImage: `url(${HOME_OG_IMAGE_URL})` }}
   >
     <h1 className="text-7xl font-thin" style={{ lineHeight: '3.5rem' }}>Dark Blue Pattern</h1>

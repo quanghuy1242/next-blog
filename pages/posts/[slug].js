@@ -3,7 +3,6 @@ import ErrorPage from 'next/error'
 import Container from '../../components/container'
 import PostBody from '../../components/post-body'
 import MoreStories from '../../components/more-stories'
-import Header from '../../components/header'
 import PostHeader from '../../components/post-header'
 import SectionSeparator from '../../components/section-separator'
 import Layout from '../../components/layout'
@@ -12,7 +11,6 @@ import PostTitle from '../../components/post-title'
 import Head from 'next/head'
 import markdownToHtml from '../../lib/markdownToHtml'
 import { renderMetaTags } from 'react-datocms'; 
-import Avatar from '../../components/avatar'
 
 export default function Post({ post, morePosts, preview }) {
   const router = useRouter()
@@ -21,8 +19,6 @@ export default function Post({ post, morePosts, preview }) {
   }
   return (
     <Layout preview={preview}>
-      <Header />
-      <div className="mt-16" />
       {router.isFallback ? (
           <PostTitle>Loading…</PostTitle>
         ) : (
@@ -35,15 +31,26 @@ export default function Post({ post, morePosts, preview }) {
                 title={post.title}
                 coverImage={post.coverImage}
                 date={post.date}
+                category={post.category}
               />
               <Container>
-                <PostBody content={post.content} author={post.author} />
+                <PostBody
+                  content={post.content}
+                  author={post.author}
+                  tags={post.tags.split(', ').filter(Boolean)}
+                />
               </Container>
             </article>
             <SectionSeparator />
             <Container>
               <div className="max-w-2xl mx-auto">
-                {morePosts.length > 0 && <MoreStories posts={morePosts} hasMoreCol={false} hasTitle={true} />}
+                {morePosts.length > 0 && (
+                  <MoreStories
+                    posts={morePosts}
+                    hasMoreCol={false}
+                    hasTitle={true}
+                  />
+                )}
               </div>
             </Container>
           </>
