@@ -4,22 +4,31 @@ import Layout from '../components/layout'
 import { getAllPostsForHome } from '../lib/api'
 import Head from 'next/head'
 import Banner from '../components/banner'
-import CoverImage from '../components/cover-image'
+import { renderMetaTags } from 'react-datocms'
+import CategoryPanel from '../components/category-panel'
+import Title from '../components/title'
+import About from '../components/about'
 
-export default function Index({ allPosts }) {
+export default function Index({ allPosts, homepage, allCategories, author }) {
   return (
     <Layout>
       <Head>
-        <title>Quang Huy Blog</title>
+        {renderMetaTags(homepage.metadata)}
       </Head>
-      <Banner />
+      <Banner header={homepage.header} subHeader={homepage.subHeader} />
       <Container>
-        <div className="mt-10 flex md:flex-row flex-col md:px-20">
+        <div className="my-2 flex md:flex-row flex-col md:px-20">
           <div className="flex-grow md:w-2/3 md:mr-6">
+            <Title text="Latest Posts" />
             <MoreStories posts={allPosts} hasMoreCol={false} />
           </div>
           <div className="md:w-1/3">
-            <CoverImage responsiveImage={allPosts[2].coverImage.responsiveImage} />
+            <CategoryPanel categories={allCategories} />
+            <About
+              displayName={author.displayName}
+              picture={author.picture}
+              description={author.description}
+            />
           </div>
         </div>
       </Container>
@@ -28,8 +37,8 @@ export default function Index({ allPosts }) {
 }
 
 export async function getServerSideProps({ preview }) {
-  const allPosts = (await getAllPostsForHome(preview)) || []
+  const data = (await getAllPostsForHome(preview)) || []
   return {
-    props: { allPosts }
+    props: data
   }
 }
