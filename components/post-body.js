@@ -13,7 +13,7 @@ export default function PostBody({ content, author, tags }) {
         <div className="flex-grow" />
         <Avatar name={author.name} picture={author.picture} />
       </div>
-      {tags.length && <TagList items={tags} />}
+      {!!tags.length && <TagList items={tags} />}
     </div>
   )
 }
