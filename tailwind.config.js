@@ -7,7 +7,8 @@ module.exports = {
         'accent-7': '#333',
         success: '#0070f3',
         cyan: '#79FFE1',
-        blue: '#416275'
+        blue: '#416275',
+        darkBlue: '#3a5a6b'
       },
       spacing: {
         28: '7rem',
@@ -32,6 +33,9 @@ module.exports = {
       height: {
         banner: '20rem'
       },
+      width: {
+        searchBar: '450px'
+      }
     },
   },
 }
