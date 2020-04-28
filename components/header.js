@@ -5,7 +5,7 @@ export default function Header() {
     <div className="bg-blue p-2 shadow-dark fixed w-full h-16 top-0 z-50 flex items-center">
       <h3 className="text-2xl font-semibold pl-2 my-2 tracking-tight md:tracking-tighter leading-tight text-white mr-4 z-50">
         <Link href="/">
-          <a className="hover:underline whitespace-no-wrap md:hidden">Birdless</a>
+          <a className="hover:underline whitespace-no-wrap md:hidden">BS</a>
         </Link>
         <Link href="/">
           <a className="hover:underline whitespace-no-wrap hidden md:block">Birdless Sky</a>
