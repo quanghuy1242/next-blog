@@ -47,7 +47,6 @@ export default function Post({ post, morePosts, preview }) {
                 {morePosts.length > 0 && (
                   <MoreStories
                     posts={morePosts}
-                    hasMoreCol={false}
                     hasTitle={true}
                   />
                 )}
