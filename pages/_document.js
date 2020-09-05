@@ -4,10 +4,13 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head />
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-LCDKH73MHQ"></script>
+        <Head>
         <script async src="/gtag.js"></script>
+        </Head>
         <body>
+          <noscript>
+            <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WHRN24T" height="0" width="0" style={{display: 'none', visibility: 'hidden'}}></iframe>
+          </noscript>
           <Main />
           <NextScript />
         </body>
