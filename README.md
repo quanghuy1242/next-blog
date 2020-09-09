@@ -1,3 +1,3 @@
 # Next Blog
 
-Welcome! https://quanghuy.now.sh/
+Welcome! https://blog.quanghuy.dev/
