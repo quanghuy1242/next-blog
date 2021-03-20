@@ -32,7 +32,11 @@ export default function PostPreview({
         <Date dateString={date} />
       </div>
       <div>
-        <Badge text={category.name} link={{ as: `/posts/${slug}`, href: '/posts/[slug]' }} />
+        <Badge
+          text={category.name}
+          enableBorder={true}
+          link={{ as: `/posts/${slug}`, href: '/posts/[slug]' }}
+        />
         {tags.map(item => (
           <Badge
             text={item}
