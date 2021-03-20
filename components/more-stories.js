@@ -20,6 +20,7 @@ export default function MoreStories({ posts, hasMoreCol = true, hasTitle = false
             slug={post.slug}
             excerpt={post.excerpt}
             category={post.category}
+            tags={post.tags.split(', ').filter(Boolean)}
           />
         ))}
       </div>
