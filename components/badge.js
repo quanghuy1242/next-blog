@@ -13,7 +13,7 @@ export default function Badge({
     borderStyle = "border-solid border-1 border-gray-500";
   }
   return (
-    <span className={cn(className, enableBorder, defaultStyle)}>
+    <span className={cn(className, borderStyle, defaultStyle)}>
       <Link as={link.as} href={link.href}>
         <a>{text}</a>
       </Link>
