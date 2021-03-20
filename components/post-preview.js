@@ -11,7 +11,8 @@ export default function PostPreview({
   excerpt,
   author,
   slug,
-  category = ''
+  category = '',
+  tags = []
 }) {
   return (
     <div>
@@ -30,9 +31,19 @@ export default function PostPreview({
       <div className="text-sm text-gray-700 mb-1">
         <Date dateString={date} />
       </div>
-      <Badge text={category.name} link={{ as: `/posts/${slug}`, href: '/posts/[slug]' }} />
+      <div>
+        <Badge text={category.name} link={{ as: `/posts/${slug}`, href: '/posts/[slug]' }} />
+        {tags.map(item => (
+          <Badge
+            text={item}
+            link={{ as: `/posts/${slug}`, href: '/posts/[slug]' }}
+            className="ml-2"
+            key={item}
+          />
+      ))}
+      </div>
       <p className="text-base leading-relaxed mb-4 mt-2">{excerpt}</p>
-      <Avatar name={author.name} picture={author.picture} />
+      <Avatar name={author.displayName} picture={author.picture} />
     </div>
   )
 }
