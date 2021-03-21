@@ -12,7 +12,7 @@ export default function Category({
     <a className={cn(className, "block relative")}>
       <CoverImage responsiveImage={image.responsiveImage} />
       <div className="absolute flex top-0 left-0 bottom-0 right-0 justify-center items-center">
-        <div className="text-white md:text-3xl text-2xl">{name}</div>
+        <div className="text-white md:text-2xl text-xl">{name}</div>
       </div>
     </a>
   </Link>

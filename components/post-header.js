@@ -6,7 +6,7 @@ import Badge from './badge'
 export default function PostHeader({ title, coverImage, date, category }) {
   return (
     <>
-      <div className="mb-4 md:mb-4 -mx-5 sm:mx-0 h-banner overflow-hidden">
+      <div className="mb-2 mx-0 h-banner overflow-hidden">
         <CoverImage
           title={title}
           responsiveImage={coverImage.responsiveImage}

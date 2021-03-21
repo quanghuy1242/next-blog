@@ -1,7 +1,7 @@
 import Meta from './meta'
 import Header from './header'
 
-export default function Layout({ preview, children }) {
+export default function Layout({ children }) {
   return (
     <>
       <Meta />

@@ -14,7 +14,7 @@ export default function Badge({
   }
   return (
     <span className={cn(className, borderStyle, defaultStyle)}>
-      <Link as={link.as} href={link.href}>
+      <Link as={link.as} href={link.href} prefetch={false}>
         <a>{text}</a>
       </Link>
     </span>
