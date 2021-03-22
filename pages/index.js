@@ -47,6 +47,7 @@ export default function Index({ allPosts, homepage, allCategories, author }) {
 export async function getStaticProps() {
   const data = (await getDataForHome()) || []
   return {
-    props: data
+    props: data,
+    revalidate: 60
   }
 }
