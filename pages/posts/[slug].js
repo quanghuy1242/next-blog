@@ -7,7 +7,6 @@ import PostHeader from '../../components/post-header'
 import SectionSeparator from '../../components/section-separator'
 import Layout from '../../components/layout'
 import { getDataForPostSlug } from '../../apis/posts.slug'
-import PostTitle from '../../components/post-title'
 import Head from 'next/head'
 import markdownToHtml from '../../lib/markdownToHtml'
 import { renderMetaTags } from 'react-datocms';
@@ -52,13 +51,19 @@ export default function Post({ post, morePosts }) {
   )
 }
 
-export async function getServerSideProps({ params, preview = null }) {
-  const data = await getDataForPostSlug(params.slug, preview)
+export async function getStaticPaths() {
+  return {
+    paths: [], // indicates that no page needs be created at build time
+    fallback: 'blocking' // indicates the type of fallback
+}
+}
+
+export async function getStaticProps({ params }) {
+  const data = await getDataForPostSlug(params.slug)
   const content = await markdownToHtml(data?.post?.content || '')
 
   return {
     props: {
-      preview,
       post: {
         ...data?.post,
         content,

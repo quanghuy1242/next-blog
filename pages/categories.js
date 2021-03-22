@@ -23,8 +23,8 @@ export default function Categories({ allPosts, homepage, allCategories, author }
   )
 }
 
-export async function getServerSideProps({ preview }) {
-  const data = (await getDataForHome(preview)) || []
+export async function getStaticProps() {
+  const data = (await getDataForHome()) || []
   return {
     props: data
   }
