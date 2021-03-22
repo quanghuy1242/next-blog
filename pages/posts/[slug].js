@@ -70,5 +70,6 @@ export async function getStaticProps({ params }) {
       },
       morePosts: data?.morePosts,
     },
+    revalidate: 60
   }
 }
