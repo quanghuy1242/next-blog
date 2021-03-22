@@ -1,6 +1,6 @@
 import { fetchAPI, responsiveImageFragment } from "./base";
 
-export async function getDataForHome(preview) {
+export async function getDataForHome() {
   const data = await fetchAPI(
     `#graphql
       {
@@ -56,8 +56,7 @@ export async function getDataForHome(preview) {
       }
   
       ${responsiveImageFragment}
-    `,
-    { preview }
+    `
   )
   return data;
 }
