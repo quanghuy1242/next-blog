@@ -36,6 +36,7 @@ export async function getDataForHome() {
         }
         allCategories(orderBy: updatedAt_DESC, first: 2) {
           name
+          description
           image {
             responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
               ...responsiveImageFragment
