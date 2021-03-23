@@ -10,6 +10,7 @@ export default function CategoryPanel({
       {categories.map(category => (
         <Category
           name={category.name}
+          description={category.description}
           image={category.image}
           slug={category.slug}
           key={category.slug}
