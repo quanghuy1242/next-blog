@@ -47,7 +47,6 @@ export default function PostPreview({
       ))}
       </div>
       <p className="text-base leading-relaxed mb-4 mt-2">{excerpt}</p>
-      <Avatar name={author.displayName} picture={author.picture} />
     </div>
   )
 }

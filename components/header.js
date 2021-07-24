@@ -71,7 +71,7 @@ const NavigatorSeparator = () => (
 
 const NavigatorWrapper = ({ children }) => {
   return (
-    <div className="md:w-full justify-end relative">
+    <div className="justify-end relative">
       {children}
     </div>
   )
@@ -89,13 +89,13 @@ export default function Header() {
   return (
     <div className="bg-blue p-2 shadow-dark fixed w-full h-16 top-0 z-50 flex items-center">
       <HeaderTitle text={header} link='/' />
-      <NavigatorSeparator />
+      {/* <NavigatorSeparator />
       <NavigatorWrapper>
         <ToggleButton isOpen={isOpen} setIsOpen={setIsOpen} />
         <Navigator isOpen={isOpen} links={links}>
           <SeachBox />
         </Navigator>
-      </NavigatorWrapper>
+      </NavigatorWrapper> */}
     </div>
   )
 }

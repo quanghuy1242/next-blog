@@ -7,7 +7,7 @@ export default function Badge({
   enableBorder=false,
   className
 }) {
-  let defaultStyle = 'bg-gray-400 p-1 pl-2 pr-2 text-xs rounded hover:bg-gray-500'
+  let defaultStyle = 'bg-gray-300 p-1 pl-2 pr-2 text-xs rounded hover:bg-gray-400'
   let borderStyle = '';
   if (enableBorder) {
     borderStyle = "border-solid border-1 border-gray-500";
