@@ -6,7 +6,7 @@ export default function MoreStories({ posts, hasMoreCol = true, hasTitle = false
   return (
     <section>
       {hasTitle && <PostTitle>More post:</PostTitle>}
-      <div className={cn('grid grid-cols-1 md:gap-x-10 lg:gap-x-10 gap-y-10 md:gap-y-10 mb-32', {
+      <div className={cn('grid grid-cols-1 md:gap-x-10 lg:gap-x-10 gap-y-10 md:gap-y-10 mb-10', {
         'md:grid-cols-2': hasMoreCol,
         'md:grid-cols-1': !hasMoreCol
       })}>

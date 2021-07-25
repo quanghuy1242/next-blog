@@ -1,8 +1,16 @@
 require('dotenv').config()
 
-module.exports = {
+const withTM = require('next-transpile-modules')([
+  'hastscript',
+  'property-information',
+  'hast-util-parse-selector',
+  'space-separated-tokens',
+  'comma-separated-tokens'
+])
+
+module.exports = withTM({
   env: {
     NEXT_EXAMPLE_CMS_DATOCMS_API_TOKEN:
       process.env.NEXT_EXAMPLE_CMS_DATOCMS_API_TOKEN,
   },
-}
+})
