@@ -5,7 +5,7 @@ export default function PostBody({ content, author, tags }) {
   return (
     <div className="max-w-2xl mx-auto">
       <div
-        className="prose mb-4"
+        className="prose prose-directive mb-4"
         dangerouslySetInnerHTML={{ __html: content }}
       />
       {!!tags.length && <TagList items={tags} />}
