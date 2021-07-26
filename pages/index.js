@@ -1,15 +1,15 @@
-import Container from '../components/container'
-import MoreStories from '../components/more-stories'
-import Layout from '../components/layout'
-import { getDataForHome } from '../apis/index'
+import { getDataForHome } from 'common/apis/index'
+import About from 'components/about'
+import Banner from 'components/banner'
+import CategoryPanel from 'components/category-panel'
+import Container from 'components/container'
+import Layout from 'components/layout'
+import MoreStories from 'components/more-stories'
+import Title from 'components/title'
+import { useAppContext } from 'context/state'
 import Head from 'next/head'
-import Banner from '../components/banner'
-import { renderMetaTags } from 'react-datocms'
-import CategoryPanel from '../components/category-panel'
-import Title from '../components/title'
-import About from '../components/about'
-import { useAppContext } from '../context/state';
 import { useEffect } from 'react'
+import { renderMetaTags } from 'react-datocms'
 
 export default function Index({ allPosts, homepage, allCategories, author }) {
   const { changeHeader } = useAppContext();

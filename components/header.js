@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useState } from 'react';
 import cn from 'classnames';
-import { useAppContext } from '../context/state';
+import { useAppContext } from 'context/state';
 
 /**
  * @param {Object} props The props of the component

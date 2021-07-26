@@ -1,10 +1,10 @@
-import Layout from '../components/layout'
-import { getDataForHome } from '../apis/index'
-import Head from 'next/head'
-import { renderMetaTags } from 'react-datocms'
-import { useAppContext } from '../context/state';
-import { useEffect } from 'react'
-import { Placeholder } from '../components/placeholder';
+import { getDataForHome } from 'common/apis/index';
+import Layout from 'components/layout';
+import { Placeholder } from 'components/placeholder';
+import { useAppContext } from 'context/state';
+import Head from 'next/head';
+import { useEffect } from 'react';
+import { renderMetaTags } from 'react-datocms';
 
 export default function Categories({ allPosts, homepage, allCategories, author }) {
   const { changeHeader } = useAppContext()

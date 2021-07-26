@@ -1,4 +1,4 @@
-import PostPreview from '../components/post-preview'
+import PostPreview from 'components/post-preview'
 import PostTitle from './post-title'
 import cn from 'classnames'
 

@@ -1,8 +1,8 @@
-import '../styles/index.css'
-import Router from 'next/router'
-import * as gtag from '../lib/gtag'
-import { AppWrapper } from '../context/state'
-import { useRef, useEffect } from 'react';
+import * as gtag from 'common/gtag';
+import { AppWrapper } from 'context/state';
+import Router from 'next/router';
+import { useEffect, useRef } from 'react';
+import '../styles/index.css';
 
 function MyApp({ Component, pageProps, router }) {
   // Using useRef to avoid unwanted re-render

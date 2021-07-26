@@ -1,15 +1,15 @@
-import { useRouter } from 'next/router'
+import { getDataForPostSlug } from 'common/apis/posts.slug'
+import markdownToHtml from 'common/markdownToHtml'
+import Container from 'components/container'
+import Layout from 'components/layout'
+import MoreStories from 'components/more-stories'
+import PostBody from 'components/post-body'
+import PostHeader from 'components/post-header'
+import SectionSeparator from 'components/section-separator'
 import ErrorPage from 'next/error'
-import Container from '../../components/container'
-import PostBody from '../../components/post-body'
-import MoreStories from '../../components/more-stories'
-import PostHeader from '../../components/post-header'
-import SectionSeparator from '../../components/section-separator'
-import Layout from '../../components/layout'
-import { getDataForPostSlug } from '../../apis/posts.slug'
 import Head from 'next/head'
-import markdownToHtml from '../../lib/markdownToHtml'
-import { renderMetaTags } from 'react-datocms';
+import { useRouter } from 'next/router'
+import { renderMetaTags } from 'react-datocms'
 
 export default function Post({ post, morePosts }) {
   const router = useRouter()
