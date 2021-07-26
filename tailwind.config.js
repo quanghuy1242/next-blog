@@ -1,3 +1,5 @@
+const plugin = require('tailwindcss/plugin')
+
 module.exports = {
   theme: {
     extend: {
@@ -39,6 +41,26 @@ module.exports = {
     },
   },
   plugins: [
-    require('@tailwindcss/typography')
+    require('@tailwindcss/typography'),
+    plugin(function({ addUtilities }) {
+      const newUtilities = {
+        '.youtube-container': {
+          display: 'block',
+          position: 'relative',
+          paddingBottom: `${100*9/16}%`,
+          paddingTop: '30px',
+          height: '0',
+          overflow: 'hidden',
+        },
+        '.youtube-content': {
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          width: '100%',
+          height: '100%',
+        },
+      }
+      addUtilities(newUtilities)
+    })
   ]
 }
