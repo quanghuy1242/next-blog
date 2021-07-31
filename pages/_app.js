@@ -12,21 +12,21 @@ function MyApp({ Component, pageProps, router }) {
    * Save current scroll position
    * @param {string} url Page path
    */
-  const savePos = url => {
+  const savePos = (url) => {
     const scrollPos = { x: window.scrollX, y: window.scrollY };
     posRef.current = { ...posRef.current, [url]: scrollPos };
-  }
+  };
 
   /**
    * Restore scroll position of the provided path
    * @param {string} url Page path
    */
-  const restorePos = url => {
+  const restorePos = (url) => {
     const scrollPos = posRef.current[url];
     if (scrollPos) {
       window.scrollTo(scrollPos.x, scrollPos.y);
     }
-  }
+  };
 
   // The hacky way to fix the restore scroll position
   useEffect(() => {
@@ -35,7 +35,7 @@ function MyApp({ Component, pageProps, router }) {
       window.history.scrollRestoration = 'manual';
       restorePos(router.asPath, posRef);
 
-      const onBeforeUnload = event => {
+      const onBeforeUnload = (event) => {
         savePos(router.asPath, posRef);
         delete event['returnValue'];
       };
@@ -44,7 +44,7 @@ function MyApp({ Component, pageProps, router }) {
         savePos(router.asPath, posRef);
       };
 
-      const onRouteChangeComplete = url => {
+      const onRouteChangeComplete = (url) => {
         // Send static about current page to Google Analyzes
         gtag.pageview(url);
         if (shouldScrollRestore) {
@@ -73,7 +73,7 @@ function MyApp({ Component, pageProps, router }) {
     <AppWrapper>
       <Component {...pageProps} />
     </AppWrapper>
-  )
+  );
 }
 
-export default MyApp
+export default MyApp;

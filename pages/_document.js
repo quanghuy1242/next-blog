@@ -1,5 +1,5 @@
-import { GA_TRACKING_ID } from 'common/gtag'
-import Document, { Head, Html, Main, NextScript } from 'next/document'
+import { GA_TRACKING_ID } from 'common/gtag';
+import Document, { Head, Html, Main, NextScript } from 'next/document';
 
 export default class MyDocument extends Document {
   render() {
@@ -29,6 +29,6 @@ export default class MyDocument extends Document {
           <NextScript />
         </body>
       </Html>
-    )
+    );
   }
 }
