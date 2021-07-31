@@ -1,7 +1,7 @@
-import Date from 'components/date'
-import CoverImage from 'components/cover-image'
-import PostTitle from 'components/post-title'
-import Badge from './badge'
+import Date from 'components/date';
+import CoverImage from 'components/cover-image';
+import PostTitle from 'components/post-title';
+import Badge from './badge';
 
 export default function PostHeader({ title, coverImage, date, category }) {
   return (
@@ -22,5 +22,5 @@ export default function PostHeader({ title, coverImage, date, category }) {
         </div>
       </div>
     </>
-  )
+  );
 }

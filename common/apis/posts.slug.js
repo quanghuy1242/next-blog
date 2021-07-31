@@ -1,4 +1,4 @@
-import { fetchAPI, responsiveImageFragment } from "./base"
+import { fetchAPI, responsiveImageFragment } from './base';
 
 export async function getDataForPostSlug(slug, preview) {
   const data = await fetchAPI(
@@ -10,7 +10,7 @@ export async function getDataForPostSlug(slug, preview) {
         content
         date
         ogImage: coverImage{
-          url(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 })
+          url(imgixParams: {fm: jpg, fit: crop, w: 1000, h: 500 })
         }
         coverImage {
           responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
@@ -55,6 +55,10 @@ export async function getDataForPostSlug(slug, preview) {
         }
         tags
       }
+
+      homepage {
+        header
+      }
     }
 
     ${responsiveImageFragment}
@@ -65,6 +69,6 @@ export async function getDataForPostSlug(slug, preview) {
         slug,
       },
     }
-  )
-  return data
+  );
+  return data;
 }

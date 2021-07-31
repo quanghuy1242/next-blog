@@ -1,8 +1,8 @@
-import Avatar from 'components/avatar'
-import Date from 'components/date'
-import CoverImage from './cover-image'
-import Link from 'next/link'
-import Badge from './badge'
+import Avatar from 'components/avatar';
+import Date from 'components/date';
+import CoverImage from './cover-image';
+import Link from 'next/link';
+import Badge from './badge';
 
 export default function PostPreview({
   title,
@@ -12,7 +12,7 @@ export default function PostPreview({
   author,
   slug,
   category = '',
-  tags = []
+  tags = [],
 }) {
   return (
     <div>
@@ -37,16 +37,16 @@ export default function PostPreview({
           enableBorder={true}
           link={{ as: `/posts/${slug}`, href: '/posts/[slug]' }}
         />
-        {tags.map(item => (
+        {tags.map((item) => (
           <Badge
             text={item}
             link={{ as: `/posts/${slug}`, href: '/posts/[slug]' }}
             className="ml-2"
             key={item}
           />
-      ))}
+        ))}
       </div>
       <p className="text-base leading-relaxed mb-4 mt-2">{excerpt}</p>
     </div>
-  )
+  );
 }

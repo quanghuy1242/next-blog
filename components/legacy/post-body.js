@@ -1,5 +1,5 @@
-import Avatar from './avatar'
-import TagList from './tag-list'
+import Avatar from './avatar';
+import TagList from './tag-list';
 
 export default function PostBody({ content, author, tags }) {
   return (
@@ -10,5 +10,5 @@ export default function PostBody({ content, author, tags }) {
       />
       {!!tags.length && <TagList items={tags} />}
     </div>
-  )
+  );
 }

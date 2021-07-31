@@ -1,7 +1,7 @@
-import 'isomorphic-unfetch'
+import 'isomorphic-unfetch';
 
-const API_URL = 'https://graphql.datocms.com'
-const API_TOKEN = process.env.NEXT_EXAMPLE_CMS_DATOCMS_API_TOKEN
+const API_URL = 'https://graphql.datocms.com';
+const API_TOKEN = process.env.NEXT_EXAMPLE_CMS_DATOCMS_API_TOKEN;
 
 // See: https://www.datocms.com/blog/offer-responsive-progressive-lqip-images-in-2020
 export const responsiveImageFragment = `#graphql
@@ -18,7 +18,7 @@ export const responsiveImageFragment = `#graphql
     bgColor
     base64
   }
-`
+`;
 
 // Rework this with useSWR
 export async function fetchAPI(query, { variables, preview } = {}) {
@@ -32,12 +32,12 @@ export async function fetchAPI(query, { variables, preview } = {}) {
       query,
       variables,
     }),
-  })
+  });
 
-  const json = await res.json()
+  const json = await res.json();
   if (json.errors) {
-    console.error(json.errors)
-    throw new Error('Failed to fetch API')
+    console.error(json.errors);
+    throw new Error('Failed to fetch API');
   }
   return json.data;
 }

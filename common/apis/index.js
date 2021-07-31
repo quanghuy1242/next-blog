@@ -1,4 +1,4 @@
-import { fetchAPI, responsiveImageFragment } from "./base";
+import { fetchAPI, responsiveImageFragment } from './base';
 
 export async function getDataForHome() {
   const data = await fetchAPI(
@@ -58,6 +58,6 @@ export async function getDataForHome() {
   
       ${responsiveImageFragment}
     `
-  )
+  );
   return data;
 }

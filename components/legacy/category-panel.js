@@ -1,13 +1,11 @@
-import Category from "./category";
-import Title from "./title";
+import Category from './category';
+import Title from './title';
 
-export default function CategoryPanel({
-  categories = []
-}) {
+export default function CategoryPanel({ categories = [] }) {
   return (
     <div>
       <Title text="Categories" />
-      {categories.map(category => (
+      {categories.map((category) => (
         <Category
           name={category.name}
           description={category.description}

@@ -1,53 +1,40 @@
-import { getDataForHome } from 'common/apis/index'
-import About from 'components/about'
-import Banner from 'components/banner'
-import CategoryPanel from 'components/category-panel'
-import Container from 'components/container'
-import Layout from 'components/layout'
-import MoreStories from 'components/more-stories'
-import Title from 'components/title'
-import { useAppContext } from 'context/state'
-import Head from 'next/head'
-import { useEffect } from 'react'
-import { renderMetaTags } from 'react-datocms'
+import { getDataForHome } from 'common/apis/index';
+import { Container } from 'components/core/container';
+import { Layout } from 'components/core/layout';
+import { Banner } from 'components/pages/index/banner';
+import { Categories } from 'components/shared/categories';
+import { Posts } from 'components/shared/posts';
+import { Text } from 'components/shared/text';
+import Head from 'next/head';
+import { renderMetaTags } from 'react-datocms';
 
-export default function Index({ allPosts, homepage, allCategories, author }) {
-  const { changeHeader } = useAppContext();
-
-  useEffect(() => {
-    changeHeader(homepage.header);
-  }, [homepage])
-
+export default function Index({ allPosts, homepage, allCategories }) {
   return (
-    <Layout>
-      <Head>
-        {renderMetaTags(homepage.metadata)}
-      </Head>
-      <Banner header={homepage.header} subHeader={homepage.subHeader} />
-      <Container>
-        <div className="my-2 flex md:flex-row flex-col md:px-20">
-          <div className="flex-grow md:w-2/3 md:mr-6">
-            <Title text="Latest Posts" />
-            <MoreStories posts={allPosts} hasMoreCol={false} />
-          </div>
-          <div className="md:w-1/3">
-            <CategoryPanel categories={allCategories} />
-            <About
-              displayName={author.displayName}
-              picture={author.picture}
-              description={author.description}
-            />
-          </div>
+    <Layout header={homepage.header} className="flex flex-col items-center">
+      <Head>{renderMetaTags(homepage.metadata)}</Head>
+      <Banner
+        header={homepage.header}
+        subHeader={homepage.subHeader}
+        className="w-full"
+      />
+      <Container className="flex flex-col md:flex-row md:px-20">
+        <div className="flex-grow md:w-2/3 md:mr-6">
+          <Text text="Latest Posts" />
+          <Posts posts={allPosts} hasMoreCol={false} />
+        </div>
+        <div className="md:w-1/3">
+          <Text text="Categories" />
+          <Categories categories={allCategories} />
         </div>
       </Container>
     </Layout>
-  )
+  );
 }
 
 export async function getStaticProps() {
-  const data = (await getDataForHome()) || []
+  const data = (await getDataForHome()) || [];
   return {
     props: data,
-    revalidate: 60
-  }
+    revalidate: 60,
+  };
 }

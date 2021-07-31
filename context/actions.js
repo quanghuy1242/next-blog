@@ -1,6 +1,6 @@
 /**
  * @typedef {(value: string) => void} ChangeFuncType
- * 
+ *
  * @typedef {Object} ChangeStatesType
  * @property {ChangeFuncType} changeHeader - Change header of the Application
  */
@@ -15,6 +15,6 @@ export const changeHeader = 'changeHeader';
  */
 export function getChangeStateFuncs(dispatch) {
   return {
-    changeHeader: value => dispatch({ type: changeHeader, value: value })
-  }
+    changeHeader: (value) => dispatch({ type: changeHeader, value: value }),
+  };
 }

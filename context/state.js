@@ -15,8 +15,8 @@ const AppContext = createContext();
 function init() {
   return {
     // Header of the whole application
-    header: "Birdless Sky"
-  }
+    header: 'Birdless Sky',
+  };
 }
 
 /**
@@ -28,10 +28,10 @@ function init() {
 function reducer(state, action) {
   switch (action.type) {
     case changeHeader: {
-      return {...state, header: action.value}
+      return { ...state, header: action.value };
     }
     default:
-      throw Error("What is this?");
+      throw Error('What is this?');
   }
 }
 
@@ -40,7 +40,7 @@ function reducer(state, action) {
  * @returns {JSX.Element} - AppContext Wrapper
  */
 export function AppWrapper({ children }) {
-  let [state, dispatch] = useReducer(reducer, init())
+  let [state, dispatch] = useReducer(reducer, init());
 
   return (
     <AppContext.Provider value={{ ...state, ...getChangeStateFuncs(dispatch) }}>
