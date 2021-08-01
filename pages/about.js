@@ -1,25 +1,33 @@
-import { getDataForHome } from 'common/apis/index';
+import { getDataForAbout, getDataContentForAbout } from 'common/apis/author';
+import markdownToHtml from 'common/markdown-to-html';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
-import { NotYetImplemented } from 'components/core/not-yet-implemented';
 import Head from 'next/head';
 import { renderMetaTags } from 'react-datocms';
 
-export default function Index({ homepage }) {
+export default function Index({ homepage, author, githubReadMeContent }) {
   return (
-    <Layout>
-      <Head>{renderMetaTags(homepage.metadata)}</Head>
-      <Container className="flex flex-col md:flex-row md:px-20">
-        <NotYetImplemented />
+    <Layout header={homepage.header} className="flex flex-col items-center">
+      <Head>{renderMetaTags(author.metadata)}</Head>
+      <Container className="flex flex-col items-center md:px-20 my-4 px-4">
+        <div
+          className="prose"
+          dangerouslySetInnerHTML={{ __html: githubReadMeContent }}
+        />
       </Container>
     </Layout>
   );
 }
 
 export async function getStaticProps() {
-  const data = (await getDataForHome()) || [];
+  const data = (await getDataForAbout('quanghuy1242')) || [];
+  const md = await getDataContentForAbout(data.author.externalContentUrl);
+  const content = await markdownToHtml(md || '');
   return {
-    props: data,
+    props: {
+      ...data,
+      githubReadMeContent: content,
+    },
     revalidate: 60,
   };
 }
