@@ -5,10 +5,10 @@ import { NotYetImplemented } from 'components/core/not-yet-implemented';
 import Head from 'next/head';
 import { renderMetaTags } from 'react-datocms';
 
-export default function Index({ homepage }) {
+export default function Index({ homepage = {} }) {
   return (
     <Layout>
-      <Head>{renderMetaTags(homepage.metadata)}</Head>
+      <Head>{renderMetaTags(homepage?.metadata || [])}</Head>
       <Container className="flex flex-col md:flex-row md:px-20">
         <NotYetImplemented />
       </Container>
@@ -17,9 +17,11 @@ export default function Index({ homepage }) {
 }
 
 export async function getStaticProps() {
-  const data = (await getDataForHome()) || [];
+  const apiData = (await getDataForHome()) || {}; // Ensure data is an object
   return {
-    props: data,
+    props: {
+      homepage: apiData.homepage || {},
+    },
     revalidate: 60,
   };
 }

@@ -5,10 +5,10 @@ import { Layout } from 'components/core/layout';
 import Head from 'next/head';
 import { renderMetaTags } from 'react-datocms';
 
-export default function Index({ homepage, author, githubReadMeContent }) {
+export default function Index({ homepage = {}, author = {}, githubReadMeContent }) {
   return (
-    <Layout header={homepage.header} className="flex flex-col items-center">
-      <Head>{renderMetaTags(author.metadata)}</Head>
+    <Layout header={homepage?.header} className="flex flex-col items-center">
+      <Head>{renderMetaTags(author?.metadata || [])}</Head>
       <Container className="flex flex-col items-center md:px-20 my-4 px-4">
         <div
           className="prose"
@@ -20,12 +20,13 @@ export default function Index({ homepage, author, githubReadMeContent }) {
 }
 
 export async function getStaticProps() {
-  const data = (await getDataForAbout('quanghuy1242')) || [];
-  const md = await getDataContentForAbout(data.author.externalContentUrl);
+  const apiData = (await getDataForAbout('quanghuy1242')) || {};
+  const md = await getDataContentForAbout(apiData?.author?.externalContentUrl);
   const content = await markdownToHtml(md || '');
   return {
     props: {
-      ...data,
+      homepage: apiData.homepage || {},
+      author: apiData.author || {},
       githubReadMeContent: content,
     },
     revalidate: 60,

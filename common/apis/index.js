@@ -61,3 +61,43 @@ export async function getDataForHome() {
   );
   return data;
 }
+
+export async function getMorePosts(limit, skip) {
+  console.log(`getMorePosts called with limit: ${limit}, skip: ${skip}`);
+  const data = await fetchAPI(
+    `#graphql
+      query GetMorePosts($limit: IntType!, $skip: IntType!) {
+        allPosts(orderBy: date_DESC, first: $limit, skip: $skip) {
+          title
+          slug
+          excerpt
+          date
+          coverImage {
+            responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
+              ...responsiveImageFragment
+            }
+          }
+          author {
+            displayName
+            picture {
+              url(imgixParams: {fm: jpg, fit: crop, w: 100, h: 100})
+            }
+          }
+          category {
+            name
+          }
+          tags
+        }
+      }
+  
+      ${responsiveImageFragment}
+    `,
+    {
+      variables: {
+        limit,
+        skip,
+      },
+    }
+  );
+  return data;
+}

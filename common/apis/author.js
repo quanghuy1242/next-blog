@@ -30,6 +30,9 @@ export async function getDataForAbout(name) {
 }
 
 export async function getDataContentForAbout(url) {
+  if (!url) {
+    return null; // Or return ''; depending on how downstream code handles it
+  }
   const res = await fetch(url, {
     method: 'GET',
   });
