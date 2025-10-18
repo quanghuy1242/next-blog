@@ -35,8 +35,10 @@ function reducer(state: State, action: Action): State {
     case setHomePosts: {
       return { ...state, homePosts: action.value };
     }
-    default:
-      throw new Error(`Unknown action type: ${action.type as string}`);
+    default: {
+      const _exhaustiveCheck: never = action;
+      throw new Error('Unknown action type');
+    }
   }
 }
 
