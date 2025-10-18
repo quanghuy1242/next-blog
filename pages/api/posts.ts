@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPaginatedPosts } from 'common/apis/posts';
 
-const DEFAULT_LIMIT = 20;
+const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 50;
 
 export default async function handler(

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getDataForHome } from 'common/apis/index';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
@@ -10,6 +10,7 @@ import type { GetStaticProps } from 'next';
 import Head from 'next/head';
 import { renderMetaTags } from 'react-datocms';
 import type { HomePageData, Post } from 'types/datocms';
+import { useAppContext, type HomePostsState } from 'context/state';
 
 interface HomePageProps {
   allPosts: HomePageData['allPosts'];
@@ -17,20 +18,7 @@ interface HomePageProps {
   homepage: HomePageData['homepage'];
 }
 
-interface PostsState {
-  posts: Post[];
-  offset: number;
-  hasMore: boolean;
-}
-
-interface PersistedPostsState extends PostsState {
-  timestamp: number;
-  firstSlug: string | null;
-}
-
 const POSTS_PAGE_SIZE = 5;
-const POSTS_STORAGE_KEY = 'next-blog::home::posts';
-const POSTS_STORAGE_TTL = 10 * 60 * 1000; // 10 minutes
 
 export default function Index({
   allPosts,
@@ -38,34 +26,27 @@ export default function Index({
   allCategories,
 }: HomePageProps) {
   const header = homepage?.header || '';
-  const baselineFirstSlug = allPosts[0]?.slug ?? null;
-  const loaderRef = useRef<HTMLDivElement | null>(null);
-  const hasRestoredState = useRef(false);
+  const initialState = useMemo<HomePostsState>(
+    () => ({
+      posts: allPosts,
+      offset: allPosts.length,
+      hasMore: allPosts.length === POSTS_PAGE_SIZE,
+    }),
+    [allPosts]
+  );
 
-  const [postsState, setPostsState] = useState<PostsState>(() => ({
-    posts: allPosts,
-    offset: allPosts.length,
-    hasMore: allPosts.length === POSTS_PAGE_SIZE,
-  }));
+  const { homePosts, setHomePosts } = useAppContext();
+  const loaderRef = useRef<HTMLDivElement | null>(null);
+
+  const [postsState, setPostsState] = useState<HomePostsState>(
+    () => homePosts ?? initialState
+  );
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || hasRestoredState.current) {
-      return;
-    }
-
-    const restoredState = readPersistedPostsState(baselineFirstSlug);
-
-    if (restoredState) {
-      hasRestoredState.current = true;
-      setPostsState(restoredState);
-    }
-  }, [baselineFirstSlug]);
-
-  useEffect(() => {
-    persistPostsState(postsState);
-  }, [postsState]);
+    setHomePosts(postsState);
+  }, [postsState, setHomePosts]);
 
   const loadMorePosts = useCallback(async () => {
     if (isFetching || !postsState.hasMore) {
@@ -217,68 +198,4 @@ function mergePosts(current: Post[], incoming: Post[]): Post[] {
   }
 
   return merged;
-}
-
-function readPersistedPostsState(
-  baselineFirstSlug: string | null
-): PostsState | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  const raw = window.sessionStorage.getItem(POSTS_STORAGE_KEY);
-
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as PersistedPostsState;
-
-    if (!Array.isArray(parsed.posts) || parsed.posts.length === 0) {
-      return null;
-    }
-
-    if (
-      parsed.firstSlug &&
-      baselineFirstSlug &&
-      parsed.firstSlug !== baselineFirstSlug
-    ) {
-      return null;
-    }
-
-    if (Date.now() - parsed.timestamp > POSTS_STORAGE_TTL) {
-      return null;
-    }
-
-    return {
-      posts: parsed.posts,
-      offset: parsed.offset ?? parsed.posts.length,
-      hasMore:
-        typeof parsed.hasMore === 'boolean'
-          ? parsed.hasMore
-          : parsed.posts.length >= POSTS_PAGE_SIZE,
-    };
-  } catch (error) {
-    console.error('Failed to parse cached posts state', error);
-    return null;
-  }
-}
-
-function persistPostsState(state: PostsState): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  try {
-    const payload: PersistedPostsState = {
-      ...state,
-      timestamp: Date.now(),
-      firstSlug: state.posts[0]?.slug ?? null,
-    };
-
-    window.sessionStorage.setItem(POSTS_STORAGE_KEY, JSON.stringify(payload));
-  } catch (error) {
-    console.error('Failed to persist posts state', error);
-  }
 }
