@@ -37,6 +37,7 @@ export default function Index({
 
   const { homePosts, setHomePosts } = useAppContext();
   const loaderRef = useRef<HTMLDivElement | null>(null);
+  const hasHydratedFromContext = useRef(false);
 
   const [postsState, setPostsState] = useState<HomePostsState>(
     () => homePosts ?? initialState
@@ -45,8 +46,16 @@ export default function Index({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setHomePosts(postsState);
-  }, [postsState, setHomePosts]);
+    if (!hasHydratedFromContext.current && homePosts) {
+      hasHydratedFromContext.current = true;
+      setPostsState(homePosts);
+      return;
+    }
+
+    if (postsState !== homePosts) {
+      setHomePosts(postsState);
+    }
+  }, [homePosts, postsState, setHomePosts]);
 
   const loadMorePosts = useCallback(async () => {
     if (isFetching || !postsState.hasMore) {
