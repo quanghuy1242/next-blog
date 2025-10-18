@@ -5,7 +5,7 @@ export async function getDataForHome(): Promise<HomePageData> {
   const data = await fetchAPI<HomePageData>(
     `#graphql
       {
-        allPosts(orderBy: date_DESC, first: 20) {
+        allPosts(orderBy: date_DESC, first: 5) {
           title
           slug
           excerpt

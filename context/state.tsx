@@ -1,18 +1,29 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useReducer } from 'react';
-import { changeHeader, getChangeStateFuncs, type ChangeStates } from './actions';
+import type { Post } from 'types/datocms';
+import { changeHeader, getChangeStateFuncs, setHomePosts, type ChangeStates } from './actions';
 
 export interface State {
   header: string;
+  homePosts: HomePostsState | null;
 }
 
-export type Action = { type: typeof changeHeader; value: string };
+export interface HomePostsState {
+  posts: Post[];
+  offset: number;
+  hasMore: boolean;
+}
+
+export type Action =
+  | { type: typeof changeHeader; value: string }
+  | { type: typeof setHomePosts; value: HomePostsState | null };
 
 const AppContext = createContext<(State & ChangeStates) | undefined>(undefined);
 
 function init(): State {
   return {
     header: 'Birdless Sky',
+    homePosts: null,
   };
 }
 
@@ -21,8 +32,13 @@ function reducer(state: State, action: Action): State {
     case changeHeader: {
       return { ...state, header: action.value };
     }
-    default:
-      throw new Error(`Unknown action type: ${action.type as string}`);
+    case setHomePosts: {
+      return { ...state, homePosts: action.value };
+    }
+    default: {
+      const _exhaustiveCheck: never = action;
+      throw new Error('Unknown action type');
+    }
   }
 }
 
