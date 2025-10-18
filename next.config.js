@@ -9,6 +9,7 @@ const withTM = require('next-transpile-modules')([
 ]);
 
 module.exports = withTM({
+  outputFileTracingRoot: __dirname,
   env: {
     NEXT_EXAMPLE_CMS_DATOCMS_API_TOKEN:
       process.env.NEXT_EXAMPLE_CMS_DATOCMS_API_TOKEN,

@@ -7,39 +7,38 @@ export function Category({ name, image, description = '', slug, className }) {
   const [show, setShow] = useState(false);
 
   return (
-    <Link as={`/categories/${slug}`} href="/categories/[slug]">
-      <a
-        className={cn(className, 'block relative')}
-        onMouseOver={() => setShow(true)}
-        onMouseLeave={() => setShow(false)}
+    <Link
+      href={`/categories/${slug}`}
+      className={cn(className, 'block relative')}
+      onMouseOver={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      <CoverImage responsiveImage={image.responsiveImage} />
+      <div
+        className={cn(
+          'absolute top-0 left-0 bottom-0 right-0',
+          'flex flex-col justify-center items-center'
+        )}
       >
-        <CoverImage responsiveImage={image.responsiveImage} />
         <div
           className={cn(
-            'absolute top-0 left-0 bottom-0 right-0',
-            'flex flex-col justify-center items-center'
+            'text-white md:text-2xl text-xl',
+            'transition-transform duration-300 ease-in-out',
+            show ? 'transform translate-y-1' : 'transform translate-y-3'
           )}
         >
-          <div
-            className={cn(
-              'text-white md:text-2xl text-xl',
-              'transition-transform duration-300 ease-in-out',
-              show ? 'transform translate-y-1' : 'transform translate-y-3'
-            )}
-          >
-            {name}
-          </div>
-          <div
-            className={cn(
-              'text-white md:text-sm text-sm',
-              'transition-opacity duration-300 ease-in-out',
-              show ? 'opacity-100' : 'opacity-0'
-            )}
-          >
-            {description.slice(0, 35)}
-          </div>
+          {name}
         </div>
-      </a>
+        <div
+          className={cn(
+            'text-white md:text-sm text-sm',
+            'transition-opacity duration-300 ease-in-out',
+            show ? 'opacity-100' : 'opacity-0'
+          )}
+        >
+          {description.slice(0, 35)}
+        </div>
+      </div>
     </Link>
   );
 }

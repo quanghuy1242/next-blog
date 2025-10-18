@@ -16,8 +16,8 @@ const HeaderTitle = ({ text, link }) => {
         'tracking-tight md:tracking-tighter leading-tight'
       )}
     >
-      <Link href={link}>
-        <a className="hover:underline whitespace-no-wrap">{text}</a>
+      <Link href={link} className="hover:underline whitespace-no-wrap">
+        {text}
       </Link>
     </h3>
   );
@@ -32,9 +32,7 @@ const OptionItem = ({ name, href }) => {
         'border-b-2 border-transparent hover:border-white'
       )}
     >
-      <Link href={href}>
-        <a>{name}</a>
-      </Link>
+      <Link href={href}>{name}</Link>
     </span>
   );
 };
