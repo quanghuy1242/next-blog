@@ -8,13 +8,18 @@ import { Text } from 'components/shared/text';
 import Head from 'next/head';
 import { renderMetaTags } from 'react-datocms';
 
-export default function Index({ allPosts, homepage, allCategories }) {
+export default function Index({
+  allPosts = [],
+  homepage,
+  allCategories = [],
+}) {
+  const header = homepage?.header || '';
   return (
-    <Layout header={homepage.header} className="flex flex-col items-center">
-      <Head>{renderMetaTags(homepage.metadata)}</Head>
+    <Layout header={header} className="flex flex-col items-center">
+      <Head>{renderMetaTags(homepage?.metadata || [])}</Head>
       <Banner
-        header={homepage.header}
-        subHeader={homepage.subHeader}
+        header={header}
+        subHeader={homepage?.subHeader || ''}
         className="w-full"
       />
       <Container className="flex flex-col md:flex-row md:px-20">
@@ -32,9 +37,13 @@ export default function Index({ allPosts, homepage, allCategories }) {
 }
 
 export async function getStaticProps() {
-  const data = (await getDataForHome()) || [];
+  const data = (await getDataForHome()) || {};
   return {
-    props: data,
+    props: {
+      allPosts: data?.allPosts || [],
+      allCategories: data?.allCategories || [],
+      homepage: data?.homepage || null,
+    },
     revalidate: 60,
   };
 }
