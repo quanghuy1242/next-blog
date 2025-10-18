@@ -141,7 +141,7 @@ export default function Index({
           <Posts posts={postsState.posts} hasMoreCol={false} />
           <div ref={loaderRef} className="h-1 w-full" aria-hidden />
           {isFetching && (
-            <div className="mt-6 flex justify-center">
+            <div className="my-6 flex justify-center">
               <span className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
             </div>
           )}
@@ -158,7 +158,7 @@ export default function Index({
             </div>
           )}
           {!postsState.hasMore && !isFetching && (
-            <p className="mt-6 text-center text-sm text-gray-500">
+            <p className="my-6 text-center text-sm text-gray-500">
               You&apos;ve reached the end.
             </p>
           )}
