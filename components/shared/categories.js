@@ -9,7 +9,7 @@ export function Category({ name, image, description = '', slug, className }) {
   return (
     <Link
       href={`/categories/${slug}`}
-      className={cn(className, 'block relative')}
+      className={cn(className, 'block relative mb-6')}
       onMouseOver={() => setShow(true)}
       onMouseLeave={() => setShow(false)}
     >
