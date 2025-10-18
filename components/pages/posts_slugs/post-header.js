@@ -24,7 +24,7 @@ export function PostHeader({ header, date, category, imageUrl, className }) {
         <h1 className="text-5xl font-thin">{header}</h1>
         <Date dateString={date} className="text-sm text-white" />
         <div className="flex flex-row justify-center gap-1">
-          <Tag text={category} link={{ as: '/', href: '/' }} primary={true} />
+          <Tag text={category} href="/" primary={true} />
         </div>
       </div>
     </div>

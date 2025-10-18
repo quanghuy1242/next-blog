@@ -11,7 +11,7 @@ export function PostContent({ content, tags }) {
         <Tags
           items={tags.map((tag) => ({
             name: tag,
-            link: { as: '/', href: '/' },
+            href: '/',
           }))}
         />
       )}

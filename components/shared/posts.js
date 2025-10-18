@@ -6,8 +6,8 @@ import Link from 'next/link';
 
 const PostTitle = ({ slug, title }) => (
   <h3 className="text-2xl leading-snug">
-    <Link as={`/posts/${slug}`} href="/posts/[slug]" prefetch={false}>
-      <a className="hover:underline">{title}</a>
+    <Link href={`/posts/${slug}`} prefetch={false} className="hover:underline">
+      {title}
     </Link>
   </h3>
 );
@@ -18,9 +18,12 @@ export function Post({
   date,
   excerpt,
   slug,
-  category = '',
+  category = {},
   tags = [],
 }) {
+  const categoryName =
+    typeof category === 'string' ? category : category?.name || '';
+
   return (
     <div className="flex flex-col gap-1">
       <CoverImage
@@ -32,15 +35,13 @@ export function Post({
       <PostTitle slug={slug} title={title} />
       <Date dateString={date} className="text-sm text-gray-700" />
       <div className="flex flex-row gap-1">
-        <Tag
-          text={category.name}
-          link={{ as: `/posts/${slug}`, href: '/posts/[slug]' }}
-          primary={true}
-        />
+        {categoryName && (
+          <Tag text={categoryName} href={`/posts/${slug}`} primary={true} />
+        )}
         <Tags
           items={tags.map((tag) => ({
             name: tag,
-            link: { as: '/', href: '/' },
+            href: '/',
           }))}
         />
       </div>
@@ -68,7 +69,13 @@ export function Posts({ posts, hasMoreCol = true }) {
           slug={post.slug}
           excerpt={post.excerpt}
           category={post.category}
-          tags={post.tags.split(', ').filter(Boolean)}
+          tags={
+            typeof post.tags === 'string'
+              ? post.tags.split(', ').filter(Boolean)
+              : Array.isArray(post.tags)
+              ? post.tags
+              : []
+          }
         />
       ))}
     </div>

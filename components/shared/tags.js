@@ -1,11 +1,13 @@
 import cn from 'classnames';
 import Link from 'next/link';
 
-export function Tag({ text, link, className, primary = false }) {
+export function Tag({ text, href = '/', className, primary = false }) {
   return (
-    <span
+    <Link
+      href={href}
+      prefetch={false}
       className={cn(
-        'p-1 px-2 text-xs rounded',
+        'inline-block p-1 px-2 text-xs rounded',
         {
           'bg-gray-300 hover:bg-gray-400': !primary,
           'bg-blue text-white': primary,
@@ -13,10 +15,8 @@ export function Tag({ text, link, className, primary = false }) {
         className || ''
       )}
     >
-      <Link as={link.as} href={link.href} prefetch={false}>
-        <a>{text}</a>
-      </Link>
-    </span>
+      {text}
+    </Link>
   );
 }
 
@@ -26,9 +26,9 @@ export function Tags({ items = [] }) {
       {items.map((item) => (
         <Tag
           text={item.name}
-          link={{ as: item.link.as, href: item.link.href }}
+          href={item.href}
           className="mr-1"
-          key={item}
+          key={`${item.href || 'href'}-${item.name || 'tag'}`}
         />
       ))}
     </div>

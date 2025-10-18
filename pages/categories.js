@@ -8,7 +8,7 @@ import { renderMetaTags } from 'react-datocms';
 export default function Index({ homepage }) {
   return (
     <Layout>
-      <Head>{renderMetaTags(homepage.metadata)}</Head>
+      <Head>{renderMetaTags(homepage?.metadata || [])}</Head>
       <Container className="flex flex-col md:flex-row md:px-20">
         <NotYetImplemented />
       </Container>
@@ -17,9 +17,11 @@ export default function Index({ homepage }) {
 }
 
 export async function getStaticProps() {
-  const data = (await getDataForHome()) || [];
+  const data = (await getDataForHome()) || {};
   return {
-    props: data,
+    props: {
+      homepage: data?.homepage || null,
+    },
     revalidate: 60,
   };
 }

@@ -17,32 +17,42 @@ export default function Post({ post, morePosts, homepage }) {
   if (!router.isFallback && !post?.slug) {
     return <ErrorPage statusCode={404} />;
   }
+  const header = homepage?.header || '';
+  const metaTags = post?.metadata || [];
+  const categoryName = post?.category?.name || '';
+  const morePostList = Array.isArray(morePosts) ? morePosts : [];
   return (
-    <Layout header={homepage.header} className="flex flex-col items-center">
+    <Layout header={header} className="flex flex-col items-center">
       <article className="flex flex-col items-center w-full">
-        <Head>{renderMetaTags(post.metadata)}</Head>
+        <Head>{renderMetaTags(metaTags)}</Head>
         <PostHeader
-          header={post.title}
-          date={post.date}
-          category={post.category.name}
-          imageUrl={post.ogImage.url}
+          header={post?.title}
+          date={post?.date}
+          category={categoryName}
+          imageUrl={post?.ogImage?.url}
           className="w-full"
         />
         <Container className="my-4 flex justify-center">
           <PostContent
-            content={post.content}
-            author={post.author}
-            tags={post.tags.split(', ').filter(Boolean)}
+            content={post?.content}
+            author={post?.author}
+            tags={
+              typeof post?.tags === 'string'
+                ? post.tags.split(', ').filter(Boolean)
+                : Array.isArray(post?.tags)
+                ? post.tags
+                : []
+            }
           />
         </Container>
       </article>
       <SectionSeparator />
       <Container>
         <div className="max-w-2xl mx-auto">
-          {morePosts.length > 0 && (
+          {morePostList.length > 0 && (
             <>
               <Text text="More posts" />
-              <Posts posts={morePosts} hasTitle={true} />
+              <Posts posts={morePostList} hasTitle={true} />
             </>
           )}
         </div>
@@ -68,8 +78,8 @@ export async function getStaticProps({ params }) {
         ...data?.post,
         content,
       },
-      morePosts: data?.morePosts,
-      homepage: data?.homepage,
+      morePosts: data?.morePosts || [],
+      homepage: data?.homepage || null,
     },
     revalidate: 60,
   };

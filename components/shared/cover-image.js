@@ -18,8 +18,13 @@ export function CoverImage({ title, responsiveImage, slug, className }) {
   return (
     <div className={cn('sm:mx-0', className)}>
       {slug ? (
-        <Link as={`/posts/${slug}`} href="/posts/[slug]" prefetch={false}>
-          <a aria-label={title}>{image}</a>
+        <Link
+          href={`/posts/${slug}`}
+          prefetch={false}
+          aria-label={title}
+          className="block"
+        >
+          {image}
         </Link>
       ) : (
         image
