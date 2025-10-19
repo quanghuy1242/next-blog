@@ -16,6 +16,7 @@ export default defineConfig({
       common: path.resolve(__dirname, 'common'),
       components: path.resolve(__dirname, 'components'),
       context: path.resolve(__dirname, 'context'),
+      hooks: path.resolve(__dirname, 'hooks'),
       pages: path.resolve(__dirname, 'pages'),
       styles: path.resolve(__dirname, 'styles'),
       types: path.resolve(__dirname, 'types'),
