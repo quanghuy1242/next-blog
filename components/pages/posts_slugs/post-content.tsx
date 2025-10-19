@@ -19,7 +19,7 @@ export function PostContent({
         <Tags
           items={tags.map((tag) => ({
             name: tag,
-            href: '/',
+            href: { pathname: '/', query: { tag } },
           }))}
         />
       )}

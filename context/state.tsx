@@ -12,6 +12,8 @@ export interface HomePostsState {
   posts: Post[];
   offset: number;
   hasMore: boolean;
+  category: string | null;
+  tag: string | null;
 }
 
 export type Action =

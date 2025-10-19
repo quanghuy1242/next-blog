@@ -34,6 +34,7 @@ export async function getDataForPostSlug(
         }
         category {
           name
+          slug
         }
         tags
       }
@@ -56,6 +57,7 @@ export async function getDataForPostSlug(
         }
         category {
           name
+          slug
         }
         tags
       }

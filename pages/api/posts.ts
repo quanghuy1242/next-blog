@@ -16,11 +16,15 @@ export default async function handler(
 
   const limit = normalizeLimit(req.query.limit);
   const offset = normalizeOffset(req.query.offset);
+  const category = normalizeNullableString(req.query.category);
+  const tag = normalizeNullableString(req.query.tag);
 
   try {
     const { posts, hasMore } = await getPaginatedPosts({
       limit,
       skip: offset,
+      category,
+      tag,
     });
 
     res.status(200).json({
@@ -52,6 +56,16 @@ function normalizeOffset(value: unknown): number {
   }
 
   return parsed;
+}
+
+function normalizeNullableString(value: unknown): string | null {
+  const stringValue = stringifyValue(value).trim();
+
+  if (!stringValue) {
+    return null;
+  }
+
+  return stringValue;
 }
 
 function stringifyValue(value: unknown): string {

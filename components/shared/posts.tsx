@@ -3,6 +3,7 @@ import { CoverImage } from 'components/shared/cover-image';
 import { Date } from 'components/shared/date';
 import { Tag, Tags } from 'components/shared/tags';
 import Link from 'next/link';
+import type { LinkProps } from 'next/link';
 import type { Post as PostType } from 'types/datocms';
 
 interface PostTitleProps {
@@ -39,6 +40,12 @@ export function Post({
 }: PostProps) {
   const categoryName =
     typeof category === 'string' ? category : category?.name ?? '';
+  const categorySlug =
+    typeof category === 'object' && category ? category.slug : null;
+
+  const categoryHref: LinkProps['href'] | undefined = categorySlug
+    ? { pathname: '/', query: { category: categorySlug } }
+    : undefined;
 
   return (
     <div className="flex flex-col gap-1">
@@ -52,12 +59,16 @@ export function Post({
       <Date dateString={date} className="text-sm text-gray-700" />
       <div className="flex flex-row gap-1">
         {categoryName && (
-          <Tag text={categoryName} href={`/posts/${slug}`} primary={true} />
+          <Tag
+            text={categoryName}
+            href={categoryHref}
+            primary={true}
+          />
         )}
         <Tags
           items={tags.map((tag) => ({
             name: tag,
-            href: '/',
+            href: { pathname: '/', query: { tag } },
           }))}
         />
       </div>

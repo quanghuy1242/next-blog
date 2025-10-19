@@ -23,6 +23,7 @@ export async function getDataForHome(): Promise<HomePageData> {
           }
           category {
             name
+            slug
           }
           tags
         }

@@ -9,6 +9,7 @@ import { Text } from 'components/shared/text';
 import type { GetStaticProps } from 'next';
 import Head from 'next/head';
 import { renderMetaTags } from 'react-datocms';
+import { useRouter } from 'next/router';
 import type { HomePageData, Post } from 'types/datocms';
 import { useAppContext, type HomePostsState } from 'context/state';
 
@@ -31,11 +32,23 @@ export default function Index({
       posts: allPosts,
       offset: allPosts.length,
       hasMore: allPosts.length === POSTS_PAGE_SIZE,
+      category: null,
+      tag: null,
     }),
     [allPosts]
   );
 
   const { homePosts, setHomePosts } = useAppContext();
+  const router = useRouter();
+  const activeCategory = useMemo(
+    () =>
+      router.isReady ? normalizeQueryParam(router.query.category) : null,
+    [router.isReady, router.query.category]
+  );
+  const activeTag = useMemo(
+    () => (router.isReady ? normalizeQueryParam(router.query.tag) : null),
+    [router.isReady, router.query.tag]
+  );
   const loaderRef = useRef<HTMLDivElement | null>(null);
   const hasHydratedFromContext = useRef(false);
 
@@ -46,29 +59,126 @@ export default function Index({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!hasHydratedFromContext.current && homePosts) {
-      hasHydratedFromContext.current = true;
+    if (!router.isReady || hasHydratedFromContext.current) {
+      return;
+    }
+
+    if (homePosts && filtersMatch(homePosts, activeCategory, activeTag)) {
       setPostsState(homePosts);
+    }
+
+    hasHydratedFromContext.current = true;
+  }, [router.isReady, homePosts, activeCategory, activeTag]);
+
+  useEffect(() => {
+    if (!hasHydratedFromContext.current) {
       return;
     }
 
     if (postsState !== homePosts) {
       setHomePosts(postsState);
     }
-  }, [homePosts, postsState, setHomePosts]);
+  }, [postsState, homePosts, setHomePosts]);
 
-  const loadMorePosts = useCallback(async () => {
-    if (isFetching || !postsState.hasMore) {
+  const fetchPostsForFilters = useCallback(async () => {
+    if (!router.isReady) {
       return;
+    }
+
+    if (filtersMatch(postsState, activeCategory, activeTag)) {
+      return;
+    }
+
+    if (!activeCategory && !activeTag) {
+      setPostsState({
+        posts: allPosts,
+        offset: allPosts.length,
+        hasMore: allPosts.length === POSTS_PAGE_SIZE,
+        category: null,
+        tag: null,
+      });
+      setIsFetching(false);
+      setError(null);
+      return;
+    }
+
+    const params = new URLSearchParams({
+      limit: POSTS_PAGE_SIZE.toString(),
+      offset: '0',
+    });
+
+    if (activeCategory) {
+      params.set('category', activeCategory);
+    }
+
+    if (activeTag) {
+      params.set('tag', activeTag);
     }
 
     setIsFetching(true);
     setError(null);
 
     try {
-      const response = await fetch(
-        `/api/posts?offset=${postsState.offset}&limit=${POSTS_PAGE_SIZE}`
-      );
+      const response = await fetch(`/api/posts?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const payload = (await response.json()) as PaginatedPostsApiResponse;
+      const posts = payload.posts ?? [];
+      const nextOffset = payload.nextOffset ?? posts.length;
+
+      setPostsState({
+        posts,
+        offset: nextOffset,
+        hasMore: payload.hasMore ?? false,
+        category: activeCategory,
+        tag: activeTag,
+      });
+    } catch (loadError) {
+      console.error('Failed to fetch filtered posts', loadError);
+      setError('Unable to load posts for this filter. Tap to retry.');
+    } finally {
+      setIsFetching(false);
+    }
+  }, [
+    router.isReady,
+    postsState,
+    activeCategory,
+    activeTag,
+    allPosts,
+  ]);
+
+  useEffect(() => {
+    void fetchPostsForFilters();
+  }, [fetchPostsForFilters]);
+
+  const loadMorePosts = useCallback(async () => {
+    if (isFetching || !postsState.hasMore) {
+      return;
+    }
+
+    const { category: currentCategory, tag: currentTag } = postsState;
+
+    setIsFetching(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams({
+        offset: postsState.offset.toString(),
+        limit: POSTS_PAGE_SIZE.toString(),
+      });
+
+      if (currentCategory) {
+        params.set('category', currentCategory);
+      }
+
+      if (currentTag) {
+        params.set('tag', currentTag);
+      }
+
+      const response = await fetch(`/api/posts?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error(`Request failed with status ${response.status}`);
@@ -77,6 +187,10 @@ export default function Index({
       const payload = (await response.json()) as PaginatedPostsApiResponse;
 
       setPostsState((previous) => {
+        if (!filtersMatch(previous, currentCategory, currentTag)) {
+          return previous;
+        }
+
         const mergedPosts = mergePosts(previous.posts, payload.posts ?? []);
 
         const nextOffset = Math.max(
@@ -88,6 +202,8 @@ export default function Index({
           posts: mergedPosts,
           offset: nextOffset,
           hasMore: payload.hasMore ?? previous.hasMore,
+          category: previous.category ?? currentCategory ?? null,
+          tag: previous.tag ?? currentTag ?? null,
         };
       });
     } catch (loadError) {
@@ -96,7 +212,7 @@ export default function Index({
     } finally {
       setIsFetching(false);
     }
-  }, [isFetching, postsState.hasMore, postsState.offset]);
+  }, [isFetching, postsState]);
 
   useEffect(() => {
     if (!postsState.hasMore) {
@@ -139,6 +255,11 @@ export default function Index({
         <div className="flex-grow md:w-2/3 md:mr-6">
           <Text text="Latest Posts" />
           <Posts posts={postsState.posts} hasMoreCol={false} />
+          {!isFetching && !error && postsState.posts.length === 0 && (
+            <p className="mt-6 text-center text-sm text-gray-500">
+              No posts found for this filter.
+            </p>
+          )}
           <div ref={loaderRef} className="h-1 w-full" aria-hidden />
           {isFetching && (
             <div className="my-6 flex justify-center">
@@ -150,7 +271,13 @@ export default function Index({
               <p className="text-sm text-red-600">{error}</p>
               <button
                 type="button"
-                onClick={() => void loadMorePosts()}
+                onClick={() => {
+                  if (activeCategory || activeTag) {
+                    void fetchPostsForFilters();
+                  } else {
+                    void loadMorePosts();
+                  }
+                }}
                 className="mt-2 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:border-gray-400 hover:text-gray-900"
               >
                 Try again
@@ -207,4 +334,32 @@ function mergePosts(current: Post[], incoming: Post[]): Post[] {
   }
 
   return merged;
+}
+
+function filtersMatch(
+  state: HomePostsState | null,
+  category: string | null,
+  tag: string | null
+): boolean {
+  if (!state) {
+    return false;
+  }
+
+  return (state.category ?? null) === category && (state.tag ?? null) === tag;
+}
+
+function normalizeQueryParam(
+  value: string | string[] | undefined
+): string | null {
+  if (Array.isArray(value)) {
+    return normalizeQueryParam(value[0]);
+  }
+
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const trimmed = value.trim();
+
+  return trimmed ? trimmed : null;
 }

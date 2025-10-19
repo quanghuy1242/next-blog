@@ -13,17 +13,36 @@ export interface PaginatedPostsResult {
 export interface PaginatedPostsParams {
   limit: number;
   skip: number;
+  category?: string | null;
+  tag?: string | null;
 }
 
-export async function getPaginatedPosts(
-  { limit, skip }: PaginatedPostsParams
-): Promise<PaginatedPostsResult> {
+export async function getPaginatedPosts({
+  limit,
+  skip,
+  category,
+  tag,
+}: PaginatedPostsParams): Promise<PaginatedPostsResult> {
   const first = limit + 1;
+
+  const filterConditions: string[] = [];
+
+  if (category) {
+    filterConditions.push('category: { slug: { eq: $category } }');
+  }
+
+  if (tag) {
+    filterConditions.push('tags: { matches: { pattern: $tag } }');
+  }
+
+  const filterClause = filterConditions.length
+    ? `, filter: { ${filterConditions.join(' ')} }`
+    : '';
 
   const data = await fetchAPI<PaginatedPostsResponse>(
     `#graphql
-      query PaginatedPosts($first: IntType!, $skip: IntType!) {
-        allPosts(orderBy: date_DESC, first: $first, skip: $skip) {
+      query PaginatedPosts($first: IntType!, $skip: IntType!, $category: String, $tag: String) {
+        allPosts(orderBy: date_DESC, first: $first, skip: $skip${filterClause}) {
           title
           slug
           excerpt
@@ -41,6 +60,7 @@ export async function getPaginatedPosts(
           }
           category {
             name
+            slug
           }
           tags
         }
@@ -51,6 +71,8 @@ export async function getPaginatedPosts(
       variables: {
         first,
         skip,
+        category,
+        tag,
       },
     }
   );
