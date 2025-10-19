@@ -21,6 +21,10 @@ export const responsiveImageFragment = `#graphql
 export interface FetchApiOptions {
   variables?: Record<string, unknown>;
   preview?: boolean;
+  next?: {
+    revalidate?: number;
+    tags?: string[];
+  };
 }
 
 interface DatocmsResponse<TData> {
@@ -31,7 +35,7 @@ interface DatocmsResponse<TData> {
 // Rework this with useSWR
 export async function fetchAPI<TData>(
   query: string,
-  { variables, preview }: FetchApiOptions = {}
+  { variables, preview, next }: FetchApiOptions = {}
 ): Promise<TData> {
   if (!API_TOKEN) {
     console.warn(
@@ -50,6 +54,7 @@ export async function fetchAPI<TData>(
       query,
       variables,
     }),
+    next,
   });
 
   if (!res.ok) {
