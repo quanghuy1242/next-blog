@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getCategoryIdBySlug } from 'common/apis/categories';
 import { getPaginatedPosts } from 'common/apis/posts';
 
 const DEFAULT_LIMIT = 5;
@@ -16,14 +17,27 @@ export default async function handler(
 
   const limit = normalizeLimit(req.query.limit);
   const offset = normalizeOffset(req.query.offset);
-  const category = normalizeNullableString(req.query.category);
+  const categorySlug = normalizeNullableString(req.query.category);
   const tag = normalizeNullableString(req.query.tag);
 
   try {
+    const categoryId = categorySlug
+      ? await getCategoryIdBySlug(categorySlug)
+      : null;
+
+    if (categorySlug && !categoryId) {
+      res.status(200).json({
+        posts: [],
+        hasMore: false,
+        nextOffset: offset,
+      });
+      return;
+    }
+
     const { posts, hasMore } = await getPaginatedPosts({
       limit,
       skip: offset,
-      category,
+      categoryId,
       tag,
     });
 

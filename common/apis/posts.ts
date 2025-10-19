@@ -13,19 +13,19 @@ export interface PaginatedPostsResult {
 export interface PaginatedPostsParams {
   limit: number;
   skip: number;
-  category?: string | null;
+  categoryId?: string | null;
   tag?: string | null;
 }
 
 export async function getPaginatedPosts({
   limit,
   skip,
-  category,
+  categoryId,
   tag,
 }: PaginatedPostsParams): Promise<PaginatedPostsResult> {
   const first = limit + 1;
 
-  const filter: Record<string, unknown> | null = buildFilter(category, tag);
+  const filter: Record<string, unknown> | null = buildFilter(categoryId, tag);
 
   const data = await fetchAPI<PaginatedPostsResponse>(
     `#graphql
@@ -75,13 +75,13 @@ export async function getPaginatedPosts({
 }
 
 function buildFilter(
-  category: string | null | undefined,
+  categoryId: string | null | undefined,
   tag: string | null | undefined
 ): Record<string, unknown> | null {
   const filters: Record<string, unknown> = {};
 
-  if (category) {
-    filters.category = { slug: { eq: category } };
+  if (categoryId) {
+    filters.category = { eq: categoryId };
   }
 
   if (tag) {
