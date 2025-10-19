@@ -13,7 +13,7 @@ export interface HomePostsState {
   offset: number;
   hasMore: boolean;
   category: string | null;
-  tag: string | null;
+  tags: string[];
 }
 
 export type Action =

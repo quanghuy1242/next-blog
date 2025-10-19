@@ -10,6 +10,7 @@ interface CategoryProps {
   description?: string | null;
   slug: string;
   className?: string;
+  activeTags?: string[];
 }
 
 export function Category({
@@ -18,13 +19,20 @@ export function Category({
   description = '',
   slug,
   className,
+  activeTags = [],
 }: CategoryProps) {
   const [show, setShow] = useState(false);
   const descriptionText = description ?? '';
 
   return (
     <Link
-      href={{ pathname: '/', query: { category: slug } }}
+      href={{
+        pathname: '/',
+        query: {
+          category: slug,
+          ...(activeTags.length ? { tag: activeTags } : {}),
+        },
+      }}
       className={cn(className, 'block relative mb-2')}
       onMouseOver={() => setShow(true)}
       onMouseLeave={() => setShow(false)}
@@ -61,9 +69,10 @@ export function Category({
 
 interface CategoriesProps {
   categories?: CategoryData[];
+  activeTags?: string[];
 }
 
-export function Categories({ categories = [] }: CategoriesProps) {
+export function Categories({ categories = [], activeTags = [] }: CategoriesProps) {
   return (
     <div>
       {categories
@@ -74,6 +83,7 @@ export function Categories({ categories = [] }: CategoriesProps) {
             description={category.description}
             image={category.image}
             slug={category.slug}
+            activeTags={activeTags}
             key={category.slug}
           />
         ))}

@@ -33,7 +33,7 @@ export default function Index({
       offset: allPosts.length,
       hasMore: allPosts.length === POSTS_PAGE_SIZE,
       category: null,
-      tag: null,
+      tags: [],
     }),
     [allPosts]
   );
@@ -42,11 +42,11 @@ export default function Index({
   const router = useRouter();
   const activeCategory = useMemo(
     () =>
-      router.isReady ? normalizeQueryParam(router.query.category) : null,
+      router.isReady ? normalizeSingleQueryParam(router.query.category) : null,
     [router.isReady, router.query.category]
   );
-  const activeTag = useMemo(
-    () => (router.isReady ? normalizeQueryParam(router.query.tag) : null),
+  const activeTags = useMemo(
+    () => (router.isReady ? normalizeQueryParamArray(router.query.tag) : []),
     [router.isReady, router.query.tag]
   );
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -63,12 +63,12 @@ export default function Index({
       return;
     }
 
-    if (homePosts && filtersMatch(homePosts, activeCategory, activeTag)) {
+    if (homePosts && filtersMatch(homePosts, activeCategory, activeTags)) {
       setPostsState(homePosts);
     }
 
     hasHydratedFromContext.current = true;
-  }, [router.isReady, homePosts, activeCategory, activeTag]);
+  }, [router.isReady, homePosts, activeCategory, activeTags]);
 
   useEffect(() => {
     if (!hasHydratedFromContext.current) {
@@ -85,17 +85,17 @@ export default function Index({
       return;
     }
 
-    if (filtersMatch(postsState, activeCategory, activeTag)) {
+    if (filtersMatch(postsState, activeCategory, activeTags)) {
       return;
     }
 
-    if (!activeCategory && !activeTag) {
+    if (!activeCategory && activeTags.length === 0) {
       setPostsState({
         posts: allPosts,
         offset: allPosts.length,
         hasMore: allPosts.length === POSTS_PAGE_SIZE,
         category: null,
-        tag: null,
+        tags: [],
       });
       setIsFetching(false);
       setError(null);
@@ -111,8 +111,8 @@ export default function Index({
       params.set('category', activeCategory);
     }
 
-    if (activeTag) {
-      params.set('tag', activeTag);
+    for (const tag of activeTags) {
+      params.append('tag', tag);
     }
 
     setIsFetching(true);
@@ -134,7 +134,7 @@ export default function Index({
         offset: nextOffset,
         hasMore: payload.hasMore ?? false,
         category: activeCategory,
-        tag: activeTag,
+        tags: [...activeTags],
       });
     } catch (loadError) {
       console.error('Failed to fetch filtered posts', loadError);
@@ -146,7 +146,7 @@ export default function Index({
     router.isReady,
     postsState,
     activeCategory,
-    activeTag,
+    activeTags,
     allPosts,
   ]);
 
@@ -159,7 +159,7 @@ export default function Index({
       return;
     }
 
-    const { category: currentCategory, tag: currentTag } = postsState;
+    const { category: currentCategory, tags: currentTags } = postsState;
 
     setIsFetching(true);
     setError(null);
@@ -174,8 +174,8 @@ export default function Index({
         params.set('category', currentCategory);
       }
 
-      if (currentTag) {
-        params.set('tag', currentTag);
+      for (const tag of currentTags) {
+        params.append('tag', tag);
       }
 
       const response = await fetch(`/api/posts?${params.toString()}`);
@@ -187,7 +187,7 @@ export default function Index({
       const payload = (await response.json()) as PaginatedPostsApiResponse;
 
       setPostsState((previous) => {
-        if (!filtersMatch(previous, currentCategory, currentTag)) {
+        if (!filtersMatch(previous, currentCategory, currentTags)) {
           return previous;
         }
 
@@ -203,7 +203,7 @@ export default function Index({
           offset: nextOffset,
           hasMore: payload.hasMore ?? previous.hasMore,
           category: previous.category ?? currentCategory ?? null,
-          tag: previous.tag ?? currentTag ?? null,
+          tags: [...currentTags],
         };
       });
     } catch (loadError) {
@@ -254,7 +254,12 @@ export default function Index({
       <Container className="flex flex-col md:flex-row md:px-20">
         <div className="flex-grow md:w-2/3 md:mr-6">
           <Text text="Latest Posts" />
-          <Posts posts={postsState.posts} hasMoreCol={false} />
+          <Posts
+            posts={postsState.posts}
+            hasMoreCol={false}
+            activeCategory={postsState.category}
+            activeTags={postsState.tags}
+          />
           {!isFetching && !error && postsState.posts.length === 0 && (
             <p className="mt-6 text-center text-sm text-gray-500">
               No posts found for this filter.
@@ -272,7 +277,7 @@ export default function Index({
               <button
                 type="button"
                 onClick={() => {
-                  if (activeCategory || activeTag) {
+                  if (activeCategory || activeTags.length) {
                     void fetchPostsForFilters();
                   } else {
                     void loadMorePosts();
@@ -292,7 +297,7 @@ export default function Index({
         </div>
         <div className="md:w-1/3">
           <Text text="Categories" />
-          <Categories categories={allCategories} />
+          <Categories categories={allCategories} activeTags={postsState.tags} />
         </div>
       </Container>
     </Layout>
@@ -339,20 +344,26 @@ function mergePosts(current: Post[], incoming: Post[]): Post[] {
 function filtersMatch(
   state: HomePostsState | null,
   category: string | null,
-  tag: string | null
+  tags: string[]
 ): boolean {
   if (!state) {
     return false;
   }
 
-  return (state.category ?? null) === category && (state.tag ?? null) === tag;
+  if ((state.category ?? null) !== category) {
+    return false;
+  }
+
+  const stateTags = Array.isArray(state.tags) ? state.tags : [];
+
+  return areArraysEqual(stateTags, tags);
 }
 
-function normalizeQueryParam(
+function normalizeSingleQueryParam(
   value: string | string[] | undefined
 ): string | null {
   if (Array.isArray(value)) {
-    return normalizeQueryParam(value[0]);
+    return normalizeSingleQueryParam(value[0]);
   }
 
   if (typeof value !== 'string') {
@@ -362,4 +373,46 @@ function normalizeQueryParam(
   const trimmed = value.trim();
 
   return trimmed ? trimmed : null;
+}
+
+function normalizeQueryParamArray(
+  value: string | string[] | undefined
+): string[] {
+  const rawValues = Array.isArray(value) ? value : value ? [value] : [];
+
+  if (!rawValues.length) {
+    return [];
+  }
+
+  const normalized = rawValues
+    .map((entry) => (typeof entry === 'string' ? entry : entry?.toString() ?? ''))
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+
+  if (!normalized.length) {
+    return [];
+  }
+
+  const unique = Array.from(new Set(normalized));
+
+  unique.sort((a, b) => a.localeCompare(b));
+
+  return unique;
+}
+
+function areArraysEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  const aSorted = [...a].sort((first, second) => first.localeCompare(second));
+  const bSorted = [...b].sort((first, second) => first.localeCompare(second));
+
+  for (let index = 0; index < aSorted.length; index += 1) {
+    if (aSorted[index] !== bSorted[index]) {
+      return false;
+    }
+  }
+
+  return true;
 }

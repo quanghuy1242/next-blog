@@ -27,6 +27,8 @@ export interface PostProps {
   slug: string;
   category?: PostType['category'];
   tags?: string[];
+  activeCategory?: string | null;
+  activeTags?: string[];
 }
 
 export function Post({
@@ -37,6 +39,8 @@ export function Post({
   slug,
   category,
   tags = [],
+  activeCategory = null,
+  activeTags = [],
 }: PostProps) {
   const categoryName =
     typeof category === 'string' ? category : category?.name ?? '';
@@ -44,8 +48,24 @@ export function Post({
     typeof category === 'object' && category ? category.slug : null;
 
   const categoryHref: LinkProps['href'] | undefined = categorySlug
-    ? { pathname: '/', query: { category: categorySlug } }
+    ? {
+        pathname: '/',
+        query: {
+          category: categorySlug,
+          ...(activeTags.length ? { tag: activeTags } : {}),
+        },
+      }
     : undefined;
+
+  const baseTagQuery: Record<string, string | string[]> = {};
+
+  if (activeCategory) {
+    baseTagQuery.category = activeCategory;
+  }
+
+  if (activeTags.length) {
+    baseTagQuery.tag = activeTags;
+  }
 
   return (
     <div className="flex flex-col gap-1">
@@ -68,7 +88,10 @@ export function Post({
         <Tags
           items={tags.map((tag) => ({
             name: tag,
-            href: { pathname: '/', query: { tag } },
+            href: {
+              pathname: '/',
+              query: buildTagQuery(baseTagQuery, tag),
+            },
           }))}
         />
       </div>
@@ -80,9 +103,16 @@ export function Post({
 interface PostsProps {
   posts: PostType[];
   hasMoreCol?: boolean;
+  activeCategory?: string | null;
+  activeTags?: string[];
 }
 
-export function Posts({ posts, hasMoreCol = true }: PostsProps) {
+export function Posts({
+  posts,
+  hasMoreCol = true,
+  activeCategory = null,
+  activeTags = [],
+}: PostsProps) {
   return (
     <div
       className={cn(
@@ -102,6 +132,8 @@ export function Posts({ posts, hasMoreCol = true }: PostsProps) {
           excerpt={post.excerpt}
           category={post.category}
           tags={normalizeTags(post.tags)}
+          activeCategory={activeCategory}
+          activeTags={activeTags}
         />
       ))}
     </div>
@@ -118,4 +150,39 @@ function normalizeTags(tags: PostType['tags']): string[] {
   }
 
   return [];
+}
+
+function buildTagQuery(
+  base: Record<string, string | string[]>,
+  nextTag: string
+): Record<string, string | string[]> {
+  const normalizedTag = nextTag.trim();
+
+  if (!normalizedTag) {
+    return base;
+  }
+
+  const existingTags = new Set<string>();
+  const current = base.tag;
+
+  if (Array.isArray(current)) {
+    for (const value of current) {
+      existingTags.add(value);
+    }
+  } else if (typeof current === 'string' && current) {
+    existingTags.add(current);
+  }
+
+  if (!existingTags.has(normalizedTag)) {
+    existingTags.add(normalizedTag);
+  }
+
+  const tagValues = Array.from(existingTags);
+
+  tagValues.sort((a, b) => a.localeCompare(b));
+
+  return {
+    ...base,
+    tag: tagValues,
+  };
 }

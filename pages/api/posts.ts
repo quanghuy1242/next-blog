@@ -18,7 +18,7 @@ export default async function handler(
   const limit = normalizeLimit(req.query.limit);
   const offset = normalizeOffset(req.query.offset);
   const categorySlug = normalizeNullableString(req.query.category);
-  const tag = normalizeNullableString(req.query.tag);
+  const tags = normalizeStringList(req.query.tag);
 
   try {
     const categoryId = categorySlug
@@ -38,7 +38,7 @@ export default async function handler(
       limit,
       skip: offset,
       categoryId,
-      tag,
+      tags: tags.length ? tags : null,
     });
 
     res.status(200).json({
@@ -80,6 +80,25 @@ function normalizeNullableString(value: unknown): string | null {
   }
 
   return stringValue;
+}
+
+function normalizeStringList(value: unknown): string[] {
+  const values = Array.isArray(value) ? value : [value];
+
+  const normalized = values
+    .map((entry) => (typeof entry === 'string' ? entry : entry?.toString() ?? ''))
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+
+  if (!normalized.length) {
+    return [];
+  }
+
+  const unique = Array.from(new Set(normalized));
+
+  unique.sort((a, b) => a.localeCompare(b));
+
+  return unique;
 }
 
 function stringifyValue(value: unknown): string {
