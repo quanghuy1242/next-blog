@@ -13,6 +13,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { renderMetaTags } from 'react-datocms';
 import type { Post as PostType, PostSlugData } from 'types/datocms';
+import { normalizePostTags } from 'common/utils/tags';
 
 interface PostPageProps {
   post: (PostType & { content: string }) | null;
@@ -41,7 +42,7 @@ export default function PostPage({
     post?.ogImage?.url ??
     post?.coverImage.responsiveImage.src ??
     '';
-  const tags = normalizeTags(post?.tags);
+  const tags = normalizePostTags(post?.tags);
   const morePostList = Array.isArray(morePosts) ? morePosts : [];
 
   return (
@@ -112,17 +113,3 @@ export const getStaticProps: GetStaticProps<PostPageProps> = async ({
     revalidate: 60,
   };
 };
-
-function normalizeTags(
-  tags: PostType['tags'] | undefined
-): string[] {
-  if (typeof tags === 'string') {
-    return tags.split(', ').filter(Boolean);
-  }
-
-  if (Array.isArray(tags)) {
-    return tags.filter((tag): tag is string => Boolean(tag));
-  }
-
-  return [];
-}

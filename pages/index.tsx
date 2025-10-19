@@ -12,6 +12,11 @@ import { renderMetaTags } from 'react-datocms';
 import { useRouter } from 'next/router';
 import type { HomePageData, Post } from 'types/datocms';
 import { useAppContext, type HomePostsState } from 'context/state';
+import {
+  areStringArraysEqual,
+  normalizeQueryParam,
+  normalizeQueryParamList,
+} from 'common/utils/query';
 
 interface HomePageProps {
   allPosts: HomePageData['allPosts'];
@@ -21,12 +26,20 @@ interface HomePageProps {
 
 const POSTS_PAGE_SIZE = 5;
 
+/**
+ * Home page with filter-aware infinite scrolling.
+ *
+ * Reads `category`/`tag` query params, fetches matching posts, and keeps the
+ * result cached via context so navigating back restores the filtered view. All
+ * fetching honours the active filters, including the infinite scroll loader.
+ */
 export default function Index({
   allPosts,
   homepage,
   allCategories,
 }: HomePageProps) {
   const header = homepage?.header || '';
+  // Memoize the baseline list so we can restore it when filters clear.
   const initialState = useMemo<HomePostsState>(
     () => ({
       posts: allPosts,
@@ -40,13 +53,13 @@ export default function Index({
 
   const { homePosts, setHomePosts } = useAppContext();
   const router = useRouter();
+  // Derive normalized query params once per render to avoid churn.
   const activeCategory = useMemo(
-    () =>
-      router.isReady ? normalizeSingleQueryParam(router.query.category) : null,
+    () => (router.isReady ? normalizeQueryParam(router.query.category) : null),
     [router.isReady, router.query.category]
   );
   const activeTags = useMemo(
-    () => (router.isReady ? normalizeQueryParamArray(router.query.tag) : []),
+    () => (router.isReady ? normalizeQueryParamList(router.query.tag) : []),
     [router.isReady, router.query.tag]
   );
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -58,6 +71,7 @@ export default function Index({
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Hydrate from context (if available) once on the client.
   useEffect(() => {
     if (!router.isReady || hasHydratedFromContext.current) {
       return;
@@ -70,6 +84,7 @@ export default function Index({
     hasHydratedFromContext.current = true;
   }, [router.isReady, homePosts, activeCategory, activeTags]);
 
+  // Persist the latest state back into context after hydration.
   useEffect(() => {
     if (!hasHydratedFromContext.current) {
       return;
@@ -80,6 +95,10 @@ export default function Index({
     }
   }, [postsState, homePosts, setHomePosts]);
 
+  /**
+   * Fetch the first page for the current filter set and reset local state.
+   * Invoked on mount and whenever the router query changes.
+   */
   const fetchPostsForFilters = useCallback(async () => {
     if (!router.isReady) {
       return;
@@ -90,6 +109,7 @@ export default function Index({
     }
 
     if (!activeCategory && activeTags.length === 0) {
+      // No filters selected, revert to the initial SSR payload.
       setPostsState({
         posts: allPosts,
         offset: allPosts.length,
@@ -102,6 +122,7 @@ export default function Index({
       return;
     }
 
+    // Build the fetch URL with the active filters.
     const params = new URLSearchParams({
       limit: POSTS_PAGE_SIZE.toString(),
       offset: '0',
@@ -154,6 +175,10 @@ export default function Index({
     void fetchPostsForFilters();
   }, [fetchPostsForFilters]);
 
+  /**
+   * Append another page of posts while ensuring responses correspond to the
+   * filters that triggered them (protects against race conditions).
+   */
   const loadMorePosts = useCallback(async () => {
     if (isFetching || !postsState.hasMore) {
       return;
@@ -187,6 +212,7 @@ export default function Index({
       const payload = (await response.json()) as PaginatedPostsApiResponse;
 
       setPostsState((previous) => {
+        // Ignore responses that were requested with outdated filters.
         if (!filtersMatch(previous, currentCategory, currentTags)) {
           return previous;
         }
@@ -225,6 +251,7 @@ export default function Index({
       return;
     }
 
+    // Trigger `loadMorePosts` once the sentinel is near the viewport.
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
@@ -304,6 +331,11 @@ export default function Index({
   );
 }
 
+/**
+ * Fetch the static payload required to render the home page. Runs at build
+ * time (and revalidates) so the initial render is always hydrated with posts
+ * and metadata before client-side filtering kicks in.
+ */
 export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
   const data = await getDataForHome();
 
@@ -323,6 +355,10 @@ interface PaginatedPostsApiResponse {
   nextOffset?: number;
 }
 
+/**
+ * Append incoming posts while skipping duplicates (e.g. when the backend
+ * returns overlapping pages after content updates).
+ */
 function mergePosts(current: Post[], incoming: Post[]): Post[] {
   if (!incoming.length) {
     return current;
@@ -341,6 +377,10 @@ function mergePosts(current: Post[], incoming: Post[]): Post[] {
   return merged;
 }
 
+/**
+ * Checks if a stored state snapshot matches the provided filters.
+ * Used to avoid redundant fetches and to discard responses for stale filters.
+ */
 function filtersMatch(
   state: HomePostsState | null,
   category: string | null,
@@ -354,67 +394,5 @@ function filtersMatch(
     return false;
   }
 
-  const stateTags = Array.isArray(state.tags) ? state.tags : [];
-
-  return areArraysEqual(stateTags, tags);
-}
-
-function normalizeSingleQueryParam(
-  value: string | string[] | undefined
-): string | null {
-  if (Array.isArray(value)) {
-    return normalizeSingleQueryParam(value[0]);
-  }
-
-  if (typeof value !== 'string') {
-    return null;
-  }
-
-  const trimmed = value.trim();
-
-  return trimmed ? trimmed : null;
-}
-
-function normalizeQueryParamArray(
-  value: string | string[] | undefined
-): string[] {
-  const rawValues = Array.isArray(value) ? value : value ? [value] : [];
-
-  if (!rawValues.length) {
-    return [];
-  }
-
-  const normalized = rawValues
-    .map((entry) =>
-      typeof entry === 'string' ? entry : entry == null ? '' : String(entry)
-    )
-    .map((entry) => entry.trim())
-    .filter((entry) => entry.length > 0);
-
-  if (!normalized.length) {
-    return [];
-  }
-
-  const unique = Array.from(new Set(normalized));
-
-  unique.sort((a, b) => a.localeCompare(b));
-
-  return unique;
-}
-
-function areArraysEqual(a: string[], b: string[]): boolean {
-  if (a.length !== b.length) {
-    return false;
-  }
-
-  const aSorted = [...a].sort((first, second) => first.localeCompare(second));
-  const bSorted = [...b].sort((first, second) => first.localeCompare(second));
-
-  for (let index = 0; index < aSorted.length; index += 1) {
-    if (aSorted[index] !== bSorted[index]) {
-      return false;
-    }
-  }
-
-  return true;
+  return areStringArraysEqual(state.tags, tags);
 }

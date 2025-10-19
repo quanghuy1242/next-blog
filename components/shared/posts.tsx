@@ -5,6 +5,8 @@ import { Tag, Tags } from 'components/shared/tags';
 import Link from 'next/link';
 import type { LinkProps } from 'next/link';
 import type { Post as PostType } from 'types/datocms';
+import { uniqueSortedStrings } from 'common/utils/query';
+import { normalizePostTags } from 'common/utils/tags';
 
 interface PostTitleProps {
   slug: string;
@@ -128,25 +130,13 @@ export function Posts({
           slug={post.slug}
           excerpt={post.excerpt}
           category={post.category}
-          tags={normalizeTags(post.tags)}
+          tags={normalizePostTags(post.tags)}
           activeCategory={activeCategory}
           activeTags={activeTags}
         />
       ))}
     </div>
   );
-}
-
-function normalizeTags(tags: PostType['tags']): string[] {
-  if (typeof tags === 'string') {
-    return tags.split(', ').filter(Boolean);
-  }
-
-  if (Array.isArray(tags)) {
-    return tags.filter((tag): tag is string => Boolean(tag));
-  }
-
-  return [];
 }
 
 function buildTagQuery(
@@ -159,27 +149,17 @@ function buildTagQuery(
     return base;
   }
 
-  const existingTags = new Set<string>();
   const current = base.tag;
+  const currentTags = Array.isArray(current)
+    ? current
+    : typeof current === 'string' && current.length
+      ? [current]
+      : [];
 
-  if (Array.isArray(current)) {
-    for (const value of current) {
-      existingTags.add(value);
-    }
-  } else if (typeof current === 'string' && current) {
-    existingTags.add(current);
-  }
-
-  if (!existingTags.has(normalizedTag)) {
-    existingTags.add(normalizedTag);
-  }
-
-  const tagValues = Array.from(existingTags);
-
-  tagValues.sort((a, b) => a.localeCompare(b));
+  const tags = uniqueSortedStrings([...currentTags, normalizedTag]);
 
   return {
     ...base,
-    tag: tagValues,
+    tag: tags,
   };
 }
