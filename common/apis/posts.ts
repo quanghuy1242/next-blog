@@ -1,5 +1,6 @@
 import { fetchAPI, responsiveImageFragment } from './base';
 import type { Post } from 'types/datocms';
+import { uniqueSortedStrings } from '../utils/query';
 
 interface PaginatedPostsResponse {
   allPosts: Post[];
@@ -85,15 +86,9 @@ function buildFilter(
   }
 
   if (Array.isArray(tags) && tags.length) {
-    const uniqueTags = Array.from(
-      new Set(
-        tags
-          .map((tagValue) => (typeof tagValue === 'string' ? tagValue.trim() : ''))
-          .filter((tagValue) => tagValue.length > 0)
-      )
-    );
+    const sanitizedTags = uniqueSortedStrings(tags);
 
-    for (const tag of uniqueTags) {
+    for (const tag of sanitizedTags) {
       const pattern = createTagRegex(tag);
 
       if (pattern) {
