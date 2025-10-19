@@ -92,6 +92,31 @@ describe('useHomePosts', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  test('initial state respects provided filters metadata', () => {
+    const setHomePosts = vi.fn();
+    const fetchMock = vi.fn();
+
+    const { result } = renderHook(() =>
+      useHomePosts({
+        initialPosts,
+        pageSize,
+        activeCategory: null,
+        activeTags: [],
+        initialCategory: 'story',
+        initialTags: ['tech'],
+        initialHasMore: false,
+        routerReady: false,
+        homePosts: null,
+        setHomePosts,
+        fetchImplementation: fetchMock as unknown as typeof fetch,
+      })
+    );
+
+    expect(result.current.postsState.category).toBe('story');
+    expect(result.current.postsState.tags).toEqual(['tech']);
+    expect(result.current.postsState.hasMore).toBe(false);
+  });
+
   test('fetches posts when filters change', async () => {
     const setHomePosts = vi.fn();
     const responseData = {
