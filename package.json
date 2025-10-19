@@ -4,9 +4,8 @@
   "scripts": {
     "lint": "next lint",
     "test": "vitest run",
-    "test:ci": "vitest run --runInBand",
     "test:watch": "vitest",
-    "prebuild": "yarn lint && yarn test:ci",
+    "prebuild": "yarn lint && yarn test",
     "dev": "next",
     "build": "next build",
     "start": "next start"
