@@ -10,6 +10,7 @@ interface UseHomePostsParams {
   activeTags: string[];
   routerReady: boolean;
   homePosts: HomePostsState | null;
+  // eslint-disable-next-line no-unused-vars
   setHomePosts: (value: HomePostsState | null) => void;
   fetchImplementation?: typeof fetch;
 }
@@ -31,8 +32,7 @@ interface PaginatedPostsApiResponse {
 
 const FILTER_FETCH_ERROR =
   'Unable to load posts for this filter. Tap to retry.';
-const LOAD_MORE_ERROR =
-  'Unable to load more posts right now. Tap to retry.';
+const LOAD_MORE_ERROR = 'Unable to load more posts right now. Tap to retry.';
 
 export function useHomePosts({
   initialPosts,
@@ -92,72 +92,75 @@ export function useHomePosts({
     }
   }, [postsState, homePosts, setHomePosts]);
 
-  const fetchPostsForFilters = useCallback(async (force = false) => {
-    if (!routerReady) {
-      return;
-    }
-
-    if (!force && filtersMatch(postsState, activeCategory, activeTags)) {
-      return;
-    }
-
-    if (!hasActiveFilters) {
-      setPostsState(initialState);
-      setIsFetching(false);
-      setError(null);
-      return;
-    }
-
-    const params = new URLSearchParams({
-      limit: pageSize.toString(),
-      offset: '0',
-    });
-
-    if (activeCategory) {
-      params.set('category', activeCategory);
-    }
-
-    for (const tag of activeTags) {
-      params.append('tag', tag);
-    }
-
-    setIsFetching(true);
-    setError(null);
-
-    try {
-      const response = await fetchFn(`/api/posts?${params.toString()}`);
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+  const fetchPostsForFilters = useCallback(
+    async (force = false) => {
+      if (!routerReady) {
+        return;
       }
 
-      const payload = (await response.json()) as PaginatedPostsApiResponse;
-      const posts = payload.posts ?? [];
-      const nextOffset = payload.nextOffset ?? posts.length;
+      if (!force && filtersMatch(postsState, activeCategory, activeTags)) {
+        return;
+      }
 
-      setPostsState({
-        posts,
-        offset: nextOffset,
-        hasMore: payload.hasMore ?? false,
-        category: activeCategory,
-        tags: [...activeTags],
+      if (!hasActiveFilters) {
+        setPostsState(initialState);
+        setIsFetching(false);
+        setError(null);
+        return;
+      }
+
+      const params = new URLSearchParams({
+        limit: pageSize.toString(),
+        offset: '0',
       });
-    } catch (loadError) {
-      console.error('Failed to fetch filtered posts', loadError);
-      setError(FILTER_FETCH_ERROR);
-    } finally {
-      setIsFetching(false);
-    }
-  }, [
-    activeCategory,
-    activeTags,
-    fetchFn,
-    hasActiveFilters,
-    initialState,
-    pageSize,
-    postsState,
-    routerReady,
-  ]);
+
+      if (activeCategory) {
+        params.set('category', activeCategory);
+      }
+
+      for (const tag of activeTags) {
+        params.append('tag', tag);
+      }
+
+      setIsFetching(true);
+      setError(null);
+
+      try {
+        const response = await fetchFn(`/api/posts?${params.toString()}`);
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const payload = (await response.json()) as PaginatedPostsApiResponse;
+        const posts = payload.posts ?? [];
+        const nextOffset = payload.nextOffset ?? posts.length;
+
+        setPostsState({
+          posts,
+          offset: nextOffset,
+          hasMore: payload.hasMore ?? false,
+          category: activeCategory,
+          tags: [...activeTags],
+        });
+      } catch (loadError) {
+        console.error('Failed to fetch filtered posts', loadError);
+        setError(FILTER_FETCH_ERROR);
+      } finally {
+        setIsFetching(false);
+      }
+    },
+    [
+      activeCategory,
+      activeTags,
+      fetchFn,
+      hasActiveFilters,
+      initialState,
+      pageSize,
+      postsState,
+      routerReady,
+    ]
+  );
 
   useEffect(() => {
     void fetchPostsForFilters();
