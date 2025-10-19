@@ -85,31 +85,8 @@ function buildFilter(
   }
 
   if (tag) {
-    const tagPattern = createTagPattern(tag);
-
-    if (tagPattern) {
-      filters.tags = {
-        matches: {
-          pattern: tagPattern,
-          caseSensitive: false,
-        },
-      };
-    }
+    filters.tags = { contains: tag.trim() };
   }
 
   return Object.keys(filters).length ? filters : null;
-}
-
-function createTagPattern(tag: string): string | null {
-  const trimmed = tag.trim();
-
-  if (!trimmed) {
-    return null;
-  }
-
-  return `*${escapeDatoPattern(trimmed)}*`;
-}
-
-function escapeDatoPattern(value: string): string {
-  return value.replace(/[*?\\]/g, (match) => `\\${match}`);
 }
