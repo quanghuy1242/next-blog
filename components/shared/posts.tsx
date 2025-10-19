@@ -12,7 +12,7 @@ interface PostTitleProps {
 
 const PostTitle = ({ slug, title }: PostTitleProps) => (
   <h3 className="text-2xl leading-snug">
-    <Link href={`/posts/${slug}`} prefetch={false} className="hover:underline">
+    <Link href={`/posts/${slug}`} className="hover:underline">
       {title}
     </Link>
   </h3>
@@ -38,9 +38,7 @@ export function Post({
   tags = [],
 }: PostProps) {
   const categoryName =
-    typeof category === 'string'
-      ? category
-      : category?.name ?? '';
+    typeof category === 'string' ? category : category?.name ?? '';
 
   return (
     <div className="flex flex-col gap-1">
@@ -99,9 +97,7 @@ export function Posts({ posts, hasMoreCol = true }: PostsProps) {
   );
 }
 
-function normalizeTags(
-  tags: PostType['tags']
-): string[] {
+function normalizeTags(tags: PostType['tags']): string[] {
   if (typeof tags === 'string') {
     return tags.split(', ').filter(Boolean);
   }

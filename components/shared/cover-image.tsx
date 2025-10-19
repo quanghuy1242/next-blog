@@ -33,7 +33,6 @@ export function CoverImage({
       {slug ? (
         <Link
           href={`/posts/${slug}`}
-          prefetch={false}
           aria-label={title ?? 'Post cover'}
           className="block"
         >
