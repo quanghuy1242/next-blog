@@ -24,7 +24,12 @@ export function Category({
 
   return (
     <Link
-      href={`/categories/${slug}`}
+      href={{
+        pathname: '/',
+        query: {
+          category: slug,
+        },
+      }}
       className={cn(className, 'block relative mb-2')}
       onMouseOver={() => setShow(true)}
       onMouseLeave={() => setShow(false)}

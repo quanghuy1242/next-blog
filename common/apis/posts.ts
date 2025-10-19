@@ -13,17 +13,24 @@ export interface PaginatedPostsResult {
 export interface PaginatedPostsParams {
   limit: number;
   skip: number;
+  categoryId?: string | null;
+  tags?: string[] | null;
 }
 
-export async function getPaginatedPosts(
-  { limit, skip }: PaginatedPostsParams
-): Promise<PaginatedPostsResult> {
+export async function getPaginatedPosts({
+  limit,
+  skip,
+  categoryId,
+  tags,
+}: PaginatedPostsParams): Promise<PaginatedPostsResult> {
   const first = limit + 1;
+
+  const filter: Record<string, unknown> | null = buildFilter(categoryId, tags);
 
   const data = await fetchAPI<PaginatedPostsResponse>(
     `#graphql
-      query PaginatedPosts($first: IntType!, $skip: IntType!) {
-        allPosts(orderBy: date_DESC, first: $first, skip: $skip) {
+      query PaginatedPosts($first: IntType!, $skip: IntType!, $filter: PostModelFilter) {
+        allPosts(orderBy: date_DESC, first: $first, skip: $skip, filter: $filter) {
           title
           slug
           excerpt
@@ -41,6 +48,7 @@ export async function getPaginatedPosts(
           }
           category {
             name
+            slug
           }
           tags
         }
@@ -51,6 +59,7 @@ export async function getPaginatedPosts(
       variables: {
         first,
         skip,
+        filter,
       },
     }
   );
@@ -63,4 +72,68 @@ export async function getPaginatedPosts(
     posts: posts.slice(0, Math.max(limit, 0)),
     hasMore,
   };
+}
+
+function buildFilter(
+  categoryId: string | null | undefined,
+  tags: string[] | null | undefined
+): Record<string, unknown> | null {
+  const conditions: Record<string, unknown>[] = [];
+
+  if (categoryId) {
+    conditions.push({ category: { eq: categoryId } });
+  }
+
+  if (Array.isArray(tags) && tags.length) {
+    const uniqueTags = Array.from(
+      new Set(
+        tags
+          .map((tagValue) => (typeof tagValue === 'string' ? tagValue.trim() : ''))
+          .filter((tagValue) => tagValue.length > 0)
+      )
+    );
+
+    for (const tag of uniqueTags) {
+      const pattern = createTagRegex(tag);
+
+      if (pattern) {
+        conditions.push({
+          tags: {
+            matches: {
+              pattern,
+              caseSensitive: false,
+            },
+          },
+        });
+      }
+    }
+  }
+
+  if (!conditions.length) {
+    return null;
+  }
+
+  if (conditions.length === 1) {
+    return conditions[0];
+  }
+
+  return {
+    AND: conditions,
+  };
+}
+
+function createTagRegex(tag: string): string | null {
+  const trimmed = tag.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  const escaped = escapeRegex(trimmed);
+
+  return `(^|,\\s*)${escaped}(\\s*,|$)`;
+}
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
