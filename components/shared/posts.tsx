@@ -50,10 +50,7 @@ export function Post({
   const categoryHref: LinkProps['href'] | undefined = categorySlug
     ? {
         pathname: '/',
-        query: {
-          category: categorySlug,
-          ...(activeTags.length ? { tag: activeTags } : {}),
-        },
+        query: { category: categorySlug },
       }
     : undefined;
 

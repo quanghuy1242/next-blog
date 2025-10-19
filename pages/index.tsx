@@ -297,7 +297,7 @@ export default function Index({
         </div>
         <div className="md:w-1/3">
           <Text text="Categories" />
-          <Categories categories={allCategories} activeTags={postsState.tags} />
+          <Categories categories={allCategories} />
         </div>
       </Container>
     </Layout>
