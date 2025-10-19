@@ -1,3 +1,4 @@
+import React from 'react';
 import { HOME_OG_IMAGE_URL } from 'common/constants';
 import cn from 'classnames';
 

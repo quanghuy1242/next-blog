@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { getDataForHome } from 'common/apis/index';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
@@ -10,13 +10,10 @@ import type { GetStaticProps } from 'next';
 import Head from 'next/head';
 import { renderMetaTags } from 'react-datocms';
 import { useRouter } from 'next/router';
-import type { HomePageData, Post } from 'types/datocms';
-import { useAppContext, type HomePostsState } from 'context/state';
-import {
-  areStringArraysEqual,
-  normalizeQueryParam,
-  normalizeQueryParamList,
-} from 'common/utils/query';
+import type { HomePageData } from 'types/datocms';
+import { useAppContext } from 'context/state';
+import { normalizeQueryParam, normalizeQueryParamList } from 'common/utils/query';
+import { useHomePosts } from 'hooks/useHomePosts';
 
 interface HomePageProps {
   allPosts: HomePageData['allPosts'];
@@ -29,9 +26,9 @@ const POSTS_PAGE_SIZE = 5;
 /**
  * Home page with filter-aware infinite scrolling.
  *
- * Reads `category`/`tag` query params, fetches matching posts, and keeps the
- * result cached via context so navigating back restores the filtered view. All
- * fetching honours the active filters, including the infinite scroll loader.
+ * Reads `category`/`tag` query params, fetches matching posts via `useHomePosts`,
+ * and keeps the result cached in context so navigation restores the filtered
+ * view. Infinite scrolling respects the current filter set.
  */
 export default function Index({
   allPosts,
@@ -39,206 +36,37 @@ export default function Index({
   allCategories,
 }: HomePageProps) {
   const header = homepage?.header || '';
-  // Memoize the baseline list so we can restore it when filters clear.
-  const initialState = useMemo<HomePostsState>(
-    () => ({
-      posts: allPosts,
-      offset: allPosts.length,
-      hasMore: allPosts.length === POSTS_PAGE_SIZE,
-      category: null,
-      tags: [],
-    }),
-    [allPosts]
-  );
-
   const { homePosts, setHomePosts } = useAppContext();
   const router = useRouter();
-  // Derive normalized query params once per render to avoid churn.
+
   const activeCategory = useMemo(
     () => (router.isReady ? normalizeQueryParam(router.query.category) : null),
     [router.isReady, router.query.category]
   );
+
   const activeTags = useMemo(
     () => (router.isReady ? normalizeQueryParamList(router.query.tag) : []),
     [router.isReady, router.query.tag]
   );
-  const loaderRef = useRef<HTMLDivElement | null>(null);
-  const hasHydratedFromContext = useRef(false);
 
-  const [postsState, setPostsState] = useState<HomePostsState>(
-    () => homePosts ?? initialState
-  );
-  const [isFetching, setIsFetching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Hydrate from context (if available) once on the client.
-  useEffect(() => {
-    if (!router.isReady || hasHydratedFromContext.current) {
-      return;
-    }
-
-    if (homePosts && filtersMatch(homePosts, activeCategory, activeTags)) {
-      setPostsState(homePosts);
-    }
-
-    hasHydratedFromContext.current = true;
-  }, [router.isReady, homePosts, activeCategory, activeTags]);
-
-  // Persist the latest state back into context after hydration.
-  useEffect(() => {
-    if (!hasHydratedFromContext.current) {
-      return;
-    }
-
-    if (postsState !== homePosts) {
-      setHomePosts(postsState);
-    }
-  }, [postsState, homePosts, setHomePosts]);
-
-  /**
-   * Fetch the first page for the current filter set and reset local state.
-   * Invoked on mount and whenever the router query changes.
-   */
-  const fetchPostsForFilters = useCallback(async () => {
-    if (!router.isReady) {
-      return;
-    }
-
-    if (filtersMatch(postsState, activeCategory, activeTags)) {
-      return;
-    }
-
-    if (!activeCategory && activeTags.length === 0) {
-      // No filters selected, revert to the initial SSR payload.
-      setPostsState({
-        posts: allPosts,
-        offset: allPosts.length,
-        hasMore: allPosts.length === POSTS_PAGE_SIZE,
-        category: null,
-        tags: [],
-      });
-      setIsFetching(false);
-      setError(null);
-      return;
-    }
-
-    // Build the fetch URL with the active filters.
-    const params = new URLSearchParams({
-      limit: POSTS_PAGE_SIZE.toString(),
-      offset: '0',
-    });
-
-    if (activeCategory) {
-      params.set('category', activeCategory);
-    }
-
-    for (const tag of activeTags) {
-      params.append('tag', tag);
-    }
-
-    setIsFetching(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`/api/posts?${params.toString()}`);
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-
-      const payload = (await response.json()) as PaginatedPostsApiResponse;
-      const posts = payload.posts ?? [];
-      const nextOffset = payload.nextOffset ?? posts.length;
-
-      setPostsState({
-        posts,
-        offset: nextOffset,
-        hasMore: payload.hasMore ?? false,
-        category: activeCategory,
-        tags: [...activeTags],
-      });
-    } catch (loadError) {
-      console.error('Failed to fetch filtered posts', loadError);
-      setError('Unable to load posts for this filter. Tap to retry.');
-    } finally {
-      setIsFetching(false);
-    }
-  }, [
-    router.isReady,
+  const {
     postsState,
+    isFetching,
+    error,
+    hasActiveFilters,
+    loadMorePosts,
+    refetchCurrentFilters,
+  } = useHomePosts({
+    initialPosts: allPosts,
+    pageSize: POSTS_PAGE_SIZE,
     activeCategory,
     activeTags,
-    allPosts,
-  ]);
+    routerReady: router.isReady,
+    homePosts,
+    setHomePosts,
+  });
 
-  useEffect(() => {
-    void fetchPostsForFilters();
-  }, [fetchPostsForFilters]);
-
-  /**
-   * Append another page of posts while ensuring responses correspond to the
-   * filters that triggered them (protects against race conditions).
-   */
-  const loadMorePosts = useCallback(async () => {
-    if (isFetching || !postsState.hasMore) {
-      return;
-    }
-
-    const { category: currentCategory, tags: currentTags } = postsState;
-
-    setIsFetching(true);
-    setError(null);
-
-    try {
-      const params = new URLSearchParams({
-        offset: postsState.offset.toString(),
-        limit: POSTS_PAGE_SIZE.toString(),
-      });
-
-      if (currentCategory) {
-        params.set('category', currentCategory);
-      }
-
-      for (const tag of currentTags) {
-        params.append('tag', tag);
-      }
-
-      const response = await fetch(`/api/posts?${params.toString()}`);
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-
-      const payload = (await response.json()) as PaginatedPostsApiResponse;
-
-      setPostsState((previous) => {
-        // Ignore responses that were requested with outdated filters.
-        if (!filtersMatch(previous, currentCategory, currentTags)) {
-          return previous;
-        }
-
-        const mergedPosts = mergePosts(previous.posts, payload.posts ?? []);
-
-        const nextOffset = Math.max(
-          payload.nextOffset ?? previous.offset,
-          mergedPosts.length
-        );
-
-        return {
-          posts: mergedPosts,
-          offset: nextOffset,
-          hasMore: payload.hasMore ?? previous.hasMore,
-          category: previous.category ?? currentCategory ?? null,
-          tags: [...currentTags],
-        };
-      });
-    } catch (loadError) {
-      console.error('Failed to load more posts', loadError);
-      setError('Unable to load more posts right now. Tap to retry.');
-    } finally {
-      setIsFetching(false);
-    }
-  }, [isFetching, postsState]);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!postsState.hasMore) {
@@ -251,7 +79,6 @@ export default function Index({
       return;
     }
 
-    // Trigger `loadMorePosts` once the sentinel is near the viewport.
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
@@ -304,8 +131,8 @@ export default function Index({
               <button
                 type="button"
                 onClick={() => {
-                  if (activeCategory || activeTags.length) {
-                    void fetchPostsForFilters();
+                  if (hasActiveFilters) {
+                    void refetchCurrentFilters();
                   } else {
                     void loadMorePosts();
                   }
@@ -348,51 +175,3 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
     revalidate: 60,
   };
 };
-
-interface PaginatedPostsApiResponse {
-  posts?: Post[];
-  hasMore?: boolean;
-  nextOffset?: number;
-}
-
-/**
- * Append incoming posts while skipping duplicates (e.g. when the backend
- * returns overlapping pages after content updates).
- */
-function mergePosts(current: Post[], incoming: Post[]): Post[] {
-  if (!incoming.length) {
-    return current;
-  }
-
-  const seen = new Set(current.map((post) => post.slug));
-  const merged = [...current];
-
-  for (const post of incoming) {
-    if (!seen.has(post.slug)) {
-      seen.add(post.slug);
-      merged.push(post);
-    }
-  }
-
-  return merged;
-}
-
-/**
- * Checks if a stored state snapshot matches the provided filters.
- * Used to avoid redundant fetches and to discard responses for stale filters.
- */
-function filtersMatch(
-  state: HomePostsState | null,
-  category: string | null,
-  tags: string[]
-): boolean {
-  if (!state) {
-    return false;
-  }
-
-  if ((state.category ?? null) !== category) {
-    return false;
-  }
-
-  return areStringArraysEqual(state.tags, tags);
-}
