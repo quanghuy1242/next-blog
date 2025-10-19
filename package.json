@@ -4,8 +4,9 @@
   "scripts": {
     "lint": "next lint",
     "test": "vitest run",
+    "test:ci": "cross-env NODE_ENV=test vitest run",
     "test:watch": "vitest",
-    "prebuild": "yarn lint && yarn test",
+    "prebuild": "yarn lint && yarn test:ci",
     "dev": "next",
     "build": "next build",
     "start": "next start"
@@ -40,6 +41,7 @@
     "@testing-library/react": "^16.1.0",
     "jsdom": "^26.0.0",
     "node-mocks-http": "^1.13.0",
-    "vitest": "^2.1.4"
+    "vitest": "^2.1.4",
+    "cross-env": "^7.0.3"
   }
 }
