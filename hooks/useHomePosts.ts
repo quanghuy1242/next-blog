@@ -8,6 +8,9 @@ interface UseHomePostsParams {
   pageSize: number;
   activeCategory: string | null;
   activeTags: string[];
+  initialHasMore?: boolean;
+  initialCategory?: string | null;
+  initialTags?: string[];
   routerReady: boolean;
   homePosts: HomePostsState | null;
   // eslint-disable-next-line no-unused-vars
@@ -39,6 +42,9 @@ export function useHomePosts({
   pageSize,
   activeCategory,
   activeTags,
+  initialHasMore,
+  initialCategory,
+  initialTags,
   routerReady,
   homePosts,
   setHomePosts,
@@ -50,15 +56,29 @@ export function useHomePosts({
     throw new Error('Fetch implementation is required to load posts.');
   }
 
+  const normalizedInitialTags = useMemo(
+    () => (initialTags ? [...initialTags] : []),
+    [initialTags]
+  );
+
   const initialState = useMemo<HomePostsState>(
     () => ({
       posts: initialPosts,
       offset: initialPosts.length,
-      hasMore: initialPosts.length === pageSize,
-      category: null,
-      tags: [],
+      hasMore:
+        typeof initialHasMore === 'boolean'
+          ? initialHasMore
+          : initialPosts.length === pageSize,
+      category: initialCategory ?? null,
+      tags: [...normalizedInitialTags],
     }),
-    [initialPosts, pageSize]
+    [
+      initialPosts,
+      pageSize,
+      initialHasMore,
+      initialCategory,
+      normalizedInitialTags,
+    ]
   );
 
   const [postsState, setPostsState] = useState<HomePostsState>(

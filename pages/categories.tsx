@@ -23,7 +23,7 @@ export default function Categories({ homepage }: CategoriesPageProps) {
 }
 
 export const getStaticProps: GetStaticProps<CategoriesPageProps> = async () => {
-  const data = await getDataForHome();
+  const { data } = await getDataForHome();
   return {
     props: {
       homepage: data.homepage ?? null,

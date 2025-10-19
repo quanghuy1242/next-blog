@@ -26,7 +26,10 @@ export async function getPaginatedPosts({
 }: PaginatedPostsParams): Promise<PaginatedPostsResult> {
   const first = limit + 1;
 
-  const filter: Record<string, unknown> | null = buildFilter(categoryId, tags);
+  const filter: Record<string, unknown> | null = createPostsFilter(
+    categoryId,
+    tags
+  );
 
   const data = await fetchAPI<PaginatedPostsResponse>(
     `#graphql
@@ -75,7 +78,7 @@ export async function getPaginatedPosts({
   };
 }
 
-function buildFilter(
+export function createPostsFilter(
   categoryId: string | null | undefined,
   tags: string[] | null | undefined
 ): Record<string, unknown> | null {

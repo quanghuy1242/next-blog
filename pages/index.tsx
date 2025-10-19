@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { getDataForHome } from 'common/apis/index';
+import { getCategoryIdBySlug } from 'common/apis/categories';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { Banner } from 'components/pages/index/banner';
 import { Categories } from 'components/shared/categories';
 import { Posts } from 'components/shared/posts';
 import { Text } from 'components/shared/text';
-import type { GetStaticProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { renderMetaTags } from 'react-datocms';
 import { useRouter } from 'next/router';
@@ -16,9 +17,12 @@ import { normalizeQueryParam, normalizeQueryParamList } from 'common/utils/query
 import { useHomePosts } from 'hooks/useHomePosts';
 
 interface HomePageProps {
-  allPosts: HomePageData['allPosts'];
+  initialPosts: HomePageData['allPosts'];
   allCategories: HomePageData['allCategories'];
   homepage: HomePageData['homepage'];
+  initialHasMore: boolean;
+  initialCategory: string | null;
+  initialTags: string[];
 }
 
 const POSTS_PAGE_SIZE = 5;
@@ -31,22 +35,31 @@ const POSTS_PAGE_SIZE = 5;
  * view. Infinite scrolling respects the current filter set.
  */
 export default function Index({
-  allPosts,
+  initialPosts,
   homepage,
   allCategories,
+  initialHasMore,
+  initialCategory,
+  initialTags,
 }: HomePageProps) {
   const header = homepage?.header || '';
   const { homePosts, setHomePosts } = useAppContext();
   const router = useRouter();
 
   const activeCategory = useMemo(
-    () => (router.isReady ? normalizeQueryParam(router.query.category) : null),
-    [router.isReady, router.query.category]
+    () =>
+      router.isReady
+        ? normalizeQueryParam(router.query.category)
+        : initialCategory,
+    [router.isReady, router.query.category, initialCategory]
   );
 
   const activeTags = useMemo(
-    () => (router.isReady ? normalizeQueryParamList(router.query.tag) : []),
-    [router.isReady, router.query.tag]
+    () =>
+      router.isReady
+        ? normalizeQueryParamList(router.query.tag)
+        : initialTags,
+    [router.isReady, router.query.tag, initialTags]
   );
 
   const {
@@ -57,7 +70,10 @@ export default function Index({
     loadMorePosts,
     refetchCurrentFilters,
   } = useHomePosts({
-    initialPosts: allPosts,
+    initialPosts,
+    initialHasMore,
+    initialCategory,
+    initialTags,
     pageSize: POSTS_PAGE_SIZE,
     activeCategory,
     activeTags,
@@ -159,19 +175,41 @@ export default function Index({
 }
 
 /**
- * Fetch the static payload required to render the home page. Runs at build
- * time (and revalidates) so the initial render is always hydrated with posts
- * and metadata before client-side filtering kicks in.
+ * Fetch the server-rendered payload required to render the home page. The
+ * initial posts respect incoming query filters so the first paint matches what
+ * the user requested.
  */
-export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
-  const data = await getDataForHome();
+export const getServerSideProps: GetServerSideProps<HomePageProps> = async (
+  context
+) => {
+  const initialCategory = normalizeQueryParam(context.query.category);
+  const initialTags = normalizeQueryParamList(context.query.tag);
+  const tags = initialTags.length ? initialTags : null;
+
+  let categoryId: string | null = null;
+
+  if (initialCategory) {
+    categoryId = await getCategoryIdBySlug(initialCategory);
+  }
+
+  const { data, hasMore } = await getDataForHome({
+    limit: POSTS_PAGE_SIZE,
+    categoryId,
+    tags,
+  });
+
+  const categoryIsValid = !initialCategory || Boolean(categoryId);
+  const initialPosts = categoryIsValid ? data.allPosts ?? [] : [];
+  const initialHasMore = categoryIsValid ? hasMore : false;
 
   return {
     props: {
-      allPosts: data.allPosts ?? [],
+      initialPosts,
       allCategories: data.allCategories ?? [],
       homepage: data.homepage ?? null,
+      initialHasMore,
+      initialCategory,
+      initialTags,
     },
-    revalidate: 60,
   };
 };
