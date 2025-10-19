@@ -385,7 +385,9 @@ function normalizeQueryParamArray(
   }
 
   const normalized = rawValues
-    .map((entry) => (typeof entry === 'string' ? entry : entry?.toString() ?? ''))
+    .map((entry) =>
+      typeof entry === 'string' ? entry : entry == null ? '' : String(entry)
+    )
     .map((entry) => entry.trim())
     .filter((entry) => entry.length > 0);
 

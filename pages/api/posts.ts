@@ -86,7 +86,9 @@ function normalizeStringList(value: unknown): string[] {
   const values = Array.isArray(value) ? value : [value];
 
   const normalized = values
-    .map((entry) => (typeof entry === 'string' ? entry : entry?.toString() ?? ''))
+    .map((entry) =>
+      typeof entry === 'string' ? entry : entry == null ? '' : String(entry)
+    )
     .map((entry) => entry.trim())
     .filter((entry) => entry.length > 0);
 
