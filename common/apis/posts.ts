@@ -85,8 +85,33 @@ function buildFilter(
   }
 
   if (tag) {
-    filters.tags = { contains: tag.trim() };
+    const pattern = createTagRegex(tag);
+
+    if (pattern) {
+      filters.tags = {
+        matches: {
+          pattern,
+          caseSensitive: false,
+        },
+      };
+    }
   }
 
   return Object.keys(filters).length ? filters : null;
+}
+
+function createTagRegex(tag: string): string | null {
+  const trimmed = tag.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  const escaped = escapeRegex(trimmed);
+
+  return `.*${escaped}.*`;
+}
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
