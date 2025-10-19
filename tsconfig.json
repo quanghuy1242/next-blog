@@ -18,7 +18,7 @@
     "paths": {
       "*": ["./*"]
     },
-    "types": ["node", "react"]
+    "types": ["node", "react", "vitest/globals"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules", ".next"]
