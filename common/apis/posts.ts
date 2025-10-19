@@ -29,7 +29,7 @@ export async function getPaginatedPosts({
 
   const data = await fetchAPI<PaginatedPostsResponse>(
     `#graphql
-      query PaginatedPosts($first: IntType!, $skip: IntType!, $filter: PostFilter) {
+      query PaginatedPosts($first: IntType!, $skip: IntType!, $filter: PostModelFilter) {
         allPosts(orderBy: date_DESC, first: $first, skip: $skip, filter: $filter) {
           title
           slug
