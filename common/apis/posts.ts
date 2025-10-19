@@ -25,24 +25,12 @@ export async function getPaginatedPosts({
 }: PaginatedPostsParams): Promise<PaginatedPostsResult> {
   const first = limit + 1;
 
-  const filterConditions: string[] = [];
-
-  if (category) {
-    filterConditions.push('category: { slug: { eq: $category } }');
-  }
-
-  if (tag) {
-    filterConditions.push('tags: { matches: { pattern: $tag } }');
-  }
-
-  const filterClause = filterConditions.length
-    ? `, filter: { ${filterConditions.join(' ')} }`
-    : '';
+  const filter: Record<string, unknown> | null = buildFilter(category, tag);
 
   const data = await fetchAPI<PaginatedPostsResponse>(
     `#graphql
-      query PaginatedPosts($first: IntType!, $skip: IntType!, $category: String, $tag: String) {
-        allPosts(orderBy: date_DESC, first: $first, skip: $skip${filterClause}) {
+      query PaginatedPosts($first: IntType!, $skip: IntType!, $filter: PostFilter) {
+        allPosts(orderBy: date_DESC, first: $first, skip: $skip, filter: $filter) {
           title
           slug
           excerpt
@@ -71,8 +59,7 @@ export async function getPaginatedPosts({
       variables: {
         first,
         skip,
-        category,
-        tag,
+        filter,
       },
     }
   );
@@ -85,4 +72,44 @@ export async function getPaginatedPosts({
     posts: posts.slice(0, Math.max(limit, 0)),
     hasMore,
   };
+}
+
+function buildFilter(
+  category: string | null | undefined,
+  tag: string | null | undefined
+): Record<string, unknown> | null {
+  const filters: Record<string, unknown> = {};
+
+  if (category) {
+    filters.category = { slug: { eq: category } };
+  }
+
+  if (tag) {
+    const tagPattern = createTagPattern(tag);
+
+    if (tagPattern) {
+      filters.tags = {
+        matches: {
+          pattern: tagPattern,
+          caseSensitive: false,
+        },
+      };
+    }
+  }
+
+  return Object.keys(filters).length ? filters : null;
+}
+
+function createTagPattern(tag: string): string | null {
+  const trimmed = tag.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  return `*${escapeDatoPattern(trimmed)}*`;
+}
+
+function escapeDatoPattern(value: string): string {
+  return value.replace(/[*?\\]/g, (match) => `\\${match}`);
 }
