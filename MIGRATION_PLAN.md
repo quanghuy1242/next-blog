@@ -20,6 +20,7 @@ This document outlines the migration plan from DatoCMS to a new PayloadCMS-based
   - Content field returns `JSON` instead of markdown string
   - Tags structure changed from `string[]` to `[Post_Tags!]` (array of objects with `tag` and `id`)
   - New `_status` field (`draft` | `published`)
+  - **No `date` field** - use `createdAt` and `updatedAt` for all timestamp needs
   - Supports draft/trash modes via query parameters
 
 #### 2. **Categories**
@@ -414,7 +415,8 @@ SimilarPosts(postId: $postId, limit: 2) {
     title
     slug
     excerpt
-    date
+    createdAt
+    updatedAt
     coverImage { url width height }
     author { fullName }
     category { name slug }
@@ -650,6 +652,8 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
    - Add `avatar` (nullable Media) to User type
    - Map author ID = 1 for quanghuy1242
    - Update Post, Category, Media types
+   - **Map `createdAt` to display dates** (no separate `date` field)
+   - Use `updatedAt` for "last modified" timestamps
 3. Create type mappers for backward compatibility where possible
 
 ### Phase 3: Core API Layer (Day 2-3)
@@ -688,7 +692,10 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
 1. Update `CoverImage` component for new image structure with R2 transformations
 2. Update `Posts` component for new tag structure
 3. Update metadata rendering (replace `react-datocms` with custom function)
-4. Update author display components:
+4. Update date/timestamp display components:
+   - Replace `date` field usage with `createdAt`
+   - Use `updatedAt` for "last modified" displays
+5. Update author display components:
    - Use `fullName` field
    - Handle nullable `avatar` field with placeholder fallback
    - Ensure no sensitive fields are accessed
@@ -939,5 +946,6 @@ Migration is complete when:
 - Avatar: Nullable Media field with public domain placeholder fallback
 - Bio: Lexical JSON content for about page
 - Display name: Use `fullName` directly
+- Timestamps: Use `createdAt` and `updatedAt` (no separate `date` field)
 - Content migration: Manual process (no markdown)
 - No rate limits to worry about
