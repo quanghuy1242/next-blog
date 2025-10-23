@@ -219,7 +219,7 @@ import { RichText } from '@payloadcms/richtext-lexical/react';
 
 **Migration Notes**:
 
-- Need to migrate existing markdown content to Lexical format (manual or scripted)
+- Content migration to Lexical format handled manually (no automated script needed)
 - Lexical supports custom nodes for YouTube embeds and other directives
 - Can implement similar directive functionality using Lexical plugins
 
@@ -286,6 +286,7 @@ author: User {
   id: Int!
   fullName: String!
   avatar: Media  # Nullable - use placeholder if null
+  bio(depth: Int): JSON  # Lexical content for about page
   # Exclude from public queries:
   # - email: EmailAddress
   # - apiKey: String
@@ -431,9 +432,9 @@ SimilarPosts(postId: $postId, limit: 2) {
 
 ---
 
-### 9. **About Page / External Content**
+### 9. **About Page Content**
 
-**Issue**: Current implementation fetches external content (GitHub README).
+**Issue**: Current implementation fetches external content (GitHub README) and converts markdown to HTML.
 
 **Current**:
 
@@ -441,32 +442,82 @@ SimilarPosts(postId: $postId, limit: 2) {
 author(filter: { name: { eq: "quanghuy1242" } }) {
   externalContentUrl
 }
+// Fetches markdown and converts to HTML
+const md = await getDataContentForAbout(externalContentUrl);
+const content = await markdownToHtml(md || '');
 ```
 
-**New Schema**: User type doesn't have `externalContentUrl` field.
+**New Schema**: User type has `bio` field with Lexical JSON content.
 
-**✅ SOLUTION**: Hardcode external README URL temporarily
+```graphql
+User {
+  id: Int!
+  fullName: String!
+  avatar: Media
+  bio(depth: Int): JSON  # Lexical editor content
+}
+```
 
-- Hardcode the `externalContentUrl` in the about page component
-- Can be updated later when User schema is extended or About page collection is created
+**✅ SOLUTION**: Use User bio field with Lexical renderer
+
+- Query the `bio` field from User (ID = 1)
+- Render using `@payloadcms/richtext-lexical` like post content
+- No markdown processing needed
+- No external URL fetching needed
 
 **Implementation Approach**:
 
 ```typescript
 // pages/about.tsx
-const EXTERNAL_README_URL =
-  'https://raw.githubusercontent.com/quanghuy1242/quanghuy1242/main/README.md';
+import { RichText } from '@payloadcms/richtext-lexical/react';
 
 export const getStaticProps: GetStaticProps<AboutPageProps> = async () => {
-  // Fetch content directly from hardcoded URL
-  const md = await getDataContentForAbout(EXTERNAL_README_URL);
-  const githubReadMeContent = await markdownToHtml(md || '');
+  const headers = {
+    Authorization: `users API-Key ${process.env.GRAPHQL_API_KEY}`,
+  };
 
-  // ... rest of the implementation
+  const response = await fetch(
+    `${process.env.GRAPHQL_ENDPOINT_BASE_URL}/api/graphql`,
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        query: `
+        query {
+          User(id: 1) {
+            fullName
+            bio
+            avatar {
+              url
+              alt
+            }
+          }
+        }
+      `,
+      }),
+    }
+  );
+
+  const { data } = await response.json();
+
+  return {
+    props: {
+      user: data.User,
+    },
+    revalidate: 3600, // ISR - revalidate every hour
+  };
 };
+
+// In component
+<RichText data={user.bio} />;
 ```
 
-**Future Improvement**: Add `externalContentUrl` custom field to User collection or create dedicated About collection
+**Benefits**:
+
+- No external dependencies or URL fetching
+- Consistent Lexical rendering with post content
+- Managed within PayloadCMS admin
+- ISR caching for performance
 
 ---
 
@@ -652,7 +703,7 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
    - Replace "More posts" with `SimilarPosts` query
    - Update metadata rendering with custom function
    - Add published/author filters
-3. Update `pages/about.tsx` - Hardcode external README URL
+3. Update `pages/about.tsx` - Use User bio field with Lexical renderer
 4. Update `pages/categories.tsx` if exists
    - Add published posts filter (author=1, \_status=published)
 5. Update `pages/api/posts.ts` if exists
@@ -746,11 +797,8 @@ Consider these improvements during migration:
 - `remark` - Replaced by Lexical renderer
 - `remark-html` - Replaced by Lexical renderer
 - `remark-directive` - Lexical has its own plugin system
-
-### 🔧 Keep (for now):
-
-- `hastscript` - May still be useful for HTML manipulation
-- Keep markdown processing temporarily for About page external content
+- `hastscript` - No longer needed (was for HTML manipulation)
+- All markdown processing dependencies - no markdown content anymore
 
 ---
 
@@ -773,7 +821,7 @@ Migration is complete when:
 - ✅ Pagination works correctly with new schema
 - ✅ Filtering by category/tags works with new where clauses
 - ✅ Tag structure (object array) is properly handled
-- ✅ About page loads external README content (hardcoded URL)
+- ✅ About page renders user bio content with Lexical
 - ✅ All tests pass and updated for new data structures
 - ✅ No DatoCMS dependencies remain (`react-datocms` removed)
 - ✅ Performance is equal or better than before
@@ -887,8 +935,9 @@ Migration is complete when:
 - User ID for quanghuy1242: `1`
 - GraphQL endpoint: `/api/graphql` (with base URL from env)
 - Authentication: API key in env vars, ISR preferred
-- User fields: Exclude sensitive fields (email, apiKey, etc.)
+- User fields: Exclude sensitive fields (email, apiKey, etc.); Include bio for about page
 - Avatar: Nullable Media field with public domain placeholder fallback
+- Bio: Lexical JSON content for about page
 - Display name: Use `fullName` directly
-- Content migration: Manual process
+- Content migration: Manual process (no markdown)
 - No rate limits to worry about
