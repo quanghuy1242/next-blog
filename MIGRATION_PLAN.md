@@ -283,23 +283,47 @@ author: {
 
 ```graphql
 author: User {
+  id: Int!
   fullName: String!
-  email: EmailAddress!
-  role: User_role
+  avatar: Media  # Nullable - use placeholder if null
+  # Exclude from public queries:
+  # - email: EmailAddress
+  # - apiKey: String
+  # - enableAPIKey: Boolean
+  # - Other auth fields
 }
 ```
 
-**📝 TODO**: Pending decisions on:
+**✅ SOLUTION**: Secure user data handling
 
-1. Display name mapping - use `fullName` directly or add custom field
-2. Email visibility - keep private or expose publicly
-3. Profile picture storage - confirm if using Media collection or custom field
+- Use `fullName` directly for display (no separate displayName field needed in current impl)
+- **Exclude sensitive fields** from all public queries:
+  - `email`
+  - `apiKey`, `apiKeyIndex`, `enableAPIKey`
+  - `resetPasswordToken`, `resetPasswordExpiration`
+  - `salt`, `hash`
+  - `loginAttempts`, `lockUntil`
+  - `sessions`
+- `avatar` field references Media collection (nullable) - use public domain placeholder image if null
+- Filter posts by author ID = 1 (quanghuy1242)
 
-**Temporary Approach**:
+**Implementation Approach**:
 
-- Map `fullName` to `displayName` for compatibility
-- Filter out `email` from public queries for now
-- Investigate User-Media relationship for profile pictures
+```graphql
+# Only query safe fields in public queries
+author {
+  id
+  fullName
+  avatar {
+    url
+    thumbnailURL
+    alt
+  }
+}
+
+# Filter posts by quanghuy1242 (user ID = 1)
+Posts(where: { author: { equals: 1 }, _status: { equals: published } })
+```
 
 ---
 
@@ -533,24 +557,25 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
    - ✅ No draft preview mode needed
    - ✅ No version history features needed
 
-### 📝 Remaining Questions (TODO):
+### ✅ Questions Answered:
 
 1. **Author/User Data**:
 
-   - ❓ Should User.email be public or filtered out in queries?
-   - ❓ Where are author profile pictures stored? (Media collection or custom field?)
-   - ❓ Use `fullName` as `displayName` or add custom field?
-   - ❓ What is the user ID for "quanghuy1242" to filter posts?
+   - ✅ **User.email**: Filter out from public queries (sensitive field)
+   - ✅ **User.apiKey**: Filter out from public queries (sensitive field)
+   - ✅ **Profile pictures**: Add `avatar` field to User type (nullable Media reference). Use public domain placeholder if null
+   - ✅ **Display name**: Use `fullName` field (not using displayName in current impl)
+   - ✅ **User ID for "quanghuy1242"**: ID = `1` (integer)
 
 2. **API Configuration**:
 
-   - ❓ What is the GraphQL endpoint URL?
-   - ❓ Does it require authentication for public queries?
-   - ❓ Are there rate limits or query complexity limits?
+   - ✅ **GraphQL endpoint**: `/api/graphql` (base URL from env var)
+   - ✅ **Authentication**: All resources protected via API key - use SSR or ISR (prefer ISR with revalidation like current approach)
+   - ✅ **Rate limits**: No limits to worry about
 
 3. **Content Migration**:
-   - ❓ Do you have existing markdown content that needs migrating to Lexical format?
-   - ❓ Should we create a migration script or manual process?
+   - ✅ **Markdown to Lexical**: Manual migration - no automated script needed
+   - ✅ **Migration process**: Manual - don't worry about it
 
 ---
 
@@ -558,15 +583,22 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
 
 ### Phase 1: Setup & Configuration (Day 1)
 
-1. Update environment variables with new GraphQL endpoint
+1. ✅ Configure environment variables:
+   - Add `GRAPHQL_ENDPOINT_BASE_URL` for base URL
+   - Add `GRAPHQL_API_KEY` for API authentication
+   - Endpoint path: `/api/graphql`
 2. Remove `react-datocms` dependency
-3. Install any required PayloadCMS client libraries
-4. Configure authentication if needed
+3. Install PayloadCMS client libraries if needed
+4. Configure API authentication headers with API key
 
 ### Phase 2: Type Definitions (Day 1-2)
 
 1. Create new TypeScript types based on PayloadCMS schema
-2. Update `types/datocms.ts` to match new schema
+2. Update `types/datocms.ts` to match new schema:
+   - **Exclude sensitive User fields** (email, apiKey, auth fields)
+   - Add `avatar` (nullable Media) to User type
+   - Map author ID = 1 for quanghuy1242
+   - Update Post, Category, Media types
 3. Create type mappers for backward compatibility where possible
 
 ### Phase 3: Core API Layer (Day 2-3)
@@ -574,13 +606,15 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
 1. Update `common/apis/base.ts`:
    - Remove DatoCMS `responsiveImageFragment`
    - Create Cloudflare R2 image transformation utilities
-   - Update fetchAPI function if auth is needed
+   - Update fetchAPI function with API key authentication headers
+   - Set base URL from environment variable
 2. Rewrite query functions:
-   - `common/apis/posts.ts` - Update pagination & filtering
+   - `common/apis/posts.ts` - Update pagination & filtering, add author=1 filter
    - `common/apis/posts.slug.ts` - Update post query, keep content as JSON
    - `common/apis/categories.ts` - Update categories query
    - `common/apis/index.ts` - Update homepage query
-   - `common/apis/author.ts` - Update user/author query
+   - `common/apis/author.ts` - Update user/author query, **exclude sensitive fields**
+3. Add ISR with revalidation support (keep existing approach)
 
 ### Phase 4: Content Rendering (Day 3-4)
 
@@ -600,22 +634,30 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
 
 ### Phase 5: Component Updates (Day 4-5)
 
-1. Update `CoverImage` component for new image structure
+1. Update `CoverImage` component for new image structure with R2 transformations
 2. Update `Posts` component for new tag structure
-3. Update metadata rendering (remove `renderMetaTags` usage)
-4. Update author display components
+3. Update metadata rendering (replace `react-datocms` with custom function)
+4. Update author display components:
+   - Use `fullName` field
+   - Handle nullable `avatar` field with placeholder fallback
+   - Ensure no sensitive fields are accessed
 
 ### Phase 6: Page Updates (Day 5-6)
 
 1. Update `pages/index.tsx` - Homepage with new queries
-   - Add filter for published posts by quanghuy1242
+   - Add filter for published posts by quanghuy1242 (author ID = 1)
+   - Use ISR with revalidation
 2. Update `pages/posts/[slug].tsx` - Post detail page
    - Use Lexical renderer for content
    - Replace "More posts" with `SimilarPosts` query
    - Update metadata rendering with custom function
+   - Add published/author filters
 3. Update `pages/about.tsx` - Hardcode external README URL
 4. Update `pages/categories.tsx` if exists
-   - Add published posts filter
+   - Add published posts filter (author=1, \_status=published)
+5. Update `pages/api/posts.ts` if exists
+   - Add API key authentication
+   - Add published/author filters
 
 ### Phase 7: Hooks & State (Day 6)
 
@@ -633,10 +675,17 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
 
 ### Phase 9: Deployment Preparation (Day 8)
 
-1. Update environment variables documentation
+1. Update environment variables documentation:
+   - `GRAPHQL_ENDPOINT_BASE_URL` - Base URL for GraphQL API
+   - `GRAPHQL_API_KEY` - API key for authentication
+   - Document ISR revalidation settings
 2. Create migration runbook
-3. Plan data migration if needed
+3. Plan data migration if needed (manual, no automated script)
 4. Create rollback plan
+5. Security checklist:
+   - Verify no sensitive User fields in public queries
+   - Verify API key is properly protected in env vars
+   - Test ISR cache behavior with API authentication
 
 ---
 
@@ -710,21 +759,94 @@ Consider these improvements during migration:
 Migration is complete when:
 
 - ✅ All pages render correctly with PayloadCMS data
+- ✅ API authentication with API key works correctly
+- ✅ ISR with revalidation works (similar to current DatoCMS approach)
 - ✅ Images display properly using Cloudflare R2 transformations
 - ✅ Responsive images work with different sizes and formats
 - ✅ Lexical content renders correctly on all post pages
 - ✅ SEO metadata (Open Graph + Twitter Cards) is correctly generated from Post_Meta
 - ✅ Custom `renderMetaTags` function works properly
-- ✅ Only published posts by quanghuy1242 are shown on frontend
+- ✅ Only published posts by quanghuy1242 (author ID=1) are shown on frontend
+- ✅ **No sensitive User fields** (email, apiKey, auth fields) are exposed in queries
+- ✅ Author avatar displays with placeholder fallback when null
 - ✅ Similar posts feature works on post detail pages
 - ✅ Pagination works correctly with new schema
 - ✅ Filtering by category/tags works with new where clauses
 - ✅ Tag structure (object array) is properly handled
-- ✅ About page loads external README content
+- ✅ About page loads external README content (hardcoded URL)
 - ✅ All tests pass and updated for new data structures
 - ✅ No DatoCMS dependencies remain (`react-datocms` removed)
 - ✅ Performance is equal or better than before
 - ✅ Image loading performance is optimized with R2 transformations
+- ✅ Security: No API keys or sensitive data exposed in client-side code
+
+---
+
+## **Security Considerations**
+
+### Critical Security Requirements
+
+1. **User Data Protection**:
+
+   - **NEVER query these sensitive User fields in public/client-side queries**:
+     - `email`
+     - `apiKey`, `apiKeyIndex`, `enableAPIKey`
+     - `resetPasswordToken`, `resetPasswordExpiration`
+     - `salt`, `hash`
+     - `loginAttempts`, `lockUntil`
+     - `sessions`
+   - Only query safe fields:
+     - `id`
+     - `fullName`
+     - `avatar` (Media reference)
+
+2. **API Authentication**:
+
+   - API key must be stored in environment variable: `GRAPHQL_API_KEY`
+   - **NEVER expose API key in client-side code**
+   - Use ISR/SSR only - all GraphQL queries run server-side
+   - **Correct API key format**: `users API-Key {your-api-key}`
+   - Add API key to request headers for ALL requests:
+
+     ```typescript
+     const headers = {
+       Authorization: `users API-Key ${process.env.GRAPHQL_API_KEY}`,
+     };
+
+     // Example: GraphQL query
+     await fetch(`${process.env.GRAPHQL_ENDPOINT_BASE_URL}/api/graphql`, {
+       method: 'POST',
+       headers,
+       body: JSON.stringify({
+         query: '{ Posts { docs { title } } }',
+       }),
+     });
+
+     // Example: REST endpoint
+     await fetch(`${process.env.GRAPHQL_ENDPOINT_BASE_URL}/api/posts`, {
+       headers,
+     });
+     ```
+
+3. **Query Filtering**:
+
+   - Always filter for published posts: `_status: { equals: published }`
+   - Always filter by author ID = 1 (quanghuy1242)
+   - Prevent draft content exposure
+
+4. **Image Security**:
+   - R2 URLs may be public - ensure no sensitive data in filenames
+   - Consider signed URLs for private content if needed
+
+### Security Checklist Before Deployment
+
+- [ ] Audit all GraphQL queries to ensure no sensitive User fields
+- [ ] Verify API key is only in environment variables
+- [ ] Test that draft posts are not accessible
+- [ ] Verify ISR cache doesn't expose sensitive data
+- [ ] Check that API key is not in any client-side bundles
+- [ ] Test with browser DevTools network tab - no API keys visible
+- [ ] Review all author/user-related queries and components
 
 ---
 
@@ -749,11 +871,24 @@ Migration is complete when:
 | Breaking changes in production     | High   | Low        | Thorough testing, staged rollout                                      |
 | Performance regression             | Medium | Medium     | Load testing, caching strategy, optimize R2 queries                   |
 | Filter/search functionality breaks | Medium | Medium     | Unit tests for filter logic with new where syntax                     |
-| Content migration complexity       | Medium | Medium     | Plan markdown→Lexical migration carefully                             |
+| Content migration complexity       | Medium | Low        | ✅ Manual migration process - no automated script needed              |
 | Migration timeline overrun         | Medium | High       | Buffer time in estimate, prioritize features                          |
+| API key exposure risk              | High   | Low        | ✅ Use env vars only, never expose in client code, test security      |
+| Sensitive data leaks               | High   | Low        | ✅ Exclude all sensitive User fields from queries, audit carefully    |
 
 ---
 
-**Document Version**: 1.0  
+**Document Version**: 2.0  
 **Last Updated**: 2025-10-23  
-**Status**: Awaiting Feedback
+**Status**: ✅ Ready for Implementation - All Questions Answered
+
+**Key Decisions Made**:
+
+- User ID for quanghuy1242: `1`
+- GraphQL endpoint: `/api/graphql` (with base URL from env)
+- Authentication: API key in env vars, ISR preferred
+- User fields: Exclude sensitive fields (email, apiKey, etc.)
+- Avatar: Nullable Media field with public domain placeholder fallback
+- Display name: Use `fullName` directly
+- Content migration: Manual process
+- No rate limits to worry about
