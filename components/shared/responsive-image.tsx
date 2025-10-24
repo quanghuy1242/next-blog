@@ -81,10 +81,11 @@ export function ResponsiveImage({
 
   // Get low-res blurred placeholder using Cloudflare transformations
   // This loads a tiny image with the correct aspect ratio, heavily blurred
-  const blurPlaceholderWidth = 20;
-  const blurPlaceholderHeight = aspectRatio
-    ? Math.round(blurPlaceholderWidth * aspectRatio)
-    : undefined;
+  // We set height first to ensure minimum blur quality, then calculate width
+  const blurPlaceholderHeight = 20;
+  const blurPlaceholderWidth = aspectRatio
+    ? Math.round(blurPlaceholderHeight / aspectRatio)
+    : 20;
   const blurPlaceholder = getBlurPlaceholder(
     src,
     blurPlaceholderWidth,
