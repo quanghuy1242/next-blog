@@ -91,8 +91,14 @@ export function generateSrcSet(
     .map((width) => {
       const transformOptions: ImageTransformOptions = { ...options, width };
 
-      // If we have an aspect ratio, calculate proportional height
-      if (aspectRatio) {
+      // Only add height for cover/crop/pad modes where exact dimensions matter
+      // For scale-down/contain, let R2 maintain original aspect ratio
+      const needsExactDimensions =
+        options.fit === 'cover' ||
+        options.fit === 'crop' ||
+        options.fit === 'pad';
+
+      if (aspectRatio && needsExactDimensions) {
         transformOptions.height = Math.round(width * aspectRatio);
       }
 
@@ -149,13 +155,14 @@ export function generateResponsiveImage(
   // Base transformation options for all formats
   const baseOptions: ImageTransformOptions = {
     quality,
+    fit, // Always include fit mode to control how images are resized
   };
 
-  // Only add fit and dimensions if both width and height are provided
-  if (width && height) {
+  // For cover/crop modes with specific dimensions, set both width and height
+  // For scale-down/contain modes, only set width to maintain aspect ratio
+  if (width && height && (fit === 'cover' || fit === 'crop' || fit === 'pad')) {
     baseOptions.width = width;
     baseOptions.height = height;
-    baseOptions.fit = fit; // Use provided fit mode or default to scale-down
     if (gravity) {
       baseOptions.gravity = gravity; // Add gravity for crop focal point
     }
