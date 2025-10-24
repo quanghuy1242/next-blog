@@ -71,18 +71,6 @@ export function ResponsiveImage({
     return null;
   }
 
-  // Debug: Log the generated URLs (remove after debugging)
-  if (typeof window !== 'undefined' && !isLoaded) {
-    console.log('ResponsiveImage Debug:', {
-      src,
-      blurPlaceholder,
-      mainSrc: imageData.src,
-      srcSet: imageData.srcSet,
-      isLoaded,
-      hasError,
-    });
-  }
-
   // Calculate aspect ratio for maintaining image proportions (only for non-fill mode)
   const aspectRatio =
     !fill && width && height && width > 0 && height > 0
@@ -102,27 +90,31 @@ export function ResponsiveImage({
   // In fill mode, don't use relative positioning - let it be controlled by parent
   const containerClasses = fill
     ? 'overflow-hidden'
-    : cn('relative overflow-hidden');
+    : aspectRatio
+    ? cn('relative overflow-hidden') // Aspect ratio mode needs relative container
+    : ''; // Natural sizing mode doesn't need container wrapper
 
   return (
     <div className={cn(containerClasses, className)} style={containerStyles}>
-      {/* LQIP Background - tiny blurred image from Cloudflare */}
-      <img
-        src={blurPlaceholder}
-        alt=""
-        aria-hidden="true"
-        className={cn(
-          imageClasses,
-          'transition-opacity duration-300',
-          isLoaded ? 'opacity-0' : 'opacity-100'
-        )}
-        style={{
-          objectFit: fill ? objectFit : 'cover',
-          objectPosition,
-          filter: 'blur(20px)',
-          transform: 'scale(1.1)', // Slightly scale up to hide blur edges
-        }}
-      />
+      {/* LQIP Background - only show for fill/aspect ratio modes */}
+      {(fill || aspectRatio) && (
+        <img
+          src={blurPlaceholder}
+          alt=""
+          aria-hidden="true"
+          className={cn(
+            imageClasses,
+            'transition-opacity duration-300',
+            isLoaded ? 'opacity-0' : 'opacity-100'
+          )}
+          style={{
+            objectFit: fill ? objectFit : 'cover',
+            objectPosition,
+            filter: 'blur(20px)',
+            transform: 'scale(1.1)', // Slightly scale up to hide blur edges
+          }}
+        />
+      )}
 
       {/* Progressive Image with <picture> for format negotiation */}
       <picture>
@@ -154,11 +146,9 @@ export function ResponsiveImage({
           loading={priority ? 'eager' : 'lazy'}
           decoding={priority ? 'sync' : 'async'}
           onLoad={() => {
-            console.log('Image loaded successfully:', imageData.src);
             setIsLoaded(true);
           }}
-          onError={(e) => {
-            console.error('Image failed to load:', imageData.src, e);
+          onError={() => {
             setHasError(true);
             setIsLoaded(true); // Show original even if failed
           }}

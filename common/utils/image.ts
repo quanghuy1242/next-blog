@@ -66,22 +66,9 @@ export function transformImage(
 
     const transformedUrl = `${urlObj.origin}/cdn-cgi/image/${optionsStr}${sourcePath}`;
 
-    // Debug log in development
-    if (
-      typeof window !== 'undefined' &&
-      process.env.NODE_ENV === 'development'
-    ) {
-      console.log('[transformImage]', {
-        original: url,
-        transformed: transformedUrl,
-        options: optionsStr,
-      });
-    }
-
     return transformedUrl;
   } catch {
     // If URL parsing fails, return original URL
-    console.warn('[transformImage] Failed to parse URL:', url);
     return url;
   }
 }
