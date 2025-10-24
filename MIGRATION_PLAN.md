@@ -202,27 +202,36 @@ function renderMetaTags(meta: Post_Meta, post?: Post) {
 content(depth: Int): JSON
 ```
 
-**✅ SOLUTION**: Use **@payloadcms/richtext-lexical** for rendering
+**✅ SOLUTION**: Defer Lexical rendering to final phase
 
-- Install `@payloadcms/richtext-lexical` package
+- **Phase 1 (Initial Migration)**: Display raw JSON content on page
+- **Phase 2 (Final Polish)**: Install `@payloadcms/richtext-lexical` and implement proper rendering
 - The `content` JSON field contains Lexical editor state
-- Use Lexical's React components to render the rich text content
-- Replace `markdownToHtml` function with Lexical renderer
+- This approach ensures easier parts are completed first before tackling rich text rendering
 
-**Implementation Approach**:
+**Implementation Approach (Initial - Raw JSON)**:
+
+```typescript
+// Temporary: Display raw JSON for verification
+<pre>{JSON.stringify(post.content, null, 2)}</pre>
+```
+
+**Implementation Approach (Final - Lexical Renderer)**:
 
 ```typescript
 import { RichText } from '@payloadcms/richtext-lexical/react';
 
-// In component
+// Final implementation
 <RichText data={post.content} />;
 ```
 
 **Migration Notes**:
 
+- Start with raw JSON display to validate data flow
+- Complete all API, routing, filtering, and pagination first
+- Implement Lexical rendering in final phase
 - Content migration to Lexical format handled manually (no automated script needed)
 - Lexical supports custom nodes for YouTube embeds and other directives
-- Can implement similar directive functionality using Lexical plugins
 
 ---
 
@@ -671,21 +680,25 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
    - `common/apis/author.ts` - Update user/author query, **exclude sensitive fields**
 3. Add ISR with revalidation support (keep existing approach)
 
-### Phase 4: Content Rendering (Day 3-4)
+### Phase 4: Content Display (Day 3-4) - WITHOUT Lexical Rendering
 
-1. Install `@payloadcms/richtext-lexical` package
-2. Replace `markdownToHtml` with Lexical renderer component
-3. Create Cloudflare R2 image helper functions:
+1. **Display raw JSON content temporarily**:
+   - Post content: `<pre>{JSON.stringify(post.content, null, 2)}</pre>`
+   - User bio: `<pre>{JSON.stringify(user.bio, null, 2)}</pre>`
+   - This validates data flow before implementing complex rendering
+2. Create Cloudflare R2 image helper functions:
    - Generate responsive image URLs with transformations
    - Support multiple formats (WebP, AVIF, JPEG)
    - Generate srcSet for different screen sizes
-4. Create custom `renderMetaTags` function:
+3. Create custom `renderMetaTags` function:
    - Convert `Post_Meta` to HTML meta tags
    - Generate Open Graph tags
    - Generate Twitter Card tags
    - Replace `react-datocms` renderMetaTags
-5. Update `CoverImage` component to use R2 transformations
-6. Create tag normalization utility functions
+4. Update `CoverImage` component to use R2 transformations
+5. Create tag normalization utility functions
+
+**Note**: Lexical rendering deferred to Phase 9 (final polish)
 
 ### Phase 5: Component Updates (Day 4-5)
 
@@ -706,11 +719,13 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
    - Add filter for published posts by quanghuy1242 (author ID = 1)
    - Use ISR with revalidation
 2. Update `pages/posts/[slug].tsx` - Post detail page
-   - Use Lexical renderer for content
+   - **Display raw JSON for content** (temporary)
    - Replace "More posts" with `SimilarPosts` query
    - Update metadata rendering with custom function
    - Add published/author filters
-3. Update `pages/about.tsx` - Use User bio field with Lexical renderer
+3. Update `pages/about.tsx` - Use User bio field
+   - **Display raw JSON for bio** (temporary)
+   - Query User(id: 1) with bio field
 4. Update `pages/categories.tsx` if exists
    - Add published posts filter (author=1, \_status=published)
 5. Update `pages/api/posts.ts` if exists
@@ -731,7 +746,33 @@ query Posts($limit: Int!, $page: Int!, $where: Post_where) {
 4. Validate image loading and responsiveness
 5. Update test files
 
-### Phase 9: Deployment Preparation (Day 8)
+### Phase 9: Lexical Rendering Implementation (Day 8) - FINAL PHASE
+
+**This is the final polish phase after all core functionality is working**
+
+1. Install `@payloadcms/richtext-lexical` package:
+   ```bash
+   npm install @payloadcms/richtext-lexical
+   # or
+   yarn add @payloadcms/richtext-lexical
+   ```
+2. Replace raw JSON displays with Lexical renderer:
+   - Update post content display: `<RichText data={post.content} />`
+   - Update about page bio: `<RichText data={user.bio} />`
+3. Create reusable Lexical renderer component wrapper
+4. Implement custom Lexical nodes if needed:
+   - YouTube embeds
+   - Code blocks with syntax highlighting
+   - Custom directives
+5. Test Lexical rendering across all pages
+6. Verify rich text features work correctly:
+   - Links
+   - Images
+   - Lists
+   - Headings
+   - Custom nodes
+
+### Phase 10: Deployment Preparation (Day 9)
 
 1. Update environment variables documentation:
    - `GRAPHQL_ENDPOINT_BASE_URL` - Base URL for GraphQL API
@@ -793,10 +834,15 @@ Consider these improvements during migration:
 
 ### ✅ Required Additions:
 
-- `@payloadcms/richtext-lexical` - **Required** for rendering Lexical content
-- `@lexical/react` - React bindings for Lexical (likely included with above)
+**Initial Phase (Core Functionality)**:
+
 - `graphql-request` - Lightweight GraphQL client (optional, can continue using fetch)
 - `@graphql-codegen/cli` - Generate TypeScript types from schema (recommended)
+
+**Final Phase (Lexical Rendering)**:
+
+- `@payloadcms/richtext-lexical` - **Required** for rendering Lexical content (install in Phase 9)
+- `@lexical/react` - React bindings for Lexical (likely included with above)
 
 ### ⚠️ To Remove:
 
@@ -811,14 +857,14 @@ Consider these improvements during migration:
 
 ## 🎯 **Success Criteria**
 
-Migration is complete when:
+### Phase 1 Success (Core Migration - Raw JSON Display):
 
 - ✅ All pages render correctly with PayloadCMS data
 - ✅ API authentication with API key works correctly
 - ✅ ISR with revalidation works (similar to current DatoCMS approach)
 - ✅ Images display properly using Cloudflare R2 transformations
 - ✅ Responsive images work with different sizes and formats
-- ✅ Lexical content renders correctly on all post pages
+- ✅ **Raw JSON content displays** on post pages and about page
 - ✅ SEO metadata (Open Graph + Twitter Cards) is correctly generated from Post_Meta
 - ✅ Custom `renderMetaTags` function works properly
 - ✅ Only published posts by quanghuy1242 (author ID=1) are shown on frontend
@@ -828,12 +874,18 @@ Migration is complete when:
 - ✅ Pagination works correctly with new schema
 - ✅ Filtering by category/tags works with new where clauses
 - ✅ Tag structure (object array) is properly handled
-- ✅ About page renders user bio content with Lexical
 - ✅ All tests pass and updated for new data structures
 - ✅ No DatoCMS dependencies remain (`react-datocms` removed)
 - ✅ Performance is equal or better than before
 - ✅ Image loading performance is optimized with R2 transformations
 - ✅ Security: No API keys or sensitive data exposed in client-side code
+
+### Phase 2 Success (Final Polish - Lexical Rendering):
+
+- ✅ Lexical content renders correctly on all post pages
+- ✅ About page renders user bio content with Lexical
+- ✅ Rich text features work properly (links, images, lists, headings)
+- ✅ Custom Lexical nodes render correctly (if implemented)
 
 ---
 
