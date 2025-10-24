@@ -106,8 +106,7 @@ export function ResponsiveImage({
     ? cn('relative overflow-hidden') // Aspect ratio mode needs relative container
     : ''; // Natural sizing mode doesn't need container wrapper
 
-  const shouldScalePlaceholder =
-    objectFit === 'cover' || objectFit === 'fill';
+  // const shouldScalePlaceholder = objectFit === 'cover' || objectFit === 'fill';
 
   return (
     <div className={cn(containerClasses, className)} style={containerStyles}>
@@ -127,7 +126,7 @@ export function ResponsiveImage({
             objectFit, // Use the same objectFit as the main image
             objectPosition,
             filter: 'blur(20px)',
-            transform: shouldScalePlaceholder ? 'scale(1.1)' : undefined, // Avoid over-scaling for contain/scale-down
+            // transform: shouldScalePlaceholder ? 'scale(1.1)' : undefined, // Avoid over-scaling for contain/scale-down
           }}
         />
       )}
