@@ -42,7 +42,7 @@ export function ResponsiveImage({
     width,
     height,
     alt: alt ?? undefined,
-    quality: 75,
+    quality: 80,
     includeAvif: true,
   });
 
@@ -54,18 +54,29 @@ export function ResponsiveImage({
     return null;
   }
 
+  // Calculate aspect ratio for maintaining image proportions
+  const aspectRatio =
+    width && height && width > 0 && height > 0 ? height / width : undefined;
+
   return (
-    <div className={cn('relative overflow-hidden', className)}>
+    <div
+      className={cn('relative overflow-hidden', className)}
+      style={{
+        paddingBottom: aspectRatio ? `${aspectRatio * 100}%` : undefined,
+      }}
+    >
       {/* LQIP Background - tiny blurred image from Cloudflare */}
-      <div
+      <img
+        src={blurPlaceholder}
+        alt=""
+        aria-hidden="true"
         className={cn(
-          'absolute inset-0 transition-opacity duration-300',
+          'absolute inset-0 w-full h-full transition-opacity duration-300',
           isLoaded ? 'opacity-0' : 'opacity-100'
         )}
         style={{
-          backgroundImage: `url("${blurPlaceholder}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: objectPosition,
+          objectFit: 'cover',
+          objectPosition,
           filter: 'blur(20px)',
           transform: 'scale(1.1)', // Slightly scale up to hide blur edges
         }}
@@ -101,14 +112,12 @@ export function ResponsiveImage({
           decoding={priority ? 'sync' : 'async'}
           onLoad={() => setIsLoaded(true)}
           className={cn(
-            'transition-opacity duration-300',
+            'absolute inset-0 w-full h-full transition-opacity duration-300',
             isLoaded ? 'opacity-100' : 'opacity-0'
           )}
           style={{
             objectFit,
             objectPosition,
-            width: '100%',
-            height: '100%',
           }}
         />
       </picture>

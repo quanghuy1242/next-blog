@@ -32,18 +32,16 @@ export function Banner({
       )}
     >
       {/* Background image with progressive loading */}
-      <div className="absolute inset-0">
-        <ResponsiveImage
-          src={bannerUrl}
-          alt={bannerAlt}
-          width={2000}
-          height={800}
-          objectFit="cover"
-          objectPosition="bottom"
-          priority={true}
-          className="w-full h-full"
-        />
-      </div>
+      <ResponsiveImage
+        src={bannerUrl}
+        alt={bannerAlt}
+        width={2000}
+        height={800}
+        objectFit="cover"
+        objectPosition="bottom"
+        priority={true}
+        className="absolute inset-0 w-full h-full"
+      />
 
       {/* Content overlay */}
       <div className="z-10 relative">

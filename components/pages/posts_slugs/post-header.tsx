@@ -29,17 +29,15 @@ export function PostHeader({
       )}
     >
       {/* Background image with progressive loading */}
-      <div className="absolute inset-0">
-        <ResponsiveImage
-          src={imageUrl}
-          alt={`Cover image for ${header}`}
-          width={2000}
-          height={1000}
-          objectFit="cover"
-          priority={true}
-          className="w-full h-full"
-        />
-      </div>
+      <ResponsiveImage
+        src={imageUrl}
+        alt={`Cover image for ${header}`}
+        width={2000}
+        height={1000}
+        objectFit="cover"
+        priority={true}
+        className="absolute inset-0 w-full h-full"
+      />
 
       <div
         className={cn(

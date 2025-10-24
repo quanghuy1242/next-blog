@@ -127,16 +127,16 @@ export function generateResponsiveImage(
     alt = null,
     width = null,
     height = null,
-    quality = 75,
-    includeAvif = false,
+    quality = 75, // Higher quality for better visual experience
+    includeAvif = true,
   } = options;
 
   return {
-    src: transformImage(url, { quality, format: 'jpeg' }),
-    srcSet: generateSrcSet(url, widths, { quality, format: 'jpeg' }),
+    src: transformImage(url, { quality, format: 'webp' }), // WebP as default, lighter than JPEG
+    srcSet: generateSrcSet(url, widths, { quality, format: 'webp' }),
     webpSrcSet: generateSrcSet(url, widths, { quality, format: 'webp' }),
     avifSrcSet: includeAvif
-      ? generateSrcSet(url, widths, { quality, format: 'avif' })
+      ? generateSrcSet(url, widths, { quality, format: 'avif' }) // AVIF is even smaller than WebP
       : undefined,
     sizes,
     width,
@@ -176,7 +176,7 @@ export function getCoverImageUrl(
     height,
     fit: 'cover',
     quality,
-    format: 'jpeg',
+    format: 'webp', // WebP is 20-30% smaller than JPEG at same quality
   });
 }
 
