@@ -40,7 +40,8 @@ export function Banner({
         objectFit="cover"
         objectPosition="bottom"
         priority={true}
-        className="absolute inset-0 w-full h-full"
+        fill={true}
+        className="absolute inset-0"
       />
 
       {/* Content overlay */}

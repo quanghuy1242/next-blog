@@ -36,7 +36,8 @@ export function PostHeader({
         height={1000}
         objectFit="cover"
         priority={true}
-        className="absolute inset-0 w-full h-full"
+        fill={true}
+        className="absolute inset-0"
       />
 
       <div

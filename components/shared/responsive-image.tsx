@@ -24,6 +24,11 @@ export interface ResponsiveImageProps {
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
   objectPosition?: string;
   priority?: boolean;
+  /**
+   * If true, image fills its container (position: absolute)
+   * If false, maintains aspect ratio with padding-bottom technique
+   */
+  fill?: boolean;
 }
 
 export function ResponsiveImage({
@@ -35,6 +40,7 @@ export function ResponsiveImage({
   objectFit = 'cover',
   objectPosition = 'center',
   priority = false,
+  fill = false,
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -54,28 +60,41 @@ export function ResponsiveImage({
     return null;
   }
 
-  // Calculate aspect ratio for maintaining image proportions
+  // Calculate aspect ratio for maintaining image proportions (only for non-fill mode)
   const aspectRatio =
-    width && height && width > 0 && height > 0 ? height / width : undefined;
+    !fill && width && height && width > 0 && height > 0
+      ? height / width
+      : undefined;
+
+  const containerStyles = fill
+    ? undefined // Fill mode: no padding, let parent control size
+    : { paddingBottom: aspectRatio ? `${aspectRatio * 100}%` : undefined };
+
+  const imageClasses = fill
+    ? 'absolute inset-0 w-full h-full' // Fill mode: absolute positioning
+    : aspectRatio
+    ? 'absolute inset-0 w-full h-full' // Aspect ratio mode: absolute within padded container
+    : 'w-full h-auto'; // No aspect ratio: natural sizing
+
+  // In fill mode, don't use relative positioning - let it be controlled by parent
+  const containerClasses = fill
+    ? 'overflow-hidden'
+    : cn('relative overflow-hidden');
 
   return (
-    <div
-      className={cn('relative overflow-hidden', className)}
-      style={{
-        paddingBottom: aspectRatio ? `${aspectRatio * 100}%` : undefined,
-      }}
-    >
+    <div className={cn(containerClasses, className)} style={containerStyles}>
       {/* LQIP Background - tiny blurred image from Cloudflare */}
       <img
         src={blurPlaceholder}
         alt=""
         aria-hidden="true"
         className={cn(
-          'absolute inset-0 w-full h-full transition-opacity duration-300',
+          imageClasses,
+          'transition-opacity duration-300',
           isLoaded ? 'opacity-0' : 'opacity-100'
         )}
         style={{
-          objectFit: 'cover',
+          objectFit: fill ? objectFit : 'cover',
           objectPosition,
           filter: 'blur(20px)',
           transform: 'scale(1.1)', // Slightly scale up to hide blur edges
@@ -112,7 +131,8 @@ export function ResponsiveImage({
           decoding={priority ? 'sync' : 'async'}
           onLoad={() => setIsLoaded(true)}
           className={cn(
-            'absolute inset-0 w-full h-full transition-opacity duration-300',
+            imageClasses,
+            'transition-opacity duration-300',
             isLoaded ? 'opacity-100' : 'opacity-0'
           )}
           style={{
