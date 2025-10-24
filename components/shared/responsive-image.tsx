@@ -123,7 +123,7 @@ export function ResponsiveImage({
             isLoaded ? 'opacity-0' : 'opacity-100'
           )}
           style={{
-            objectFit: fill ? objectFit : 'contain', // Use 'contain' to maintain aspect ratio
+            objectFit, // Use the same objectFit as the main image
             objectPosition,
             filter: 'blur(20px)',
             transform: 'scale(1.1)', // Slightly scale up to hide blur edges
