@@ -69,10 +69,6 @@ export function ResponsiveImage({
     gravity: gravity, // Pass gravity for Cloudflare transformation
   });
 
-  // Get low-res blurred placeholder using Cloudflare transformations
-  // This loads a tiny ~20px wide, heavily blurred image
-  const blurPlaceholder = getBlurPlaceholder(src);
-
   if (!imageData) {
     return null;
   }
@@ -82,6 +78,18 @@ export function ResponsiveImage({
     !fill && width && height && width > 0 && height > 0
       ? height / width
       : undefined;
+
+  // Get low-res blurred placeholder using Cloudflare transformations
+  // This loads a tiny image with the correct aspect ratio, heavily blurred
+  const blurPlaceholderWidth = 20;
+  const blurPlaceholderHeight = aspectRatio
+    ? Math.round(blurPlaceholderWidth * aspectRatio)
+    : undefined;
+  const blurPlaceholder = getBlurPlaceholder(
+    src,
+    blurPlaceholderWidth,
+    blurPlaceholderHeight
+  );
 
   const containerStyles = fill
     ? undefined // Fill mode: no padding, let parent control size

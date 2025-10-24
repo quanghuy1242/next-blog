@@ -232,23 +232,37 @@ export function getCoverImageUrl(
  * Generate a low-quality blurred placeholder for progressive image loading
  * This replicates DatoCMS LQIP (Low Quality Image Placeholder) behavior
  *
- * Returns a Cloudflare-transformed URL with blur and low quality for use as Next.js Image placeholder
+ * Returns a Cloudflare-transformed URL with blur and low quality for use as placeholder
+ *
+ * @param url - Source image URL
+ * @param width - Target width for placeholder (default: 20px)
+ * @param height - Optional height to maintain aspect ratio
+ * @param quality - Quality setting (default: 20)
  */
 export function getBlurPlaceholder(
   url: string | undefined | null,
   width = 20,
+  height?: number,
   quality = 20
 ): string {
   if (!url) {
     return '';
   }
 
-  return transformImage(url, {
+  const options: ImageTransformOptions = {
     width,
     quality,
     blur: 10,
     format: 'jpeg',
-  });
+  };
+
+  // If height is provided, maintain aspect ratio
+  if (height) {
+    options.height = height;
+    options.fit = 'cover'; // Ensure it covers the space
+  }
+
+  return transformImage(url, options);
 }
 
 /**
