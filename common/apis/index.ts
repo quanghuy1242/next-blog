@@ -98,7 +98,7 @@ async function fetchHomeData({
             name
             description
             slug
-            imageBanner {
+            image {
               id
               url
               thumbnailURL
