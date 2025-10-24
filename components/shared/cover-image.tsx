@@ -22,10 +22,7 @@ export function CoverImage({ title, media, slug, className }: CoverImageProps) {
     <ResponsiveImage
       src={media.url}
       alt={alt}
-      // Use actual media dimensions to maintain aspect ratio
-      // If dimensions are missing, component will use natural image size
-      width={media.width}
-      height={media.height}
+      // Don't pass width/height - let images use their natural aspect ratio
       className={cn('shadow-small', {
         'hover:shadow-medium transition-shadow duration-200': slug,
       })}

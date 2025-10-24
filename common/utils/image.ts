@@ -160,13 +160,13 @@ export function generateResponsiveImage(
   // Base transformation options for all formats
   const baseOptions: ImageTransformOptions = {
     quality,
-    fit, // Use provided fit mode or default to scale-down
   };
 
-  // Add dimensions if provided
+  // Only add fit and dimensions if both width and height are provided
   if (width && height) {
     baseOptions.width = width;
     baseOptions.height = height;
+    baseOptions.fit = fit; // Use provided fit mode or default to scale-down
   }
 
   // Calculate aspect ratio for srcSet generation
