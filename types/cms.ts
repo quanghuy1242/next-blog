@@ -7,6 +7,8 @@ export interface Media {
   id?: number;
   url?: string;
   thumbnailURL?: string | null;
+  lowResUrl?: string | null; // Pre-generated low-res base64 data URL for blur placeholder
+  blurDataURL?: string | null; // Deprecated: use lowResUrl instead
   alt?: string | null;
   filename?: string | null;
   mimeType?: string | null;

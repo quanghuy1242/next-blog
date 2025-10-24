@@ -34,6 +34,11 @@ export interface ResponsiveImageProps {
    * Maps to objectPosition for consistency
    */
   gravity?: 'auto' | 'left' | 'right' | 'top' | 'bottom' | 'center';
+  /**
+   * Pre-generated low-res base64 data URL for blur placeholder (from backend)
+   * If provided, this will be used instead of R2 transformation
+   */
+  lowResUrl?: string | null;
 }
 
 export function ResponsiveImage({
@@ -47,6 +52,7 @@ export function ResponsiveImage({
   priority = false,
   fill = false,
   gravity,
+  lowResUrl,
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
@@ -81,9 +87,9 @@ export function ResponsiveImage({
       ? height / width
       : undefined;
 
-  // Get low-res blurred placeholder using Cloudflare transformations
-  // This loads a tiny image with the correct aspect ratio, heavily blurred
-  // We set height first to ensure minimum blur quality, then calculate width
+  // Get low-res blurred placeholder
+  // If lowResUrl is provided (base64 from backend), use it directly
+  // Otherwise, use Cloudflare R2 transformation with calculated dimensions
   const blurPlaceholderHeight = 20;
   const blurPlaceholderWidth = aspectRatio
     ? Math.round(blurPlaceholderHeight / aspectRatio)
@@ -91,7 +97,9 @@ export function ResponsiveImage({
   const blurPlaceholder = getBlurPlaceholder(
     src,
     blurPlaceholderWidth,
-    blurPlaceholderHeight
+    blurPlaceholderHeight,
+    20,
+    lowResUrl
   );
 
   const containerStyles = fill

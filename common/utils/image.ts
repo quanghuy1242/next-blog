@@ -245,19 +245,27 @@ export function getCoverImageUrl(
  * Generate a low-quality blurred placeholder for progressive image loading
  * This replicates DatoCMS LQIP (Low Quality Image Placeholder) behavior
  *
- * Returns a Cloudflare-transformed URL with blur and low quality for use as placeholder
+ * If lowResUrl is provided (base64 data URL from backend), use it directly.
+ * Otherwise, returns a Cloudflare-transformed URL with blur and low quality.
  *
  * @param url - Source image URL
  * @param width - Target width for placeholder (default: 20px)
  * @param height - Optional height to maintain aspect ratio
  * @param quality - Quality setting (default: 20)
+ * @param lowResUrl - Optional pre-generated base64 data URL from backend
  */
 export function getBlurPlaceholder(
   url: string | undefined | null,
   width = 20,
   height?: number,
-  quality = 20
+  quality = 20,
+  lowResUrl?: string | null
 ): string {
+  // If we have a pre-generated low-res data URL from backend, use it directly
+  if (lowResUrl) {
+    return lowResUrl;
+  }
+
   if (!url) {
     return '';
   }

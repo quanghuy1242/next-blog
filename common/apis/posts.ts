@@ -45,6 +45,7 @@ export async function getPaginatedPosts({
               id
               url
               thumbnailURL
+              lowResUrl
               alt
               width
               height
@@ -55,6 +56,7 @@ export async function getPaginatedPosts({
               avatar {
                 url
                 thumbnailURL
+                lowResUrl
                 alt
               }
             }

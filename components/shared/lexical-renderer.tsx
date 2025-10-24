@@ -49,7 +49,7 @@ const CustomUploadComponent: React.FC<{
       return null;
     }
 
-    const { alt, height, url, width } = uploadDoc;
+    const { alt, height, url, width, lowResUrl } = uploadDoc;
 
     // Handle missing URL
     if (!url) {
@@ -62,6 +62,7 @@ const CustomUploadComponent: React.FC<{
         alt={alt || ''}
         width={width || null}
         height={height || null}
+        lowResUrl={lowResUrl || null}
         className="my-4"
         objectFit="contain"
       />

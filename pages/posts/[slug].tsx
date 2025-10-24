@@ -46,7 +46,6 @@ export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
     typeof post?.category === 'string'
       ? post.category
       : post?.category?.name || '';
-  const imageUrl = post?.coverImage?.url || '';
   const tags = normalizePostTags(post?.tags);
   const morePostList = Array.isArray(morePosts) ? morePosts : [];
 
@@ -58,7 +57,7 @@ export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
           header={post?.title ?? ''}
           date={post?.createdAt ?? post?.updatedAt ?? ''}
           category={categoryName}
-          imageUrl={imageUrl}
+          coverImage={post?.coverImage}
           className="w-full"
         />
         <Container className="my-4 flex justify-center">

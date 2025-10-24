@@ -75,6 +75,7 @@ async function fetchHomeData({
               avatar {
                 url
                 thumbnailURL
+                lowResUrl
                 alt
               }
             }
@@ -97,10 +98,11 @@ async function fetchHomeData({
             name
             description
             slug
-            image {
+            imageBanner {
               id
               url
               thumbnailURL
+              lowResUrl
               alt
               width
               height

@@ -16,8 +16,10 @@ export async function getDataForAbout(): Promise<AboutPageData> {
         id
         fullName
         avatar {
+          id
           url
           thumbnailURL
+          lowResUrl
           alt
           width
           height

@@ -22,6 +22,7 @@ export function CoverImage({ title, media, slug, className }: CoverImageProps) {
     <ResponsiveImage
       src={media.url}
       alt={alt}
+      lowResUrl={media.lowResUrl}
       // Force 2:1 aspect ratio like DatoCMS (1000×500, 2000×1000, etc.)
       width={2000}
       height={1000}
