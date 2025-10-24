@@ -47,22 +47,26 @@ module.exports = {
           css: {
             // Match PayloadCMS admin font family (sans-serif)
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
-            // Responsive images matching PayloadCMS admin
+            // Responsive images matching PayloadCMS admin - disable all default margins
             img: {
               maxWidth: '100%',
               height: 'auto',
-              marginTop: '0',
-              marginBottom: '0',
+              marginTop: '0 !important',
+              marginBottom: '0 !important',
             },
             figure: {
-              marginTop: '0',
-              marginBottom: '0',
+              marginTop: '0 !important',
+              marginBottom: '0 !important',
+            },
+            'figure > *': {
+              marginTop: '0 !important',
+              marginBottom: '0 !important',
             },
             video: {
               maxWidth: '100%',
               height: 'auto',
-              marginTop: '0',
-              marginBottom: '0',
+              marginTop: '0 !important',
+              marginBottom: '0 !important',
             },
           },
         },
