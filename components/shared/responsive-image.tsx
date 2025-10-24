@@ -60,6 +60,7 @@ export function ResponsiveImage({
     alt: alt ?? undefined,
     quality: 80,
     includeAvif: true,
+    fit: fill ? 'cover' : 'scale-down', // Cover for banners, scale-down for posts
   });
 
   // Get low-res blurred placeholder using Cloudflare transformations

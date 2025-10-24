@@ -139,6 +139,7 @@ export function generateResponsiveImage(
     height?: number | null;
     quality?: number;
     includeAvif?: boolean;
+    fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
   } = {}
 ): ResponsiveImageData | null {
   if (!url) {
@@ -153,12 +154,13 @@ export function generateResponsiveImage(
     height = null,
     quality = 80, // Higher quality for better visual experience
     includeAvif = true,
+    fit = 'scale-down', // Default: resize without cropping, maintaining aspect ratio
   } = options;
 
   // Base transformation options for all formats
   const baseOptions: ImageTransformOptions = {
     quality,
-    fit: 'cover', // Crop to fit the specified dimensions
+    fit, // Use provided fit mode or default to scale-down
   };
 
   // Add dimensions if provided
