@@ -22,9 +22,9 @@ export function CoverImage({ title, media, slug, className }: CoverImageProps) {
     <ResponsiveImage
       src={media.url}
       alt={alt}
-      // Pass actual media dimensions from PayloadCMS to maintain correct aspect ratio
-      width={media.width}
-      height={media.height}
+      // Force 2:1 aspect ratio like DatoCMS (1000×500, 2000×1000, etc.)
+      width={2000}
+      height={1000}
       className={cn('shadow-small', {
         'hover:shadow-medium transition-shadow duration-200': slug,
       })}
