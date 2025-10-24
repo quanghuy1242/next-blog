@@ -1,8 +1,6 @@
 import type { PostSlugData, Post, SimilarPostsResult } from '../../types/cms';
 import { fetchAPI } from './base';
 
-const AUTHOR_ID = 1; // quanghuy1242
-
 interface PostSlugResponse {
   Posts: {
     docs: Post[];
@@ -16,13 +14,12 @@ interface PostSlugResponse {
 export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
   const data = await fetchAPI<PostSlugResponse>(
     `#graphql
-    query PostBySlug($slug: String!, $authorId: Int!) {
+    query PostBySlug($slug: String!) {
       Posts(
         where: {
           AND: [
             { slug: { equals: $slug } }
             { _status: { equals: published } }
-            { author: { equals: $authorId } }
           ]
         }
         limit: 1
@@ -72,44 +69,6 @@ export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
         }
       }
 
-      SimilarPosts(postId: $postId, limit: 2) {
-        docs {
-          id
-          title
-          slug
-          excerpt
-          createdAt
-          updatedAt
-          coverImage {
-            id
-            url
-            thumbnailURL
-            alt
-            width
-            height
-          }
-          author {
-            id
-            fullName
-            avatar {
-              url
-              thumbnailURL
-              alt
-            }
-          }
-          category {
-            id
-            name
-            slug
-          }
-          tags {
-            tag
-            id
-          }
-        }
-        totalDocs
-      }
-
       Homepage {
         header
       }
@@ -118,9 +77,6 @@ export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
     {
       variables: {
         slug,
-        authorId: AUTHOR_ID,
-        // Note: We'll need to fetch the post first to get its ID for SimilarPosts
-        // For now, we'll handle this in two queries
       },
     }
   );
