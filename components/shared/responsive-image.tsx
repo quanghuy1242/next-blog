@@ -65,7 +65,9 @@ export function ResponsiveImage({
     alt: alt ?? undefined,
     quality: 80,
     includeAvif: true,
-    fit: fill ? 'cover' : 'scale-down', // Cover for banners, scale-down for posts
+    // Use 'cover' when dimensions are specified to ensure exact aspect ratio
+    // Use 'scale-down' when no dimensions to preserve original
+    fit: width && height ? 'cover' : 'scale-down',
     gravity: gravity, // Pass gravity for Cloudflare transformation
   });
 
