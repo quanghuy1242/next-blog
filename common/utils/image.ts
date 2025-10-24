@@ -259,7 +259,7 @@ export function getBlurPlaceholder(
   // If height is provided, maintain aspect ratio
   if (height) {
     options.height = height;
-    options.fit = 'cover'; // Ensure it covers the space
+    options.fit = 'scale-down'; // Maintain aspect ratio, don't crop
   }
 
   return transformImage(url, options);
