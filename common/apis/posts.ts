@@ -117,14 +117,14 @@ export function createPostsWhere(
   if (Array.isArray(tags) && tags.length) {
     const sanitizedTags = uniqueSortedStrings(tags);
 
-    // Use AND for multiple tags - post should have ALL of the specified tags
+    // Each tag must match - use AND to ensure post has ALL specified tags
     for (const tag of sanitizedTags) {
       const trimmed = tag.trim();
 
       if (trimmed) {
         conditions.push({
           tags__tag: {
-            like: trimmed,
+            equals: trimmed,
           },
         });
       }
