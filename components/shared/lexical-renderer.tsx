@@ -64,6 +64,7 @@ const CustomUploadComponent: React.FC<{
         height={height || null}
         className="my-4"
         objectFit="contain"
+        fill={true}
       />
     );
   }

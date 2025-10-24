@@ -104,6 +104,7 @@ export function ResponsiveImage({
     <div className={cn(containerClasses, className)} style={containerStyles}>
       {/* LQIP Background - only show for fill/aspect ratio modes */}
       {(fill || aspectRatio) && (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={blurPlaceholder}
           alt=""
