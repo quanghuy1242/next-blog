@@ -116,25 +116,18 @@ export function createPostsWhere(
 
   if (Array.isArray(tags) && tags.length) {
     const sanitizedTags = uniqueSortedStrings(tags);
-    const tagConditions: Record<string, unknown>[] = [];
 
+    // Use AND for multiple tags - post should have ALL of the specified tags
     for (const tag of sanitizedTags) {
       const trimmed = tag.trim();
 
       if (trimmed) {
-        tagConditions.push({
+        conditions.push({
           tags__tag: {
             like: trimmed,
           },
         });
       }
-    }
-
-    // Use OR for multiple tags - post should have ANY of the specified tags
-    if (tagConditions.length > 0) {
-      conditions.push(
-        tagConditions.length === 1 ? tagConditions[0] : { OR: tagConditions }
-      );
     }
   }
 
