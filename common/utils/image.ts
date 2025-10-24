@@ -141,7 +141,7 @@ export function generateResponsiveImage(
   }
 
   const {
-    widths = [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    widths = [640, 750, 828, 1080, 1200, 1920, 2100, 3840],
     sizes = '100vw',
     alt = null,
     width = null,
