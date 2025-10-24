@@ -2,14 +2,23 @@
  * Lexical Renderer Component
  *
  * Renders Lexical editor state (from PayloadCMS) as React JSX.
- * Uses the official @payloadcms/richtext-lexical package.
+ * Uses the official @payloadcms/richtext-lexical package with custom converters
+ * for upload nodes (images) to use our custom ResponsiveImage component.
  *
  * @see https://payloadcms.com/docs/rich-text/lexical
  */
 
 import React from 'react';
-import { RichText } from '@payloadcms/richtext-lexical/react';
+import {
+  RichText,
+  type JSXConvertersFunction,
+} from '@payloadcms/richtext-lexical/react';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
+import type {
+  DefaultNodeTypes,
+  SerializedUploadNode,
+} from '@payloadcms/richtext-lexical';
+import { ResponsiveImage } from './responsive-image';
 
 export interface LexicalRendererProps {
   /**
@@ -27,6 +36,53 @@ export interface LexicalRendererProps {
    */
   fallback?: React.ReactNode;
 }
+
+/**
+ * Custom upload component that uses our ResponsiveImage for optimized images
+ */
+const CustomUploadComponent: React.FC<{
+  node: SerializedUploadNode;
+}> = ({ node }) => {
+  if (node.relationTo === 'media') {
+    const uploadDoc = node.value;
+    if (typeof uploadDoc !== 'object') {
+      return null;
+    }
+
+    const { alt, height, url, width } = uploadDoc;
+
+    // Handle missing URL
+    if (!url) {
+      return null;
+    }
+
+    return (
+      <ResponsiveImage
+        src={url}
+        alt={alt || ''}
+        width={width || null}
+        height={height || null}
+        className="my-4"
+        objectFit="contain"
+      />
+    );
+  }
+
+  return null;
+};
+
+/**
+ * JSX converters for custom node types
+ */
+const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
+  defaultConverters,
+}) => ({
+  ...defaultConverters,
+  // Override the default upload converter to use next/image
+  upload: ({ node }) => {
+    return <CustomUploadComponent node={node} />;
+  },
+});
 
 /**
  * Renders Lexical rich text content from PayloadCMS
@@ -55,7 +111,7 @@ export function LexicalRenderer({
 
   return (
     <div className={combinedClassName}>
-      <RichText data={data} />
+      <RichText data={data} converters={jsxConverters} />
     </div>
   );
 }
