@@ -159,13 +159,19 @@ export function generateResponsiveImage(
   };
 
   // For cover/crop modes with specific dimensions, set both width and height
-  // For scale-down/contain modes, only set width to maintain aspect ratio
-  if (width && height && (fit === 'cover' || fit === 'crop' || fit === 'pad')) {
+  // For scale-down/contain modes, let R2 maintain aspect ratio naturally
+  const shouldSetDimensions =
+    fit === 'cover' || fit === 'crop' || fit === 'pad';
+
+  if (width && height && shouldSetDimensions) {
     baseOptions.width = width;
     baseOptions.height = height;
     if (gravity) {
       baseOptions.gravity = gravity; // Add gravity for crop focal point
     }
+  } else if (width && !height) {
+    // If only width is provided, set it for any fit mode
+    baseOptions.width = width;
   }
 
   // Calculate aspect ratio for srcSet generation
