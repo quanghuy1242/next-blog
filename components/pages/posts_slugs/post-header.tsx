@@ -1,8 +1,7 @@
 import cn from 'classnames';
-import Image from 'next/image';
+import { ResponsiveImage } from 'components/shared/responsive-image';
 import { Date } from 'components/shared/date';
 import { Tag } from 'components/shared/tags';
-import { getCoverImageUrl, getBlurPlaceholder } from 'common/utils/image';
 
 interface PostHeaderProps {
   header: string;
@@ -19,10 +18,6 @@ export function PostHeader({
   imageUrl,
   className,
 }: PostHeaderProps) {
-  // Apply R2 transformations for optimized banner image
-  const optimizedImageUrl = getCoverImageUrl(imageUrl, 2000, 1000, 75);
-  const blurDataURL = getBlurPlaceholder(imageUrl);
-
   return (
     <div
       className={cn(
@@ -33,17 +28,19 @@ export function PostHeader({
         className
       )}
     >
-      {/* Background image with Next.js Image optimization */}
-      <Image
-        src={optimizedImageUrl}
-        alt={`Cover image for ${header}`}
-        fill
-        className="object-cover"
-        placeholder="blur"
-        blurDataURL={blurDataURL}
-        priority // Banner images should load with priority
-        unoptimized // R2 handles transformations
-      />
+      {/* Background image with progressive loading */}
+      <div className="absolute inset-0">
+        <ResponsiveImage
+          src={imageUrl}
+          alt={`Cover image for ${header}`}
+          width={2000}
+          height={1000}
+          objectFit="cover"
+          priority={true}
+          className="w-full h-full"
+        />
+      </div>
+
       <div
         className={cn(
           'absolute top-0 bottom-0 left-0 right-0',

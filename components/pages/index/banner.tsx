@@ -1,7 +1,6 @@
 import React from 'react';
-import Image from 'next/image';
 import { PLACEHOLDER_BANNER_URL } from 'common/constants';
-import { getCoverImageUrl, getBlurPlaceholder } from 'common/utils/image';
+import { ResponsiveImage } from 'components/shared/responsive-image';
 import type { Media } from 'types/cms';
 import cn from 'classnames';
 
@@ -22,10 +21,6 @@ export function Banner({
   const bannerUrl = imageBanner?.url || PLACEHOLDER_BANNER_URL;
   const bannerAlt = imageBanner?.alt || 'Banner background';
 
-  // Apply R2 transformations for optimized banner image
-  const optimizedImageUrl = getCoverImageUrl(bannerUrl, 2000, 800, 75);
-  const blurDataURL = getBlurPlaceholder(bannerUrl);
-
   return (
     <div
       className={cn(
@@ -36,17 +31,21 @@ export function Banner({
         className
       )}
     >
-      {/* Background image with Next.js Image optimization */}
-      <Image
-        src={optimizedImageUrl}
-        alt={bannerAlt}
-        fill
-        className="object-cover object-bottom"
-        placeholder="blur"
-        blurDataURL={blurDataURL}
-        priority // Homepage banner should load with priority
-        unoptimized // R2 handles transformations
-      />
+      {/* Background image with progressive loading */}
+      <div className="absolute inset-0">
+        <ResponsiveImage
+          src={bannerUrl}
+          alt={bannerAlt}
+          width={2000}
+          height={800}
+          objectFit="cover"
+          objectPosition="bottom"
+          priority={true}
+          className="w-full h-full"
+        />
+      </div>
+
+      {/* Content overlay */}
       <div className="z-10 relative">
         <h1 className="text-7xl font-thin" style={{ lineHeight: '3.5rem' }}>
           {header}
