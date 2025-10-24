@@ -43,6 +43,16 @@ export function ResponsiveImage({
   fill = false,
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const imgRef = React.useRef<HTMLImageElement>(null);
+
+  // Check if image is already loaded (cached)
+  React.useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalHeight !== 0) {
+      setIsLoaded(true);
+    }
+  }, []);
 
   const imageData = generateResponsiveImage(src, {
     width,
@@ -58,6 +68,18 @@ export function ResponsiveImage({
 
   if (!imageData) {
     return null;
+  }
+
+  // Debug: Log the generated URLs (remove after debugging)
+  if (typeof window !== 'undefined' && !isLoaded) {
+    console.log('ResponsiveImage Debug:', {
+      src,
+      blurPlaceholder,
+      mainSrc: imageData.src,
+      srcSet: imageData.srcSet,
+      isLoaded,
+      hasError,
+    });
   }
 
   // Calculate aspect ratio for maintaining image proportions (only for non-fill mode)
@@ -121,6 +143,7 @@ export function ResponsiveImage({
 
         {/* JPEG fallback */}
         <img
+          ref={imgRef}
           src={imageData.src}
           srcSet={imageData.srcSet}
           sizes={imageData.sizes}
@@ -129,7 +152,15 @@ export function ResponsiveImage({
           height={height || undefined}
           loading={priority ? 'eager' : 'lazy'}
           decoding={priority ? 'sync' : 'async'}
-          onLoad={() => setIsLoaded(true)}
+          onLoad={() => {
+            console.log('Image loaded successfully:', imageData.src);
+            setIsLoaded(true);
+          }}
+          onError={(e) => {
+            console.error('Image failed to load:', imageData.src, e);
+            setHasError(true);
+            setIsLoaded(true); // Show original even if failed
+          }}
           className={cn(
             imageClasses,
             'transition-opacity duration-300',

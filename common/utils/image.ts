@@ -64,20 +64,37 @@ export function transformImage(
     // The source image path should be the full path after the domain
     const sourcePath = urlObj.pathname + urlObj.search + urlObj.hash;
 
-    return `${urlObj.origin}/cdn-cgi/image/${optionsStr}${sourcePath}`;
+    const transformedUrl = `${urlObj.origin}/cdn-cgi/image/${optionsStr}${sourcePath}`;
+
+    // Debug log in development
+    if (
+      typeof window !== 'undefined' &&
+      process.env.NODE_ENV === 'development'
+    ) {
+      console.log('[transformImage]', {
+        original: url,
+        transformed: transformedUrl,
+        options: optionsStr,
+      });
+    }
+
+    return transformedUrl;
   } catch {
     // If URL parsing fails, return original URL
+    console.warn('[transformImage] Failed to parse URL:', url);
     return url;
   }
 }
 
 /**
  * Generate a srcSet string for responsive images
+ * Maintains aspect ratio when both width and height are provided in options
  */
 export function generateSrcSet(
   url: string | undefined | null,
   widths: number[],
-  options: Omit<ImageTransformOptions, 'width'> = {}
+  options: Omit<ImageTransformOptions, 'width'> = {},
+  aspectRatio?: number // height / width ratio
 ): string {
   if (!url) {
     return '';
@@ -85,7 +102,14 @@ export function generateSrcSet(
 
   return widths
     .map((width) => {
-      const transformedUrl = transformImage(url, { ...options, width });
+      const transformOptions: ImageTransformOptions = { ...options, width };
+
+      // If we have an aspect ratio, calculate proportional height
+      if (aspectRatio) {
+        transformOptions.height = Math.round(width * aspectRatio);
+      }
+
+      const transformedUrl = transformImage(url, transformOptions);
       return `${transformedUrl} ${width}w`;
     })
     .join(', ');
@@ -127,16 +151,46 @@ export function generateResponsiveImage(
     alt = null,
     width = null,
     height = null,
-    quality = 75, // Higher quality for better visual experience
+    quality = 80, // Higher quality for better visual experience
     includeAvif = true,
   } = options;
 
+  // Base transformation options for all formats
+  const baseOptions: ImageTransformOptions = {
+    quality,
+    fit: 'cover', // Crop to fit the specified dimensions
+  };
+
+  // Add dimensions if provided
+  if (width && height) {
+    baseOptions.width = width;
+    baseOptions.height = height;
+  }
+
+  // Calculate aspect ratio for srcSet generation
+  const aspectRatio = width && height && width > 0 ? height / width : undefined;
+
   return {
-    src: transformImage(url, { quality, format: 'webp' }), // WebP as default, lighter than JPEG
-    srcSet: generateSrcSet(url, widths, { quality, format: 'webp' }),
-    webpSrcSet: generateSrcSet(url, widths, { quality, format: 'webp' }),
+    src: transformImage(url, { ...baseOptions, format: 'webp' }), // WebP as default, lighter than JPEG
+    srcSet: generateSrcSet(
+      url,
+      widths,
+      { ...baseOptions, format: 'webp' },
+      aspectRatio
+    ),
+    webpSrcSet: generateSrcSet(
+      url,
+      widths,
+      { ...baseOptions, format: 'webp' },
+      aspectRatio
+    ),
     avifSrcSet: includeAvif
-      ? generateSrcSet(url, widths, { quality, format: 'avif' }) // AVIF is even smaller than WebP
+      ? generateSrcSet(
+          url,
+          widths,
+          { ...baseOptions, format: 'avif' },
+          aspectRatio
+        ) // AVIF is even smaller than WebP
       : undefined,
     sizes,
     width,
@@ -151,7 +205,7 @@ export function generateResponsiveImage(
 export function getThumbnailUrl(
   url: string | undefined | null,
   size = 100,
-  quality = 75
+  quality = 80
 ): string {
   return transformImage(url, {
     width: size,
@@ -169,7 +223,7 @@ export function getCoverImageUrl(
   url: string | undefined | null,
   width = 2000,
   height = 1000,
-  quality = 75
+  quality = 80
 ): string {
   return transformImage(url, {
     width,
