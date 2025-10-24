@@ -65,6 +65,7 @@ async function fetchHomeData({
               id
               url
               thumbnailURL
+              lowResUrl
               alt
               width
               height
@@ -115,6 +116,7 @@ async function fetchHomeData({
           subHeader
           imageBanner {
             url
+            lowResUrl
             alt
           }
           meta {
@@ -122,6 +124,7 @@ async function fetchHomeData({
             description
             image {
               url
+              lowResUrl
               alt
             }
           }
@@ -133,6 +136,7 @@ async function fetchHomeData({
           avatar {
             url
             thumbnailURL
+            lowResUrl
             alt
             width
             height
