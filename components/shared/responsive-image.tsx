@@ -43,7 +43,6 @@ export function ResponsiveImage({
   fill = false,
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
 
   // Check if image is already loaded (cached)
@@ -149,7 +148,6 @@ export function ResponsiveImage({
             setIsLoaded(true);
           }}
           onError={() => {
-            setHasError(true);
             setIsLoaded(true); // Show original even if failed
           }}
           className={cn(
