@@ -51,6 +51,18 @@ module.exports = {
             img: {
               maxWidth: '100%',
               height: 'auto',
+              marginTop: '0',
+              marginBottom: '0',
+            },
+            figure: {
+              marginTop: '0',
+              marginBottom: '0',
+            },
+            video: {
+              maxWidth: '100%',
+              height: 'auto',
+              marginTop: '0',
+              marginBottom: '0',
             },
           },
         },
