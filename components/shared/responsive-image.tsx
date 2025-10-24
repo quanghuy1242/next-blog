@@ -82,18 +82,16 @@ export function ResponsiveImage({
   // Get low-res blurred placeholder using Cloudflare transformations
   // This loads a tiny image with the correct aspect ratio, heavily blurred
   const blurPlaceholderWidth = 20;
-  const blurPlaceholderHeight = aspectRatio
-    ? Math.round(blurPlaceholderWidth * aspectRatio)
-    : undefined;
-  const blurPlaceholder = getBlurPlaceholder(
-    src,
-    blurPlaceholderWidth,
-    blurPlaceholderHeight
-  );
+  const blurPlaceholder = getBlurPlaceholder(src, blurPlaceholderWidth);
 
   const containerStyles = fill
     ? undefined // Fill mode: no padding, let parent control size
-    : { paddingBottom: aspectRatio ? `${aspectRatio * 100}%` : undefined };
+    : aspectRatio
+    ? {
+        paddingBottom: `${aspectRatio * 100}%`,
+        aspectRatio: width && height ? `${width} / ${height}` : undefined,
+      }
+    : undefined;
 
   const imageClasses = fill
     ? 'absolute inset-0 w-full h-full' // Fill mode: absolute positioning
@@ -107,6 +105,9 @@ export function ResponsiveImage({
     : aspectRatio
     ? cn('relative overflow-hidden') // Aspect ratio mode needs relative container
     : ''; // Natural sizing mode doesn't need container wrapper
+
+  const shouldScalePlaceholder =
+    objectFit === 'cover' || objectFit === 'fill';
 
   return (
     <div className={cn(containerClasses, className)} style={containerStyles}>
@@ -126,7 +127,7 @@ export function ResponsiveImage({
             objectFit, // Use the same objectFit as the main image
             objectPosition,
             filter: 'blur(20px)',
-            transform: 'scale(1.1)', // Slightly scale up to hide blur edges
+            transform: shouldScalePlaceholder ? 'scale(1.1)' : undefined, // Avoid over-scaling for contain/scale-down
           }}
         />
       )}
