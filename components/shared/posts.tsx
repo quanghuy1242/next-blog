@@ -6,7 +6,6 @@ import { Tag, Tags } from 'components/shared/tags';
 import Link from 'next/link';
 import type { LinkProps } from 'next/link';
 import type { Post as PostType } from 'types/cms';
-import { uniqueSortedStrings } from 'common/utils/query';
 import { normalizePostTags } from 'common/utils/tags';
 
 interface PostTitleProps {
@@ -146,17 +145,9 @@ function buildTagQuery(
     return base;
   }
 
-  const current = base.tag;
-  const currentTags = Array.isArray(current)
-    ? current
-    : typeof current === 'string' && current.length
-    ? [current]
-    : [];
-
-  const tags = uniqueSortedStrings([...currentTags, normalizedTag]);
-
+  // Replace existing tag instead of accumulating (PayloadCMS limitation)
   return {
     ...base,
-    tag: tags,
+    tag: normalizedTag,
   };
 }

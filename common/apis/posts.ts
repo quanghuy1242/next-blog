@@ -1,6 +1,5 @@
 import { fetchAPI } from './base';
 import type { Post, PaginatedResponse } from 'types/cms';
-import { uniqueSortedStrings } from '../utils/query';
 
 interface PaginatedPostsResponse {
   Posts: PaginatedResponse<Post>;
@@ -115,19 +114,15 @@ export function createPostsWhere(
   }
 
   if (Array.isArray(tags) && tags.length) {
-    const sanitizedTags = uniqueSortedStrings(tags);
+    // Only use first tag (PayloadCMS limitation: AND filtering on array fields doesn't work as expected)
+    const tag = tags[0]?.trim();
 
-    // Each tag must match - use AND to ensure post has ALL specified tags
-    for (const tag of sanitizedTags) {
-      const trimmed = tag.trim();
-
-      if (trimmed) {
-        conditions.push({
-          tags__tag: {
-            equals: trimmed,
-          },
-        });
-      }
+    if (tag) {
+      conditions.push({
+        tags__tag: {
+          equals: tag,
+        },
+      });
     }
   }
 

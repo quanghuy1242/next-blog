@@ -2,10 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCategoryIdBySlug } from 'common/apis/categories';
 import { getPaginatedPosts } from 'common/apis/posts';
 import { normalizeLimit, normalizeOffset } from 'common/utils/number';
-import {
-  normalizeQueryParam,
-  normalizeQueryParamList,
-} from 'common/utils/query';
+import { normalizeQueryParam } from 'common/utils/query';
 
 const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 50;
@@ -23,7 +20,9 @@ export default async function handler(
   const limit = normalizeLimit(req.query.limit, DEFAULT_LIMIT, MAX_LIMIT);
   const offset = normalizeOffset(req.query.offset);
   const categorySlug = normalizeQueryParam(req.query.category);
-  const tags = normalizeQueryParamList(req.query.tag);
+  // Only support single tag filtering due to PayloadCMS limitation
+  const tagParam = normalizeQueryParam(req.query.tag);
+  const tags = tagParam ? [tagParam] : [];
 
   try {
     const categoryIdNum = categorySlug
