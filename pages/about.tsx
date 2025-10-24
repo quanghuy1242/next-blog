@@ -2,6 +2,7 @@ import { getDataForAbout } from 'common/apis/author';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
+import { LexicalRenderer } from 'components/shared/lexical-renderer';
 import { generateMetaTags } from 'common/utils/meta-tags';
 import { getCoverImageUrl } from 'common/utils/image';
 import type { GetStaticProps } from 'next';
@@ -11,14 +12,9 @@ import type { AboutPageData } from 'types/cms';
 interface AboutPageProps {
   homepage: AboutPageData['homepage'];
   author: AboutPageData['author'];
-  bioContent: string;
 }
 
-export default function About({
-  homepage,
-  author,
-  bioContent,
-}: AboutPageProps) {
+export default function About({ homepage, author }: AboutPageProps) {
   // Optimize avatar image for social media previews (Open Graph standard: 1200x630)
   const metaImageUrl = author?.avatar?.url
     ? getCoverImageUrl(author.avatar.url, 1200, 630, 80)
@@ -35,12 +31,15 @@ export default function About({
       <Head>{renderMetaTags(metaTags)}</Head>
       <Container className="flex flex-col items-center md:px-20 my-4 px-4">
         <h1 className="text-4xl font-bold mb-6">{author?.fullName}</h1>
-        {/* Temporary: Display raw JSON bio (Phase 4) */}
-        {/* TODO Phase 9: Replace with Lexical rendering */}
+        {/* Phase 9: Lexical rich text rendering */}
         <div className="w-full max-w-4xl">
-          <pre className="bg-gray-100 p-4 rounded overflow-x-auto text-sm">
-            {bioContent}
-          </pre>
+          <LexicalRenderer
+            data={author?.bio}
+            className="prose prose-lg max-w-none"
+            fallback={
+              <div className="text-gray-500 italic">No bio available.</div>
+            }
+          />
         </div>
       </Container>
     </Layout>
@@ -49,19 +48,11 @@ export default function About({
 
 export const getStaticProps: GetStaticProps<AboutPageProps> = async () => {
   const data = await getDataForAbout();
-  const author = data.author ?? null;
-
-  // Temporary: Display raw JSON bio (Phase 4)
-  // TODO Phase 9: Replace with Lexical rendering
-  const bioContent = author?.bio
-    ? JSON.stringify(author.bio, null, 2)
-    : 'No bio available';
 
   return {
     props: {
       homepage: data.homepage ?? null,
-      author,
-      bioContent,
+      author: data.author ?? null,
     },
     revalidate: 3600, // Revalidate every hour
   };

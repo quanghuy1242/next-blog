@@ -17,7 +17,7 @@ import type { Post as PostType, PostSlugData } from 'types/cms';
 import { normalizePostTags } from 'common/utils/tags';
 
 interface PostPageProps {
-  post: (Omit<PostType, 'content'> & { content: string }) | null;
+  post: PostType | null;
   morePosts: PostType[];
   homepage: PostSlugData['homepage'];
 }
@@ -62,7 +62,7 @@ export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
           className="w-full"
         />
         <Container className="my-4 flex justify-center">
-          <PostContent content={post?.content ?? ''} tags={tags} />
+          <PostContent content={post?.content} tags={tags} />
         </Container>
       </article>
       <SectionSeparator />
@@ -102,14 +102,9 @@ export const getStaticProps: GetStaticProps<PostPageProps> = async ({
 
   const data = await getDataForPostSlug(slugParam);
 
-  // Temporary: Display raw JSON content (Phase 4)
-  // TODO Phase 9: Replace with Lexical rendering
-  const content = JSON.stringify(data.post?.content, null, 2);
-  const postWithContent = data.post ? { ...data.post, content } : null;
-
   return {
     props: {
-      post: postWithContent,
+      post: data.post ?? null,
       morePosts: data.morePosts ?? [],
       homepage: data.homepage ?? null,
     },

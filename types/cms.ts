@@ -1,5 +1,7 @@
 // PayloadCMS Types (migrated from DatoCMS)
 
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
+
 // Media/Image Types
 export interface Media {
   id?: number;
@@ -22,7 +24,7 @@ export interface Author {
   id: number;
   fullName: string;
   avatar?: Media | null;
-  bio?: JSON | null; // Lexical editor content
+  bio?: SerializedEditorState | null; // Lexical editor content
   updatedAt?: string;
   createdAt?: string;
 }
@@ -58,7 +60,7 @@ export interface Post {
   title: string;
   slug: string;
   excerpt?: string | null;
-  content?: JSON | null; // Lexical editor content
+  content?: SerializedEditorState | null; // Lexical editor content
   coverImage?: Media | null;
   author?: Author | null;
   category?: Category | null;

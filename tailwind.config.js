@@ -42,8 +42,18 @@ module.exports = {
         searchBar: '450px'
       },
       typography: {
-        // Custom typography variants can be added here for Lexical rendering (Phase 9)
-        // Example: custom styling for code blocks, tables, etc.
+        // Custom typography variants to match PayloadCMS admin Lexical editor styles
+        DEFAULT: {
+          css: {
+            // Match PayloadCMS admin font family (sans-serif)
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+            // Responsive images matching PayloadCMS admin
+            img: {
+              maxWidth: '100%',
+              height: 'auto',
+            },
+          },
+        },
       },
     },
   },
