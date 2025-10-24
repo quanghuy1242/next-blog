@@ -127,6 +127,7 @@ export function generateResponsiveImage(
     quality?: number;
     includeAvif?: boolean;
     fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
+    gravity?: 'auto' | 'left' | 'right' | 'top' | 'bottom' | 'center';
   } = {}
 ): ResponsiveImageData | null {
   if (!url) {
@@ -142,6 +143,7 @@ export function generateResponsiveImage(
     quality = 80, // Higher quality for better visual experience
     includeAvif = true,
     fit = 'scale-down', // Default: resize without cropping, maintaining aspect ratio
+    gravity,
   } = options;
 
   // Base transformation options for all formats
@@ -154,6 +156,9 @@ export function generateResponsiveImage(
     baseOptions.width = width;
     baseOptions.height = height;
     baseOptions.fit = fit; // Use provided fit mode or default to scale-down
+    if (gravity) {
+      baseOptions.gravity = gravity; // Add gravity for crop focal point
+    }
   }
 
   // Calculate aspect ratio for srcSet generation

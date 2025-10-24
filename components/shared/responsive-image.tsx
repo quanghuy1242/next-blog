@@ -29,6 +29,11 @@ export interface ResponsiveImageProps {
    * If false, maintains aspect ratio with padding-bottom technique
    */
   fill?: boolean;
+  /**
+   * Cloudflare gravity parameter - controls crop focal point
+   * Maps to objectPosition for consistency
+   */
+  gravity?: 'auto' | 'left' | 'right' | 'top' | 'bottom' | 'center';
 }
 
 export function ResponsiveImage({
@@ -41,6 +46,7 @@ export function ResponsiveImage({
   objectPosition = 'center',
   priority = false,
   fill = false,
+  gravity,
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
@@ -60,6 +66,7 @@ export function ResponsiveImage({
     quality: 80,
     includeAvif: true,
     fit: fill ? 'cover' : 'scale-down', // Cover for banners, scale-down for posts
+    gravity: gravity, // Pass gravity for Cloudflare transformation
   });
 
   // Get low-res blurred placeholder using Cloudflare transformations

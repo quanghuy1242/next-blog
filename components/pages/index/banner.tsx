@@ -39,6 +39,7 @@ export function Banner({
         height={800}
         objectFit="cover"
         objectPosition="bottom"
+        gravity="bottom"
         priority={true}
         fill={true}
         className="absolute inset-0"
