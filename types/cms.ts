@@ -77,8 +77,7 @@ export interface HomepageMeta {
 }
 
 export interface Homepage {
-  id: number;
-  header?: string | null;
+  header: string;
   subHeader?: string | null;
   imageBanner?: Media | null;
   meta?: HomepageMeta | null;

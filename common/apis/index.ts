@@ -109,7 +109,6 @@ async function fetchHomeData({
         }
         
         Homepage {
-          id
           header
           subHeader
           imageBanner {
