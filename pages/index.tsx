@@ -125,6 +125,7 @@ export default function Index({
       <Banner
         header={header}
         subHeader={homepage?.subHeader || ''}
+        imageBanner={homepage?.imageBanner || null}
         className="w-full"
       />
       <Container className="flex flex-col md:flex-row md:px-20">
