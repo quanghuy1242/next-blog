@@ -1,15 +1,17 @@
 import { fetchAPI } from './base';
+import type { Category } from 'types/cms';
 
 interface CategoryBySlugResponse {
-  category: {
-    id: string;
-    slug: string;
-  } | null;
+  Categories: {
+    docs: Category[];
+  };
 }
 
-const categoryIdCache = new Map<string, string>();
+const categoryIdCache = new Map<string, number>();
 
-export async function getCategoryIdBySlug(slug: string): Promise<string | null> {
+export async function getCategoryIdBySlug(
+  slug: string
+): Promise<number | null> {
   const trimmedSlug = slug.trim();
 
   if (!trimmedSlug) {
@@ -24,10 +26,12 @@ export async function getCategoryIdBySlug(slug: string): Promise<string | null> 
 
   const data = await fetchAPI<CategoryBySlugResponse>(
     `#graphql
-      query CategoryBySlug($slug: String) {
-        category(filter: { slug: { eq: $slug } }) {
-          id
-          slug
+      query CategoryBySlug($slug: String!) {
+        Categories(where: { slug: { equals: $slug } }, limit: 1) {
+          docs {
+            id
+            slug
+          }
         }
       }
     `,
@@ -38,7 +42,8 @@ export async function getCategoryIdBySlug(slug: string): Promise<string | null> 
     }
   );
 
-  const categoryId = data?.category?.id ?? null;
+  const category = data?.Categories?.docs?.[0] ?? null;
+  const categoryId = category?.id ?? null;
 
   if (categoryId) {
     categoryIdCache.set(trimmedSlug, categoryId);

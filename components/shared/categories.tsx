@@ -3,7 +3,7 @@ import cn from 'classnames';
 import { CoverImage } from 'components/shared/cover-image';
 import Link from 'next/link';
 import { useState } from 'react';
-import type { Category as CategoryData } from 'types/datocms';
+import type { Category as CategoryData } from 'types/cms';
 
 interface CategoryProps {
   name: string;
@@ -35,7 +35,7 @@ export function Category({
       onMouseOver={() => setShow(true)}
       onMouseLeave={() => setShow(false)}
     >
-      <CoverImage responsiveImage={image.responsiveImage} />
+      <CoverImage media={image} />
       <div
         className={cn(
           'absolute top-0 left-0 bottom-0 right-0',
@@ -73,7 +73,13 @@ export function Categories({ categories = [] }: CategoriesProps) {
   return (
     <div>
       {categories
-        .filter((category): category is CategoryData & { image: NonNullable<CategoryData['image']> } => !!category.image)
+        .filter(
+          (
+            category
+          ): category is CategoryData & {
+            image: NonNullable<CategoryData['image']>;
+          } => !!category.image
+        )
         .map((category) => (
           <Category
             name={category.name}

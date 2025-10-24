@@ -2,7 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCategoryIdBySlug } from 'common/apis/categories';
 import { getPaginatedPosts } from 'common/apis/posts';
 import { normalizeLimit, normalizeOffset } from 'common/utils/number';
-import { normalizeQueryParam, normalizeQueryParamList } from 'common/utils/query';
+import {
+  normalizeQueryParam,
+  normalizeQueryParamList,
+} from 'common/utils/query';
 
 const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 50;
@@ -23,11 +26,11 @@ export default async function handler(
   const tags = normalizeQueryParamList(req.query.tag);
 
   try {
-    const categoryId = categorySlug
+    const categoryIdNum = categorySlug
       ? await getCategoryIdBySlug(categorySlug)
       : null;
 
-    if (categorySlug && !categoryId) {
+    if (categorySlug && !categoryIdNum) {
       res.status(200).json({
         posts: [],
         hasMore: false,
@@ -39,7 +42,7 @@ export default async function handler(
     const { posts, hasMore } = await getPaginatedPosts({
       limit,
       skip: offset,
-      categoryId,
+      categoryId: categoryIdNum ? String(categoryIdNum) : null,
       tags: tags.length ? tags : null,
     });
 

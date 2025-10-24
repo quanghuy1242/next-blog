@@ -1,23 +1,25 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useHomePosts } from 'hooks/useHomePosts';
-import type { Post } from 'types/datocms';
+import type { Post } from 'types/cms';
 import type { HomePostsState } from 'context/state';
 import { vi } from 'vitest';
 
 function createPost(slug: string): Post {
   return {
+    id: 1,
     slug,
     title: slug,
-    date: '2024-01-01',
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01',
     excerpt: null,
     content: null,
-    coverImage: { responsiveImage: {} as never },
-    author: { displayName: 'Author', picture: {} as never } as never,
+    coverImage: null,
+    author: null,
     category: null,
     tags: null,
-    metadata: [],
-    ogImage: undefined,
-  } as unknown as Post;
+    meta: null,
+    _status: 'published',
+  };
 }
 
 function createState(overrides: Partial<HomePostsState>): HomePostsState {
@@ -149,9 +151,7 @@ describe('useHomePosts', () => {
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('category=story')
     );
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('tag=tech')
-    );
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('tag=tech'));
     expect(setHomePosts).toHaveBeenCalledWith({
       posts: responseData.posts,
       offset: responseData.nextOffset,
@@ -203,9 +203,7 @@ describe('useHomePosts', () => {
       ]);
     });
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('offset=1')
-    );
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('offset=1'));
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('category=story')
     );

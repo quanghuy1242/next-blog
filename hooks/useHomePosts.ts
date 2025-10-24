@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Post } from 'types/datocms';
+import type { Post } from 'types/cms';
 import type { HomePostsState } from 'context/state';
 import { areStringArraysEqual } from 'common/utils/query';
 

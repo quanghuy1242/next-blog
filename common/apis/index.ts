@@ -1,9 +1,17 @@
 import { unstable_cache } from 'next/cache';
-import type { HomePageData } from '../../types/datocms';
-import { fetchAPI, responsiveImageFragment } from './base';
-import { createPostsFilter } from './posts';
+import type {
+  HomePageData,
+  Post,
+  Category,
+  Author,
+  Homepage,
+} from '../../types/cms';
+import { fetchAPI } from './base';
+import { createPostsWhere } from './posts';
 
 const DEFAULT_HOME_POST_LIMIT = 5;
+const HOME_DATA_REVALIDATE_SECONDS = 60;
+const AUTHOR_ID = 1; // quanghuy1242
 
 export interface GetDataForHomeOptions {
   limit?: number;
@@ -16,12 +24,22 @@ export interface GetDataForHomeResult {
   hasMore: boolean;
 }
 
-const HOME_DATA_REVALIDATE_SECONDS = 60;
-
 interface NormalizedHomeOptions {
   limit: number;
   categoryId: string | null;
   tags: string[] | null;
+}
+
+interface HomePageResponse {
+  Posts: {
+    docs: Post[];
+    hasNextPage: boolean;
+  };
+  Categories: {
+    docs: Category[];
+  };
+  Homepage: Homepage | null;
+  User: Author | null;
 }
 
 async function fetchHomeData({
@@ -29,84 +47,120 @@ async function fetchHomeData({
   categoryId,
   tags,
 }: NormalizedHomeOptions): Promise<GetDataForHomeResult> {
-  const filter = createPostsFilter(categoryId, tags);
+  const where = createPostsWhere(categoryId, tags);
   const queryLimit = limit + 1;
 
-  const data = await fetchAPI<HomePageData>(
+  const data = await fetchAPI<HomePageResponse>(
     `#graphql
-      query HomePage($first: IntType!, $filter: PostModelFilter) {
-        allPosts(orderBy: date_DESC, first: $first, filter: $filter) {
-          title
-          slug
-          excerpt
-          date
-          coverImage {
-            responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
-              ...responsiveImageFragment
-            }
-          }
-          author {
-            displayName
-            picture {
-              url(imgixParams: {fm: jpg, fit: crop, w: 100, h: 100})
-            }
-          }
-          category {
-            name
+      query HomePage($limit: Int!, $where: Post_where, $authorId: Int!) {
+        Posts(limit: $limit, where: $where, sort: "-createdAt") {
+          docs {
+            id
+            title
             slug
+            excerpt
+            createdAt
+            updatedAt
+            coverImage {
+              id
+              url
+              thumbnailURL
+              alt
+              width
+              height
+            }
+            author {
+              id
+              fullName
+              avatar {
+                url
+                thumbnailURL
+                alt
+              }
+            }
+            category {
+              id
+              name
+              slug
+            }
+            tags {
+              tag
+              id
+            }
           }
-          tags
+          hasNextPage
         }
-        homepage {
+        
+        Categories(limit: 2, sort: "-updatedAt") {
+          docs {
+            id
+            name
+            description
+            slug
+            image {
+              id
+              url
+              thumbnailURL
+              alt
+              width
+              height
+            }
+          }
+        }
+        
+        Homepage {
+          id
           header
           subHeader
-          metadata: _seoMetaTags {
-            attributes
-            content
-            tag
+          imageBanner {
+            url
+            alt
           }
-        }
-        allCategories(orderBy: updatedAt_DESC, first: 2) {
-          name
-          description
-          image {
-            responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
-              ...responsiveImageFragment
+          meta {
+            title
+            description
+            image {
+              url
+              alt
             }
           }
-          slug
         }
-        author(filter: { name: { eq: "quanghuy1242" } }) {
-          name
-          displayName
-          description
-          picture {
-            responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 600, h: 600 }) {
-              ...responsiveImageFragment
-            }
+        
+        User(id: $authorId) {
+          id
+          fullName
+          avatar {
+            url
+            thumbnailURL
+            alt
+            width
+            height
           }
+          bio
         }
       }
-  
-      ${responsiveImageFragment}
     `,
     {
       variables: {
-        first: Math.max(queryLimit, 1),
-        filter,
+        limit: Math.max(queryLimit, 1),
+        where,
+        authorId: AUTHOR_ID,
       },
       next: { revalidate: HOME_DATA_REVALIDATE_SECONDS },
     }
   );
 
-  const posts = data?.allPosts ?? [];
-  const hasMore = limit > 0 ? posts.length > limit : posts.length > 0;
+  const posts = data?.Posts?.docs ?? [];
+  const hasMore =
+    limit > 0 ? data?.Posts?.hasNextPage ?? false : posts.length > 0;
   const trimmedPosts = limit > 0 ? posts.slice(0, limit) : [];
 
   return {
     data: {
-      ...data,
       allPosts: trimmedPosts,
+      allCategories: data?.Categories?.docs ?? [],
+      homepage: data?.Homepage ?? null,
+      author: data?.User ?? null,
     },
     hasMore,
   };

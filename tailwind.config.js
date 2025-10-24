@@ -42,28 +42,14 @@ module.exports = {
         searchBar: '450px'
       },
       typography: {
-        'directive': {
-          css: {
-            'div.youtube-container': {
-              display: 'block',
-              position: 'relative',
-              paddingBottom: `${100*9/16}%`,
-              height: '0',
-              overflow: 'hidden',
-            },
-            'iframe.youtube-content': {
-              position: 'absolute',
-              top: '0',
-              left: '0',
-              width: '100%',
-              height: '100%',
-            }
-          },
-        },
+        // Custom typography variants can be added here for Lexical rendering (Phase 9)
+        // Example: custom styling for code blocks, tables, etc.
       },
     },
   },
   plugins: [
+    // Keep @tailwindcss/typography for Phase 9 Lexical rendering
+    // Provides 'prose' class for rich text styling
     require('@tailwindcss/typography')
   ]
-}
+};

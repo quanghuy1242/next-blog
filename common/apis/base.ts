@@ -1,55 +1,50 @@
-const API_URL = 'https://graphql.datocms.com';
-const API_TOKEN = process.env.NEXT_EXAMPLE_CMS_DATOCMS_API_TOKEN;
+// PayloadCMS GraphQL API Configuration
+const PAYLOAD_BASE_URL = process.env.PAYLOAD_BASE_URL;
+const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY;
 
-// See: https://www.datocms.com/blog/offer-responsive-progressive-lqip-images-in-2020
-export const responsiveImageFragment = `#graphql
-  fragment responsiveImageFragment on ResponsiveImage {
-  srcSet
-    webpSrcSet
-    sizes
-    src
-    width
-    height
-    aspectRatio
-    alt
-    title
-    bgColor
-    base64
-  }
-`;
+const API_URL = PAYLOAD_BASE_URL ? `${PAYLOAD_BASE_URL}/api/graphql` : '';
 
 export interface FetchApiOptions {
   variables?: Record<string, unknown>;
-  preview?: boolean;
   next?: {
     revalidate?: number;
     tags?: string[];
   };
 }
 
-interface DatocmsResponse<TData> {
+interface PayloadCMSResponse<TData> {
   data: TData;
   errors?: Array<{ message?: string }>;
 }
 
-// Rework this with useSWR
+/**
+ * Fetch data from PayloadCMS GraphQL API
+ */
 export async function fetchAPI<TData>(
   query: string,
-  { variables, preview, next }: FetchApiOptions = {}
+  { variables, next }: FetchApiOptions = {}
 ): Promise<TData> {
-  if (!API_TOKEN) {
-    console.warn(
-      'NEXT_EXAMPLE_CMS_DATOCMS_API_TOKEN is not set. Returning empty response.'
-    );
+  if (!PAYLOAD_BASE_URL) {
+    console.warn('PAYLOAD_BASE_URL is not set. Returning empty response.');
     return {} as TData;
   }
 
-  const res = await fetch(API_URL + (preview ? '/preview' : ''), {
+  if (!PAYLOAD_API_KEY) {
+    console.warn('PAYLOAD_API_KEY is not set. Authentication may fail.');
+  }
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  // Add API key authentication
+  if (PAYLOAD_API_KEY) {
+    headers['Authorization'] = `users API-Key ${PAYLOAD_API_KEY}`;
+  }
+
+  const res = await fetch(API_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_TOKEN}`,
-    },
+    headers,
     body: JSON.stringify({
       query,
       variables,
@@ -61,7 +56,7 @@ export async function fetchAPI<TData>(
     throw new Error(`Failed to fetch API. Status: ${res.status}`);
   }
 
-  const json = (await res.json()) as DatocmsResponse<TData>;
+  const json = (await res.json()) as PayloadCMSResponse<TData>;
 
   if (json.errors) {
     console.error(json.errors);

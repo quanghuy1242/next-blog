@@ -1,24 +1,30 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Posts } from 'components/shared/posts';
-import type { Post } from 'types/datocms';
+import type { Post } from 'types/cms';
 
 function createPost(overrides: Partial<Post> = {}): Post {
   return {
+    id: overrides.id ?? 1,
     slug: overrides.slug ?? 'sample-post',
     title: overrides.title ?? 'Sample Title',
-    date: overrides.date ?? '2024-01-01',
+    createdAt: overrides.createdAt ?? '2024-01-01',
+    updatedAt: overrides.updatedAt ?? '2024-01-01',
     excerpt: overrides.excerpt ?? 'Excerpt',
-    coverImage: overrides.coverImage ?? { responsiveImage: {} as never },
-    author:
-      overrides.author ??
-      ({ displayName: 'Author', picture: {} as never } as unknown as Post['author']),
-    category: overrides.category ?? { name: 'Stories', slug: 'stories' },
-    tags: overrides.tags ?? ['nextjs', 'react'],
+    coverImage: overrides.coverImage ?? null,
+    author: overrides.author ?? null,
+    category: overrides.category ?? {
+      id: 1,
+      name: 'Stories',
+      slug: 'stories',
+      description: '',
+      image: {} as never,
+    },
+    tags: overrides.tags ?? [{ tag: 'nextjs' }, { tag: 'react' }],
     content: overrides.content ?? null,
-    metadata: overrides.metadata ?? [],
-    ogImage: overrides.ogImage,
-  } as Post;
+    meta: overrides.meta ?? null,
+    _status: overrides._status ?? 'published',
+  };
 }
 
 describe('Posts component', () => {
