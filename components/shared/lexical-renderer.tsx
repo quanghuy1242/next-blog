@@ -49,16 +49,19 @@ const CustomUploadComponent: React.FC<{
       return null;
     }
 
-    const { alt, height, url, width, lowResUrl } = uploadDoc;
+    const { alt, height, url, width, lowResUrl, optimizedUrl } = uploadDoc;
+
+    // Use optimizedUrl with fallback to url
+    const mediaUrl = optimizedUrl || url;
 
     // Handle missing URL
-    if (!url) {
+    if (!mediaUrl) {
       return null;
     }
 
     return (
       <ResponsiveImage
-        src={url}
+        src={mediaUrl}
         alt={alt || ''}
         width={width || null}
         height={height || null}

@@ -2,6 +2,7 @@ import React from 'react';
 import cn from 'classnames';
 import Link from 'next/link';
 import { ResponsiveImage } from 'components/shared/responsive-image';
+import { getMediaUrl } from 'common/utils/image';
 import type { Media } from 'types/cms';
 
 interface CoverImageProps {
@@ -12,17 +13,19 @@ interface CoverImageProps {
 }
 
 export function CoverImage({ title, media, slug, className }: CoverImageProps) {
-  if (!media?.url) {
+  const mediaUrl = getMediaUrl(media);
+
+  if (!mediaUrl) {
     return null;
   }
 
-  const alt = media.alt || `Cover Image for ${title}` || 'Cover Image';
+  const alt = media?.alt || `Cover Image for ${title}` || 'Cover Image';
 
   const image = (
     <ResponsiveImage
-      src={media.url}
+      src={mediaUrl}
       alt={alt}
-      lowResUrl={media.lowResUrl}
+      lowResUrl={media?.lowResUrl}
       // Force 2:1 aspect ratio like DatoCMS (1000×500, 2000×1000, etc.)
       width={2000}
       height={1000}
