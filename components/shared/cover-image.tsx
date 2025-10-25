@@ -30,10 +30,14 @@ export function CoverImage({ title, media, slug, className }: CoverImageProps) {
         'hover:shadow-medium transition-shadow duration-200': slug,
       })}
       priority={!slug} // Priority for non-linked images (usually hero images)
-      // Mobile-optimized widths - smaller sizes for mobile devices
-      widths={[480, 640, 750, 828]}
-      // Be very specific: mobile displays are ~380px, use 640px max for 2x retina
-      sizes="(max-width: 640px) 100vw, (max-width: 768px) 750px, (max-width: 1024px) 50vw, 33vw"
+      // Full range of widths for all breakpoints
+      // Mobile will use 480/640, Tablet 750/828, Desktop 1080+
+      widths={[480, 640, 750, 828, 1080, 1200]}
+      // Key: Tell browser the ACTUAL CSS display size at each breakpoint
+      // Mobile: ~380px CSS pixels, browser picks based on DPR
+      // On 2x display: 380*2=760, browser should pick 750w or 828w
+      // But we tell it the image displays at 90vw (342px), so 342*2=684 -> picks 750w
+      sizes="(max-width: 640px) 90vw, (max-width: 768px) 45vw, (max-width: 1024px) 45vw, 30vw"
       quality={75}
     />
   );
