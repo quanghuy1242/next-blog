@@ -56,6 +56,11 @@ export interface ResponsiveImageProps {
    * Default: 80
    */
   quality?: number;
+  /**
+   * Array of image widths to generate for srcset
+   * Smaller arrays = fewer variants = better for mobile
+   */
+  widths?: number[];
 }
 
 export function ResponsiveImage({
@@ -73,6 +78,7 @@ export function ResponsiveImage({
   fetchPriority,
   sizes,
   quality,
+  widths,
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
@@ -106,6 +112,7 @@ export function ResponsiveImage({
     fit: width && height ? 'cover' : 'scale-down',
     gravity: gravity, // Pass gravity for Cloudflare transformation
     sizes: sizes, // Custom sizes attribute
+    widths: widths, // Custom widths for srcset generation
   });
 
   if (!imageData) {
