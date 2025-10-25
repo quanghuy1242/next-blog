@@ -137,7 +137,7 @@ export interface ResponsiveImageData {
 }
 
 export function generateResponsiveImage(
-  url: string | undefined | null,
+  urlOrMedia: string | Media | undefined | null,
   options: {
     widths?: number[];
     sizes?: string;
@@ -150,6 +150,10 @@ export function generateResponsiveImage(
     gravity?: 'auto' | 'left' | 'right' | 'top' | 'bottom' | 'center';
   } = {}
 ): ResponsiveImageData | null {
+  // Extract the URL to use for transformations (prefer optimizedUrl)
+  const url =
+    typeof urlOrMedia === 'string' ? urlOrMedia : getMediaUrl(urlOrMedia);
+
   if (!url) {
     return null;
   }
@@ -224,10 +228,14 @@ export function generateResponsiveImage(
  * Get optimized thumbnail URL
  */
 export function getThumbnailUrl(
-  url: string | undefined | null,
+  urlOrMedia: string | Media | undefined | null,
   size = 100,
   quality = 80
 ): string {
+  // Extract the URL to use for transformations (prefer optimizedUrl)
+  const url =
+    typeof urlOrMedia === 'string' ? urlOrMedia : getMediaUrl(urlOrMedia);
+
   return transformImage(url, {
     width: size,
     height: size,
@@ -241,11 +249,15 @@ export function getThumbnailUrl(
  * Get cover image URL with specific dimensions
  */
 export function getCoverImageUrl(
-  url: string | undefined | null,
+  urlOrMedia: string | Media | undefined | null,
   width = 2000,
   height = 1000,
   quality = 80
 ): string {
+  // Extract the URL to use for transformations (prefer optimizedUrl)
+  const url =
+    typeof urlOrMedia === 'string' ? urlOrMedia : getMediaUrl(urlOrMedia);
+
   return transformImage(url, {
     width,
     height,
@@ -262,14 +274,14 @@ export function getCoverImageUrl(
  * If lowResUrl is provided (base64 data URL from backend), use it directly.
  * Otherwise, returns a Cloudflare-transformed URL with blur and low quality.
  *
- * @param url - Source image URL
+ * @param urlOrMedia - Source image URL or Media object
  * @param width - Target width for placeholder (default: 20px)
  * @param height - Optional height to maintain aspect ratio
  * @param quality - Quality setting (default: 20)
  * @param lowResUrl - Optional pre-generated base64 data URL from backend
  */
 export function getBlurPlaceholder(
-  url: string | undefined | null,
+  urlOrMedia: string | Media | undefined | null,
   width = 20,
   height?: number,
   quality = 20,
@@ -279,6 +291,10 @@ export function getBlurPlaceholder(
   if (lowResUrl) {
     return lowResUrl;
   }
+
+  // Extract the URL to use for transformations (prefer optimizedUrl)
+  const url =
+    typeof urlOrMedia === 'string' ? urlOrMedia : getMediaUrl(urlOrMedia);
 
   if (!url) {
     return '';

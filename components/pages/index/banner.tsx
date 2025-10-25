@@ -22,6 +22,9 @@ export function Banner({
   const bannerUrl = getMediaUrl(imageBanner) || PLACEHOLDER_BANNER_URL;
   const bannerAlt = imageBanner?.alt || 'Banner background';
 
+  // Use Media object if available, otherwise use the URL string
+  const imageSrc = imageBanner || bannerUrl;
+
   return (
     <div
       className={cn(
@@ -34,7 +37,7 @@ export function Banner({
     >
       {/* Background image with progressive loading */}
       <ResponsiveImage
-        src={bannerUrl}
+        src={imageSrc}
         alt={bannerAlt}
         width={2000}
         height={800}

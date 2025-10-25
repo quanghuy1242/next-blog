@@ -16,9 +16,10 @@ import {
 } from 'common/utils/image';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
 import cn from 'classnames';
+import type { Media } from 'types/cms';
 
 export interface ResponsiveImageProps {
-  src: string;
+  src: string | Media;
   alt?: string | null;
   width?: number | null;
   height?: number | null;
@@ -101,6 +102,12 @@ export function ResponsiveImage({
     }
   }, []);
 
+  // Extract lowResUrl from Media object if src is Media, otherwise use prop
+  const actualLowResUrl =
+    typeof src === 'object' && src !== null && 'lowResUrl' in src
+      ? src.lowResUrl
+      : lowResUrl;
+
   const imageData = generateResponsiveImage(src, {
     width,
     height,
@@ -137,7 +144,7 @@ export function ResponsiveImage({
     blurPlaceholderWidth,
     blurPlaceholderHeight,
     20,
-    lowResUrl
+    actualLowResUrl
   );
 
   const containerStyles = fill

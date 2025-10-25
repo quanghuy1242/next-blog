@@ -38,9 +38,8 @@ export function PostHeader({
     >
       {/* Background image with progressive loading */}
       <ResponsiveImage
-        src={coverUrl}
+        src={coverImage!}
         alt={`Cover image for ${header}`}
-        lowResUrl={coverImage?.lowResUrl}
         width={2000}
         height={1000}
         objectFit="cover"
