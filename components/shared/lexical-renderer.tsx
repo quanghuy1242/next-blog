@@ -51,21 +51,28 @@ const CustomUploadComponent: React.FC<{
 
     const { alt, height, url, width, lowResUrl, optimizedUrl } = uploadDoc;
 
-    // Use optimizedUrl with fallback to url
-    const mediaUrl = optimizedUrl || url;
-
-    // Handle missing URL
-    if (!mediaUrl) {
+    // Check if we have a valid URL
+    if (!url && !optimizedUrl) {
       return null;
     }
 
+    // Pass the entire media object to ResponsiveImage
+    // This allows the component to detect optimizedUrl and apply 1920px optimization
+    const mediaObject = {
+      url,
+      optimizedUrl,
+      lowResUrl,
+      alt,
+      width,
+      height,
+    };
+
     return (
       <ResponsiveImage
-        src={mediaUrl}
+        src={mediaObject}
         alt={alt || ''}
         width={width || null}
         height={height || null}
-        lowResUrl={lowResUrl || null}
         className="my-4"
         objectFit="contain"
       />
