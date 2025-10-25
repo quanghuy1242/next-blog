@@ -43,6 +43,8 @@ export function PostHeader({
         objectFit="cover"
         priority={true}
         fill={true}
+        fetchPriority="high"
+        sizes="100vw"
         className="absolute inset-0"
       />
 

@@ -41,6 +41,16 @@ export interface ResponsiveImageProps {
    * If provided, this will be used instead of R2 transformation
    */
   lowResUrl?: string | null;
+  /**
+   * Fetch priority hint for the browser
+   * Use 'high' for LCP (Largest Contentful Paint) images
+   */
+  fetchPriority?: 'high' | 'low' | 'auto';
+  /**
+   * Custom sizes attribute for responsive images
+   * Helps browser select optimal image size
+   */
+  sizes?: string;
 }
 
 export function ResponsiveImage({
@@ -55,6 +65,8 @@ export function ResponsiveImage({
   fill = false,
   gravity,
   lowResUrl,
+  fetchPriority,
+  sizes,
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
@@ -87,6 +99,7 @@ export function ResponsiveImage({
     // Use 'scale-down' when no dimensions to preserve original
     fit: width && height ? 'cover' : 'scale-down',
     gravity: gravity, // Pass gravity for Cloudflare transformation
+    sizes: sizes, // Custom sizes attribute
   });
 
   if (!imageData) {
@@ -194,6 +207,7 @@ export function ResponsiveImage({
             height={height || undefined}
             loading={priority ? 'eager' : 'lazy'}
             decoding={priority ? 'sync' : 'async'}
+            fetchPriority={fetchPriority}
             onLoad={() => {
               setIsLoaded(true);
             }}

@@ -30,6 +30,9 @@ export function CoverImage({ title, media, slug, className }: CoverImageProps) {
         'hover:shadow-medium transition-shadow duration-200': slug,
       })}
       priority={!slug} // Priority for non-linked images (usually hero images)
+      // Responsive sizes: full width on mobile, constrained on desktop
+      // Post grids: 2 columns on md+, 1 column on mobile with padding
+      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
     />
   );
 
