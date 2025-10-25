@@ -1,5 +1,5 @@
 import React from 'react';
-import { parseISO, format } from 'date-fns';
+import { formatDate } from 'common/utils/date';
 
 interface DateProps {
   dateString: string;
@@ -7,10 +7,9 @@ interface DateProps {
 }
 
 export function Date({ dateString, className }: DateProps) {
-  const date = parseISO(dateString);
   return (
-    <time dateTime={dateString} className={className}>
-      {format(date, 'LLLL	d, yyyy')}
+    <time dateTime={dateString} className={className} suppressHydrationWarning>
+      {formatDate(dateString)}
     </time>
   );
 }
