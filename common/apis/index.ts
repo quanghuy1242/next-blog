@@ -64,6 +64,7 @@ async function fetchHomeData({
             coverImage {
               id
               url
+              optimizedUrl
               thumbnailURL
               lowResUrl
               alt
@@ -75,6 +76,7 @@ async function fetchHomeData({
               fullName
               avatar {
                 url
+                optimizedUrl
                 thumbnailURL
                 lowResUrl
                 alt
@@ -102,6 +104,7 @@ async function fetchHomeData({
             image {
               id
               url
+              optimizedUrl
               thumbnailURL
               lowResUrl
               alt
@@ -116,6 +119,7 @@ async function fetchHomeData({
           subHeader
           imageBanner {
             url
+            optimizedUrl
             lowResUrl
             alt
           }
@@ -124,6 +128,7 @@ async function fetchHomeData({
             description
             image {
               url
+              optimizedUrl
               lowResUrl
               alt
             }
@@ -135,6 +140,7 @@ async function fetchHomeData({
           fullName
           avatar {
             url
+            optimizedUrl
             thumbnailURL
             lowResUrl
             alt

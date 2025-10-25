@@ -158,6 +158,16 @@ export function generateResponsiveImage(
     return null;
   }
 
+  // Check if we're using an optimized URL (pre-computed backend images)
+  // Optimized images are always 1920px wide, so we avoid upscaling beyond that
+  const isOptimizedUrl =
+    typeof urlOrMedia === 'object' && urlOrMedia !== null
+      ? !!urlOrMedia.optimizedUrl
+      : false;
+
+  // Maximum width to prevent upscaling optimized images (1920px)
+  const OPTIMIZED_MAX_WIDTH = 1920;
+
   const {
     widths = [640, 750, 828, 1080, 1200, 1920, 2100, 3840],
     sizes = '100vw',
@@ -169,6 +179,13 @@ export function generateResponsiveImage(
     fit = 'scale-down', // Default: resize without cropping, maintaining aspect ratio
     gravity,
   } = options;
+
+  // Optimization: If using optimized URL (1920px), filter out larger sizes
+  // This prevents Cloudflare from trying to upscale beyond the source resolution
+  // Reduces: 1) transformation costs, 2) bandwidth waste, 3) quality loss from upscaling
+  const finalWidths = isOptimizedUrl
+    ? widths.filter((w) => w <= OPTIMIZED_MAX_WIDTH)
+    : widths;
 
   // Base transformation options for all formats
   const baseOptions: ImageTransformOptions = {
@@ -199,20 +216,20 @@ export function generateResponsiveImage(
     src: transformImage(url, { ...baseOptions, format: 'webp' }), // WebP as default, lighter than JPEG
     srcSet: generateSrcSet(
       url,
-      widths,
+      finalWidths,
       { ...baseOptions, format: 'webp' },
       aspectRatio
     ),
     webpSrcSet: generateSrcSet(
       url,
-      widths,
+      finalWidths,
       { ...baseOptions, format: 'webp' },
       aspectRatio
     ),
     avifSrcSet: includeAvif
       ? generateSrcSet(
           url,
-          widths,
+          finalWidths,
           { ...baseOptions, format: 'avif' },
           aspectRatio
         ) // AVIF is even smaller than WebP

@@ -44,6 +44,7 @@ export async function getPaginatedPosts({
             coverImage {
               id
               url
+              optimizedUrl
               thumbnailURL
               lowResUrl
               alt
@@ -55,6 +56,7 @@ export async function getPaginatedPosts({
               fullName
               avatar {
                 url
+                optimizedUrl
                 thumbnailURL
                 lowResUrl
                 alt

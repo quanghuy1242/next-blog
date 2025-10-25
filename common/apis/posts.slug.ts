@@ -35,6 +35,7 @@ export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
           coverImage {
             id
             url
+            optimizedUrl
             thumbnailURL
             lowResUrl
             alt
@@ -47,6 +48,7 @@ export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
             avatar {
               id
               url
+              optimizedUrl
               thumbnailURL
               lowResUrl
               alt
@@ -66,6 +68,7 @@ export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
             description
             image {
               url
+              optimizedUrl
               lowResUrl
             }
           }
@@ -103,6 +106,7 @@ export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
             coverImage {
               id
               url
+              optimizedUrl
               thumbnailURL
               lowResUrl
               alt
@@ -114,6 +118,7 @@ export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
               fullName
               avatar {
                 url
+                optimizedUrl
                 thumbnailURL
                 lowResUrl
                 alt
