@@ -1,11 +1,12 @@
 /**
  * Progressive Responsive Image Component
  *
- * Replicates DatoCMS's progressive image loading behavior:
+ * Implements progressive image loading with viewport detection:
  * 1. Shows low-quality placeholder immediately (LQIP)
- * 2. Loads full-quality image progressively
- * 3. Uses <picture> element with multiple formats (WebP, AVIF)
- * 4. Supports responsive srcSet for different screen sizes
+ * 2. Detects when component enters viewport using Intersection Observer
+ * 3. Loads full-quality image only when visible
+ * 4. Uses <picture> element with multiple formats (WebP, AVIF)
+ * 5. Supports responsive srcSet for different screen sizes
  */
 
 import React, { useState } from 'react';
@@ -13,6 +14,7 @@ import {
   generateResponsiveImage,
   getBlurPlaceholder,
 } from 'common/utils/image';
+import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
 import cn from 'classnames';
 
 export interface ResponsiveImageProps {
@@ -56,6 +58,16 @@ export function ResponsiveImage({
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
+
+  // Observe when component enters viewport
+  // Use generous rootMargin to start loading slightly before visible
+  const { ref: containerRef, isIntersecting } = useIntersectionObserver({
+    rootMargin: '200px 0px',
+    triggerOnce: true, // Only trigger once, no need to re-observe
+  });
+
+  // For priority images, always load immediately
+  const shouldLoad = priority || isIntersecting;
 
   // Check if image is already loaded (cached)
   React.useEffect(() => {
@@ -126,8 +138,12 @@ export function ResponsiveImage({
   const shouldScalePlaceholder = objectFit === 'cover' || objectFit === 'fill';
 
   return (
-    <div className={cn(containerClasses, className)} style={containerStyles}>
-      {/* LQIP Background - only show for fill/aspect ratio modes */}
+    <div
+      ref={containerRef as React.RefObject<HTMLDivElement>}
+      className={cn(containerClasses, className)}
+      style={containerStyles}
+    >
+      {/* LQIP Background - always show until full image loads */}
       {(fill || aspectRatio) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -148,52 +164,54 @@ export function ResponsiveImage({
         />
       )}
 
-      {/* Progressive Image with <picture> for format negotiation */}
-      <picture>
-        {/* AVIF format - best compression */}
-        {imageData.avifSrcSet && (
+      {/* Progressive Image - only load when in viewport (or priority) */}
+      {shouldLoad && (
+        <picture>
+          {/* AVIF format - best compression */}
+          {imageData.avifSrcSet && (
+            <source
+              type="image/avif"
+              srcSet={imageData.avifSrcSet}
+              sizes={imageData.sizes}
+            />
+          )}
+
+          {/* WebP format - good compression */}
           <source
-            type="image/avif"
-            srcSet={imageData.avifSrcSet}
+            type="image/webp"
+            srcSet={imageData.webpSrcSet}
             sizes={imageData.sizes}
           />
-        )}
 
-        {/* WebP format - good compression */}
-        <source
-          type="image/webp"
-          srcSet={imageData.webpSrcSet}
-          sizes={imageData.sizes}
-        />
-
-        {/* JPEG fallback */}
-        <img
-          ref={imgRef}
-          src={imageData.src}
-          srcSet={imageData.srcSet}
-          sizes={imageData.sizes}
-          alt={alt || ''}
-          width={width || undefined}
-          height={height || undefined}
-          loading={priority ? 'eager' : 'lazy'}
-          decoding={priority ? 'sync' : 'async'}
-          onLoad={() => {
-            setIsLoaded(true);
-          }}
-          onError={() => {
-            setIsLoaded(true); // Show original even if failed
-          }}
-          className={cn(
-            imageClasses,
-            'transition-opacity duration-300',
-            isLoaded ? 'opacity-100' : 'opacity-0'
-          )}
-          style={{
-            objectFit,
-            objectPosition,
-          }}
-        />
-      </picture>
+          {/* JPEG fallback */}
+          <img
+            ref={imgRef}
+            src={imageData.src}
+            srcSet={imageData.srcSet}
+            sizes={imageData.sizes}
+            alt={alt || ''}
+            width={width || undefined}
+            height={height || undefined}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding={priority ? 'sync' : 'async'}
+            onLoad={() => {
+              setIsLoaded(true);
+            }}
+            onError={() => {
+              setIsLoaded(true); // Show original even if failed
+            }}
+            className={cn(
+              imageClasses,
+              'transition-opacity duration-300',
+              isLoaded ? 'opacity-100' : 'opacity-0'
+            )}
+            style={{
+              objectFit,
+              objectPosition,
+            }}
+          />
+        </picture>
+      )}
     </div>
   );
 }

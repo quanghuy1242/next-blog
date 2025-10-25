@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import { getDataForHome } from 'common/apis/index';
 import { getCategoryIdBySlug } from 'common/apis/categories';
 import { Container } from 'components/core/container';
@@ -19,6 +19,7 @@ import {
   normalizeQueryParamList,
 } from 'common/utils/query';
 import { useHomePosts } from 'hooks/useHomePosts';
+import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
 
 interface HomePageProps {
   initialPosts: HomePageData['allPosts'];
@@ -88,36 +89,19 @@ export default function Index({
     setHomePosts,
   });
 
-  const loaderRef = useRef<HTMLDivElement | null>(null);
+  // Use intersection observer hook for infinite scroll
+  const { ref: loaderRef, isIntersecting } =
+    useIntersectionObserver<HTMLDivElement>({
+      rootMargin: '200px 0px',
+      enabled: postsState.hasMore,
+    });
 
+  // Trigger load more when sentinel is intersecting
   useEffect(() => {
-    if (!postsState.hasMore) {
-      return;
+    if (isIntersecting && postsState.hasMore) {
+      void loadMorePosts();
     }
-
-    const sentinel = loaderRef.current;
-
-    if (!sentinel) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-
-        if (entry?.isIntersecting) {
-          void loadMorePosts();
-        }
-      },
-      {
-        rootMargin: '200px 0px',
-      }
-    );
-
-    observer.observe(sentinel);
-
-    return () => observer.disconnect();
-  }, [loadMorePosts, postsState.hasMore]);
+  }, [isIntersecting, postsState.hasMore, loadMorePosts]);
 
   return (
     <Layout header={header} className="flex flex-col items-center">
