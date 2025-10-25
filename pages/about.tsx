@@ -4,7 +4,7 @@ import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
 import { LexicalRenderer } from 'components/shared/lexical-renderer';
 import { generateMetaTags } from 'common/utils/meta-tags';
-import { getCoverImageUrl } from 'common/utils/image';
+import { getCoverImageUrl, getMediaUrl } from 'common/utils/image';
 import type { GetStaticProps } from 'next';
 import Head from 'next/head';
 import type { AboutPageData } from 'types/cms';
@@ -16,8 +16,10 @@ interface AboutPageProps {
 
 export default function About({ homepage, author }: AboutPageProps) {
   // Optimize avatar image for social media previews (Open Graph standard: 1200x630)
-  const metaImageUrl = author?.avatar?.url
-    ? getCoverImageUrl(author.avatar.url, 1200, 630, 80)
+  // Use optimizedUrl if available, otherwise transform the base url
+  const avatarUrl = getMediaUrl(author?.avatar);
+  const metaImageUrl = avatarUrl
+    ? getCoverImageUrl(avatarUrl, 1200, 630, 80)
     : undefined;
 
   const metaTags = generateMetaTags({

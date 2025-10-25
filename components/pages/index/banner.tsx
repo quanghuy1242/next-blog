@@ -1,6 +1,7 @@
 import React from 'react';
 import { PLACEHOLDER_BANNER_URL } from 'common/constants';
 import { ResponsiveImage } from 'components/shared/responsive-image';
+import { getMediaUrl } from 'common/utils/image';
 import type { Media } from 'types/cms';
 import cn from 'classnames';
 
@@ -18,7 +19,7 @@ export function Banner({
   className,
 }: BannerProps) {
   // Use imageBanner from Homepage, fallback to placeholder
-  const bannerUrl = imageBanner?.url || PLACEHOLDER_BANNER_URL;
+  const bannerUrl = getMediaUrl(imageBanner) || PLACEHOLDER_BANNER_URL;
   const bannerAlt = imageBanner?.alt || 'Banner background';
 
   return (

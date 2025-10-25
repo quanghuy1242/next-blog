@@ -2,6 +2,7 @@ import cn from 'classnames';
 import { ResponsiveImage } from 'components/shared/responsive-image';
 import { Date } from 'components/shared/date';
 import { Tag } from 'components/shared/tags';
+import { getMediaUrl } from 'common/utils/image';
 import type { Media } from 'types/cms';
 
 interface PostHeaderProps {
@@ -19,7 +20,9 @@ export function PostHeader({
   coverImage,
   className,
 }: PostHeaderProps) {
-  if (!coverImage?.url) {
+  const coverUrl = getMediaUrl(coverImage);
+
+  if (!coverUrl) {
     return null;
   }
 
@@ -35,9 +38,9 @@ export function PostHeader({
     >
       {/* Background image with progressive loading */}
       <ResponsiveImage
-        src={coverImage.url}
+        src={coverUrl}
         alt={`Cover image for ${header}`}
-        lowResUrl={coverImage.lowResUrl}
+        lowResUrl={coverImage?.lowResUrl}
         width={2000}
         height={1000}
         objectFit="cover"

@@ -6,6 +6,7 @@ import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical
 export interface Media {
   id?: number;
   url?: string;
+  optimizedUrl?: string | null; // Pre-computed optimized image URL from backend
   thumbnailURL?: string | null;
   lowResUrl?: string | null; // Pre-generated low-res base64 data URL for blur placeholder
   blurDataURL?: string | null; // Deprecated: use lowResUrl instead

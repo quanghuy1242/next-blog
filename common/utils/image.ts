@@ -8,6 +8,20 @@
  * @see https://developers.cloudflare.com/images/transform-images/transform-via-url
  */
 
+import type { Media } from 'types/cms';
+
+/**
+ * Get the preferred URL from a Media object.
+ * Prioritizes optimizedUrl (pre-computed backend URL) over url (on-demand transformation).
+ *
+ * @param media - Media object from CMS
+ * @returns The optimized URL if available, otherwise falls back to url
+ */
+export function getMediaUrl(media: Media | null | undefined): string {
+  if (!media) return '';
+  return media.optimizedUrl || media.url || '';
+}
+
 export interface ImageTransformOptions {
   width?: number;
   height?: number;

@@ -8,7 +8,7 @@ import { SectionSeparator } from 'components/shared/section-separator';
 import { Text } from 'components/shared/text';
 import { getDataForPostSlug } from 'common/apis/posts.slug';
 import { generatePostMetaTags } from 'common/utils/meta-tags';
-import { getCoverImageUrl } from 'common/utils/image';
+import { getCoverImageUrl, getMediaUrl } from 'common/utils/image';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import ErrorPage from 'next/error';
 import Head from 'next/head';
@@ -32,8 +32,10 @@ export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
   const header = homepage?.header || '';
 
   // Optimize cover image for social media previews (Open Graph standard: 1200x630)
-  const metaImageUrl = post?.coverImage?.url
-    ? getCoverImageUrl(post.coverImage.url, 1200, 630, 80)
+  // Use optimizedUrl if available, otherwise transform the base url
+  const coverImageUrl = getMediaUrl(post?.coverImage);
+  const metaImageUrl = coverImageUrl
+    ? getCoverImageUrl(coverImageUrl, 1200, 630, 80)
     : undefined;
 
   const metaTags = generatePostMetaTags(post?.meta, {
