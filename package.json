@@ -40,5 +40,11 @@
     "tailwindcss": "^2.2.7",
     "typescript": "^5.6.3",
     "vitest": "^2.1.4"
-  }
+  },
+  "browserslist": [
+    "chrome >= 91",
+    "firefox >= 90",
+    "safari >= 14",
+    "edge >= 91"
+  ]
 }
