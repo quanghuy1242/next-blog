@@ -16,11 +16,8 @@ interface AboutPageProps {
 
 export default function About({ homepage, author }: AboutPageProps) {
   // Optimize avatar image for social media previews (Open Graph standard: 1200x630)
-  // Pass Media object to use optimizedUrl for transformations
-  const metaImageUrl = author?.avatar
-    ? getCoverImageUrl(author.avatar, 1200, 630, 80)
-    : undefined;
-
+  // Pass Media object to use optimizedUrl directly - CSS handles sizing
+  const metaImageUrl = author?.avatar ? getCoverImageUrl(author.avatar) : '';
   const metaTags = generateMetaTags({
     title: `About ${author?.fullName || 'Author'}`,
     description: `Learn more about ${author?.fullName || 'the author'}`,

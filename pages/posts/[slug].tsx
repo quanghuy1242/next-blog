@@ -32,11 +32,10 @@ export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
   const header = homepage?.header || '';
 
   // Optimize cover image for social media previews (Open Graph standard: 1200x630)
-  // Pass Media object to use optimizedUrl for transformations
+  // Pass Media object to use optimizedUrl directly - CSS handles sizing
   const metaImageUrl = post?.coverImage
-    ? getCoverImageUrl(post.coverImage, 1200, 630, 80)
-    : undefined;
-
+    ? getCoverImageUrl(post.coverImage)
+    : '';
   const metaTags = generatePostMetaTags(post?.meta, {
     title: post?.title,
     description: post?.excerpt || undefined,

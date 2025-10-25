@@ -134,18 +134,8 @@ export function ResponsiveImage({
 
   // Get low-res blurred placeholder
   // If lowResUrl is provided (base64 from backend), use it directly
-  // Otherwise, use Cloudflare R2 transformation with calculated dimensions
-  const blurPlaceholderHeight = 20;
-  const blurPlaceholderWidth = aspectRatio
-    ? Math.round(blurPlaceholderHeight / aspectRatio)
-    : 20;
-  const blurPlaceholder = getBlurPlaceholder(
-    src,
-    blurPlaceholderWidth,
-    blurPlaceholderHeight,
-    20,
-    actualLowResUrl
-  );
+  // Otherwise, use smallest available variant
+  const blurPlaceholder = getBlurPlaceholder(src, actualLowResUrl);
 
   const containerStyles = fill
     ? undefined // Fill mode: no padding, let parent control size

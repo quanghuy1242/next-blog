@@ -1,11 +1,14 @@
 /**
- * Cloudflare Image Transformation Utilities
+ * Image Utilities - Native Storage Variants
  *
- * Provides helper functions to transform image URLs using Cloudflare's
- * /cdn-cgi/image/ transformation endpoint.
+ * Provides helper functions to work with pre-generated image variants from storage.
+ * Instead of on-demand transformation, uses native storage variants with naming pattern:
  *
- * URL format: https://<ZONE>/cdn-cgi/image/<OPTIONS>/<SOURCE-IMAGE>
- * @see https://developers.cloudflare.com/images/transform-images/transform-via-url
+ * Pattern: {basename}-{width}x{height}.{format}
+ * Example: image-640x320.webp, image-1200x600.webp
+ *
+ * Available widths: 480, 640, 750, 828, 1080, 1200, 1920
+ * Formats: webp, avif
  */
 
 import type { Media } from 'types/cms';
@@ -37,11 +40,12 @@ export interface ImageTransformOptions {
 }
 
 /**
- * Transform an image URL using Cloudflare's /cdn-cgi/image/ endpoint
+ * Transform an image URL to use native storage variants
+ * Replaces the suffix (e.g., '-optimized.webp') with the variant format (e.g., '-640x320.webp')
  *
  * @example
- * transformImage('https://example.com/image.jpg', { width: 800, quality: 75 })
- * // Returns: 'https://example.com/cdn-cgi/image/width=800,quality=75/image.jpg'
+ * transformImage('https://example.com/image-optimized.webp', { width: 640, format: 'webp' })
+ * // Returns: 'https://example.com/image-640x320.webp'
  */
 export function transformImage(
   url: string | undefined | null,
@@ -51,44 +55,43 @@ export function transformImage(
     return '';
   }
 
-  const params: string[] = [];
-
-  if (options.width) params.push(`width=${options.width}`);
-  if (options.height) params.push(`height=${options.height}`);
-  if (options.format) params.push(`format=${options.format}`);
-  if (options.quality) params.push(`quality=${options.quality}`);
-  if (options.fit) params.push(`fit=${options.fit}`);
-  if (options.gravity) params.push(`gravity=${options.gravity}`);
-  if (options.background) params.push(`background=${options.background}`);
-  if (options.blur) params.push(`blur=${options.blur}`);
-  if (options.sharpen) params.push(`sharpen=${options.sharpen}`);
-  if (options.rotate) params.push(`rotate=${options.rotate}`);
-  if (options.flip) params.push(`flip=${options.flip}`);
-
-  if (params.length === 0) {
+  // If no width is specified or not using webp/avif, return original URL
+  const format = options.format || 'webp';
+  if (!options.width || (format !== 'webp' && format !== 'avif')) {
     return url;
   }
 
-  // Parse the URL to extract the zone and path
   try {
-    const urlObj = new URL(url);
-    const optionsStr = params.join(',');
+    // Calculate height maintaining aspect ratio if needed
+    const width = options.width;
+    let height = options.height;
 
-    // Construct: https://<ZONE>/cdn-cgi/image/<OPTIONS>/<SOURCE-IMAGE>
-    // The source image path should be the full path after the domain
-    const sourcePath = urlObj.pathname + urlObj.search + urlObj.hash;
+    // For responsive images, maintain 2:1 aspect ratio if height not specified
+    if (!height && (options.fit === 'cover' || options.fit === 'crop')) {
+      height = Math.round(width / 2);
+    }
 
-    const transformedUrl = `${urlObj.origin}/cdn-cgi/image/${optionsStr}${sourcePath}`;
+    // Replace the suffix with the variant
+    // Pattern: remove '-optimized.webp' or similar and replace with '-{width}x{height}.{format}'
+    const variantSuffix = height
+      ? `-${width}x${height}.${format}`
+      : `-${width}.${format}`;
 
-    return transformedUrl;
+    // Remove existing suffix (matches patterns like '-optimized.webp', '-1920x1080.webp', etc.)
+    const urlWithoutSuffix = url.replace(
+      /(-optimized|-\d+x?\d*)?\.(webp|avif|jpg|jpeg|png)$/i,
+      ''
+    );
+
+    return `${urlWithoutSuffix}${variantSuffix}`;
   } catch {
-    // If URL parsing fails, return original URL
+    // If transformation fails, return original URL
     return url;
   }
 }
 
 /**
- * Generate a srcSet string for responsive images
+ * Generate a srcSet string for responsive images using native storage variants
  * Maintains aspect ratio when both width and height are provided in options
  */
 export function generateSrcSet(
@@ -105,14 +108,8 @@ export function generateSrcSet(
     .map((width) => {
       const transformOptions: ImageTransformOptions = { ...options, width };
 
-      // Only add height for cover/crop/pad modes where exact dimensions matter
-      // For scale-down/contain, let R2 maintain original aspect ratio
-      const needsExactDimensions =
-        options.fit === 'cover' ||
-        options.fit === 'crop' ||
-        options.fit === 'pad';
-
-      if (aspectRatio && needsExactDimensions) {
+      // For responsive images, maintain aspect ratio (typically 2:1)
+      if (aspectRatio) {
         transformOptions.height = Math.round(width * aspectRatio);
       }
 
@@ -158,59 +155,31 @@ export function generateResponsiveImage(
     return null;
   }
 
-  // Check if we're using an optimized URL (pre-computed backend images)
-  // Optimized images are always 1920px wide, so we avoid upscaling beyond that
-  const isOptimizedUrl =
-    typeof urlOrMedia === 'object' && urlOrMedia !== null
-      ? !!urlOrMedia.optimizedUrl
-      : false;
-
-  // Maximum width to prevent upscaling optimized images (1920px)
-  const OPTIMIZED_MAX_WIDTH = 1920;
+  // Native storage supports variants up to specific widths
+  // Common variants: 480, 640, 750, 828, 1080, 1200, 1920
+  const AVAILABLE_WIDTHS = [480, 640, 750, 828, 1080, 1200, 1920];
 
   const {
-    widths = [640, 750, 828, 1080, 1200, 1920, 2100, 3840],
+    widths = AVAILABLE_WIDTHS,
     sizes = '100vw',
     alt = null,
     width = null,
     height = null,
-    quality = 80, // Higher quality for better visual experience
+    quality = 80, // Not used with native variants, kept for API compatibility
     includeAvif = true,
-    fit = 'scale-down', // Default: resize without cropping, maintaining aspect ratio
-    gravity,
   } = options;
 
-  // Optimization: If using optimized URL (1920px), filter out larger sizes
-  // This prevents Cloudflare from trying to upscale beyond the source resolution
-  // Reduces: 1) transformation costs, 2) bandwidth waste, 3) quality loss from upscaling
-  const finalWidths = isOptimizedUrl
-    ? widths.filter((w) => w <= OPTIMIZED_MAX_WIDTH)
-    : widths;
+  // Filter to only use available variant widths
+  const finalWidths = widths.filter((w) => AVAILABLE_WIDTHS.includes(w));
 
   // Base transformation options for all formats
   const baseOptions: ImageTransformOptions = {
     quality,
-    fit, // Always include fit mode to control how images are resized
+    fit: 'cover', // Native variants use cover by default (2:1 aspect ratio)
   };
 
-  // For cover/crop modes with specific dimensions, set both width and height
-  // For scale-down/contain modes, let R2 maintain aspect ratio naturally
-  const shouldSetDimensions =
-    fit === 'cover' || fit === 'crop' || fit === 'pad';
-
-  if (width && height && shouldSetDimensions) {
-    baseOptions.width = width;
-    baseOptions.height = height;
-    if (gravity) {
-      baseOptions.gravity = gravity; // Add gravity for crop focal point
-    }
-  } else if (width && !height) {
-    // If only width is provided, set it for any fit mode
-    baseOptions.width = width;
-  }
-
-  // Calculate aspect ratio for srcSet generation
-  const aspectRatio = width && height && width > 0 ? height / width : undefined;
+  // Calculate aspect ratio for srcSet generation (typically 2:1 for cover images)
+  const aspectRatio = width && height && width > 0 ? height / width : 0.5; // Default to 2:1
 
   return {
     src: transformImage(url, { ...baseOptions, format: 'webp' }), // WebP as default, lighter than JPEG
@@ -243,65 +212,49 @@ export function generateResponsiveImage(
 
 /**
  * Get optimized thumbnail URL
+ * Uses native storage variant
  */
 export function getThumbnailUrl(
-  urlOrMedia: string | Media | undefined | null,
-  size = 100,
-  quality = 80
+  urlOrMedia: string | Media | undefined | null
 ): string {
-  // Extract the URL to use for transformations (prefer optimizedUrl)
+  // Extract the URL to use (prefer optimizedUrl)
   const url =
     typeof urlOrMedia === 'string' ? urlOrMedia : getMediaUrl(urlOrMedia);
 
+  // Use smallest available variant for thumbnails
   return transformImage(url, {
-    width: size,
-    height: size,
-    fit: 'cover',
-    quality,
+    width: 480,
     format: 'webp',
+    fit: 'cover',
   });
 }
 
 /**
- * Get cover image URL with specific dimensions
+ * Get cover image URL
+ * Returns the optimizedUrl directly (no transformation needed)
  */
 export function getCoverImageUrl(
-  urlOrMedia: string | Media | undefined | null,
-  width = 2000,
-  height = 1000,
-  quality = 80
+  urlOrMedia: string | Media | undefined | null
 ): string {
-  // Extract the URL to use for transformations (prefer optimizedUrl)
+  // Extract the URL to use (prefer optimizedUrl)
   const url =
     typeof urlOrMedia === 'string' ? urlOrMedia : getMediaUrl(urlOrMedia);
 
-  return transformImage(url, {
-    width,
-    height,
-    fit: 'cover',
-    quality,
-    format: 'webp', // WebP is 20-30% smaller than JPEG at same quality
-  });
+  // Return optimizedUrl directly - CSS handles sizing
+  return url || '';
 }
 
 /**
  * Generate a low-quality blurred placeholder for progressive image loading
- * This replicates DatoCMS LQIP (Low Quality Image Placeholder) behavior
  *
  * If lowResUrl is provided (base64 data URL from backend), use it directly.
- * Otherwise, returns a Cloudflare-transformed URL with blur and low quality.
+ * Otherwise, uses the smallest available variant (480px).
  *
  * @param urlOrMedia - Source image URL or Media object
- * @param width - Target width for placeholder (default: 20px)
- * @param height - Optional height to maintain aspect ratio
- * @param quality - Quality setting (default: 20)
  * @param lowResUrl - Optional pre-generated base64 data URL from backend
  */
 export function getBlurPlaceholder(
   urlOrMedia: string | Media | undefined | null,
-  width = 20,
-  height?: number,
-  quality = 20,
   lowResUrl?: string | null
 ): string {
   // If we have a pre-generated low-res data URL from backend, use it directly
@@ -309,7 +262,7 @@ export function getBlurPlaceholder(
     return lowResUrl;
   }
 
-  // Extract the URL to use for transformations (prefer optimizedUrl)
+  // Extract the URL to use (prefer optimizedUrl)
   const url =
     typeof urlOrMedia === 'string' ? urlOrMedia : getMediaUrl(urlOrMedia);
 
@@ -317,20 +270,12 @@ export function getBlurPlaceholder(
     return '';
   }
 
-  const options: ImageTransformOptions = {
-    width,
-    quality,
-    blur: 10,
-    format: 'jpeg',
-  };
-
-  // If height is provided, maintain aspect ratio
-  if (height) {
-    options.height = height;
-    options.fit = 'scale-down'; // Maintain aspect ratio, don't crop
-  }
-
-  return transformImage(url, options);
+  // Use smallest available variant for blur placeholder
+  return transformImage(url, {
+    width: 480,
+    format: 'webp',
+    fit: 'cover',
+  });
 }
 
 /**
@@ -358,10 +303,10 @@ export function getImageWithPlaceholder(
     return null;
   }
 
-  const { width = 2000, height = 1000, quality = 75, alt = null } = options;
+  const { width = 2000, height = 1000, alt = null } = options;
 
   return {
-    src: getCoverImageUrl(url, width, height, quality),
+    src: getCoverImageUrl(url),
     blurDataURL: getBlurPlaceholder(url),
     width,
     height,
