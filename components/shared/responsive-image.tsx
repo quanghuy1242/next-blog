@@ -114,85 +114,29 @@ export function ResponsiveImage({
       ? src.lowResUrl
       : lowResUrl;
 
-  // Simple mode: use optimizedUrl directly without srcset generation
-  if (simple) {
-    const imageUrl =
-      typeof src === 'string' ? src : src.optimizedUrl || src.url || '';
-
-    if (!imageUrl) {
-      return null;
-    }
-
-    const blurPlaceholder = actualLowResUrl || '';
-
-    return (
-      <div
-        ref={containerRef as React.RefObject<HTMLDivElement>}
-        className={cn('relative', className)}
-      >
-        {/* Blur placeholder */}
-        {blurPlaceholder && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={blurPlaceholder}
-            alt=""
-            aria-hidden="true"
-            className={cn(
-              'absolute inset-0 w-full h-auto',
-              'transition-opacity duration-300',
-              isLoaded ? 'opacity-0' : 'opacity-100'
-            )}
-            style={{
-              filter: 'blur(20px)',
-            }}
-          />
-        )}
-
-        {/* Simple image - only load when in viewport (or priority) */}
-        {shouldLoad && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            ref={imgRef}
-            src={imageUrl}
-            alt={alt || ''}
-            width={width || undefined}
-            height={height || undefined}
-            loading={priority ? 'eager' : 'lazy'}
-            decoding={priority ? 'sync' : 'async'}
-            fetchPriority={fetchPriority}
-            onLoad={() => {
-              setIsLoaded(true);
-            }}
-            onError={() => {
-              setIsLoaded(true);
-            }}
-            className={cn(
-              'w-full h-auto relative',
-              'transition-opacity duration-300',
-              isLoaded ? 'opacity-100' : 'opacity-0'
-            )}
-            style={{
-              objectFit,
-              objectPosition,
-            }}
-          />
-        )}
-      </div>
-    );
-  }
-
-  const imageData = generateResponsiveImage(src, {
-    width,
-    height,
-    alt: alt ?? undefined,
-    quality: quality ?? 80,
-    // Use 'cover' when dimensions are specified to ensure exact aspect ratio
-    // Use 'scale-down' when no dimensions to preserve original
-    fit: width && height ? 'cover' : 'scale-down',
-    gravity: gravity, // Pass gravity for Cloudflare transformation
-    sizes: sizes, // Custom sizes attribute
-    widths: widths, // Custom widths for srcset generation
-  });
+  // Simple mode: return stub object with optimizedUrl only, no srcsets
+  const imageData = simple
+    ? {
+        src: typeof src === 'string' ? src : src.optimizedUrl || src.url || '',
+        srcSet: '',
+        webpSrcSet: '',
+        sizes: sizes || '100vw',
+        width,
+        height,
+        alt,
+      }
+    : generateResponsiveImage(src, {
+        width,
+        height,
+        alt: alt ?? undefined,
+        quality: quality ?? 80,
+        // Use 'cover' when dimensions are specified to ensure exact aspect ratio
+        // Use 'scale-down' when no dimensions to preserve original
+        fit: width && height ? 'cover' : 'scale-down',
+        gravity: gravity, // Pass gravity for Cloudflare transformation
+        sizes: sizes, // Custom sizes attribute
+        widths: widths, // Custom widths for srcset generation
+      });
 
   if (!imageData) {
     return null;
@@ -263,11 +207,13 @@ export function ResponsiveImage({
       {shouldLoad && (
         <picture>
           {/* WebP format - good compression */}
-          <source
-            type="image/webp"
-            srcSet={imageData.webpSrcSet}
-            sizes={imageData.sizes}
-          />
+          {imageData.webpSrcSet && (
+            <source
+              type="image/webp"
+              srcSet={imageData.webpSrcSet}
+              sizes={imageData.sizes}
+            />
+          )}
 
           {/* JPG fallback (optimized) */}
           <img
