@@ -18,6 +18,7 @@ import type {
   DefaultNodeTypes,
   SerializedUploadNode,
 } from '@payloadcms/richtext-lexical';
+import { ResponsiveImage } from './responsive-image';
 
 export interface LexicalRendererProps {
   /**
@@ -37,7 +38,7 @@ export interface LexicalRendererProps {
 }
 
 /**
- * Custom upload component that uses optimizedUrl directly for images
+ * Custom upload component that uses ResponsiveImage with optimizedUrl
  */
 const CustomUploadComponent: React.FC<{
   node: SerializedUploadNode;
@@ -48,7 +49,7 @@ const CustomUploadComponent: React.FC<{
       return null;
     }
 
-    const { alt, url, optimizedUrl } = uploadDoc;
+    const { alt, url, optimizedUrl, lowResUrl, width, height } = uploadDoc;
 
     // Use optimizedUrl if available, fallback to url
     const imageUrl = optimizedUrl || url;
@@ -58,13 +59,24 @@ const CustomUploadComponent: React.FC<{
       return null;
     }
 
+    // Create media object for ResponsiveImage
+    const mediaObject = {
+      url,
+      optimizedUrl,
+      lowResUrl,
+      alt,
+      width,
+      height,
+    };
+
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={imageUrl}
+      <ResponsiveImage
+        src={mediaObject}
         alt={alt || ''}
-        className="my-4 w-full h-auto"
-        loading="lazy"
+        width={width || null}
+        height={height || null}
+        className="my-4"
+        simple={true}
       />
     );
   }

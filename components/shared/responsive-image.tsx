@@ -62,6 +62,11 @@ export interface ResponsiveImageProps {
    * Smaller arrays = fewer variants = better for mobile
    */
   widths?: number[];
+  /**
+   * If true, renders optimizedUrl directly without srcset generation
+   * Still provides lazy loading and blur placeholder
+   */
+  simple?: boolean;
 }
 
 export function ResponsiveImage({
@@ -80,6 +85,7 @@ export function ResponsiveImage({
   sizes,
   quality,
   widths,
+  simple = false,
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
@@ -107,6 +113,73 @@ export function ResponsiveImage({
     typeof src === 'object' && src !== null && 'lowResUrl' in src
       ? src.lowResUrl
       : lowResUrl;
+
+  // Simple mode: use optimizedUrl directly without srcset generation
+  if (simple) {
+    const imageUrl =
+      typeof src === 'string' ? src : src.optimizedUrl || src.url || '';
+
+    if (!imageUrl) {
+      return null;
+    }
+
+    const blurPlaceholder = actualLowResUrl || '';
+
+    return (
+      <div
+        ref={containerRef as React.RefObject<HTMLDivElement>}
+        className={cn('relative', className)}
+      >
+        {/* Blur placeholder */}
+        {blurPlaceholder && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={blurPlaceholder}
+            alt=""
+            aria-hidden="true"
+            className={cn(
+              'absolute inset-0 w-full h-auto',
+              'transition-opacity duration-300',
+              isLoaded ? 'opacity-0' : 'opacity-100'
+            )}
+            style={{
+              filter: 'blur(20px)',
+            }}
+          />
+        )}
+
+        {/* Simple image - only load when in viewport (or priority) */}
+        {shouldLoad && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            ref={imgRef}
+            src={imageUrl}
+            alt={alt || ''}
+            width={width || undefined}
+            height={height || undefined}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding={priority ? 'sync' : 'async'}
+            fetchPriority={fetchPriority}
+            onLoad={() => {
+              setIsLoaded(true);
+            }}
+            onError={() => {
+              setIsLoaded(true);
+            }}
+            className={cn(
+              'w-full h-auto relative',
+              'transition-opacity duration-300',
+              isLoaded ? 'opacity-100' : 'opacity-0'
+            )}
+            style={{
+              objectFit,
+              objectPosition,
+            }}
+          />
+        )}
+      </div>
+    );
+  }
 
   const imageData = generateResponsiveImage(src, {
     width,
