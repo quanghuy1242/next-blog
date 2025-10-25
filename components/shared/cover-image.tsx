@@ -30,9 +30,10 @@ export function CoverImage({ title, media, slug, className }: CoverImageProps) {
         'hover:shadow-medium transition-shadow duration-200': slug,
       })}
       priority={!slug} // Priority for non-linked images (usually hero images)
-      // Responsive sizes: full width on mobile, constrained on desktop
-      // Post grids: 2 columns on md+, 1 column on mobile with padding
-      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      // Responsive sizes optimized for actual display dimensions
+      // Mobile: ~380px (with container padding), Tablet: ~45vw, Desktop: ~30vw
+      sizes="(max-width: 640px) 640px, (max-width: 768px) 750px, (max-width: 1024px) 828px, (max-width: 1280px) 640px, 828px"
+      quality={75}
     />
   );
 

@@ -51,6 +51,11 @@ export interface ResponsiveImageProps {
    * Helps browser select optimal image size
    */
   sizes?: string;
+  /**
+   * Image quality (1-100). Lower values = smaller files
+   * Default: 80
+   */
+  quality?: number;
 }
 
 export function ResponsiveImage({
@@ -67,6 +72,7 @@ export function ResponsiveImage({
   lowResUrl,
   fetchPriority,
   sizes,
+  quality,
 }: ResponsiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = React.useRef<HTMLImageElement>(null);
@@ -93,7 +99,7 @@ export function ResponsiveImage({
     width,
     height,
     alt: alt ?? undefined,
-    quality: 80,
+    quality: quality ?? 80,
     includeAvif: true,
     // Use 'cover' when dimensions are specified to ensure exact aspect ratio
     // Use 'scale-down' when no dimensions to preserve original
