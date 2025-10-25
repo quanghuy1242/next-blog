@@ -8,7 +8,7 @@
  * Example: image-640x320.webp, image-1200x600.webp
  *
  * Available widths: 480, 640, 750, 828, 1080, 1200, 1920
- * Formats: webp, avif
+ * Formats: webp (with optimized JPG fallback)
  */
 
 import type { Media } from 'types/cms';
@@ -28,7 +28,7 @@ export function getMediaUrl(media: Media | null | undefined): string {
 export interface ImageTransformOptions {
   width?: number;
   height?: number;
-  format?: 'webp' | 'avif' | 'jpeg' | 'jpg' | 'png' | 'auto';
+  format?: 'webp' | 'jpeg' | 'jpg' | 'png' | 'auto';
   quality?: number;
   fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
   gravity?: 'auto' | 'left' | 'right' | 'top' | 'bottom' | 'center';
@@ -55,9 +55,9 @@ export function transformImage(
     return '';
   }
 
-  // If no width is specified or not using webp/avif, return original URL
+  // If no width is specified or not using webp, return original URL
   const format = options.format || 'webp';
-  if (!options.width || (format !== 'webp' && format !== 'avif')) {
+  if (!options.width || format !== 'webp') {
     return url;
   }
 
@@ -123,10 +123,9 @@ export function generateSrcSet(
  * Generate responsive image object with multiple formats and sizes
  */
 export interface ResponsiveImageData {
-  src: string;
-  srcSet: string;
-  webpSrcSet: string;
-  avifSrcSet?: string;
+  src: string; // Fallback JPG (optimized URL)
+  srcSet: string; // WebP srcSet
+  webpSrcSet: string; // WebP srcSet
   sizes: string;
   width?: number | null;
   height?: number | null;
@@ -142,7 +141,6 @@ export function generateResponsiveImage(
     width?: number | null;
     height?: number | null;
     quality?: number;
-    includeAvif?: boolean;
     fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
     gravity?: 'auto' | 'left' | 'right' | 'top' | 'bottom' | 'center';
   } = {}
@@ -166,7 +164,6 @@ export function generateResponsiveImage(
     width = null,
     height = null,
     quality = 80, // Not used with native variants, kept for API compatibility
-    includeAvif = true,
   } = options;
 
   // Filter to only use available variant widths
@@ -182,7 +179,7 @@ export function generateResponsiveImage(
   const aspectRatio = width && height && width > 0 ? height / width : 0.5; // Default to 2:1
 
   return {
-    src: transformImage(url, { ...baseOptions, format: 'webp' }), // WebP as default, lighter than JPEG
+    src: url, // Use optimized JPG as fallback
     srcSet: generateSrcSet(
       url,
       finalWidths,
@@ -195,14 +192,6 @@ export function generateResponsiveImage(
       { ...baseOptions, format: 'webp' },
       aspectRatio
     ),
-    avifSrcSet: includeAvif
-      ? generateSrcSet(
-          url,
-          finalWidths,
-          { ...baseOptions, format: 'avif' },
-          aspectRatio
-        ) // AVIF is even smaller than WebP
-      : undefined,
     sizes,
     width,
     height,

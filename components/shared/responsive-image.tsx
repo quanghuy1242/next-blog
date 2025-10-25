@@ -113,7 +113,6 @@ export function ResponsiveImage({
     height,
     alt: alt ?? undefined,
     quality: quality ?? 80,
-    includeAvif: true,
     // Use 'cover' when dimensions are specified to ensure exact aspect ratio
     // Use 'scale-down' when no dimensions to preserve original
     fit: width && height ? 'cover' : 'scale-down',
@@ -190,15 +189,6 @@ export function ResponsiveImage({
       {/* Progressive Image - only load when in viewport (or priority) */}
       {shouldLoad && (
         <picture>
-          {/* AVIF format - best compression */}
-          {imageData.avifSrcSet && (
-            <source
-              type="image/avif"
-              srcSet={imageData.avifSrcSet}
-              sizes={imageData.sizes}
-            />
-          )}
-
           {/* WebP format - good compression */}
           <source
             type="image/webp"
@@ -206,7 +196,7 @@ export function ResponsiveImage({
             sizes={imageData.sizes}
           />
 
-          {/* JPEG fallback */}
+          {/* JPG fallback (optimized) */}
           <img
             ref={imgRef}
             src={imageData.src}
