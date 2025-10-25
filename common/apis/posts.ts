@@ -1,9 +1,8 @@
-import { fetchAPI, responsiveImageFragment } from './base';
-import type { Post } from 'types/datocms';
-import { uniqueSortedStrings } from '../utils/query';
+import { fetchAPI } from './base';
+import type { Post, PaginatedResponse } from 'types/cms';
 
 interface PaginatedPostsResponse {
-  allPosts: Post[];
+  Posts: PaginatedResponse<Post>;
 }
 
 export interface PaginatedPostsResult {
@@ -18,97 +17,115 @@ export interface PaginatedPostsParams {
   tags?: string[] | null;
 }
 
+const AUTHOR_ID = 1; // quanghuy1242
+
 export async function getPaginatedPosts({
   limit,
   skip,
   categoryId,
   tags,
 }: PaginatedPostsParams): Promise<PaginatedPostsResult> {
-  const first = limit + 1;
+  // Convert skip to page number
+  const page = Math.floor(skip / limit) + 1;
 
-  const filter: Record<string, unknown> | null = createPostsFilter(
-    categoryId,
-    tags
-  );
+  const where = createPostsWhere(categoryId, tags);
 
   const data = await fetchAPI<PaginatedPostsResponse>(
     `#graphql
-      query PaginatedPosts($first: IntType!, $skip: IntType!, $filter: PostModelFilter) {
-        allPosts(orderBy: date_DESC, first: $first, skip: $skip, filter: $filter) {
-          title
-          slug
-          excerpt
-          date
-          coverImage {
-            responsiveImage(imgixParams: { fm: jpg, fit: crop, w: 2000, h: 1000 }) {
-              ...responsiveImageFragment
-            }
-          }
-          author {
-            displayName
-            picture {
-              url(imgixParams: { fm: jpg, fit: crop, w: 100, h: 100 })
-            }
-          }
-          category {
-            name
+      query PaginatedPosts($limit: Int!, $page: Int!, $where: Post_where) {
+        Posts(limit: $limit, page: $page, where: $where) {
+          docs {
+            id
+            title
             slug
+            excerpt
+            createdAt
+            updatedAt
+            coverImage {
+              id
+              url
+              thumbnailURL
+              lowResUrl
+              alt
+              width
+              height
+            }
+            author {
+              id
+              fullName
+              avatar {
+                url
+                thumbnailURL
+                lowResUrl
+                alt
+              }
+            }
+            category {
+              id
+              name
+              slug
+            }
+            tags {
+              tag
+              id
+            }
           }
-          tags
+          hasNextPage
+          hasPrevPage
+          totalDocs
+          totalPages
+          page
+          limit
         }
       }
-      ${responsiveImageFragment}
     `,
     {
       variables: {
-        first,
-        skip,
-        filter,
+        limit,
+        page,
+        where,
       },
     }
   );
 
-  const posts = data?.allPosts ?? [];
-
-  const hasMore = posts.length > limit;
+  const posts = data?.Posts?.docs ?? [];
+  const hasMore = data?.Posts?.hasNextPage ?? false;
 
   return {
-    posts: posts.slice(0, Math.max(limit, 0)),
+    posts,
     hasMore,
   };
 }
 
-export function createPostsFilter(
+export function createPostsWhere(
   categoryId: string | null | undefined,
   tags: string[] | null | undefined
-): Record<string, unknown> | null {
+): Record<string, unknown> {
   const conditions: Record<string, unknown>[] = [];
 
+  // Always filter for published posts by quanghuy1242
+  conditions.push({
+    _status: { equals: 'published' },
+  });
+  conditions.push({
+    author: { equals: AUTHOR_ID },
+  });
+
   if (categoryId) {
-    conditions.push({ category: { eq: categoryId } });
+    conditions.push({ category: { equals: parseInt(categoryId, 10) } });
   }
 
   if (Array.isArray(tags) && tags.length) {
-    const sanitizedTags = uniqueSortedStrings(tags);
+    // Only use first tag (PayloadCMS limitation: AND filtering on array fields doesn't work as expected)
+    const tag = tags[0]?.trim();
 
-    for (const tag of sanitizedTags) {
-      const pattern = createTagRegex(tag);
-
-      if (pattern) {
-        conditions.push({
-          tags: {
-            matches: {
-              pattern,
-              caseSensitive: false,
-            },
-          },
-        });
-      }
+    if (tag) {
+      conditions.push({
+        tags__tag: {
+          equals: tag,
+        },
+      });
     }
-  }
-
-  if (!conditions.length) {
-    return null;
   }
 
   if (conditions.length === 1) {
@@ -120,18 +137,13 @@ export function createPostsFilter(
   };
 }
 
-function createTagRegex(tag: string): string | null {
-  const trimmed = tag.trim();
-
-  if (!trimmed) {
-    return null;
-  }
-
-  const escaped = escapeRegex(trimmed);
-
-  return `(^|,\\s*)${escaped}(\\s*,|$)`;
-}
-
-function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/**
+ * Legacy function name for backwards compatibility
+ * @deprecated Use createPostsWhere instead
+ */
+export function createPostsFilter(
+  categoryId: string | null | undefined,
+  tags: string[] | null | undefined
+): Record<string, unknown> {
+  return createPostsWhere(categoryId, tags);
 }

@@ -5,8 +5,7 @@ import { Date } from 'components/shared/date';
 import { Tag, Tags } from 'components/shared/tags';
 import Link from 'next/link';
 import type { LinkProps } from 'next/link';
-import type { Post as PostType } from 'types/datocms';
-import { uniqueSortedStrings } from 'common/utils/query';
+import type { Post as PostType } from 'types/cms';
 import { normalizePostTags } from 'common/utils/tags';
 
 interface PostTitleProps {
@@ -72,18 +71,14 @@ export function Post({
       <CoverImage
         slug={slug}
         title={title}
-        responsiveImage={coverImage.responsiveImage}
+        media={coverImage}
         className="mb-3"
       />
       <PostTitle slug={slug} title={title} />
       <Date dateString={date} className="text-sm text-gray-700" />
       <div className="flex flex-row gap-1">
         {categoryName && (
-          <Tag
-            text={categoryName}
-            href={categoryHref}
-            primary={true}
-          />
+          <Tag text={categoryName} href={categoryHref} primary={true} />
         )}
         <Tags
           items={tags.map((tag) => ({
@@ -127,7 +122,7 @@ export function Posts({
           key={post.slug}
           title={post.title}
           coverImage={post.coverImage}
-          date={post.date}
+          date={post.createdAt || post.updatedAt || ''}
           slug={post.slug}
           excerpt={post.excerpt}
           category={post.category}
@@ -150,17 +145,9 @@ function buildTagQuery(
     return base;
   }
 
-  const current = base.tag;
-  const currentTags = Array.isArray(current)
-    ? current
-    : typeof current === 'string' && current.length
-      ? [current]
-      : [];
-
-  const tags = uniqueSortedStrings([...currentTags, normalizedTag]);
-
+  // Replace existing tag instead of accumulating (PayloadCMS limitation)
   return {
     ...base,
-    tag: tags,
+    tag: normalizedTag,
   };
 }

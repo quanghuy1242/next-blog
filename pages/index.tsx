@@ -1,20 +1,25 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import { getDataForHome } from 'common/apis/index';
 import { getCategoryIdBySlug } from 'common/apis/categories';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
+import { renderMetaTags } from 'components/core/metadata';
 import { Banner } from 'components/pages/index/banner';
 import { Categories } from 'components/shared/categories';
 import { Posts } from 'components/shared/posts';
 import { Text } from 'components/shared/text';
+import { generateHomepageMetaTags } from 'common/utils/meta-tags';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import { renderMetaTags } from 'react-datocms';
 import { useRouter } from 'next/router';
-import type { HomePageData } from 'types/datocms';
+import type { HomePageData } from 'types/cms';
 import { useAppContext } from 'context/state';
-import { normalizeQueryParam, normalizeQueryParamList } from 'common/utils/query';
+import {
+  normalizeQueryParam,
+  normalizeQueryParamList,
+} from 'common/utils/query';
 import { useHomePosts } from 'hooks/useHomePosts';
+import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
 
 interface HomePageProps {
   initialPosts: HomePageData['allPosts'];
@@ -43,6 +48,10 @@ export default function Index({
   initialTags,
 }: HomePageProps) {
   const header = homepage?.header || '';
+  const metaTags = generateHomepageMetaTags(homepage?.meta, {
+    title: homepage?.header || 'Blog',
+    description: homepage?.subHeader || '',
+  });
   const { homePosts, setHomePosts } = useAppContext();
   const router = useRouter();
 
@@ -56,9 +65,7 @@ export default function Index({
 
   const activeTags = useMemo(
     () =>
-      router.isReady
-        ? normalizeQueryParamList(router.query.tag)
-        : initialTags,
+      router.isReady ? normalizeQueryParamList(router.query.tag) : initialTags,
     [router.isReady, router.query.tag, initialTags]
   );
 
@@ -82,43 +89,27 @@ export default function Index({
     setHomePosts,
   });
 
-  const loaderRef = useRef<HTMLDivElement | null>(null);
+  // Use intersection observer hook for infinite scroll
+  const { ref: loaderRef, isIntersecting } =
+    useIntersectionObserver<HTMLDivElement>({
+      rootMargin: '200px 0px',
+      enabled: postsState.hasMore,
+    });
 
+  // Trigger load more when sentinel is intersecting
   useEffect(() => {
-    if (!postsState.hasMore) {
-      return;
+    if (isIntersecting && postsState.hasMore) {
+      void loadMorePosts();
     }
-
-    const sentinel = loaderRef.current;
-
-    if (!sentinel) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-
-        if (entry?.isIntersecting) {
-          void loadMorePosts();
-        }
-      },
-      {
-        rootMargin: '200px 0px',
-      }
-    );
-
-    observer.observe(sentinel);
-
-    return () => observer.disconnect();
-  }, [loadMorePosts, postsState.hasMore]);
+  }, [isIntersecting, postsState.hasMore, loadMorePosts]);
 
   return (
     <Layout header={header} className="flex flex-col items-center">
-      <Head>{renderMetaTags(homepage?.metadata || [])}</Head>
+      <Head>{renderMetaTags(metaTags)}</Head>
       <Banner
         header={header}
         subHeader={homepage?.subHeader || ''}
+        imageBanner={homepage?.imageBanner || null}
         className="w-full"
       />
       <Container className="flex flex-col md:flex-row md:px-20">
@@ -186,7 +177,7 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (
   const initialTags = normalizeQueryParamList(context.query.tag);
   const tags = initialTags.length ? initialTags : null;
 
-  let categoryId: string | null = null;
+  let categoryId: number | null = null;
 
   if (initialCategory) {
     categoryId = await getCategoryIdBySlug(initialCategory);
@@ -194,7 +185,7 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (
 
   const { data, hasMore } = await getDataForHome({
     limit: POSTS_PAGE_SIZE,
-    categoryId,
+    categoryId: categoryId ? String(categoryId) : null,
     tags,
   });
 

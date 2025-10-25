@@ -1,8 +1,9 @@
-export const EXAMPLE_PATH = 'cms-datocms';
-export const CMS_NAME = 'DatoCMS';
-export const CMS_URL = 'https://www.datocms.com/';
-export const HOME_OG_IMAGE_URL =
-  'https://www.datocms-assets.com/26705/1587996054-ima2.jpg';
-export const HOME_OG_IMAGE_URL_2 =
-  'https://www.datocms-assets.com/26705/1587997124-ima3.jpg';
+export const EXAMPLE_PATH = 'next-blog-payloadcms';
+export const CMS_NAME = 'PayloadCMS';
+export const CMS_URL = 'https://payloadcms.com/';
+
+// Placeholder banner image (2000x800 monochrome)
+export const PLACEHOLDER_BANNER_URL =
+  'https://placehold.co/2000x800/1a202c/cbd5e0?text=Banner+Image';
+
 export const ROUTES_TO_RETAIN = ['/'];

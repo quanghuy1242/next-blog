@@ -1,31 +1,28 @@
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
+import { renderMetaTags } from 'components/core/metadata';
 import { PostContent } from 'components/pages/posts_slugs/post-content';
 import { PostHeader } from 'components/pages/posts_slugs/post-header';
 import { Posts } from 'components/shared/posts';
 import { SectionSeparator } from 'components/shared/section-separator';
 import { Text } from 'components/shared/text';
 import { getDataForPostSlug } from 'common/apis/posts.slug';
-import markdownToHtml from 'common/markdown-to-html';
+import { generatePostMetaTags } from 'common/utils/meta-tags';
+import { getCoverImageUrl } from 'common/utils/image';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import ErrorPage from 'next/error';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { renderMetaTags } from 'react-datocms';
-import type { Post as PostType, PostSlugData } from 'types/datocms';
+import type { Post as PostType, PostSlugData } from 'types/cms';
 import { normalizePostTags } from 'common/utils/tags';
 
 interface PostPageProps {
-  post: (PostType & { content: string }) | null;
+  post: PostType | null;
   morePosts: PostType[];
   homepage: PostSlugData['homepage'];
 }
 
-export default function PostPage({
-  post,
-  morePosts,
-  homepage,
-}: PostPageProps) {
+export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
   const router = useRouter();
 
   if (!router.isFallback && !post?.slug) {
@@ -33,15 +30,22 @@ export default function PostPage({
   }
 
   const header = homepage?.header || '';
-  const metaTags = post?.metadata || [];
+
+  // Optimize cover image for social media previews (Open Graph standard: 1200x630)
+  const metaImageUrl = post?.coverImage?.url
+    ? getCoverImageUrl(post.coverImage.url, 1200, 630, 80)
+    : undefined;
+
+  const metaTags = generatePostMetaTags(post?.meta, {
+    title: post?.title,
+    description: post?.excerpt || undefined,
+    image: metaImageUrl,
+  });
+
   const categoryName =
     typeof post?.category === 'string'
       ? post.category
       : post?.category?.name || '';
-  const imageUrl =
-    post?.ogImage?.url ??
-    post?.coverImage.responsiveImage.src ??
-    '';
   const tags = normalizePostTags(post?.tags);
   const morePostList = Array.isArray(morePosts) ? morePosts : [];
 
@@ -51,16 +55,13 @@ export default function PostPage({
         <Head>{renderMetaTags(metaTags)}</Head>
         <PostHeader
           header={post?.title ?? ''}
-          date={post?.date ?? ''}
+          date={post?.createdAt ?? post?.updatedAt ?? ''}
           category={categoryName}
-          imageUrl={imageUrl}
+          coverImage={post?.coverImage}
           className="w-full"
         />
         <Container className="my-4 flex justify-center">
-          <PostContent
-            content={post?.content ?? ''}
-            tags={tags}
-          />
+          <PostContent content={post?.content} tags={tags} />
         </Container>
       </article>
       <SectionSeparator />
@@ -99,14 +100,10 @@ export const getStaticProps: GetStaticProps<PostPageProps> = async ({
   }
 
   const data = await getDataForPostSlug(slugParam);
-  const content = await markdownToHtml(data.post?.content ?? '');
-  const postWithContent = data.post
-    ? { ...data.post, content }
-    : null;
 
   return {
     props: {
-      post: postWithContent,
+      post: data.post ?? null,
       morePosts: data.morePosts ?? [],
       homepage: data.homepage ?? null,
     },

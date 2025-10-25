@@ -3,3 +3,15 @@
 @tailwind components;
 /* purgecss end ignore */
 @tailwind utilities;
+
+/* Lexical rendered content styles - match PayloadCMS admin editor */
+.lexical-content {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.lexical-content img {
+  max-width: 100%;
+  height: auto;
+}

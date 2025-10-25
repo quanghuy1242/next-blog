@@ -1,7 +1,12 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useReducer } from 'react';
-import type { Post } from 'types/datocms';
-import { changeHeader, getChangeStateFuncs, setHomePosts, type ChangeStates } from './actions';
+import type { Post } from 'types/cms';
+import {
+  changeHeader,
+  getChangeStateFuncs,
+  setHomePosts,
+  type ChangeStates,
+} from './actions';
 
 export interface State {
   header: string;
@@ -38,7 +43,7 @@ function reducer(state: State, action: Action): State {
       return { ...state, homePosts: action.value };
     }
     default: {
-      const _exhaustiveCheck: never = action;
+      // const _exhaustiveCheck: never = action;
       throw new Error('Unknown action type');
     }
   }

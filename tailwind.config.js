@@ -42,28 +42,40 @@ module.exports = {
         searchBar: '450px'
       },
       typography: {
-        'directive': {
+        // Custom typography variants to match PayloadCMS admin Lexical editor styles
+        DEFAULT: {
           css: {
-            'div.youtube-container': {
-              display: 'block',
-              position: 'relative',
-              paddingBottom: `${100*9/16}%`,
-              height: '0',
-              overflow: 'hidden',
+            // Match PayloadCMS admin font family (sans-serif)
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+            // Responsive images matching PayloadCMS admin - disable all default margins
+            img: {
+              maxWidth: '100%',
+              height: 'auto',
+              marginTop: '0 !important',
+              marginBottom: '0 !important',
             },
-            'iframe.youtube-content': {
-              position: 'absolute',
-              top: '0',
-              left: '0',
-              width: '100%',
-              height: '100%',
-            }
+            figure: {
+              marginTop: '0 !important',
+              marginBottom: '0 !important',
+            },
+            'figure > *': {
+              marginTop: '0 !important',
+              marginBottom: '0 !important',
+            },
+            video: {
+              maxWidth: '100%',
+              height: 'auto',
+              marginTop: '0 !important',
+              marginBottom: '0 !important',
+            },
           },
         },
       },
     },
   },
   plugins: [
+    // Keep @tailwindcss/typography for Phase 9 Lexical rendering
+    // Provides 'prose' class for rich text styling
     require('@tailwindcss/typography')
   ]
-}
+};

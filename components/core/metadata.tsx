@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import type { MetaTag } from 'types/cms';
 
 export function Metadata() {
   return (
@@ -32,5 +33,25 @@ export function Metadata() {
       <meta name="theme-color" content="#000" />
       <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
     </Head>
+  );
+}
+
+/**
+ * Render meta tags from PayloadCMS meta structure
+ * Replacement for react-datocms renderMetaTags
+ */
+export function renderMetaTags(tags: MetaTag[]) {
+  return (
+    <>
+      {tags.map((tag, index) => {
+        if (tag.tag === 'title') {
+          return <title key={index}>{tag.content}</title>;
+        }
+        if (tag.tag === 'meta' && tag.attributes) {
+          return <meta key={index} {...tag.attributes} />;
+        }
+        return null;
+      })}
+    </>
   );
 }

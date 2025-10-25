@@ -1,39 +1,61 @@
-import type { AboutPageData } from '../../types/datocms';
+import type { AboutPageData, Author, Homepage } from '../../types/cms';
 import { fetchAPI } from './base';
 
-export async function getDataForAbout(name: string): Promise<AboutPageData> {
-  const data = await fetchAPI<AboutPageData>(
+const AUTHOR_ID = 1; // quanghuy1242
+
+interface AboutPageResponse {
+  User: Author | null;
+  Homepage: Pick<Homepage, 'header'> | null;
+}
+
+export async function getDataForAbout(): Promise<AboutPageData> {
+  const data = await fetchAPI<AboutPageResponse>(
     `#graphql
-    query AuthorByName($name: String) {
-      author(filter: { name: { eq: $name }}) {
-        name
-        externalContentUrl
-        metadata: _seoMetaTags {
-          attributes
-          content
-          tag
+    query AboutPage($authorId: Int!) {
+      User(id: $authorId) {
+        id
+        fullName
+        avatar {
+          id
+          url
+          thumbnailURL
+          lowResUrl
+          alt
+          width
+          height
         }
+        bio
       }
 
-      homepage {
+      Homepage {
         header
       }
     }
     `,
     {
       variables: {
-        name,
+        authorId: AUTHOR_ID,
       },
     }
   );
-  return data;
+
+  return {
+    author: data?.User ?? null,
+    homepage: data?.Homepage ?? null,
+  };
 }
 
+/**
+ * @deprecated External content fetching is no longer used. Bio is stored in PayloadCMS.
+ */
 interface ContentResponse {
   content: string;
   errors?: unknown;
 }
 
+/**
+ * @deprecated External content fetching is no longer used. Bio is stored in PayloadCMS.
+ */
 export async function getDataContentForAbout(url: string): Promise<string> {
   const res = await fetch(url, {
     method: 'GET',

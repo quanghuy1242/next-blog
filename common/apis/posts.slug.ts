@@ -1,80 +1,150 @@
-import type { PostSlugData } from '../../types/datocms';
-import { fetchAPI, responsiveImageFragment } from './base';
+import type { PostSlugData, Post, SimilarPostsResult } from '../../types/cms';
+import { fetchAPI } from './base';
 
-export async function getDataForPostSlug(
-  slug: string,
-  preview?: boolean
-): Promise<PostSlugData> {
-  const data = await fetchAPI<PostSlugData>(
+interface PostSlugResponse {
+  Posts: {
+    docs: Post[];
+  };
+  SimilarPosts: SimilarPostsResult;
+  Homepage: {
+    header: string | null;
+  } | null;
+}
+
+export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
+  const data = await fetchAPI<PostSlugResponse>(
     `#graphql
-    query PostBySlug($slug: String) {
-      post(filter: {slug: {eq: $slug}}) {
-        title
-        slug
-        content
-        date
-        ogImage: coverImage{
-          url(imgixParams: {fm: jpg, fit: crop, w: 1000, h: 500 })
+    query PostBySlug($slug: String!) {
+      Posts(
+        where: {
+          AND: [
+            { slug: { equals: $slug } }
+            { _status: { equals: published } }
+          ]
         }
-        coverImage {
-          responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
-            ...responsiveImageFragment
-          }
-        }
-        author {
-          name
-          picture {
-            url(imgixParams: {fm: jpg, fit: crop, w: 100, h: 100})
-          }
-        }
-        metadata: _seoMetaTags {
-          attributes
+        limit: 1
+      ) {
+        docs {
+          id
+          title
+          slug
           content
-          tag
-        }
-        category {
-          name
-          slug
-        }
-        tags
-      }
-
-      morePosts: allPosts(orderBy: date_DESC, first: 2, filter: {slug: {neq: $slug}}) {
-        title
-        slug
-        excerpt
-        date
-        coverImage {
-          responsiveImage(imgixParams: {fm: jpg, fit: crop, w: 2000, h: 1000 }) {
-            ...responsiveImageFragment
+          excerpt
+          createdAt
+          updatedAt
+          coverImage {
+            id
+            url
+            thumbnailURL
+            lowResUrl
+            alt
+            width
+            height
+          }
+          author {
+            id
+            fullName
+            avatar {
+              id
+              url
+              thumbnailURL
+              lowResUrl
+              alt
+            }
+          }
+          category {
+            id
+            name
+            slug
+          }
+          tags {
+            tag
+            id
+          }
+          meta {
+            title
+            description
+            image {
+              url
+              lowResUrl
+            }
           }
         }
-        author {
-          displayName
-          picture {
-            url(imgixParams: {fm: jpg, fit: crop, w: 100, h: 100})
-          }
-        }
-        category {
-          name
-          slug
-        }
-        tags
       }
 
-      homepage {
+      Homepage {
         header
       }
     }
-
-    ${responsiveImageFragment}
     `,
     {
-      preview,
       variables: {
         slug,
       },
     }
   );
-  return data;
+
+  const post = data?.Posts?.docs?.[0] ?? null;
+
+  // If we have a post, fetch similar posts using its ID
+  let morePosts: Post[] = [];
+  if (post?.id) {
+    const similarData = await fetchAPI<{ SimilarPosts: SimilarPostsResult }>(
+      `#graphql
+      query SimilarPosts($postId: Int!) {
+        SimilarPosts(postId: $postId, limit: 2) {
+          docs {
+            id
+            title
+            slug
+            excerpt
+            createdAt
+            updatedAt
+            coverImage {
+              id
+              url
+              thumbnailURL
+              lowResUrl
+              alt
+              width
+              height
+            }
+            author {
+              id
+              fullName
+              avatar {
+                url
+                thumbnailURL
+                lowResUrl
+                alt
+              }
+            }
+            category {
+              id
+              name
+              slug
+            }
+            tags {
+              tag
+              id
+            }
+          }
+          totalDocs
+        }
+      }
+      `,
+      {
+        variables: {
+          postId: post.id,
+        },
+      }
+    );
+    morePosts = similarData?.SimilarPosts?.docs ?? [];
+  }
+
+  return {
+    post,
+    morePosts,
+    homepage: data?.Homepage ?? null,
+  };
 }

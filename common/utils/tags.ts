@@ -1,18 +1,40 @@
-import type { Post as PostType } from 'types/datocms';
+import type { PostTag, NormalizedTags } from 'types/cms';
 
 /**
- * Normalizes the optional `tags` field returned by CMS queries.
- * Supports comma-delimited strings and arrays, returning a trimmed list.
+ * Normalizes tags from various formats to string array.
+ * Supports PostTag objects, comma-delimited strings and arrays, returning a trimmed list.
  */
 export function normalizePostTags(
-  tags: PostType['tags'] | null | undefined
+  tags: PostTag[] | string[] | string | null | undefined
 ): string[] {
-  if (typeof tags === 'string') {
-    return splitTags(tags);
+  if (!tags) {
+    return [];
   }
 
+  // Handle array of PostTag objects or strings
   if (Array.isArray(tags)) {
-    return tags.filter((tag): tag is string => Boolean(tag?.trim()));
+    return tags
+      .map((t) => {
+        if (typeof t === 'string') {
+          return t.trim();
+        }
+        // Handle PostTag object
+        if (
+          t &&
+          typeof t === 'object' &&
+          'tag' in t &&
+          typeof t.tag === 'string'
+        ) {
+          return t.tag.trim();
+        }
+        return '';
+      })
+      .filter((tag): tag is string => Boolean(tag));
+  }
+
+  // Handle comma-separated string
+  if (typeof tags === 'string') {
+    return splitTags(tags);
   }
 
   return [];
@@ -23,4 +45,20 @@ function splitTags(tags: string): string[] {
     .split(',')
     .map((tag) => tag.trim())
     .filter((tag) => tag.length > 0);
+}
+
+/**
+ * Normalize tags from PayloadCMS PostTag[] format to string[]
+ */
+export function normalizeTags(
+  tags: PostTag[] | string[] | string | null | undefined
+): NormalizedTags {
+  return normalizePostTags(tags);
+}
+
+/**
+ * Get unique sorted tags from an array of tags
+ */
+export function uniqueSortedTags(tags: string[]): string[] {
+  return [...new Set(tags)].sort();
 }
