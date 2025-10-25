@@ -1,6 +1,5 @@
 import React from 'react';
 import { PLACEHOLDER_BANNER_URL } from 'common/constants';
-import { ResponsiveImage } from 'components/shared/responsive-image';
 import { getMediaUrl } from 'common/utils/image';
 import type { Media } from 'types/cms';
 import cn from 'classnames';
@@ -21,9 +20,7 @@ export function Banner({
   // Use imageBanner from Homepage, fallback to placeholder
   const bannerUrl = getMediaUrl(imageBanner) || PLACEHOLDER_BANNER_URL;
   const bannerAlt = imageBanner?.alt || 'Banner background';
-
-  // Use Media object if available, otherwise use the URL string
-  const imageSrc = imageBanner || bannerUrl;
+  const lowResUrl = imageBanner?.lowResUrl;
 
   return (
     <div
@@ -35,20 +32,31 @@ export function Banner({
         className
       )}
     >
-      {/* Background image with progressive loading */}
-      <ResponsiveImage
-        src={imageSrc}
+      {/* Background image - use optimizedUrl directly with CSS */}
+      {lowResUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={lowResUrl}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-bottom"
+          style={{
+            filter: 'blur(20px)',
+            transform: 'scale(1.1)',
+            aspectRatio: '2 / 1', // Mimic 2000x1000 (2:1) wide effect
+          }}
+        />
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={bannerUrl}
         alt={bannerAlt}
-        width={2000}
-        height={800}
-        objectFit="cover"
-        objectPosition="bottom"
-        gravity="bottom"
-        priority={true}
-        fill={true}
+        loading="eager"
         fetchPriority="high"
-        sizes="100vw"
-        className="absolute inset-0"
+        className="absolute inset-0 w-full h-full object-cover object-bottom"
+        style={{
+          aspectRatio: '2000 / 800',
+        }}
       />
 
       {/* Content overlay */}

@@ -1,5 +1,4 @@
 import cn from 'classnames';
-import { ResponsiveImage } from 'components/shared/responsive-image';
 import { Date } from 'components/shared/date';
 import { Tag } from 'components/shared/tags';
 import { getMediaUrl } from 'common/utils/image';
@@ -21,6 +20,7 @@ export function PostHeader({
   className,
 }: PostHeaderProps) {
   const coverUrl = getMediaUrl(coverImage);
+  const lowResUrl = coverImage?.lowResUrl;
 
   if (!coverUrl) {
     return null;
@@ -36,18 +36,31 @@ export function PostHeader({
         className
       )}
     >
-      {/* Background image with progressive loading */}
-      <ResponsiveImage
-        src={coverImage!}
+      {/* Background image - use optimizedUrl directly with CSS */}
+      {lowResUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={lowResUrl}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{
+            filter: 'blur(20px)',
+            transform: 'scale(1.1)',
+            aspectRatio: '2 / 1', // Mimic 2000x1000 (2:1) wide effect
+          }}
+        />
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={coverUrl}
         alt={`Cover image for ${header}`}
-        width={2000}
-        height={1000}
-        objectFit="cover"
-        priority={true}
-        fill={true}
+        loading="eager"
         fetchPriority="high"
-        sizes="100vw"
-        className="absolute inset-0"
+        className="absolute inset-0 w-full h-full object-cover object-center"
+        style={{
+          aspectRatio: '2 / 1', // Mimic 2000x1000 (2:1) wide effect
+        }}
       />
 
       <div
