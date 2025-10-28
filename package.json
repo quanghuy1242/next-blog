@@ -12,6 +12,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@next/third-parties": "^16.0.0",
     "@payloadcms/richtext-lexical": "^3.61.0",
     "@tailwindcss/typography": "^0.4.1",
     "classnames": "^2.5.1",

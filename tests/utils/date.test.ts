@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatDate, isValidDateString } from 'common/utils/date';
+import { formatDate } from 'common/utils/date';
 
 describe('formatDate', () => {
   it('formats ISO date string', () => {
@@ -35,32 +35,5 @@ describe('formatDate', () => {
     const result2 = formatDate(dateString);
     expect(result1).toBe(result2);
     expect(result1).toMatch(/July [34], 2024/);
-  });
-});
-
-describe('isValidDateString', () => {
-  it('returns true for valid ISO date strings', () => {
-    expect(isValidDateString('2024-01-15T10:30:00Z')).toBe(true);
-    expect(isValidDateString('2024-03-20T00:00:00')).toBe(true);
-    expect(isValidDateString('2024-12-31')).toBe(true);
-  });
-
-  it('returns false for invalid date strings', () => {
-    expect(isValidDateString('invalid-date')).toBe(false);
-    expect(isValidDateString('2024-13-45')).toBe(false);
-    expect(isValidDateString('not a date')).toBe(false);
-  });
-
-  it('returns false for non-string values', () => {
-    expect(isValidDateString(null)).toBe(false);
-    expect(isValidDateString(undefined)).toBe(false);
-    expect(isValidDateString(123)).toBe(false);
-    expect(isValidDateString({})).toBe(false);
-    expect(isValidDateString([])).toBe(false);
-  });
-
-  it('returns false for empty string', () => {
-    expect(isValidDateString('')).toBe(false);
-    expect(isValidDateString('   ')).toBe(false);
   });
 });

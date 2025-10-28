@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { Date } from 'components/shared/date';
 import { Tag } from 'components/shared/tags';
-import { getMediaUrl } from 'common/utils/image';
+import { ResponsiveImage } from 'components/shared/responsive-image';
 import type { Media } from 'types/cms';
 
 interface PostHeaderProps {
@@ -19,10 +19,7 @@ export function PostHeader({
   coverImage,
   className,
 }: PostHeaderProps) {
-  const coverUrl = getMediaUrl(coverImage);
-  const lowResUrl = coverImage?.lowResUrl;
-
-  if (!coverUrl) {
+  if (!coverImage) {
     return null;
   }
 
@@ -36,31 +33,31 @@ export function PostHeader({
         className
       )}
     >
-      {/* Background image - use optimizedUrl directly with CSS */}
-      {lowResUrl && (
+      {/* Background blur image */}
+      {coverImage.lowResUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={lowResUrl}
+          src={coverImage.lowResUrl}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{
             filter: 'blur(20px)',
             transform: 'scale(1.1)',
-            aspectRatio: '2 / 1', // Mimic 2000x1000 (2:1) wide effect
+            aspectRatio: '2 / 1',
           }}
         />
       )}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={coverUrl}
+      {/* Main image */}
+      <ResponsiveImage
+        src={coverImage}
         alt={`Cover image for ${header}`}
-        loading="eager"
-        fetchPriority="high"
+        width={2000}
+        height={1000}
         className="absolute inset-0 w-full h-full object-cover object-center"
-        style={{
-          aspectRatio: '2 / 1', // Mimic 2000x1000 (2:1) wide effect
-        }}
+        priority
+        sizes="100vw"
+        quality={75}
       />
 
       <div

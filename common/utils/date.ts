@@ -33,22 +33,3 @@ export function formatDate(
     return '';
   }
 }
-
-/**
- * Validate if a string is a valid ISO 8601 date
- *
- * @param dateString - String to validate
- * @returns true if valid date string
- */
-export function isValidDateString(dateString: unknown): dateString is string {
-  if (typeof dateString !== 'string' || !dateString.trim()) {
-    return false;
-  }
-
-  try {
-    const date = parseISO(dateString);
-    return !isNaN(date.getTime());
-  } catch {
-    return false;
-  }
-}

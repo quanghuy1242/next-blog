@@ -200,25 +200,6 @@ export function generateResponsiveImage(
 }
 
 /**
- * Get optimized thumbnail URL
- * Uses native storage variant
- */
-export function getThumbnailUrl(
-  urlOrMedia: string | Media | undefined | null
-): string {
-  // Extract the URL to use (prefer optimizedUrl)
-  const url =
-    typeof urlOrMedia === 'string' ? urlOrMedia : getMediaUrl(urlOrMedia);
-
-  // Use smallest available variant for thumbnails
-  return transformImage(url, {
-    width: 480,
-    format: 'webp',
-    fit: 'cover',
-  });
-}
-
-/**
  * Get cover image URL
  * Returns the optimizedUrl directly (no transformation needed)
  */
@@ -266,45 +247,3 @@ export function getBlurPlaceholder(
     fit: 'cover',
   });
 }
-
-/**
- * Get optimized image URLs for Next.js Image with blur placeholder
- * This provides the full-quality image URL and a blurred placeholder URL
- */
-export interface ImageWithPlaceholder {
-  src: string;
-  blurDataURL: string;
-  width?: number | null;
-  height?: number | null;
-  alt?: string | null;
-}
-
-export function getImageWithPlaceholder(
-  url: string | undefined | null,
-  options: {
-    width?: number;
-    height?: number;
-    quality?: number;
-    alt?: string | null;
-  } = {}
-): ImageWithPlaceholder | null {
-  if (!url) {
-    return null;
-  }
-
-  const { width = 2000, height = 1000, alt = null } = options;
-
-  return {
-    src: getCoverImageUrl(url),
-    blurDataURL: getBlurPlaceholder(url),
-    width,
-    height,
-    alt,
-  };
-}
-
-/**
- * Default placeholder image for missing avatars
- */
-export const DEFAULT_AVATAR_PLACEHOLDER =
-  'https://ui-avatars.com/api/?name=User&size=200&background=random';

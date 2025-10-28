@@ -45,31 +45,3 @@ export async function getDataForAbout(): Promise<AboutPageData> {
     homepage: data?.Homepage ?? null,
   };
 }
-
-/**
- * @deprecated External content fetching is no longer used. Bio is stored in PayloadCMS.
- */
-interface ContentResponse {
-  content: string;
-  errors?: unknown;
-}
-
-/**
- * @deprecated External content fetching is no longer used. Bio is stored in PayloadCMS.
- */
-export async function getDataContentForAbout(url: string): Promise<string> {
-  const res = await fetch(url, {
-    method: 'GET',
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch content. Status: ${res.status}`);
-  }
-
-  const json = (await res.json()) as ContentResponse;
-  if (json.errors) {
-    console.error(json.errors);
-    throw new Error('Failed to fetch API');
-  }
-  return Buffer.from(json.content, 'base64').toString();
-}

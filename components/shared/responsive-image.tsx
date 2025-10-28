@@ -9,6 +9,8 @@
  * 5. Supports responsive srcSet for different screen sizes
  */
 
+'use client';
+
 import React, { useState } from 'react';
 import {
   generateResponsiveImage,

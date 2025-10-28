@@ -2,7 +2,6 @@ import React from 'react';
 import cn from 'classnames';
 import { CoverImage } from 'components/shared/cover-image';
 import Link from 'next/link';
-import { useState } from 'react';
 import type { Category as CategoryData } from 'types/cms';
 
 interface CategoryProps {
@@ -20,7 +19,6 @@ export function Category({
   slug,
   className,
 }: CategoryProps) {
-  const [show, setShow] = useState(false);
   const descriptionText = description ?? '';
 
   return (
@@ -31,9 +29,7 @@ export function Category({
           category: slug,
         },
       }}
-      className={cn(className, 'block relative mb-2')}
-      onMouseOver={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
+      className={cn(className, 'block relative mb-2 group')}
     >
       <CoverImage media={image} />
       <div
@@ -46,7 +42,7 @@ export function Category({
           className={cn(
             'text-white md:text-2xl text-xl',
             'transition-transform duration-300 ease-in-out',
-            show ? 'transform translate-y-1' : 'transform translate-y-3'
+            'group-hover:translate-y-1 translate-y-3'
           )}
         >
           {name}
@@ -55,7 +51,7 @@ export function Category({
           className={cn(
             'text-white md:text-sm text-sm',
             'transition-opacity duration-300 ease-in-out',
-            show ? 'opacity-100' : 'opacity-0'
+            'group-hover:opacity-100 opacity-0'
           )}
         >
           {descriptionText.slice(0, 35)}

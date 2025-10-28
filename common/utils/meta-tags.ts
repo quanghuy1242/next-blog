@@ -193,14 +193,3 @@ export function generateHomepageMetaTags(
     type: 'website',
   });
 }
-
-/**
- * Convert MetaTag array to React Head elements props
- */
-export function metaTagsToHeadProps(tags: MetaTag[]): Array<{
-  tag: string;
-  attributes?: Record<string, string>;
-  content?: string | null;
-}> {
-  return tags;
-}
