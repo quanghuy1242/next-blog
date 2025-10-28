@@ -51,7 +51,7 @@ export interface UseIntersectionObserverResult<
   /**
    * Ref to attach to the element you want to observe
    */
-  ref: React.RefObject<T>;
+  ref: React.RefObject<T | null>;
 
   /**
    * Whether the element is currently intersecting
@@ -111,7 +111,8 @@ export function useIntersectionObserver<T extends HTMLElement = HTMLElement>(
     // Check if IntersectionObserver is supported
     if (typeof IntersectionObserver === 'undefined') {
       // Fallback: assume visible if IntersectionObserver not supported
-      setIsIntersecting(true);
+      // Use a microtask to avoid synchronous setState in effect
+      Promise.resolve().then(() => setIsIntersecting(true));
       return;
     }
 

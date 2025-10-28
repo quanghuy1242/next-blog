@@ -24,7 +24,7 @@ describe('useIntersectionObserver', () => {
       observe: observeMock,
       disconnect: disconnectMock,
       unobserve: unobserveMock,
-    })) as any;
+    })) as unknown as typeof IntersectionObserver;
   });
 
   it('should return a ref and initial isIntersecting false', () => {
@@ -48,7 +48,7 @@ describe('useIntersectionObserver', () => {
     );
 
     // Type assertion to verify the ref type is correct
-    const _ref: React.RefObject<HTMLDivElement> = result.current.ref;
+    const _ref: React.RefObject<HTMLDivElement | null> = result.current.ref;
 
     expect(_ref).toBeDefined();
   });
