@@ -15,9 +15,7 @@ const nextConfig = {
     } : false,
   },
   // Enable React Compiler for automatic memoization
-  reactCompiler: {
-    compilationMode: 'annotation', // Only compile components with "use memo" directive
-  },
+  reactCompiler: true,
   // Performance optimizations
   experimental: {
     // Enable Turbopack file system caching for development
