@@ -1,5 +1,4 @@
 import cn from 'classnames';
-import { useAppContext } from 'context/state';
 import Link from 'next/link';
 
 interface NavigationItem {
@@ -61,8 +60,6 @@ interface HeaderProps {
 }
 
 export function Header({ text }: HeaderProps) {
-  const { header } = useAppContext();
-
   return (
     <div
       className={cn(
@@ -72,7 +69,7 @@ export function Header({ text }: HeaderProps) {
         'bg-blue shadow-dark'
       )}
     >
-      <HeaderTitle text={text || header} link="/" />
+      <HeaderTitle text={text || ''} link="/" />
       <div className="flex-grow" />
       <Option items={[{ name: 'About me', href: '/about' }]} />
     </div>

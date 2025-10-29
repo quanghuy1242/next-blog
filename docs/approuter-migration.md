@@ -1,4 +1,13 @@
-It is still using the classic Pages Router. There is no `app/` directory yet; instead, global behaviour lives in `pages/_app.tsx` and `pages/_document.tsx`, and page components live under `pages/`. The current `_app.tsx` implements manual scroll‑restoration and calls Google Analytics on route change, while `_document.tsx` injects the GA script. Client state is managed via an `AppContext` reducer/ and a `useHomePosts` hook to cache posts and handle infinite scroll. The home page uses `getServerSideProps` and `useHomePosts`, and other pages use `getStaticProps`/`getStaticPaths` for data fetching. With this context, the migration plan can be updated as follows.
+## It is still using the classic Pages Router. There is no `app/` directory yet; instead, global behaviour lives in `pages/_app.tsx` and `pages/_document.tsx`, and page components live under `pages/`. The current `_app.tsx` implements manual scroll‑restoration and calls Google Analytics on route change, while `_document.tsx` injects the GA script. Client state is managed via an `AppContext` reducer/ and a `useHomePosts` hook to cache posts and handle infinite scroll. The home page uses `getServerSideProps` and `useHomePosts`, and other pages use `getStaticProps`/`getStaticPaths` for data fetching. With this context, the migration plan can be updated as follows.
+
+- All pages must be server side rendering, no pre built pages, so we want to have const dynamic = 'force-dynamic'; and server side may want to cache the actual graphql api calls, or even ISR is fine to revalidate the post detail every 1 hours, but the homepage and everything else should be force server and real data with some cache on the API.
+- Make sure and trace down all the links works, especially the / to filter posts by tags and categories.
+- Tests may fail, just remove them, don't try to fix it.
+- Server Component is prefered to keep client javascript code at the zero at possible. So if there's any component you want to make it client, try to scope down and make the deepest nested component "use client".
+- If there's any issue or concerns, garther all of thems and raise or at one, don't try to workaround and make assumptions.
+- Header component should pick the page title from home query (`common/apis/index.ts#L118`)
+- If the `common/apis` can not be reusable or its not efficent anymore, try to break it or rework the shared `api` part so the app can use correctly. Especially, try to avoid several pages (about, categories, page, posts/[slug]) will call the same data-fetching function in both the Page component and its corresponding generateMetadata function.
+- Remove everything unrelated to the app and make sure its clean and have no code duplications or tech debts.
 
 ---
 
@@ -41,7 +50,7 @@ It is still using the classic Pages Router. There is no `app/` directory yet; in
 - Add a new client component (mark it with `"use client"`) that accepts `initialPosts`, `initialHasMore`, `category` and `tags` as props. The component should:
 
   - Store the current list of posts and pagination state in its own `useState`.
-  - Fetch additional posts when the user scrolls near the bottom, using either the existing API route (`/api/posts`) or a new server action that wraps `getPaginatedPosts()`. Pass `limit`, `offset`, `category` and `tags` as query parameters or arguments.
+  - Fetch additional posts when the user scrolls near the bottom, using a new server action that wraps `getPaginatedPosts()`. Pass `limit`, `offset`, `category` and `tags` as query parameters or arguments.
   - Merge and deduplicate posts like the existing `mergePosts` function in `useHomePosts`.
   - Update the URL’s `page` search parameter using `router.replace()` with `{ scroll: false }` so back/forward navigation restores the scroll point.
   - Show loading and error states like the current infinite scroll code.
@@ -76,17 +85,14 @@ It is still using the classic Pages Router. There is no `app/` directory yet; in
 
 ### 10  Handling API routes / server actions
 
-- The existing `pages/api/posts.ts` exposes a paginated posts API. You have two options: 2. **Migrate to server actions:** Move the logic from `pages/api/posts.ts` into an exported async function in `app/actions.ts` that calls `getPaginatedPosts()`. Then call this action from the client component using the new `use server` syntax. Once server actions are used, you can delete the API route.
+- The existing `pages/api/posts.ts` exposes a paginated posts API. **Migrate to server actions:** Move the logic from `pages/api/posts.ts` into an exported async function in `app/actions.ts` that calls `getPaginatedPosts()`. Then call this action from the client component using the new `use server` syntax. Once server actions are used, you can delete the API route.
 
 ### 11  Clean‑up and final steps
 
 - After migrating every page to the `app/` directory, remove the entire `pages/` directory except for `pages/api` (if you decide to retain the API route). Delete unused context files and the `useHomePosts` hook.
 - Remove the manual scroll restoration code and GA calls in `_app.tsx`. Rely on the App Router’s built‑in cache and back/forward behaviour.
 
-### 12 Notes
+### Goal
 
-- All pages must be server side rendering, no pre built pages, so we want to have const dynamic = 'force-dynamic'; and server side may want to cache the actual graphql api calls, or even ISR is fine to revalidate the post detail every 1 hours, but the homepage and everything else should be force server and real data with some cache on the API.
-- Make sure and trace down all the links works, especially the / to filter posts by tags and categories.
-- Tests may fail, just remove them, don't try to fix it.
-- Server Component is prefered to keep client javascript code at the zero at possible. So if there's any component you want to make it client, try to scope down and make the deepest nested component "use client".
-- If there's any issue or concerns, garther all of thems and raise or at one, don't try to workaround and make assumptions.
+- `yarn built` run successfully.
+- No linting errors or typescript errors.

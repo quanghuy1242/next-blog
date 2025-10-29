@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Progressive Responsive Image Component
  *

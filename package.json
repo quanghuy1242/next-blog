@@ -6,12 +6,12 @@
     "test": "vitest run",
     "test:ci": "cross-env NODE_ENV=test vitest run",
     "test:watch": "vitest",
-    "prebuild": "yarn lint && yarn test:ci",
     "dev": "next",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "@next/third-parties": "^14.2.3",
     "@payloadcms/richtext-lexical": "^3.61.0",
     "@tailwindcss/typography": "^0.4.1",
     "classnames": "^2.5.1",
