@@ -33,7 +33,7 @@ export default function About({ homepage, author }: AboutPageProps) {
         <div className="w-full max-w-4xl">
           <LexicalRenderer
             data={author?.bio}
-            className="prose prose-lg max-w-none"
+            className="max-w-none"
             fallback={
               <div className="text-gray-500 italic">No bio available.</div>
             }

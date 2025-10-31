@@ -95,6 +95,18 @@ const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   upload: ({ node }) => {
     return <CustomUploadComponent node={node} />;
   },
+  // Handle CodeBlock blocks
+  blocks: {
+    code: ({ node }) => {
+      const language = node.fields?.language || 'plaintext';
+      const code = node.fields?.code || '';
+      return (
+        <pre className="code-block">
+          <code className={`language-${language}`}>{code}</code>
+        </pre>
+      );
+    },
+  },
 });
 
 /**
@@ -105,7 +117,7 @@ const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
  * ```tsx
  * <LexicalRenderer
  *   data={post.content}
- *   className="prose prose-lg max-w-none"
+ *   className="max-w-none"
  * />
  * ```
  */

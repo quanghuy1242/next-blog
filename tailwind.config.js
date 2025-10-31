@@ -13,7 +13,7 @@ module.exports = {
         success: '#0070f3',
         cyan: '#79FFE1',
         blue: '#416275',
-        darkBlue: '#3a5a6b'
+        darkBlue: '#3a5a6b',
       },
       spacing: {
         28: '7rem',
@@ -33,49 +33,17 @@ module.exports = {
       boxShadow: {
         small: '0 5px 10px rgba(0, 0, 0, 0.12)',
         medium: '0 8px 30px rgba(0, 0, 0, 0.12)',
-        dark: 'rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;'
+        dark: 'rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;',
       },
       height: {
-        banner: '20rem'
+        banner: '20rem',
       },
       width: {
-        searchBar: '450px'
-      },
-      typography: {
-        // Custom typography variants to match PayloadCMS admin Lexical editor styles
-        DEFAULT: {
-          css: {
-            // Match PayloadCMS admin font family (sans-serif)
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
-            // Responsive images matching PayloadCMS admin - disable all default margins
-            img: {
-              maxWidth: '100%',
-              height: 'auto',
-              marginTop: '0 !important',
-              marginBottom: '0 !important',
-            },
-            figure: {
-              marginTop: '0 !important',
-              marginBottom: '0 !important',
-            },
-            'figure > *': {
-              marginTop: '0 !important',
-              marginBottom: '0 !important',
-            },
-            video: {
-              maxWidth: '100%',
-              height: 'auto',
-              marginTop: '0 !important',
-              marginBottom: '0 !important',
-            },
-          },
-        },
+        searchBar: '450px',
       },
     },
   },
   plugins: [
-    // Keep @tailwindcss/typography for Phase 9 Lexical rendering
-    // Provides 'prose' class for rich text styling
-    require('@tailwindcss/typography')
-  ]
+    // Tailwind typography disabled - using custom Lexical styles
+  ],
 };

@@ -13,7 +13,7 @@ export function PostContent({ content, tags = [] }: PostContentProps) {
       {/* Phase 9: Lexical rich text rendering */}
       <LexicalRenderer
         data={content}
-        className="prose prose-lg max-w-none mb-8"
+        className="max-w-none mb-8"
         fallback={
           <div className="text-gray-500 italic mb-8">No content available.</div>
         }
