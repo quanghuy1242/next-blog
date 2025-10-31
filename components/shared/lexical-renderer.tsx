@@ -165,6 +165,26 @@ const CustomTable: React.FC<{
                     ? 'lexical-table-cell-header-1 lexical-table-cell-header-2'
                     : '';
 
+                // Get cell alignment from cell format
+                const cellFormat = cell.format || '';
+                const textAlign =
+                  cellFormat === 'center'
+                    ? 'center'
+                    : cellFormat === 'right'
+                    ? 'right'
+                    : cellFormat === 'left'
+                    ? 'left'
+                    : undefined;
+
+                // Combine styles
+                const cellStyle: React.CSSProperties = {};
+                if (cell.backgroundColor) {
+                  cellStyle.backgroundColor = cell.backgroundColor;
+                }
+                if (textAlign) {
+                  cellStyle.textAlign = textAlign;
+                }
+
                 return (
                   <Tag
                     key={cellIndex}
@@ -172,9 +192,7 @@ const CustomTable: React.FC<{
                     colSpan={cell.colSpan || 1}
                     rowSpan={cell.rowSpan || 1}
                     style={
-                      cell.backgroundColor
-                        ? { backgroundColor: cell.backgroundColor }
-                        : undefined
+                      Object.keys(cellStyle).length > 0 ? cellStyle : undefined
                     }
                   >
                     {cell?.children?.map((paragraph: any, pIndex: number) => (
@@ -182,7 +200,7 @@ const CustomTable: React.FC<{
                         {paragraph?.children?.map(
                           (text: any, tIndex: number) => {
                             if (text.type === 'text') {
-                              let content = text.text;
+                              let content: React.ReactNode = text.text;
                               if (text.format & 1)
                                 content = (
                                   <strong key={tIndex}>{content}</strong>
