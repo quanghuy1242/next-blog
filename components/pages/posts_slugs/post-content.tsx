@@ -9,7 +9,7 @@ interface PostContentProps {
 
 export function PostContent({ content, tags = [] }: PostContentProps) {
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto w-full">
       {/* Phase 9: Lexical rich text rendering */}
       <LexicalRenderer
         data={content}
