@@ -90,9 +90,20 @@ const CustomUploadComponent: React.FC<{
 const CustomCodeBlock: React.FC<{
   node: any;
 }> = ({ node }) => {
-  const { code, language } = node.fields || {};
+  // Debug: Log the node structure
+  console.log('CodeBlock node:', JSON.stringify(node, null, 2));
+
+  const fields = node?.fields;
+  if (!fields) {
+    console.error('CodeBlock: No fields found in node');
+    return null;
+  }
+
+  const { code, language, blockType } = fields;
+  console.log('CodeBlock fields:', { code, language, blockType });
 
   if (!code) {
+    console.error('CodeBlock: No code found in fields');
     return null;
   }
 
@@ -118,8 +129,8 @@ const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   },
   blocks: {
     ...defaultConverters.blocks,
-    // Handle CodeBlock from BlocksFeature
-    code: ({ node }) => <CustomCodeBlock node={node} />,
+    // Handle CodeBlock from BlocksFeature (blockType: "Code")
+    Code: ({ node }) => <CustomCodeBlock node={node} />,
   },
 });
 
