@@ -9,7 +9,6 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  color: #374151;
   line-height: 1.75;
 }
 
@@ -43,6 +42,12 @@
 .lexical-content p {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+/* Override paragraph spacing inside table cells */
+.lexical-content .lexical-table-cell p {
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
 }
 
 .lexical-content a {
@@ -209,19 +214,19 @@
 
 .lexical-content .lexical-table-cell-header-1,
 .lexical-content .lexical-table-cell-header-2 {
-  background-color: #1f2937;
+  background-color: #f3f4f6;
   font-weight: 600;
-  color: #ffffff;
+  color: #111827;
 }
 
 .lexical-content .lexical-table-row:hover .lexical-table-cell {
-  background-color: #f3f4f6;
+  background-color: #f9fafb;
   transition: background-color 0.15s ease;
 }
 
 .lexical-content .lexical-table-row:hover .lexical-table-cell-header-1,
 .lexical-content .lexical-table-row:hover .lexical-table-cell-header-2 {
-  background-color: #374151;
+  background-color: #e5e7eb;
 }
 
 /* Dark mode support for tables */

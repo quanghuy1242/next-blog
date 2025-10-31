@@ -95,17 +95,10 @@ const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   upload: ({ node }) => {
     return <CustomUploadComponent node={node} />;
   },
-  // Handle CodeBlock blocks
+  // Merge with default block converters (includes CodeBlock)
   blocks: {
-    code: ({ node }) => {
-      const language = node.fields?.language || 'plaintext';
-      const code = node.fields?.code || '';
-      return (
-        <pre className="code-block">
-          <code className={`language-${language}`}>{code}</code>
-        </pre>
-      );
-    },
+    ...defaultConverters.blocks,
+    // Add custom block converters here if needed
   },
 });
 
