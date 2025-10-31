@@ -85,6 +85,27 @@ const CustomUploadComponent: React.FC<{
 };
 
 /**
+ * Custom CodeBlock component for rendering code blocks from PayloadCMS
+ */
+const CustomCodeBlock: React.FC<{
+  node: any;
+}> = ({ node }) => {
+  const { code, language } = node.fields || {};
+
+  if (!code) {
+    return null;
+  }
+
+  return (
+    <pre className="code-block">
+      <code className={language ? `language-${language}` : undefined}>
+        {code}
+      </code>
+    </pre>
+  );
+};
+
+/**
  * JSX converters for custom node types
  */
 const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
@@ -97,8 +118,8 @@ const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   },
   blocks: {
     ...defaultConverters.blocks,
-    // code block is already handled by default converter
-    // keep this empty or add custom blocks here
+    // Handle CodeBlock from BlocksFeature
+    code: ({ node }) => <CustomCodeBlock node={node} />,
   },
 });
 
