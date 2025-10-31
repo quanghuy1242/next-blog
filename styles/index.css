@@ -140,6 +140,28 @@
     monospace;
 }
 
+/* YouTube embed responsive container */
+.lexical-content .youtube-embed-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.lexical-content .youtube-embed-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0.5rem;
+}
+
 /* Table styles for EXPERIMENTAL_TableFeature */
 .lexical-content .lexical-table-container {
   overflow-x: auto;

@@ -90,20 +90,9 @@ const CustomUploadComponent: React.FC<{
 const CustomCodeBlock: React.FC<{
   node: any;
 }> = ({ node }) => {
-  // Debug: Log the node structure
-  console.log('CodeBlock node:', JSON.stringify(node, null, 2));
-
-  const fields = node?.fields;
-  if (!fields) {
-    console.error('CodeBlock: No fields found in node');
-    return null;
-  }
-
-  const { code, language, blockType } = fields;
-  console.log('CodeBlock fields:', { code, language, blockType });
+  const { code, language } = node?.fields || {};
 
   if (!code) {
-    console.error('CodeBlock: No code found in fields');
     return null;
   }
 
@@ -117,6 +106,33 @@ const CustomCodeBlock: React.FC<{
 };
 
 /**
+ * Custom YouTube component for rendering YouTube embeds from PayloadCMS
+ */
+const CustomYouTube: React.FC<{
+  node: any;
+}> = ({ node }) => {
+  const { videoId, url } = node || {};
+
+  if (!videoId) {
+    return null;
+  }
+
+  return (
+    <div className="youtube-embed-container">
+      <iframe
+        width="560"
+        height="315"
+        src={`https://www.youtube.com/embed/${videoId}`}
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+  );
+};
+
+/**
  * JSX converters for custom node types
  */
 const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
@@ -126,6 +142,10 @@ const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   // Override the default upload converter to use next/image
   upload: ({ node }) => {
     return <CustomUploadComponent node={node} />;
+  },
+  // Handle YouTube embeds
+  youtube: ({ node }) => {
+    return <CustomYouTube node={node} />;
   },
   blocks: {
     ...defaultConverters.blocks,
