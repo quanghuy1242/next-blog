@@ -95,7 +95,7 @@ async function fetchHomeData({
           hasNextPage
         }
         
-        Categories(limit: 2, sort: "-updatedAt") {
+        Categories(limit: 5, sort: "-updatedAt") {
           docs {
             id
             name
