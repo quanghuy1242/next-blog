@@ -15,3 +15,60 @@
   max-width: 100%;
   height: auto;
 }
+
+/* Table styles for EXPERIMENTAL_TableFeature */
+.lexical-content .lexical-table-container {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.lexical-content .lexical-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.lexical-content .lexical-table-cell {
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.lexical-content .lexical-table-cell-header-1,
+.lexical-content .lexical-table-cell-header-2 {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #111827;
+}
+
+.lexical-content .lexical-table-row:hover {
+  background-color: #f9fafb;
+  transition: background-color 0.15s ease;
+}
+
+/* Dark mode support for tables */
+@media (prefers-color-scheme: dark) {
+  .lexical-content .lexical-table {
+    border-color: #374151;
+  }
+
+  .lexical-content .lexical-table-cell {
+    border-color: #374151;
+    color: #e5e7eb;
+  }
+
+  .lexical-content .lexical-table-cell-header-1,
+  .lexical-content .lexical-table-cell-header-2 {
+    background-color: #1f2937;
+    color: #f3f4f6;
+  }
+
+  .lexical-content .lexical-table-row:hover {
+    background-color: #1f2937;
+  }
+}
