@@ -169,8 +169,8 @@
 }
 
 .lexical-content .lexical-table {
-  width: auto;
-  min-width: 300px;
+  width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   border: 1px solid #e5e7eb;
   font-size: 0.875rem;
@@ -182,12 +182,11 @@
 
 .lexical-content .lexical-table-cell {
   border: 1px solid #e5e7eb;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem 1rem;
   text-align: left;
   vertical-align: top;
   color: #374151;
   background-color: #ffffff;
-  white-space: nowrap;
 }
 
 .lexical-content .lexical-table-cell-header-1,
