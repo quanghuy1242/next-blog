@@ -10,6 +10,7 @@
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   line-height: 1.75;
+  color: #1f2937;
 }
 
 .lexical-content h1,
@@ -108,38 +109,6 @@
   border-radius: 0.5rem;
 }
 
-/* Dark mode for content */
-@media (prefers-color-scheme: dark) {
-  .lexical-content {
-    color: #d1d5db;
-  }
-
-  .lexical-content h1,
-  .lexical-content h2,
-  .lexical-content h3,
-  .lexical-content h4,
-  .lexical-content strong {
-    color: #f3f4f6;
-  }
-
-  .lexical-content a {
-    color: #60a5fa;
-  }
-
-  .lexical-content a:hover {
-    color: #93c5fd;
-  }
-
-  .lexical-content blockquote {
-    border-left-color: #4b5563;
-    color: #9ca3af;
-  }
-
-  .lexical-content hr {
-    border-top-color: #4b5563;
-  }
-}
-
 /* Code block styles */
 .lexical-content pre.code-block {
   background-color: #1e293b;
@@ -169,19 +138,6 @@
   font-size: 0.875em;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro',
     monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  .lexical-content pre.code-block {
-    background-color: #0f172a;
-    color: #e2e8f0;
-    border-color: #1e293b;
-  }
-
-  .lexical-content code {
-    background-color: #1e293b;
-    color: #fca5a5;
-  }
 }
 
 /* Table styles for EXPERIMENTAL_TableFeature */
@@ -227,28 +183,4 @@
 .lexical-content .lexical-table-row:hover .lexical-table-cell-header-1,
 .lexical-content .lexical-table-row:hover .lexical-table-cell-header-2 {
   background-color: #e5e7eb;
-}
-
-/* Dark mode support for tables */
-@media (prefers-color-scheme: dark) {
-  .lexical-content .lexical-table {
-    border-color: #4b5563;
-    background-color: #111827;
-  }
-
-  .lexical-content .lexical-table-cell {
-    border-color: #4b5563;
-    color: #e5e7eb;
-    background-color: #1f2937;
-  }
-
-  .lexical-content .lexical-table-cell-header-1,
-  .lexical-content .lexical-table-cell-header-2 {
-    background-color: #374151;
-    color: #f9fafb;
-  }
-
-  .lexical-content .lexical-table-row:hover .lexical-table-cell {
-    background-color: #374151;
-  }
 }

@@ -95,10 +95,10 @@ const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   upload: ({ node }) => {
     return <CustomUploadComponent node={node} />;
   },
-  // Merge with default block converters (includes CodeBlock)
   blocks: {
     ...defaultConverters.blocks,
-    // Add custom block converters here if needed
+    // code block is already handled by default converter
+    // keep this empty or add custom blocks here
   },
 });
 
