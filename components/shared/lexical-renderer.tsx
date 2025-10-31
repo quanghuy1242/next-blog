@@ -133,6 +133,81 @@ const CustomYouTube: React.FC<{
 };
 
 /**
+ * Custom Table component that applies column widths from backend
+ */
+const CustomTable: React.FC<{
+  node: any;
+}> = ({ node }) => {
+  const colWidths = node?.colWidths || [];
+
+  return (
+    <div className="lexical-table-container">
+      <table className="lexical-table">
+        {colWidths.length > 0 && (
+          <colgroup>
+            {colWidths.map((width: number, index: number) => (
+              <col key={index} style={{ width: `${width}px` }} />
+            ))}
+          </colgroup>
+        )}
+        <tbody>
+          {node?.children?.map((row: any, rowIndex: number) => (
+            <tr key={rowIndex} className="lexical-table-row">
+              {row?.children?.map((cell: any, cellIndex: number) => {
+                const isHeader = cell.headerState > 0;
+                const Tag = isHeader ? 'th' : 'td';
+                const headerClass =
+                  cell.headerState === 1
+                    ? 'lexical-table-cell-header-1'
+                    : cell.headerState === 2
+                    ? 'lexical-table-cell-header-2'
+                    : cell.headerState === 3
+                    ? 'lexical-table-cell-header-1 lexical-table-cell-header-2'
+                    : '';
+
+                return (
+                  <Tag
+                    key={cellIndex}
+                    className={`lexical-table-cell ${headerClass}`.trim()}
+                    colSpan={cell.colSpan || 1}
+                    rowSpan={cell.rowSpan || 1}
+                    style={
+                      cell.backgroundColor
+                        ? { backgroundColor: cell.backgroundColor }
+                        : undefined
+                    }
+                  >
+                    {cell?.children?.map((paragraph: any, pIndex: number) => (
+                      <p key={pIndex} style={{ margin: '0.2rem' }}>
+                        {paragraph?.children?.map(
+                          (text: any, tIndex: number) => {
+                            if (text.type === 'text') {
+                              let content = text.text;
+                              if (text.format & 1)
+                                content = (
+                                  <strong key={tIndex}>{content}</strong>
+                                );
+                              if (text.format & 2)
+                                content = <em key={tIndex}>{content}</em>;
+                              return <span key={tIndex}>{content}</span>;
+                            }
+                            return null;
+                          }
+                        )}
+                      </p>
+                    ))}
+                  </Tag>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+/**
  * JSX converters for custom node types
  */
 const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
@@ -146,6 +221,10 @@ const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   // Handle YouTube embeds
   youtube: ({ node }) => {
     return <CustomYouTube node={node} />;
+  },
+  // Override table rendering to apply column widths
+  table: ({ node }) => {
+    return <CustomTable node={node} />;
   },
   blocks: {
     ...defaultConverters.blocks,
