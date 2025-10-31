@@ -169,8 +169,9 @@
 }
 
 .lexical-content .lexical-table {
-  width: 100%;
+  width: auto;
   max-width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   border: 1px solid #e5e7eb;
   font-size: 0.875rem;
