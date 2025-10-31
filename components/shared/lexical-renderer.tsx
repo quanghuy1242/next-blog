@@ -111,7 +111,7 @@ const CustomCodeBlock: React.FC<{
 const CustomYouTube: React.FC<{
   node: any;
 }> = ({ node }) => {
-  const { videoId, url } = node || {};
+  const { videoId } = node || {};
 
   if (!videoId) {
     return null;
