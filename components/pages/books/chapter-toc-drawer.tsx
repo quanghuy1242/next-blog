@@ -43,7 +43,10 @@ export function ChapterTocDrawer({
         className="absolute inset-0 bg-black/40"
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 max-h-[80vh] rounded-t-lg bg-white p-4 shadow-dark">
+      <div
+        className="absolute inset-x-0 bottom-0 rounded-t-lg bg-white p-4 shadow-dark"
+        style={{ maxHeight: '80vh' }}
+      >
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-900">Table of contents</h2>
           <button

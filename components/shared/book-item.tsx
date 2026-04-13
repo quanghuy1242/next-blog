@@ -9,7 +9,7 @@ interface BookItemProps {
 
 export function BookItem({ book }: BookItemProps) {
   return (
-    <article className="flex w-full max-w-[190px] flex-col gap-2">
+    <article className="flex w-36 flex-col gap-2 sm:w-40">
       <BookCover
         media={book.cover}
         title={book.title}
@@ -17,7 +17,7 @@ export function BookItem({ book }: BookItemProps) {
         className="w-full"
       />
 
-      <h3 className="text-base font-medium leading-snug">
+      <h3 className="text-sm font-medium leading-snug sm:text-base">
         <Link href={`/books/${book.slug}`} className="hover:underline">
           {book.title}
         </Link>
