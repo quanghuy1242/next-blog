@@ -179,13 +179,12 @@ export async function getBookBySlug(
 
   const data = await fetchAPI<BookBySlugResponse>(
     `#graphql
-      query BookBySlug($slug: String!, $authorId: Int!) {
+      query BookBySlug($slug: String!) {
         Books(
           where: {
             AND: [
               { slug: { equals: $slug } }
               { _status: { equals: published } }
-              { createdBy: { equals: $authorId } }
             ]
           }
           limit: 1
@@ -203,7 +202,6 @@ export async function getBookBySlug(
     {
       variables: {
         slug: trimmedSlug,
-        authorId: AUTHOR_ID,
       },
     }
   );
