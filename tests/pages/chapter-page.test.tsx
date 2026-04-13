@@ -48,8 +48,8 @@ function createBook(overrides: Partial<Book> = {}): Book {
       width: 800,
       height: 400,
     },
-    origin: overrides.origin ?? 'manual',
-    sourceType: overrides.sourceType ?? 'manual',
+    origin: (overrides.origin ?? 'manual') as Book['origin'],
+    sourceType: (overrides.sourceType ?? 'manual') as Book['sourceType'],
     sourceId: overrides.sourceId ?? null,
     sourceHash: overrides.sourceHash ?? null,
     sourceVersion: overrides.sourceVersion ?? null,
@@ -121,7 +121,7 @@ describe('ChapterPage', () => {
   test('hides the page chapter title for epub-imported books', () => {
     render(
       <ChapterPage
-        book={createBook({ origin: 'epub-imported' })}
+        book={createBook({ origin: 'epub_imported' as never, sourceType: 'epub_upload' as never })}
         chapter={createChapter()}
         chapters={[createChapter()]}
         homepage={createHomepage()}
