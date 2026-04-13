@@ -9,16 +9,21 @@ interface BookItemProps {
 
 export function BookItem({ book }: BookItemProps) {
   return (
-    <article className="flex flex-col gap-3">
-      <BookCover media={book.cover} title={book.title} href={`/books/${book.slug}`} />
+    <article className="flex w-full max-w-[190px] flex-col gap-2">
+      <BookCover
+        media={book.cover}
+        title={book.title}
+        href={`/books/${book.slug}`}
+        className="w-full"
+      />
 
-      <h3 className="text-2xl leading-snug">
+      <h3 className="text-base font-medium leading-snug">
         <Link href={`/books/${book.slug}`} className="hover:underline">
           {book.title}
         </Link>
       </h3>
 
-      {book.author && <p className="text-sm text-gray-700">{book.author}</p>}
+      {book.author && <p className="text-xs text-gray-700">{book.author}</p>}
     </article>
   );
 }

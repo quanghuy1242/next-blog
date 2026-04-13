@@ -55,8 +55,8 @@ export default function ChapterPage({
     <Layout header={homepage?.header} className="flex flex-col items-center">
       <Head>{renderMetaTags(metaTags)}</Head>
       <Container className="my-4 w-full md:px-20">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
-          <aside className="hidden lg:block lg:sticky lg:top-20 lg:self-start">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start lg:gap-10">
+          <aside className="hidden lg:block lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
             <p className="mb-3 text-sm font-semibold text-gray-900">Chapters</p>
             <ChapterToc
               chapters={chapters}
@@ -65,7 +65,7 @@ export default function ChapterPage({
             />
           </aside>
 
-          <article className="min-w-0">
+          <article className="min-w-0 lg:self-start">
             <div className="mx-auto max-w-3xl">
               <div className="mb-4 flex items-center justify-between gap-2">
                 <div>

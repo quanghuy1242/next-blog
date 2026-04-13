@@ -37,6 +37,7 @@ export function BookCover({
       height={BOOK_COVER_HEIGHT}
       priority={priority}
       sizes={BOOK_COVER_SIZES}
+      simple={true}
       className={cn('overflow-hidden rounded-sm shadow-small', className)}
     />
   ) : (

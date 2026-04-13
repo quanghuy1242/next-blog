@@ -13,6 +13,7 @@ export interface CategoryCardProps {
   href: LinkProps['href'];
   className?: string;
   alwaysShowDescription?: boolean;
+  simpleImage?: boolean;
 }
 
 export function CategoryCard({
@@ -22,6 +23,7 @@ export function CategoryCard({
   href,
   className,
   alwaysShowDescription = false,
+  simpleImage = false,
 }: CategoryCardProps) {
   const [show, setShow] = useState(false);
   const descriptionText = description ?? '';
@@ -43,7 +45,7 @@ export function CategoryCard({
       onBlur={() => setShow(false)}
     >
       {image ? (
-        <CoverImage media={image} />
+        <CoverImage media={image} simple={simpleImage} />
       ) : (
         <div className="h-40 w-full rounded-sm bg-gradient-to-br from-blue to-darkBlue shadow-small" />
       )}

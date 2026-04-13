@@ -10,9 +10,16 @@ interface CoverImageProps {
   media: Media | null | undefined;
   slug?: string;
   className?: string;
+  simple?: boolean;
 }
 
-export function CoverImage({ title, media, slug, className }: CoverImageProps) {
+export function CoverImage({
+  title,
+  media,
+  slug,
+  className,
+  simple = false,
+}: CoverImageProps) {
   const mediaUrl = getMediaUrl(media);
 
   if (!mediaUrl) {
@@ -41,6 +48,7 @@ export function CoverImage({ title, media, slug, className }: CoverImageProps) {
       // But we tell it the image displays at 90vw (342px), so 342*2=684 -> picks 750w
       sizes="(max-width: 640px) 90vw, (max-width: 768px) 45vw, (max-width: 1024px) 45vw, 30vw"
       quality={75}
+      simple={simple}
     />
   );
 

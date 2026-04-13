@@ -28,6 +28,7 @@ export function BooksCtaCard({
       image={BOOKS_CTA_MEDIA}
       href="/books"
       className={cn('mb-4', className)}
+      simpleImage={true}
     />
   );
 }
