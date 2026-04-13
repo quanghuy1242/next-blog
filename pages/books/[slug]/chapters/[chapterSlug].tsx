@@ -29,7 +29,8 @@ export default function ChapterPage({
   homepage,
 }: ChapterPageProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
-  const shouldRenderChapterTitle = book.origin !== 'epub-imported';
+  const shouldRenderChapterTitle =
+    book.origin !== 'epub-imported' && book.sourceType !== 'epub-upload';
 
   const { previousChapter, nextChapter } = useMemo(() => {
     const currentIndex = chapters.findIndex(

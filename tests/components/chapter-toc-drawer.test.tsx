@@ -61,4 +61,17 @@ describe('ChapterTocDrawer component', () => {
     expect(document.body.style.overflow).toBe('');
     expect(document.documentElement.style.overflow).toBe('');
   });
+
+  test('renders a fixed-height scrollable panel', () => {
+    render(
+      <ChapterTocDrawer isOpen={true} onClose={vi.fn()}>
+        <div>Content</div>
+      </ChapterTocDrawer>
+    );
+
+    const panel = screen.getByRole('dialog').querySelector('[tabindex="-1"]');
+
+    expect(panel).toHaveStyle({ height: '80vh' });
+    expect(panel).toHaveClass('overflow-hidden');
+  });
 });

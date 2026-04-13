@@ -52,16 +52,16 @@ export function ChapterTocDrawer({
       <button
         type="button"
         aria-label="Close chapter table of contents"
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 z-0 bg-black/40"
         onClick={onClose}
       />
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="absolute inset-x-0 bottom-0 rounded-t-lg bg-white p-4 shadow-dark"
-        style={{ maxHeight: '80vh', WebkitOverflowScrolling: 'touch' }}
+        className="absolute inset-x-0 bottom-0 z-10 overflow-hidden rounded-t-lg bg-white p-4 shadow-dark"
+        style={{ height: '80vh', WebkitOverflowScrolling: 'touch' }}
       >
-        <div className="flex max-h-full min-h-0 flex-col">
+        <div className="flex h-full min-h-0 flex-col">
           <div className="mb-3 flex flex-none items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-gray-900">Table of contents</h2>
             <button
