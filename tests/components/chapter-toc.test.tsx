@@ -34,7 +34,7 @@ function createChapter(overrides: Partial<Chapter> = {}): Chapter {
 }
 
 describe('ChapterToc component', () => {
-  test('highlights current chapter', () => {
+  test('highlights current chapter with simple sidebar styling', () => {
     const chapters = [
       createChapter({ slug: 'ch-1', title: 'One', order: 1 }),
       createChapter({ id: 2, slug: 'ch-2', title: 'Two', order: 2 }),
@@ -49,8 +49,10 @@ describe('ChapterToc component', () => {
     );
 
     const activeLink = screen.getByRole('link', { name: /Two/i });
-    expect(activeLink.className).toContain('bg-blue');
+    expect(activeLink.className).toContain('font-semibold');
     expect(activeLink).toHaveAttribute('href', '/books/sample-book/chapters/ch-2');
+    expect(activeLink.className).toContain('text-gray-900');
+    expect(activeLink.className).not.toContain('bg-blue');
   });
 
   test('calls onNavigate when a chapter is clicked', () => {

@@ -55,7 +55,16 @@ export default function ChapterPage({
     <Layout header={homepage?.header} className="flex flex-col items-center">
       <Head>{renderMetaTags(metaTags)}</Head>
       <Container className="my-4 w-full md:px-20">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className="hidden lg:block lg:sticky lg:top-20 lg:self-start">
+            <p className="mb-3 text-sm font-semibold text-gray-900">Chapters</p>
+            <ChapterToc
+              chapters={chapters}
+              bookSlug={book.slug}
+              currentChapterSlug={chapter.slug}
+            />
+          </aside>
+
           <article className="min-w-0">
             <div className="mx-auto max-w-3xl">
               <div className="mb-4 flex items-center justify-between gap-2">
@@ -102,16 +111,6 @@ export default function ChapterPage({
               </div>
             </div>
           </article>
-
-          <aside className="hidden lg:block">
-            <div className="sticky top-20">
-              <ChapterToc
-                chapters={chapters}
-                bookSlug={book.slug}
-                currentChapterSlug={chapter.slug}
-              />
-            </div>
-          </aside>
         </div>
       </Container>
 

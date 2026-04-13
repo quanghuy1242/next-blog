@@ -1,7 +1,7 @@
 import React from 'react';
 import cn from 'classnames';
 import type { Book } from 'types/cms';
-import { BookCard } from './book-card';
+import { BookItem } from './book-item';
 
 interface BooksGridProps {
   books: Book[];
@@ -19,7 +19,7 @@ export function BooksGrid({ books, hasMoreCol = true }: BooksGridProps) {
       )}
     >
       {books.map((book) => (
-        <BookCard key={book.slug} book={book} />
+        <BookItem key={book.slug} book={book} />
       ))}
     </div>
   );

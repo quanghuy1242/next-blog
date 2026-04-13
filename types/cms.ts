@@ -164,7 +164,6 @@ export interface SimilarPostsResult {
 export interface HomePageData {
   allPosts: Post[];
   allCategories: Category[];
-  featuredBook: Book | null;
   homepage: Homepage | null;
   author: Author | null;
 }

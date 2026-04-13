@@ -197,7 +197,7 @@ No code is included in this file; this is a detailed design and execution plan.
 
 ### Desktop ToC behavior
 
-- Render chapter ToC as side panel (left or right).
+- Render chapter ToC as a left-side panel.
 - Keep article content visually centered, not pushed into a narrow edge column.
 - Highlight current chapter in ToC.
 

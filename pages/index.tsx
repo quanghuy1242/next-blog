@@ -7,7 +7,7 @@ import { renderMetaTags } from 'components/core/metadata';
 import { Banner } from 'components/pages/index/banner';
 import { Categories } from 'components/shared/categories';
 import { CategoriesRail } from 'components/shared/categories-rail';
-import { BooksCtaCard } from 'components/shared/books-cta-card';
+import { BOOKS_CTA_MEDIA, BooksCtaCard } from 'components/shared/books-cta-card';
 import { Posts } from 'components/shared/posts';
 import { Text } from 'components/shared/text';
 import { generateHomepageMetaTags } from 'common/utils/meta-tags';
@@ -27,7 +27,6 @@ interface HomePageProps {
   initialPosts: HomePageData['allPosts'];
   allCategories: HomePageData['allCategories'];
   homepage: HomePageData['homepage'];
-  featuredBook: HomePageData['featuredBook'];
   initialHasMore: boolean;
   initialCategory: string | null;
   initialTags: string[];
@@ -46,7 +45,6 @@ export default function Index({
   initialPosts,
   homepage,
   allCategories,
-  featuredBook,
   initialHasMore,
   initialCategory,
   initialTags,
@@ -121,7 +119,7 @@ export default function Index({
           <Text text="Browse" />
           <CategoriesRail
             categories={allCategories}
-            booksMedia={featuredBook?.cover ?? null}
+            booksMedia={BOOKS_CTA_MEDIA}
           />
         </div>
 
@@ -172,7 +170,7 @@ export default function Index({
 
           <div className="hidden md:block md:w-1/3">
             <Text text="Books" />
-            <BooksCtaCard media={featuredBook?.cover ?? null} />
+            <BooksCtaCard />
             <Text text="Categories" />
             <Categories categories={allCategories} />
           </div>
@@ -214,7 +212,6 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (
     props: {
       initialPosts,
       allCategories: data.allCategories ?? [],
-      featuredBook: data.featuredBook ?? null,
       homepage: data.homepage ?? null,
       initialHasMore,
       initialCategory,
