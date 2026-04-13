@@ -20,7 +20,7 @@ export function ChapterList({ chapters, bookSlug }: ChapterListProps) {
             href={`/books/${bookSlug}/chapters/${chapter.slug}`}
             className="flex items-center justify-between rounded border border-gray-200 px-3 py-2 hover:border-gray-300"
           >
-            <span className="mr-4 text-sm text-gray-600">Chapter {chapter.order}</span>
+            {/* <span className="mr-4 text-sm text-gray-600">Chapter {chapter.order}</span> */}
             <span className="flex-1 text-sm font-medium text-gray-900">
               {chapter.title}
             </span>
