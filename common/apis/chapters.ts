@@ -44,7 +44,7 @@ const CHAPTER_TOC_FIELDS = `
 export async function getChaptersByBookId(bookID: number): Promise<Chapter[]> {
   const data = await fetchAPI<ChaptersResponse>(
     `#graphql
-      query ChaptersByBook($bookID: Int!) {
+      query ChaptersByBook($bookID: JSON!) {
         Chapters(
           where: {
             AND: [
@@ -86,7 +86,7 @@ export async function getChapterByBookAndSlug(
 
   const data = await fetchAPI<ChapterReaderResponse>(
     `#graphql
-      query ChapterByBookAndSlug($bookID: Int!, $chapterSlug: String!) {
+      query ChapterByBookAndSlug($bookID: JSON!, $chapterSlug: String!) {
         ChapterMatch: Chapters(
           where: {
             AND: [

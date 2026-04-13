@@ -85,7 +85,7 @@ query BookBySlug($slug: String!) {
 ### Fetch chapters for a book
 
 ```graphql
-query ChaptersByBook($bookID: Int!) {
+query ChaptersByBook($bookID: JSON!) {
   Chapters(where: { book: { equals: $bookID } }, sort: "order") {
     docs {
       id
