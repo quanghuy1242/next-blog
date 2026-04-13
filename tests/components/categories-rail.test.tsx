@@ -48,10 +48,10 @@ describe('CategoriesRail component', () => {
     render(<CategoriesRail categories={[createCategory()]} />);
 
     expect(
-      screen.getByRole('button', { name: 'Scroll categories left' })
-    ).toBeInTheDocument();
+      screen.queryByRole('button', { name: 'Scroll categories left' })
+    ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Scroll categories right' })
-    ).toBeInTheDocument();
+      screen.queryByRole('button', { name: 'Scroll categories right' })
+    ).not.toBeInTheDocument();
   });
 });
