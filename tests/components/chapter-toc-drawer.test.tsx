@@ -44,4 +44,21 @@ describe('ChapterTocDrawer component', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  test('locks background scrolling while open', () => {
+    const onClose = vi.fn();
+    const { unmount } = render(
+      <ChapterTocDrawer isOpen={true} onClose={onClose}>
+        <div>Content</div>
+      </ChapterTocDrawer>
+    );
+
+    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.documentElement.style.overflow).toBe('hidden');
+
+    unmount();
+
+    expect(document.body.style.overflow).toBe('');
+    expect(document.documentElement.style.overflow).toBe('');
+  });
 });
