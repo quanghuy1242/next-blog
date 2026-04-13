@@ -29,6 +29,7 @@ export default function ChapterPage({
   homepage,
 }: ChapterPageProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const shouldRenderChapterTitle = book.origin !== 'epub-imported';
 
   const { previousChapter, nextChapter } = useMemo(() => {
     const currentIndex = chapters.findIndex(
@@ -77,7 +78,9 @@ export default function ChapterPage({
                       {book.title}
                     </Link>
                   </p>
-                  <h1 className="text-3xl font-bold leading-tight">{chapter.title}</h1>
+                  {shouldRenderChapterTitle ? (
+                    <h1 className="text-3xl font-bold leading-tight">{chapter.title}</h1>
+                  ) : null}
                 </div>
                 <button
                   type="button"
