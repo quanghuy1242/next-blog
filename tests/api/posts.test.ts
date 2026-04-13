@@ -4,6 +4,7 @@ import { createMocks } from 'node-mocks-http';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { getCategoryIdBySlug } from 'common/apis/categories';
 import { getPaginatedPosts } from 'common/apis/posts';
+import type { Post } from 'types/cms';
 
 vi.mock('common/apis/categories', () => ({
   getCategoryIdBySlug: vi.fn(),
@@ -16,9 +17,27 @@ vi.mock('common/apis/posts', () => ({
 const mockedGetCategoryIdBySlug = vi.mocked(getCategoryIdBySlug);
 const mockedGetPaginatedPosts = vi.mocked(getPaginatedPosts);
 
+function createPost(overrides: Partial<Post> = {}): Post {
+  return {
+    id: overrides.id ?? 1,
+    title: overrides.title ?? 'Test post',
+    slug: overrides.slug ?? 'test',
+    excerpt: overrides.excerpt ?? null,
+    content: overrides.content ?? null,
+    coverImage: overrides.coverImage ?? null,
+    author: overrides.author ?? null,
+    category: overrides.category ?? null,
+    tags: overrides.tags ?? null,
+    meta: overrides.meta ?? null,
+    _status: overrides._status ?? 'published',
+    updatedAt: overrides.updatedAt ?? '2024-01-01',
+    createdAt: overrides.createdAt ?? '2024-01-01',
+  };
+}
+
 function runHandler(
-  req: Partial<NextApiRequest>,
-  res?: Partial<NextApiResponse>
+  req: Parameters<typeof createMocks>[0],
+  res?: Parameters<typeof createMocks>[1]
 ) {
   const { req: request, res: response } = createMocks(req, res);
   return handler(
@@ -43,7 +62,7 @@ describe('GET /api/posts', () => {
   test('normalizes query params and returns paginated posts', async () => {
     mockedGetCategoryIdBySlug.mockResolvedValue(null);
     mockedGetPaginatedPosts.mockResolvedValue({
-      posts: [{ slug: 'test' }],
+      posts: [createPost()],
       hasMore: true,
     });
 
@@ -64,7 +83,7 @@ describe('GET /api/posts', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res._getJSONData()).toEqual({
-      posts: [{ slug: 'test' }],
+      posts: [createPost()],
       hasMore: true,
       nextOffset: 0 + 1,
     });
@@ -90,7 +109,7 @@ describe('GET /api/posts', () => {
   });
 
   test('returns server error when fetching posts fails', async () => {
-    mockedGetCategoryIdBySlug.mockResolvedValue('category-id');
+    mockedGetCategoryIdBySlug.mockResolvedValue(1);
     mockedGetPaginatedPosts.mockRejectedValue(new Error('Network error'));
 
     const { res } = await runHandler({

@@ -57,6 +57,14 @@ export interface PostMeta {
 }
 
 export type PostStatus = 'draft' | 'published';
+export type BookOrigin = 'manual' | 'epub-imported' | 'synced';
+export type BookSourceType =
+  | 'manual'
+  | 'epub-upload'
+  | 'meap-feed'
+  | 'external-sync';
+export type BookImportStatus = 'idle' | 'importing' | 'ready' | 'failed';
+export type BookSyncStatus = 'clean' | 'pending' | 'conflicted' | 'diverged';
 
 export interface Post {
   id: number;
@@ -69,6 +77,52 @@ export interface Post {
   category?: Category | null;
   tags?: PostTag[] | null;
   meta?: PostMeta | null;
+  _status?: PostStatus;
+  updatedAt?: string;
+  createdAt?: string;
+}
+
+// Book Types
+export interface Book {
+  id: number;
+  title: string;
+  author?: string | null;
+  slug: string;
+  cover?: Media | null;
+  origin: BookOrigin;
+  sourceType: BookSourceType;
+  sourceId?: string | null;
+  sourceHash?: string | null;
+  sourceVersion?: string | null;
+  syncStatus: BookSyncStatus;
+  importBatchId?: string | null;
+  importStatus: BookImportStatus;
+  importTotalChapters?: number | null;
+  importCompletedChapters?: number | null;
+  importStartedAt?: string | null;
+  importFinishedAt?: string | null;
+  importFailedAt?: string | null;
+  lastImportedAt?: string | null;
+  importErrorSummary?: string | null;
+  createdBy?: Author | number | null;
+  _status?: PostStatus;
+  updatedAt?: string;
+  createdAt?: string;
+}
+
+// Chapter Types
+export interface Chapter {
+  id: number;
+  title: string;
+  book: Book | number;
+  order: number;
+  slug: string;
+  chapterSourceKey?: string | null;
+  chapterSourceHash?: string | null;
+  importBatchId?: string | null;
+  manualEditedAt?: string | null;
+  content: SerializedEditorState;
+  createdBy?: Author | number | null;
   _status?: PostStatus;
   updatedAt?: string;
   createdAt?: string;
@@ -110,6 +164,7 @@ export interface SimilarPostsResult {
 export interface HomePageData {
   allPosts: Post[];
   allCategories: Category[];
+  featuredBook: Book | null;
   homepage: Homepage | null;
   author: Author | null;
 }
@@ -122,6 +177,25 @@ export interface AboutPageData {
 export interface PostSlugData {
   post: Post | null;
   morePosts: Post[];
+  homepage: Pick<Homepage, 'header'> | null;
+}
+
+export interface BooksPageData {
+  books: Book[];
+  homepage: Pick<Homepage, 'header'> | null;
+  hasMore: boolean;
+}
+
+export interface BookSlugData {
+  book: Book | null;
+  chapters: Chapter[];
+  homepage: Pick<Homepage, 'header'> | null;
+}
+
+export interface ChapterSlugData {
+  book: Book | null;
+  chapter: Chapter | null;
+  chapters: Chapter[];
   homepage: Pick<Homepage, 'header'> | null;
 }
 

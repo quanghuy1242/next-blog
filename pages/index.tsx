@@ -6,6 +6,8 @@ import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
 import { Banner } from 'components/pages/index/banner';
 import { Categories } from 'components/shared/categories';
+import { CategoriesRail } from 'components/shared/categories-rail';
+import { BooksCtaCard } from 'components/shared/books-cta-card';
 import { Posts } from 'components/shared/posts';
 import { Text } from 'components/shared/text';
 import { generateHomepageMetaTags } from 'common/utils/meta-tags';
@@ -25,6 +27,7 @@ interface HomePageProps {
   initialPosts: HomePageData['allPosts'];
   allCategories: HomePageData['allCategories'];
   homepage: HomePageData['homepage'];
+  featuredBook: HomePageData['featuredBook'];
   initialHasMore: boolean;
   initialCategory: string | null;
   initialTags: string[];
@@ -43,6 +46,7 @@ export default function Index({
   initialPosts,
   homepage,
   allCategories,
+  featuredBook,
   initialHasMore,
   initialCategory,
   initialTags,
@@ -112,53 +116,66 @@ export default function Index({
         imageBanner={homepage?.imageBanner || null}
         className="w-full"
       />
-      <Container className="flex flex-col md:flex-row md:px-20">
-        <div className="flex-grow md:w-2/3 md:mr-6">
-          <Text text="Latest Posts" />
-          <Posts
-            posts={postsState.posts}
-            hasMoreCol={false}
-            activeCategory={postsState.category}
-            activeTags={postsState.tags}
+      <Container className="md:px-20">
+        <div className="mb-4 md:hidden">
+          <Text text="Browse" />
+          <CategoriesRail
+            categories={allCategories}
+            booksMedia={featuredBook?.cover ?? null}
           />
-          {!isFetching && !error && postsState.posts.length === 0 && (
-            <p className="mt-6 text-center text-sm text-gray-500">
-              No posts found for this filter.
-            </p>
-          )}
-          <div ref={loaderRef} className="h-1 w-full" aria-hidden />
-          {isFetching && (
-            <div className="my-6 flex justify-center">
-              <span className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
-            </div>
-          )}
-          {error && (
-            <div className="mt-4 flex flex-col items-center text-center">
-              <p className="text-sm text-red-600">{error}</p>
-              <button
-                type="button"
-                onClick={() => {
-                  if (hasActiveFilters) {
-                    void refetchCurrentFilters();
-                  } else {
-                    void loadMorePosts();
-                  }
-                }}
-                className="mt-2 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:border-gray-400 hover:text-gray-900"
-              >
-                Try again
-              </button>
-            </div>
-          )}
-          {!postsState.hasMore && !isFetching && (
-            <p className="my-6 text-center text-sm text-gray-500">
-              You&apos;ve reached the end.
-            </p>
-          )}
         </div>
-        <div className="md:w-1/3">
-          <Text text="Categories" />
-          <Categories categories={allCategories} />
+
+        <div className="flex flex-col md:flex-row">
+          <div className="flex-grow md:w-2/3 md:mr-6">
+            <Text text="Latest Posts" />
+            <Posts
+              posts={postsState.posts}
+              hasMoreCol={false}
+              activeCategory={postsState.category}
+              activeTags={postsState.tags}
+            />
+            {!isFetching && !error && postsState.posts.length === 0 && (
+              <p className="mt-6 text-center text-sm text-gray-500">
+                No posts found for this filter.
+              </p>
+            )}
+            <div ref={loaderRef} className="h-1 w-full" aria-hidden />
+            {isFetching && (
+              <div className="my-6 flex justify-center">
+                <span className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
+              </div>
+            )}
+            {error && (
+              <div className="mt-4 flex flex-col items-center text-center">
+                <p className="text-sm text-red-600">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (hasActiveFilters) {
+                      void refetchCurrentFilters();
+                    } else {
+                      void loadMorePosts();
+                    }
+                  }}
+                  className="mt-2 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:border-gray-400 hover:text-gray-900"
+                >
+                  Try again
+                </button>
+              </div>
+            )}
+            {!postsState.hasMore && !isFetching && (
+              <p className="my-6 text-center text-sm text-gray-500">
+                You&apos;ve reached the end.
+              </p>
+            )}
+          </div>
+
+          <div className="hidden md:block md:w-1/3">
+            <Text text="Books" />
+            <BooksCtaCard media={featuredBook?.cover ?? null} />
+            <Text text="Categories" />
+            <Categories categories={allCategories} />
+          </div>
         </div>
       </Container>
     </Layout>
@@ -197,6 +214,7 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (
     props: {
       initialPosts,
       allCategories: data.allCategories ?? [],
+      featuredBook: data.featuredBook ?? null,
       homepage: data.homepage ?? null,
       initialHasMore,
       initialCategory,

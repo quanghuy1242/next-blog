@@ -1,0 +1,109 @@
+import React from 'react';
+import { useEffect } from 'react';
+import type { GetServerSideProps } from 'next';
+import Head from 'next/head';
+import { getDataForBooksPage } from 'common/apis/books';
+import { Container } from 'components/core/container';
+import { Layout } from 'components/core/layout';
+import { renderMetaTags } from 'components/core/metadata';
+import { BooksGrid } from 'components/shared/books-grid';
+import { Text } from 'components/shared/text';
+import { generateMetaTags } from 'common/utils/meta-tags';
+import { useBooksFeed } from 'hooks/useBooksFeed';
+import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
+import type { Book, Homepage } from 'types/cms';
+
+const BOOKS_PAGE_SIZE = 6;
+
+interface BooksPageProps {
+  initialBooks: Book[];
+  initialHasMore: boolean;
+  homepage: Pick<Homepage, 'header'> | null;
+}
+
+export default function BooksPage({
+  initialBooks,
+  initialHasMore,
+  homepage,
+}: BooksPageProps) {
+  const metaTags = generateMetaTags({
+    title: 'Books',
+    description: 'Browse the bookshelf and continue reading chapter by chapter.',
+  });
+
+  const { booksState, isFetching, error, loadMoreBooks, retryLoadMore } =
+    useBooksFeed({
+      initialBooks,
+      initialHasMore,
+      pageSize: BOOKS_PAGE_SIZE,
+    });
+
+  const { ref: loaderRef, isIntersecting } =
+    useIntersectionObserver<HTMLDivElement>({
+      rootMargin: '200px 0px',
+      enabled: booksState.hasMore,
+    });
+
+  useEffect(() => {
+    if (isIntersecting && booksState.hasMore) {
+      void loadMoreBooks();
+    }
+  }, [booksState.hasMore, isIntersecting, loadMoreBooks]);
+
+  return (
+    <Layout header={homepage?.header} className="flex flex-col items-center">
+      <Head>{renderMetaTags(metaTags)}</Head>
+      <Container className="my-4 w-full md:px-20">
+        <div className="mx-auto w-full md:w-2/3">
+          <Text text="Books" />
+          <BooksGrid books={booksState.books} />
+
+          {!isFetching && !error && booksState.books.length === 0 && (
+            <p className="mt-6 text-center text-sm text-gray-500">No books found.</p>
+          )}
+
+          <div ref={loaderRef} className="h-1 w-full" aria-hidden />
+
+          {isFetching && (
+            <div className="my-6 flex justify-center">
+              <span className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
+            </div>
+          )}
+
+          {error && (
+            <div className="mt-4 flex flex-col items-center text-center">
+              <p className="text-sm text-red-600">{error}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  void retryLoadMore();
+                }}
+                className="mt-2 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:border-gray-400 hover:text-gray-900"
+              >
+                Try again
+              </button>
+            </div>
+          )}
+
+          {!booksState.hasMore && !isFetching && booksState.books.length > 0 && (
+            <p className="my-6 text-center text-sm text-gray-500">
+              You&apos;ve reached the end.
+            </p>
+          )}
+        </div>
+      </Container>
+    </Layout>
+  );
+}
+
+export const getServerSideProps: GetServerSideProps<BooksPageProps> = async () => {
+  const data = await getDataForBooksPage(BOOKS_PAGE_SIZE);
+
+  return {
+    props: {
+      initialBooks: data.books,
+      initialHasMore: data.hasMore,
+      homepage: data.homepage,
+    },
+  };
+};

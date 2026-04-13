@@ -3,11 +3,13 @@ import type {
   HomePageData,
   Post,
   Category,
+  Book,
   Author,
   Homepage,
 } from '../../types/cms';
 import { fetchAPI } from './base';
 import { createPostsWhere } from './posts';
+import { createBooksWhere } from './books';
 
 const DEFAULT_HOME_POST_LIMIT = 5;
 const HOME_DATA_REVALIDATE_SECONDS = 60;
@@ -35,6 +37,9 @@ interface HomePageResponse {
     docs: Post[];
     hasNextPage: boolean;
   };
+  Books: {
+    docs: Book[];
+  };
   Categories: {
     docs: Category[];
   };
@@ -48,11 +53,12 @@ async function fetchHomeData({
   tags,
 }: NormalizedHomeOptions): Promise<GetDataForHomeResult> {
   const where = createPostsWhere(categoryId, tags);
+  const booksWhere = createBooksWhere();
   const queryLimit = limit + 1;
 
   const data = await fetchAPI<HomePageResponse>(
     `#graphql
-      query HomePage($limit: Int!, $where: Post_where, $authorId: Int!) {
+      query HomePage($limit: Int!, $where: Post_where, $booksWhere: Book_where, $authorId: Int!) {
         Posts(limit: $limit, where: $where, sort: "-createdAt") {
           docs {
             id
@@ -93,6 +99,43 @@ async function fetchHomeData({
             }
           }
           hasNextPage
+        }
+
+        Books(limit: 1, where: $booksWhere, sort: "-updatedAt") {
+          docs {
+            id
+            title
+            author
+            slug
+            cover {
+              id
+              url
+              optimizedUrl
+              thumbnailURL
+              lowResUrl
+              alt
+              width
+              height
+            }
+            origin
+            sourceType
+            sourceId
+            sourceHash
+            sourceVersion
+            syncStatus
+            importBatchId
+            importStatus
+            importTotalChapters
+            importCompletedChapters
+            importStartedAt
+            importFinishedAt
+            importFailedAt
+            lastImportedAt
+            importErrorSummary
+            updatedAt
+            createdAt
+            _status
+          }
         }
         
         Categories(limit: 5, sort: "-updatedAt") {
@@ -155,6 +198,7 @@ async function fetchHomeData({
       variables: {
         limit: Math.max(queryLimit, 1),
         where,
+        booksWhere,
         authorId: AUTHOR_ID,
       },
       next: { revalidate: HOME_DATA_REVALIDATE_SECONDS },
@@ -170,6 +214,7 @@ async function fetchHomeData({
     data: {
       allPosts: trimmedPosts,
       allCategories: data?.Categories?.docs ?? [],
+      featuredBook: data?.Books?.docs?.[0] ?? null,
       homepage: data?.Homepage ?? null,
       author: data?.User ?? null,
     },
