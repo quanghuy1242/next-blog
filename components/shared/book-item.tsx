@@ -9,7 +9,7 @@ interface BookItemProps {
 
 export function BookItem({ book }: BookItemProps) {
   return (
-    <article className="flex w-44 flex-none flex-col gap-2 sm:w-48">
+    <article className="flex w-40 flex-none flex-col gap-2 sm:w-48">
       <BookCover
         media={book.cover}
         title={book.title}

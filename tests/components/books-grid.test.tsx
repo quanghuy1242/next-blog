@@ -52,8 +52,9 @@ describe('BooksGrid component', () => {
     expect(container.firstChild).toHaveClass(
       'flex',
       'flex-wrap',
-      'justify-center',
-      'gap-8'
+      'justify-start',
+      'gap-4',
+      'sm:gap-8'
     );
     expect(screen.getByText('Sample Book')).toBeInTheDocument();
     expect(screen.getByText('Second Book')).toBeInTheDocument();

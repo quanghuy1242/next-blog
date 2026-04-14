@@ -48,7 +48,7 @@ describe('BookItem component', () => {
     expect(bookLinks).toHaveLength(2);
     expect(bookLinks[0]).toHaveAttribute('href', '/books/sample-book');
     expect(bookLinks[1]).toHaveAttribute('href', '/books/sample-book');
-    expect(item).toHaveClass('w-44');
+    expect(item).toHaveClass('w-40');
     expect(item).toHaveClass('sm:w-48');
     expect(screen.getByText('Author')).toBeInTheDocument();
     expect(screen.getByAltText('Cover image for Sample Book')).toBeInTheDocument();

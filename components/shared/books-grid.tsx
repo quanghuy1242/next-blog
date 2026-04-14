@@ -8,7 +8,7 @@ interface BooksGridProps {
 
 export function BooksGrid({ books }: BooksGridProps) {
   return (
-    <div className="flex flex-wrap justify-center gap-8">
+    <div className="flex flex-wrap justify-start gap-4 sm:gap-8">
       {books.map((book) => (
         <BookItem key={book.slug} book={book} />
       ))}
