@@ -43,10 +43,13 @@ describe('BookItem component', () => {
     render(<BookItem book={createBook()} />);
 
     const bookLinks = screen.getAllByRole('link', { name: /Sample Book/i });
+    const item = screen.getByText('Sample Book').closest('article');
 
     expect(bookLinks).toHaveLength(2);
     expect(bookLinks[0]).toHaveAttribute('href', '/books/sample-book');
     expect(bookLinks[1]).toHaveAttribute('href', '/books/sample-book');
+    expect(item).toHaveClass('w-44');
+    expect(item).toHaveClass('sm:w-48');
     expect(screen.getByText('Author')).toBeInTheDocument();
     expect(screen.getByAltText('Cover image for Sample Book')).toBeInTheDocument();
     expect(screen.queryByText('manual')).not.toBeInTheDocument();
