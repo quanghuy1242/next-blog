@@ -41,7 +41,7 @@ describe('fetchAPIWithAuthToken', () => {
     );
   });
 
-  test('uses the JWT token when one is provided', async () => {
+  test('uses the bearer token when one is provided', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ data: { ok: true } }),
@@ -61,7 +61,7 @@ describe('fetchAPIWithAuthToken', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'JWT token-123',
+          Authorization: 'Bearer token-123',
         },
         body: JSON.stringify({
           query: 'query Test { ok }',
