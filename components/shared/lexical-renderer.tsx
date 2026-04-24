@@ -45,7 +45,7 @@ const CustomUploadComponent: React.FC<{
 }> = ({ node }) => {
   if (node.relationTo === 'media') {
     const uploadDoc = node.value;
-    if (typeof uploadDoc !== 'object') {
+    if (!uploadDoc || typeof uploadDoc !== 'object') {
       return null;
     }
 
