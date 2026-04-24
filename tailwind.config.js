@@ -1,8 +1,10 @@
 module.exports = {
-  purge: [
+  content: [
+    './app/**/*.{js,jsx,ts,tsx}',
     './pages/**/*.{js,jsx,ts,tsx}',
     './components/**/*.{js,jsx,ts,tsx}',
     './common/**/*.{js,jsx,ts,tsx}',
+    './hooks/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
     extend: {
@@ -43,7 +45,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    // Tailwind typography disabled - using custom Lexical styles
-  ],
+  plugins: [],
 };

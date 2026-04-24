@@ -5,7 +5,11 @@ import type { PostTag, NormalizedTags } from 'types/cms';
  * Supports PostTag objects, comma-delimited strings and arrays, returning a trimmed list.
  */
 export function normalizePostTags(
-  tags: PostTag[] | string[] | string | null | undefined
+  tags:
+    | Array<PostTag | string | null | undefined>
+    | string
+    | null
+    | undefined
 ): string[] {
   if (!tags) {
     return [];
@@ -51,7 +55,11 @@ function splitTags(tags: string): string[] {
  * Normalize tags from PayloadCMS PostTag[] format to string[]
  */
 export function normalizeTags(
-  tags: PostTag[] | string[] | string | null | undefined
+  tags:
+    | Array<PostTag | string | null | undefined>
+    | string
+    | null
+    | undefined
 ): NormalizedTags {
   return normalizePostTags(tags);
 }

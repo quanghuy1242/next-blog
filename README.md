@@ -10,10 +10,10 @@ This repository contains a personal blog built with Next.js and PayloadCMS. The 
 ## Tech stack
 
 - Next.js (app uses pages directory)
-- React 18
+- React 19
 - TypeScript
-- Tailwind CSS for styling (with `@tailwindcss/typography`)
-- PostCSS (with `postcss-preset-env` and `autoprefixer`)
+- Tailwind CSS v4 for styling (via `@tailwindcss/postcss`)
+- PostCSS (Tailwind v4 plugin only)
 - PayloadCMS (GraphQL API)
 - Cloudflare R2 for image storage and transformation
 - Lexical JSON for rich text content
@@ -22,11 +22,11 @@ This repository contains a personal blog built with Next.js and PayloadCMS. The 
 
 All scripts are defined in `package.json`:
 
-- `yarn dev` — start development server (next)
-- `yarn build` — build production assets (next build)
-- `yarn start` — run the production server (next start)
-- `yarn lint` — run Next.js/Eslint checks
-- `yarn test` — run test suite with Vitest
+- `pnpm dev` — start development server (next dev)
+- `pnpm build` — build production assets (next build)
+- `pnpm start` — run the production server (next start)
+- `pnpm lint` — run ESLint and TypeScript checks
+- `pnpm test` — run test suite with Vitest
 
 ## Environment variables
 
@@ -63,21 +63,20 @@ See `.env.local.example` for a template.
 
 - Content is fetched from PayloadCMS GraphQL API with ISR (Incremental Static Regeneration).
 - Images are stored in Cloudflare R2 and transformed on-the-fly using URL parameters.
-- Rich text content is stored in Lexical JSON format (temporary raw display, will be rendered in Phase 9).
-- Tailwind typography plugin provides styling for rich text content.
+- Rich text content is rendered with a custom Lexical renderer and local CSS styles.
 - All posts are filtered by author (ID=1, quanghuy1242) and published status.
 
 ## TypeScript & linting
 
 - TypeScript is configured via `tsconfig.json` with strict settings enabled.
-- ESLint is configured through `eslint-config-next` and can be run with `npm run lint`.
+- ESLint is configured through `eslint-config-next` and can be run with `pnpm lint`.
 
 ## Development
 
 1. Install dependencies:
 
 ```bash
-yarn install
+pnpm install
 ```
 
 2. Configure environment variables:
@@ -90,7 +89,7 @@ cp .env.local.example .env.local
 3. Start the dev server:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 Open http://localhost:3000
@@ -100,13 +99,13 @@ Open http://localhost:3000
 Run the test suite:
 
 ```bash
-yarn test
+pnpm test
 ```
 
 Run tests in watch mode:
 
 ```bash
-yarn test:watch
+pnpm test:watch
 ```
 
 ## Building & production
@@ -114,13 +113,13 @@ yarn test:watch
 Build the app:
 
 ```bash
-npm run build
+pnpm build
 ```
 
 Start the production server locally:
 
 ```bash
-npm run start
+pnpm start
 ```
 
 ## Deployment

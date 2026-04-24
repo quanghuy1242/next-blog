@@ -13,7 +13,6 @@ interface UseHomePostsParams {
   initialTags?: string[];
   routerReady: boolean;
   homePosts: HomePostsState | null;
-  // eslint-disable-next-line no-unused-vars
   setHomePosts: (value: HomePostsState | null) => void;
   fetchImplementation?: typeof fetch;
 }

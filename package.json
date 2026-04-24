@@ -1,50 +1,44 @@
 {
   "name": "next-blog-payloadcms",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.33.2",
   "scripts": {
-    "lint": "next lint",
+    "lint": "eslint && tsc --noEmit",
     "test": "vitest run",
     "test:ci": "cross-env NODE_ENV=test vitest run",
     "test:watch": "vitest",
-    "prebuild": "yarn lint && yarn test:ci",
-    "dev": "next",
+    "prebuild": "pnpm lint && pnpm test:ci",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "@payloadcms/richtext-lexical": "^3.61.0",
-    "@tailwindcss/typography": "^0.4.1",
+    "@payloadcms/richtext-lexical": "^3.84.1",
     "classnames": "^2.5.1",
-    "date-fns": "^3.0.0",
+    "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
-    "next": "15.5.9",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "next": "16.2.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
-    "@fullhuman/postcss-purgecss": "^2.3.0",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.1.0",
-    "@types/node": "^22.7.6",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "autoprefixer": "^10.4.20",
-    "cross-env": "^7.0.3",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^15.5.6",
-    "jsdom": "^26.0.0",
-    "node-mocks-http": "^1.13.0",
+    "@tailwindcss/postcss": "^4.2.4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.4",
+    "jsdom": "^29.0.2",
+    "node-mocks-http": "^1.17.2",
     "postcss": "^8.4.45",
-    "postcss-preset-env": "^6.7.0",
-    "tailwindcss": "^2.2.7",
-    "typescript": "^5.6.3",
-    "vitest": "^2.1.4"
-  },
-  "browserslist": [
-    "chrome >= 91",
-    "firefox >= 90",
-    "safari >= 14",
-    "edge >= 91"
-  ]
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
+  }
 }

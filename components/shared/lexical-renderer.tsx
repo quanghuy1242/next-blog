@@ -88,7 +88,12 @@ const CustomUploadComponent: React.FC<{
  * Custom CodeBlock component for rendering code blocks from PayloadCMS
  */
 const CustomCodeBlock: React.FC<{
-  node: any;
+  node: {
+    fields?: {
+      code?: string;
+      language?: string;
+    };
+  };
 }> = ({ node }) => {
   const { code, language } = node?.fields || {};
 
@@ -247,7 +252,9 @@ const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   blocks: {
     ...defaultConverters.blocks,
     // Handle CodeBlock from BlocksFeature (blockType: "Code")
-    Code: ({ node }) => <CustomCodeBlock node={node} />,
+    Code: ({ node }: { node: { fields?: { code?: string; language?: string } } }) => (
+      <CustomCodeBlock node={node} />
+    ),
   },
 });
 

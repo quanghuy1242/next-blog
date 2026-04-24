@@ -51,7 +51,7 @@ export interface UseIntersectionObserverResult<
   /**
    * Ref to attach to the element you want to observe
    */
-  ref: React.RefObject<T>;
+  ref: React.RefObject<T | null>;
 
   /**
    * Whether the element is currently intersecting

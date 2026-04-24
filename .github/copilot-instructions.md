@@ -68,7 +68,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 This project follows a **utilities-first architecture** where cross-cutting concerns are centralized in reusable modules rather than scattered throughout the codebase. Every implementation should prioritize reuse, extension, and maintainability.
 
-This project use yarn
+This project uses pnpm.
 
 ---
 

@@ -1,8 +1,5 @@
-/* purgecss start ignore */
-@tailwind base;
-@tailwind components;
-/* purgecss end ignore */
-@tailwind utilities;
+@config "../tailwind.config.js";
+@import "tailwindcss";
 
 /* Lexical rendered content styles - match PayloadCMS admin editor */
 .lexical-content {

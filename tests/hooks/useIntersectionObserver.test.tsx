@@ -48,7 +48,7 @@ describe('useIntersectionObserver', () => {
     );
 
     // Type assertion to verify the ref type is correct
-    const _ref: React.RefObject<HTMLDivElement> = result.current.ref;
+    const _ref: React.RefObject<HTMLDivElement | null> = result.current.ref;
 
     expect(_ref).toBeDefined();
   });
