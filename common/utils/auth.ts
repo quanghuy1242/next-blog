@@ -4,9 +4,9 @@ export const PAYLOAD_ADMIN_TOKEN_COOKIE = 'payload-token' as const
 
 const TOKEN_SCHEME_PREFIXES = ['bearer ', 'jwt '] as const
 const AUTH_TOKEN_COOKIE_CANDIDATES = [
-  BETTER_AUTH_TOKEN_COOKIE,
   PAYLOAD_BETTER_AUTH_TOKEN_COOKIE,
   PAYLOAD_ADMIN_TOKEN_COOKIE,
+  BETTER_AUTH_TOKEN_COOKIE,
 ] as const
 
 type RequestWithAuth = {
