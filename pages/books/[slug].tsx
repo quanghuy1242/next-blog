@@ -5,6 +5,7 @@ import { getBookBySlug } from 'common/apis/books';
 import { getChaptersByBookId } from 'common/apis/chapters';
 import { getCoverImageUrl } from 'common/utils/image';
 import { generateMetaTags } from 'common/utils/meta-tags';
+import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
@@ -47,8 +48,9 @@ export default function BookDetailPage({
 
 export const getServerSideProps: GetServerSideProps<
   BookDetailPageProps
-> = async ({ params }) => {
+> = async ({ params, req }) => {
   const slugParam = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug;
+  const sessionToken = getBetterAuthTokenFromRequest(req);
 
   if (!slugParam) {
     return {
@@ -56,7 +58,11 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const { book, homepage } = await getBookBySlug(slugParam);
+  const accessibleResult = await getBookBySlug(slugParam, {
+    authToken: sessionToken,
+  });
+
+  const { book, homepage } = accessibleResult;
 
   if (!book) {
     return {
@@ -64,7 +70,9 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const chapters = await getChaptersByBookId(book.id);
+  const chapters = await getChaptersByBookId(book.id, {
+    authToken: sessionToken,
+  });
 
   return {
     props: {

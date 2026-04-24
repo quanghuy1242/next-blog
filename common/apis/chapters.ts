@@ -1,5 +1,5 @@
 import type { Chapter } from 'types/cms';
-import { fetchAPI } from './base';
+import { fetchAPIWithAuthToken } from './base';
 
 interface ChaptersResponse {
   Chapters: {
@@ -14,6 +14,10 @@ interface ChapterReaderResponse {
   ChaptersByBook: {
     docs: Chapter[];
   };
+}
+
+interface ChapterFetchOptions {
+  authToken?: string | null;
 }
 
 const CHAPTER_FIELDS = `
@@ -41,8 +45,11 @@ const CHAPTER_TOC_FIELDS = `
   _status
 `;
 
-export async function getChaptersByBookId(bookID: number): Promise<Chapter[]> {
-  const data = await fetchAPI<ChaptersResponse>(
+export async function getChaptersByBookId(
+  bookID: number,
+  options: ChapterFetchOptions = {}
+): Promise<Chapter[]> {
+  const data = await fetchAPIWithAuthToken<ChaptersResponse>(
     `#graphql
       query ChaptersByBook($bookID: JSON!) {
         Chapters(
@@ -65,6 +72,7 @@ export async function getChaptersByBookId(bookID: number): Promise<Chapter[]> {
       variables: {
         bookID,
       },
+      authToken: options.authToken,
     }
   );
 
@@ -73,7 +81,8 @@ export async function getChaptersByBookId(bookID: number): Promise<Chapter[]> {
 
 export async function getChapterByBookAndSlug(
   bookID: number,
-  chapterSlug: string
+  chapterSlug: string,
+  options: ChapterFetchOptions = {}
 ): Promise<{ chapter: Chapter | null; chapters: Chapter[] }> {
   const trimmedSlug = chapterSlug.trim();
 
@@ -84,7 +93,7 @@ export async function getChapterByBookAndSlug(
     };
   }
 
-  const data = await fetchAPI<ChapterReaderResponse>(
+  const data = await fetchAPIWithAuthToken<ChapterReaderResponse>(
     `#graphql
       query ChapterByBookAndSlug($bookID: JSON!, $chapterSlug: String!) {
         ChapterMatch: Chapters(
@@ -123,6 +132,7 @@ export async function getChapterByBookAndSlug(
         bookID,
         chapterSlug: trimmedSlug,
       },
+      authToken: options.authToken,
     }
   );
 

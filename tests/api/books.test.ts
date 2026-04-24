@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { createMocks } from 'node-mocks-http';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { getPaginatedBooks } from 'common/apis/books';
+import { BETTER_AUTH_TOKEN_COOKIE } from 'common/utils/auth';
 
 vi.mock('common/apis/books', () => ({
   getPaginatedBooks: vi.fn(),
@@ -51,6 +52,8 @@ describe('GET /api/books', () => {
     expect(mockedGetPaginatedBooks).toHaveBeenCalledWith({
       limit: 50,
       skip: 0,
+    }, {
+      authToken: null,
     });
 
     expect(res.statusCode).toBe(200);
@@ -58,6 +61,27 @@ describe('GET /api/books', () => {
       books: [{ slug: 'book-1' }],
       hasMore: true,
       nextOffset: 1,
+    });
+  });
+
+  test('forwards the session token to Payload', async () => {
+    mockedGetPaginatedBooks.mockResolvedValue({
+      books: [],
+      hasMore: false,
+    });
+
+    await runHandler({
+      method: 'GET',
+      cookies: {
+        [BETTER_AUTH_TOKEN_COOKIE]: 'token-123',
+      },
+    });
+
+    expect(mockedGetPaginatedBooks).toHaveBeenCalledWith({
+      limit: 6,
+      skip: 0,
+    }, {
+      authToken: 'token-123',
     });
   });
 

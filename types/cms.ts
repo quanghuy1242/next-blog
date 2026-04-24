@@ -88,6 +88,7 @@ export interface Book {
   title: string;
   author?: string | null;
   slug: string;
+  visibility?: 'public' | 'private';
   cover?: Media | null;
   origin: BookOrigin;
   sourceType: BookSourceType;

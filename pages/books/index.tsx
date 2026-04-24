@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { getDataForBooksPage } from 'common/apis/books';
+import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
@@ -96,8 +97,11 @@ export default function BooksPage({
   );
 }
 
-export const getServerSideProps: GetServerSideProps<BooksPageProps> = async () => {
-  const data = await getDataForBooksPage(BOOKS_PAGE_SIZE);
+export const getServerSideProps: GetServerSideProps<BooksPageProps> = async ({ req }) => {
+  const sessionToken = getBetterAuthTokenFromRequest(req);
+  const data = await getDataForBooksPage(BOOKS_PAGE_SIZE, {
+    authToken: sessionToken,
+  });
 
   return {
     props: {

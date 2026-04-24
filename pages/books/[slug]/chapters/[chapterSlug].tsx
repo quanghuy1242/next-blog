@@ -7,6 +7,7 @@ import { getBookBySlug } from 'common/apis/books';
 import { getChapterByBookAndSlug } from 'common/apis/chapters';
 import { getCoverImageUrl } from 'common/utils/image';
 import { generateMetaTags } from 'common/utils/meta-tags';
+import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
@@ -143,11 +144,13 @@ export default function ChapterPage({
 
 export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
   params,
+  req,
 }) => {
   const bookSlug = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug;
   const chapterSlug = Array.isArray(params?.chapterSlug)
     ? params?.chapterSlug[0]
     : params?.chapterSlug;
+  const sessionToken = getBetterAuthTokenFromRequest(req);
 
   if (!bookSlug || !chapterSlug) {
     return {
@@ -155,7 +158,11 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
     };
   }
 
-  const { book, homepage } = await getBookBySlug(bookSlug);
+  const accessibleResult = await getBookBySlug(bookSlug, {
+    authToken: sessionToken,
+  });
+
+  let { book, homepage } = accessibleResult;
 
   if (!book) {
     return {
@@ -163,7 +170,9 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
     };
   }
 
-  const chapterData = await getChapterByBookAndSlug(book.id, chapterSlug);
+  const chapterData = await getChapterByBookAndSlug(book.id, chapterSlug, {
+    authToken: sessionToken,
+  });
 
   if (!chapterData.chapter) {
     return {

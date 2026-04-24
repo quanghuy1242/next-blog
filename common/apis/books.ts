@@ -4,7 +4,7 @@ import type {
   Homepage,
   PaginatedResponse,
 } from 'types/cms';
-import { fetchAPI } from './base';
+import { fetchAPIWithAuthToken } from './base';
 
 const AUTHOR_ID = 1; // quanghuy1242
 const DEFAULT_BOOKS_LIMIT = 6;
@@ -25,11 +25,16 @@ interface BookBySlugResponse {
   Homepage: Pick<Homepage, 'header'> | null;
 }
 
+interface BookFetchOptions {
+  authToken?: string | null;
+}
+
 const BOOK_FIELDS = `
   id
   title
   author
   slug
+  visibility
   cover {
     id
     url
@@ -87,14 +92,14 @@ export function createBooksWhere(): Record<string, unknown> {
   };
 }
 
-export async function getPaginatedBooks({
-  limit,
-  skip,
-}: PaginatedBooksParams): Promise<PaginatedBooksResult> {
+export async function getPaginatedBooks(
+  { limit, skip }: PaginatedBooksParams,
+  options: BookFetchOptions = {}
+): Promise<PaginatedBooksResult> {
   const safeLimit = Math.max(1, limit);
   const page = Math.floor(skip / safeLimit) + 1;
 
-  const data = await fetchAPI<BooksResponse>(
+  const data = await fetchAPIWithAuthToken<BooksResponse>(
     `#graphql
       query PaginatedBooks($limit: Int!, $page: Int!, $where: Book_where) {
         Books(limit: $limit, page: $page, where: $where, sort: "-updatedAt") {
@@ -116,6 +121,7 @@ export async function getPaginatedBooks({
         page,
         where: createBooksWhere(),
       },
+      authToken: options.authToken,
     }
   );
 
@@ -126,11 +132,12 @@ export async function getPaginatedBooks({
 }
 
 export async function getDataForBooksPage(
-  limit = DEFAULT_BOOKS_LIMIT
+  limit = DEFAULT_BOOKS_LIMIT,
+  options: BookFetchOptions = {}
 ): Promise<BooksPageData> {
   const safeLimit = Math.max(1, limit);
 
-  const data = await fetchAPI<BooksPageResponse>(
+  const data = await fetchAPIWithAuthToken<BooksPageResponse>(
     `#graphql
       query BooksPage($limit: Int!, $where: Book_where) {
         Books(limit: $limit, page: 1, where: $where, sort: "-updatedAt") {
@@ -155,6 +162,7 @@ export async function getDataForBooksPage(
         limit: safeLimit,
         where: createBooksWhere(),
       },
+      authToken: options.authToken,
     }
   );
 
@@ -166,7 +174,8 @@ export async function getDataForBooksPage(
 }
 
 export async function getBookBySlug(
-  slug: string
+  slug: string,
+  options: BookFetchOptions = {}
 ): Promise<{ book: Book | null; homepage: Pick<Homepage, 'header'> | null }> {
   const trimmedSlug = slug.trim();
 
@@ -177,7 +186,7 @@ export async function getBookBySlug(
     };
   }
 
-  const data = await fetchAPI<BookBySlugResponse>(
+  const data = await fetchAPIWithAuthToken<BookBySlugResponse>(
     `#graphql
       query BookBySlug($slug: String!) {
         Books(
@@ -203,6 +212,7 @@ export async function getBookBySlug(
       variables: {
         slug: trimmedSlug,
       },
+      authToken: options.authToken,
     }
   );
 

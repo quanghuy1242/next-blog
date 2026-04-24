@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPaginatedBooks } from 'common/apis/books';
+import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
 import { normalizeLimit, normalizeOffset } from 'common/utils/number';
 
 const DEFAULT_LIMIT = 6;
@@ -17,11 +18,14 @@ export default async function handler(
 
   const limit = normalizeLimit(req.query.limit, DEFAULT_LIMIT, MAX_LIMIT);
   const offset = normalizeOffset(req.query.offset);
+  const sessionToken = getBetterAuthTokenFromRequest(req);
 
   try {
     const { books, hasMore } = await getPaginatedBooks({
       limit,
       skip: offset,
+    }, {
+      authToken: sessionToken,
     });
 
     res.status(200).json({

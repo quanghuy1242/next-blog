@@ -6,6 +6,8 @@ const API_URL = PAYLOAD_BASE_URL ? `${PAYLOAD_BASE_URL}/api/graphql` : '';
 
 export interface FetchApiOptions {
   variables?: Record<string, unknown>;
+  authToken?: string | null;
+  useApiKey?: boolean;
   next?: {
     revalidate?: number;
     tags?: string[];
@@ -22,14 +24,14 @@ interface PayloadCMSResponse<TData> {
  */
 export async function fetchAPI<TData>(
   query: string,
-  { variables, next }: FetchApiOptions = {}
+  { variables, authToken, useApiKey = true, next }: FetchApiOptions = {}
 ): Promise<TData> {
   if (!PAYLOAD_BASE_URL) {
     console.warn('PAYLOAD_BASE_URL is not set. Returning empty response.');
     return {} as TData;
   }
 
-  if (!PAYLOAD_API_KEY) {
+  if (useApiKey && !PAYLOAD_API_KEY) {
     console.warn('PAYLOAD_API_KEY is not set. Authentication may fail.');
   }
 
@@ -37,8 +39,9 @@ export async function fetchAPI<TData>(
     'Content-Type': 'application/json',
   };
 
-  // Add API key authentication
-  if (PAYLOAD_API_KEY) {
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`;
+  } else if (useApiKey && PAYLOAD_API_KEY) {
     headers['Authorization'] = `users API-Key ${PAYLOAD_API_KEY}`;
   }
 
@@ -64,4 +67,16 @@ export async function fetchAPI<TData>(
   }
 
   return json.data;
+}
+
+export async function fetchAPIWithAuthToken<TData>(
+  query: string,
+  { variables, authToken, next }: Omit<FetchApiOptions, 'useApiKey'> = {}
+): Promise<TData> {
+  return fetchAPI<TData>(query, {
+    variables,
+    authToken,
+    useApiKey: false,
+    next,
+  });
 }
