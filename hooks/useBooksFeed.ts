@@ -64,7 +64,9 @@ export function useBooksFeed({
     setError(null);
 
     try {
-      const response = await fetchFn(`/api/books?${params.toString()}`);
+      const response = await fetchFn(`/api/books?${params.toString()}`, {
+        credentials: 'include',
+      });
 
       if (!response.ok) {
         throw new Error(`Request failed with status ${response.status}`);

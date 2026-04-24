@@ -82,7 +82,9 @@ describe('useBooksFeed', () => {
     });
 
     expect(result.current.booksState.hasMore).toBe(false);
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('offset=1'));
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('offset=1'), {
+      credentials: 'include',
+    });
   });
 
   test('sets error when load fails', async () => {

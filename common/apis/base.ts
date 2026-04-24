@@ -40,7 +40,7 @@ export async function fetchAPI<TData>(
   };
 
   if (authToken) {
-    headers.Authorization = `Bearer ${authToken}`;
+    headers.Authorization = `JWT ${authToken}`;
   } else if (useApiKey && PAYLOAD_API_KEY) {
     headers['Authorization'] = `users API-Key ${PAYLOAD_API_KEY}`;
   }
