@@ -162,6 +162,14 @@ If the token changes often but the visible content does not, caching by token de
 
 If the content truly differs per user, then the route is not a good candidate for shared cache. In that case the best optimization is to cache only the public parts and keep the private part request-time.
 
+There is an important repo-specific caveat here. The current books and chapter routes pass the raw auth token straight through to the Payload fetch layer. That means this plan cannot assume `anonymous` and `authenticated` are already safe cache buckets. The first implementation step has to characterize the actual response variance:
+
+- if authenticated users all see the same published content, then a shared `authenticated` bucket is reasonable
+- if different roles see different content, then the bucket has to match that role boundary
+- if the response is materially user-specific, bypass shared cache for authenticated requests and start with anonymous-only caching
+
+Until that characterization is done, "cache by audience" is a target design, not a fact about the current system.
+
 ## 8. Request Flow for SSR Routes
 
 For a books or chapters request, the Worker should follow this logic:
@@ -186,11 +194,27 @@ Recommended semantics:
 
 This gives predictable behavior under load and during upstream failures.
 
+For this repository, the safest first rollout is narrower than the full target flow:
+
+1. cache anonymous requests only
+2. bypass shared cache for authenticated requests
+3. compare authenticated responses and define stable audience buckets
+4. widen the cache key space only after the response shape is understood
+
+That sequencing is stricter, but it avoids inventing a cache taxonomy that the application has not yet earned.
+
 ## 9. Refresh Path and Queue Behavior
 
 The queue is the right place for refresh work that should be reliable.
 
 `ctx.waitUntil()` is useful for opportunistic background work after a response has already been sent, but it is not the same thing as guaranteed job processing. A queue is better when you want retries, deduplication, and a durable refresh pipeline.
+
+This section needs one explicit boundary:
+
+- the existing OpenNext `doQueue` in `open-next.config.ts` is for OpenNext time-based revalidation
+- a future Payload refresh worker would need its own queue or other dedicated background mechanism
+
+Those should not be treated as the same queue, even if they both live on Cloudflare.
 
 The refresh path should do the following:
 
@@ -207,6 +231,14 @@ If Payload content changes through a webhook, that webhook should also target th
 
 This is much safer than hoping the next user request will eventually repair the cache.
 
+The first implementation does not need a dedicated queue immediately. A pragmatic rollout is:
+
+- start with R2 as the durable store
+- optionally use `ctx.waitUntil()` for background refresh on stale hits
+- add a separate Cloudflare Queue only when refresh reliability or fan-out becomes a real operational need
+
+That keeps the first version smaller and avoids overloading the plan with infrastructure before the cache keys are proven correct.
+
 ## 10. Why Not Cache the Final HTML
 
 Caching rendered HTML is tempting because it looks simple.
@@ -222,6 +254,23 @@ Caching the Payload response is safer because the HTML still gets rendered insid
 
 That gives the app a narrower cache surface and keeps the security boundary clear.
 
+## 10.1 Where Cache API Fits
+
+Workers Cache API is still useful, but only as an optional hot layer in front of the R2-backed Payload cache.
+
+That comes with two constraints that matter here:
+
+- Cache API entries are local to a data center and do not replicate globally
+- cache operations only have real effect on a custom domain, not on playground-style preview environments
+
+So the correct model is:
+
+- R2 is the source of truth
+- Cache API is an optimization layer
+- preview testing should validate correctness first, not rely on Cache API hit behavior
+
+That is also why the plan does not describe Cache API as the primary storage for Payload responses.
+
 ## 11. Where Regional Cache Fits in This Design
 
 Regional cache is not the answer to the auth problem. It is the answer to the durable cache latency problem.
@@ -231,7 +280,8 @@ The intended stack is:
 - regional cache for hot incremental cache reads
 - R2 for durable incremental cache storage
 - Payload data cache for auth-sensitive route data
-- queue for controlled refresh
+- optional Cache API hot layer for custom-domain requests
+- a separate refresh mechanism for Payload cache updates when needed
 
 That arrangement gives three benefits:
 
@@ -239,7 +289,7 @@ That arrangement gives three benefits:
 2. SSR pages can benefit from a separate data cache without being flattened into static HTML
 3. background refresh can be controlled instead of noisy
 
-If the cache becomes noisy later, OpenNext also has a queue cache layer that can sit in front of the queue. That is an optional optimization, not a first-step requirement. It is useful when revalidation traffic gets spiky enough that the queue should also be de-duplicated by a small regional TTL.
+If OpenNext ISR revalidation becomes noisy later, OpenNext also has a `queueCache(...)` wrapper that can sit in front of the OpenNext queue. That is an optimization for OpenNext-managed revalidation traffic, not for the custom Payload cache path.
 
 ## 12. Failure Modes
 
@@ -295,6 +345,15 @@ Expected behavior:
 - reads still succeed from the last known cache entry
 - refresh latency increases, but the route does not fail by default
 
+### 12.6 False audience sharing
+
+If two authenticated users do not actually share the same Payload result, a shared cache key becomes a correctness bug, not a performance bug.
+
+Expected behavior:
+
+- default to bypass for authenticated traffic until response variance is characterized
+- add shared authenticated buckets only after confirming the response boundary is stable
+
 ## 13. What This Means for the Blog Specifically
 
 For this repository, the right division is:
@@ -335,9 +394,18 @@ The result should be:
 
 - faster books and chapter requests on repeated access
 - stale-safe serving with a refresh path
-- controlled cache keys by audience
+- anonymous caching first, then controlled cache keys by audience if the data proves that is safe
 
-### Phase 3: Add webhook-driven invalidation
+### Phase 3: Characterize authenticated response variance
+
+Before widening the cache beyond anonymous traffic, measure whether authenticated responses are actually shareable.
+
+The result should be:
+
+- a proven decision on whether `authenticated` is one bucket, several role buckets, or no shared bucket at all
+- a cache key policy based on observed behavior rather than guesswork
+
+### Phase 4: Add webhook-driven invalidation
 
 Once the cache exists, content mutation needs to push invalidation rather than wait for TTL expiry.
 
@@ -347,7 +415,7 @@ The result should be:
 - better cache hit quality
 - less reliance on a user request to refresh stale data
 
-### Phase 4: Add observability
+### Phase 5: Add observability
 
 After the behavior is correct, make the cache visible.
 
@@ -365,7 +433,7 @@ This strategy is successful if the following statements are true:
 - ISR pages keep their current semantics but fetch faster in Cloudflare
 - SSR routes continue to render per request
 - the books and chapter routes do not leak auth-specific content through a shared HTML cache
-- the Payload data cache uses stable audience keys rather than raw tokens
+- the Payload data cache starts with anonymous caching, and only uses shared authenticated audience keys if response variance has been explicitly characterized
 - stale content can be served temporarily while refresh happens in the background
 - a cache miss still returns a valid page by falling back to Payload
 
