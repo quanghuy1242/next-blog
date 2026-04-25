@@ -38,9 +38,39 @@ vi.mock('@payloadcms/richtext-lexical/react', () => ({
       ],
     };
 
+    const headingNode = {
+      type: 'heading',
+      tag: 'h2',
+      id: 'pgfId-1012022',
+      fields: {
+        anchorIds: ['pgfId-1012022', 'pgfId-1012138'],
+      },
+      children: [
+        {
+          type: 'text',
+          version: 1,
+          text: 'Section heading',
+          format: 0,
+          mode: 'normal',
+          style: '',
+          detail: 0,
+        },
+      ],
+    };
+
     return (
       <div data-testid="rich-text">
         <div data-testid="upload">{resolvedConverters.upload?.({ node: uploadNode })}</div>
+        <div data-testid="heading">
+          {resolvedConverters.heading?.({
+            node: headingNode,
+            nodesToJSX: ({ nodes }: { nodes: Array<{ text?: string }> }) =>
+              nodes.map((node) => node.text ?? ''),
+            converters: resolvedConverters,
+            parent: headingNode,
+            childIndex: 0,
+          })}
+        </div>
         <div data-testid="epub-link">
           {resolvedConverters['epub-internal-link']?.({
             node: epubNode,
@@ -107,5 +137,25 @@ describe('LexicalRenderer', () => {
       'href',
       '/books/sample-book/chapters/chapter-two#section-3',
     );
+  });
+
+  test('renders alias anchor ids alongside the heading', () => {
+    const data = {
+      root: {
+        children: [],
+        direction: null,
+        format: '',
+        indent: 0,
+        type: 'root',
+        version: 1,
+      },
+    } as any;
+
+    render(<LexicalRenderer data={data} />);
+
+    const heading = screen.getByRole('heading', { name: 'Section heading', level: 2 });
+    expect(heading).toHaveAttribute('id', 'pgfId-1012022');
+    expect(heading).toHaveAttribute('data-anchor-ids', 'pgfId-1012022 pgfId-1012138');
+    expect(screen.getByTestId('heading').querySelector('#pgfId-1012138')).toBeTruthy();
   });
 });

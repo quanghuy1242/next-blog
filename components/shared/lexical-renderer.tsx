@@ -132,22 +132,40 @@ const CustomHeading: React.FC<{
     id?: string;
     fields?: {
       id?: string;
+      anchorIds?: string[];
     };
     children?: any[];
   };
   nodesToJSX: ({ nodes }: { nodes: any[] }) => React.ReactNode[];
 }> = ({ node, nodesToJSX }) => {
   const headingTag = (typeof node.tag === 'string' && node.tag.length > 0 ? node.tag : 'h2') as React.ElementType;
-  const headingId = typeof node.id === 'string' && node.id.length > 0
-    ? node.id
-    : typeof node.fields?.id === 'string' && node.fields.id.length > 0
-      ? node.fields.id
-      : undefined;
+  const headingAnchorIds = Array.from(
+    new Set(
+      [node.id, node.fields?.id, ...(node.fields?.anchorIds ?? [])]
+        .filter((anchorId): anchorId is string => typeof anchorId === 'string')
+        .map((anchorId) => anchorId.trim())
+        .filter((anchorId) => anchorId.length > 0),
+    ),
+  );
+  const primaryAnchorId = headingAnchorIds[0];
+  const aliasAnchorIds = headingAnchorIds.slice(1);
 
-  return React.createElement(
-    headingTag,
-    headingId ? { id: headingId } : undefined,
-    nodesToJSX({ nodes: node.children ?? [] })
+  return (
+    <>
+      {aliasAnchorIds.map((anchorId) => (
+        <a key={anchorId} id={anchorId} aria-hidden="true" tabIndex={-1} />
+      ))}
+      {React.createElement(
+        headingTag,
+        primaryAnchorId
+          ? {
+              id: primaryAnchorId,
+              'data-anchor-ids': headingAnchorIds.join(' '),
+            }
+          : undefined,
+        nodesToJSX({ nodes: node.children ?? [] })
+      )}
+    </>
   );
 };
 
