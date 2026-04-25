@@ -9,16 +9,20 @@
  */
 
 import React from 'react';
+import Link from 'next/link';
 import {
   RichText,
   type JSXConvertersFunction,
 } from '@payloadcms/richtext-lexical/react';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type {
-  DefaultNodeTypes,
   SerializedUploadNode,
 } from '@payloadcms/richtext-lexical';
 import { ResponsiveImage } from './responsive-image';
+import {
+  resolveEpubHref,
+  type ChapterLinkTarget,
+} from 'common/utils/epub-link-resolver';
 
 export interface LexicalRendererProps {
   /**
@@ -35,6 +39,14 @@ export interface LexicalRendererProps {
    * Fallback content to display if data is null/undefined
    */
   fallback?: React.ReactNode;
+
+  /**
+   * Optional book/chapter context used to resolve epub-internal-link nodes to chapter URLs.
+   */
+  epubLinkContext?: {
+    bookSlug: string;
+    chapters: ChapterLinkTarget[];
+  } | null;
 }
 
 /**
@@ -107,6 +119,35 @@ const CustomCodeBlock: React.FC<{
         {code}
       </code>
     </pre>
+  );
+};
+
+/**
+ * Custom heading renderer that preserves any existing node `id` so fragment links can target
+ * imported anchors if the source data carries them.
+ */
+const CustomHeading: React.FC<{
+  node: {
+    tag?: string;
+    id?: string;
+    fields?: {
+      id?: string;
+    };
+    children?: any[];
+  };
+  nodesToJSX: ({ nodes }: { nodes: any[] }) => React.ReactNode[];
+}> = ({ node, nodesToJSX }) => {
+  const headingTag = (typeof node.tag === 'string' && node.tag.length > 0 ? node.tag : 'h2') as React.ElementType;
+  const headingId = typeof node.id === 'string' && node.id.length > 0
+    ? node.id
+    : typeof node.fields?.id === 'string' && node.fields.id.length > 0
+      ? node.fields.id
+      : undefined;
+
+  return React.createElement(
+    headingTag,
+    headingId ? { id: headingId } : undefined,
+    nodesToJSX({ nodes: node.children ?? [] })
   );
 };
 
@@ -233,30 +274,56 @@ const CustomTable: React.FC<{
 /**
  * JSX converters for custom node types
  */
-const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
-  defaultConverters,
-}) => ({
-  ...defaultConverters,
-  // Override the default upload converter to use next/image
-  upload: ({ node }) => {
-    return <CustomUploadComponent node={node} />;
-  },
-  // Handle YouTube embeds
-  youtube: ({ node }) => {
-    return <CustomYouTube node={node} />;
-  },
-  // Override table rendering to apply column widths
-  table: ({ node }) => {
-    return <CustomTable node={node} />;
-  },
-  blocks: {
-    ...defaultConverters.blocks,
-    // Handle CodeBlock from BlocksFeature (blockType: "Code")
-    Code: ({ node }: { node: { fields?: { code?: string; language?: string } } }) => (
-      <CustomCodeBlock node={node} />
-    ),
-  },
-});
+const createLexicalConverters = (
+  epubLinkContext?: LexicalRendererProps['epubLinkContext'],
+): JSXConvertersFunction => {
+  return ({ defaultConverters }) => ({
+    ...defaultConverters,
+    heading: ({ node, nodesToJSX }) => {
+      return <CustomHeading node={node} nodesToJSX={nodesToJSX} />;
+    },
+    // Override the default upload converter to use next/image
+    upload: ({ node }) => {
+      return <CustomUploadComponent node={node} />;
+    },
+    // Handle YouTube embeds
+    youtube: ({ node }) => {
+      return <CustomYouTube node={node} />;
+    },
+    // Override table rendering to apply column widths
+    table: ({ node }) => {
+      return <CustomTable node={node} />;
+    },
+    blocks: {
+      ...defaultConverters.blocks,
+      // Handle CodeBlock from BlocksFeature (blockType: "Code")
+      Code: ({ node }: { node: { fields?: { code?: string; language?: string } } }) => (
+        <CustomCodeBlock node={node} />
+      ),
+    },
+    'epub-internal-link': ({ node, nodesToJSX }) => {
+      const children = nodesToJSX({
+        nodes: node.children ?? [],
+      });
+      const epubHref = node?.fields?.epubHref ?? '';
+      const resolution = resolveEpubHref(
+        epubHref,
+        epubLinkContext?.chapters ?? [],
+        epubLinkContext?.bookSlug ?? ''
+      );
+
+      if (resolution.kind === 'chapter') {
+        return <Link href={resolution.href}>{children}</Link>;
+      }
+
+      if (resolution.kind === 'anchor') {
+        return <a href={resolution.href}>{children}</a>;
+      }
+
+      return <span>{children}</span>;
+    },
+  });
+};
 
 /**
  * Renders Lexical rich text content from PayloadCMS
@@ -274,6 +341,7 @@ export function LexicalRenderer({
   data,
   className = '',
   fallback = null,
+  epubLinkContext = null,
 }: LexicalRendererProps) {
   // Handle empty/null content
   if (!data) {
@@ -285,7 +353,7 @@ export function LexicalRenderer({
 
   return (
     <div className={combinedClassName}>
-      <RichText data={data} converters={jsxConverters} />
+      <RichText data={data} converters={createLexicalConverters(epubLinkContext ?? undefined)} />
     </div>
   );
 }

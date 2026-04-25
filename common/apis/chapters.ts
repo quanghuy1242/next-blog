@@ -40,6 +40,7 @@ const CHAPTER_TOC_FIELDS = `
   title
   slug
   order
+  chapterSourceKey
   updatedAt
   createdAt
   _status

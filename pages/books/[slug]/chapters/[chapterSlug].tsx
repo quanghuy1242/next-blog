@@ -94,7 +94,11 @@ export default function ChapterPage({
                 </button>
               </div>
 
-              <ChapterContent content={chapter.content} />
+              <ChapterContent
+                content={chapter.content}
+                bookSlug={book.slug}
+                chapters={chapters}
+              />
 
               <div className="mt-8 flex items-center justify-between gap-4 border-t border-gray-200 pt-4 text-sm">
                 <div>
