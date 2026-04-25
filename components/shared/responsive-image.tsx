@@ -24,6 +24,11 @@ export interface ResponsiveImageProps {
   width?: number | null;
   height?: number | null;
   className?: string;
+  /**
+   * If true, renders the image at its intrinsic size and centers it.
+   * The image is capped to the parent width with max-width: 100%.
+   */
+  intrinsic?: boolean;
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
   objectPosition?: string;
   priority?: boolean;
@@ -75,6 +80,7 @@ export function ResponsiveImage({
   width = null,
   height = null,
   className,
+  intrinsic = false,
   objectFit = 'cover',
   objectPosition = 'center',
   priority = false,
@@ -95,10 +101,11 @@ export function ResponsiveImage({
   const { ref: containerRef, isIntersecting } = useIntersectionObserver({
     rootMargin: '200px 0px',
     triggerOnce: true, // Only trigger once, no need to re-observe
+    enabled: !intrinsic,
   });
 
   // For priority images, always load immediately
-  const shouldLoad = priority || isIntersecting;
+  const shouldLoad = intrinsic ? true : priority || isIntersecting;
 
   // Check if image is already loaded (cached)
   React.useEffect(() => {
@@ -132,7 +139,11 @@ export function ResponsiveImage({
         quality: quality ?? 80,
         // Use 'cover' when dimensions are specified to ensure exact aspect ratio
         // Use 'scale-down' when no dimensions to preserve original
-        fit: width && height ? 'cover' : 'scale-down',
+        fit: intrinsic
+          ? 'scale-down'
+          : width && height
+          ? 'cover'
+          : 'scale-down',
         gravity: gravity, // Pass gravity for Cloudflare transformation
         sizes: sizes, // Custom sizes attribute
         widths: widths, // Custom widths for srcset generation
@@ -142,9 +153,9 @@ export function ResponsiveImage({
     return null;
   }
 
-  // Calculate aspect ratio for maintaining image proportions (only for non-fill mode)
+  // Calculate aspect ratio for maintaining image proportions (only for non-fill, non-intrinsic mode)
   const aspectRatio =
-    !fill && width && height && width > 0 && height > 0
+    !fill && !intrinsic && width && height && width > 0 && height > 0
       ? height / width
       : undefined;
 
@@ -153,7 +164,9 @@ export function ResponsiveImage({
   // Otherwise, use smallest available variant
   const blurPlaceholder = getBlurPlaceholder(src, actualLowResUrl);
 
-  const containerStyles = fill
+  const containerStyles = intrinsic
+    ? undefined
+    : fill
     ? undefined // Fill mode: no padding, let parent control size
     : aspectRatio
     ? {
@@ -161,20 +174,56 @@ export function ResponsiveImage({
       }
     : undefined;
 
-  const imageClasses = fill
+  const imageClasses = intrinsic
+    ? 'block max-w-full h-auto rounded-sm'
+    : fill
     ? 'absolute inset-0 w-full h-full' // Fill mode: absolute positioning
     : aspectRatio
     ? 'absolute inset-0 w-full h-full' // Aspect ratio mode: absolute within padded container
     : 'w-full h-auto'; // No aspect ratio: natural sizing
 
   // In fill mode, don't use relative positioning - let it be controlled by parent
-  const containerClasses = fill
+  const containerClasses = intrinsic
+    ? 'flex justify-center'
+    : fill
     ? 'overflow-hidden'
     : aspectRatio
     ? cn('relative overflow-hidden') // Aspect ratio mode needs relative container
     : ''; // Natural sizing mode doesn't need container wrapper
 
   const shouldScalePlaceholder = objectFit === 'cover' || objectFit === 'fill';
+
+  if (intrinsic) {
+    return (
+      <div
+        ref={containerRef as React.RefObject<HTMLDivElement>}
+        className={cn(containerClasses, className)}
+      >
+        {shouldLoad && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            ref={imgRef}
+            src={imageData.src}
+            srcSet={imageData.srcSet}
+            sizes={imageData.sizes}
+            alt={alt || ''}
+            width={width || undefined}
+            height={height || undefined}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding={priority ? 'sync' : 'async'}
+            fetchPriority={fetchPriority}
+            onLoad={() => {
+              setIsLoaded(true);
+            }}
+            onError={() => {
+              setIsLoaded(true); // Show original even if failed
+            }}
+            className={imageClasses}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div

@@ -23,6 +23,7 @@ import {
   resolveEpubHref,
   type ChapterLinkTarget,
 } from 'common/utils/epub-link-resolver';
+import type { Media } from 'types/cms';
 
 export interface LexicalRendererProps {
   /**
@@ -50,7 +51,10 @@ export interface LexicalRendererProps {
 }
 
 /**
- * Custom upload component that uses ResponsiveImage with optimizedUrl
+ * Custom upload component for chapter content images.
+ *
+ * Renders at the image's natural dimensions by default, centers it, and caps
+ * it to the parent width when the intrinsic size would overflow.
  */
 const CustomUploadComponent: React.FC<{
   node: SerializedUploadNode;
@@ -61,24 +65,27 @@ const CustomUploadComponent: React.FC<{
       return null;
     }
 
-    const { alt, url, optimizedUrl, lowResUrl, width, height } = uploadDoc;
+    const { alt, width, height, optimizedUrl, url, lowResUrl } = uploadDoc as {
+      alt?: string | null;
+      width?: number | null;
+      height?: number | null;
+      optimizedUrl?: string | null;
+      url?: string | null;
+      lowResUrl?: string | null;
+    };
+    const imageUrl = optimizedUrl || url || '';
 
-    // Use optimizedUrl if available, fallback to url
-    const imageUrl = optimizedUrl || url;
-
-    // Check if we have a valid URL
     if (!imageUrl) {
       return null;
     }
 
-    // Create media object for ResponsiveImage
-    const mediaObject = {
-      url,
-      optimizedUrl,
-      lowResUrl,
-      alt,
-      width,
-      height,
+    const mediaObject: Media = {
+      alt: alt ?? null,
+      width: width ?? null,
+      height: height ?? null,
+      optimizedUrl: optimizedUrl ?? null,
+      url: url || undefined,
+      lowResUrl: lowResUrl ?? null,
     };
 
     return (
@@ -89,6 +96,7 @@ const CustomUploadComponent: React.FC<{
         height={height || null}
         className="my-4"
         simple={true}
+        intrinsic={true}
       />
     );
   }

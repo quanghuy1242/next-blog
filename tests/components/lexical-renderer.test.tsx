@@ -17,7 +17,13 @@ vi.mock('@payloadcms/richtext-lexical/react', () => ({
 
     const uploadNode = {
       relationTo: 'media',
-      value: null,
+      value: {
+        alt: 'Chapter illustration',
+        optimizedUrl: 'https://example.com/chapter-illustration.jpg',
+        url: 'https://example.com/chapter-illustration-original.jpg',
+        width: 1600,
+        height: 900,
+      },
     };
 
     const epubNode = {
@@ -157,5 +163,27 @@ describe('LexicalRenderer', () => {
     expect(heading).toHaveAttribute('id', 'pgfId-1012022');
     expect(heading).toHaveAttribute('data-anchor-ids', 'pgfId-1012022 pgfId-1012138');
     expect(screen.getByTestId('heading').querySelector('#pgfId-1012138')).toBeTruthy();
+  });
+
+  test('renders chapter upload images at their natural size and centers them', () => {
+    const data = {
+      root: {
+        children: [],
+        direction: null,
+        format: '',
+        indent: 0,
+        type: 'root',
+        version: 1,
+      },
+    } as any;
+
+    render(<LexicalRenderer data={data} />);
+
+    const image = screen.getByAltText('Chapter illustration');
+    expect(image).toHaveAttribute('src', 'https://example.com/chapter-illustration.jpg');
+    expect(image).toHaveAttribute('width', '1600');
+    expect(image).toHaveAttribute('height', '900');
+    expect(image).toHaveClass('block', 'max-w-full', 'h-auto', 'rounded-sm');
+    expect(image.parentElement).toHaveClass('my-4', 'flex', 'justify-center');
   });
 });
