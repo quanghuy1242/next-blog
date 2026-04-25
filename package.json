@@ -9,10 +9,15 @@
     "test:watch": "vitest",
     "prebuild": "pnpm lint && pnpm test:ci",
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "start": "next start"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.19.4",
     "@payloadcms/richtext-lexical": "^3.84.1",
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
@@ -39,6 +44,7 @@
     "postcss": "^8.4.45",
     "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.5",
+    "wrangler": "^4.85.0"
   }
 }

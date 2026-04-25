@@ -124,18 +124,18 @@ pnpm start
 
 ## Deployment
 
-This project is prepared for deployment on Vercel.
+This project deploys to Cloudflare Workers through GitHub Actions.
 
-1. Ensure environment variables are set in Vercel project settings:
+1. Add these repository secrets:
 
+   - `CLOUDFLARE_ACCOUNT_ID`
+   - `CLOUDFLARE_API_TOKEN`
    - `PAYLOAD_BASE_URL`
    - `PAYLOAD_API_KEY`
 
-2. The `vercel.json` file maps these to Vercel secrets for both build and runtime.
+2. Push to `master` or run the `Deploy to Cloudflare` workflow manually.
 
-3. ISR configuration:
-   - Posts and homepage: 60 seconds revalidation
-   - About page: 3600 seconds (1 hour) revalidation
+3. The workflow builds the app, uploads the Payload values as Worker secrets, and deploys the worker named `next-blog-payloadcms`.
 
 ## Where to look in the code
 

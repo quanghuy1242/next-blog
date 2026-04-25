@@ -1,5 +1,8 @@
 .env
+.dev.vars
 .now
 .next
+.open-next
 *.tsbuildinfo
 node_modules/
+.wrangler/
