@@ -44,48 +44,32 @@ interface BookFetchOptions {
   cache?: PayloadCacheSettings;
 }
 
+const BOOK_LOOKUP_FIELDS = `
+  id
+  slug
+`;
+
 const BOOK_LIST_FIELDS = `
   id
   title
   author
   slug
-  visibility
   cover {
-    id
     url
     optimizedUrl
-    thumbnailURL
-    lowResUrl
-    alt
-    width
-    height
   }
-  origin
-  sourceType
-  sourceId
-  sourceHash
-  sourceVersion
-  syncStatus
-  importBatchId
-  importStatus
-  importTotalChapters
-  importCompletedChapters
-  importStartedAt
-  importFinishedAt
-  importFailedAt
-  lastImportedAt
-  importErrorSummary
-  updatedAt
-  createdAt
-  _status
 `;
 
 const BOOK_DETAIL_FIELDS = `
-  ${BOOK_LIST_FIELDS}
-  description
-  language
-  chapterCount
-  totalWordCount
+  id
+  title
+  author
+  slug
+  cover {
+    url
+    optimizedUrl
+    lowResUrl
+  }
 `;
 
 export interface PaginatedBooksParams {
@@ -224,7 +208,7 @@ export async function getBookBySlug(
           limit: 1
         ) {
           docs {
-            ${BOOK_DETAIL_FIELDS}
+            ${BOOK_LOOKUP_FIELDS}
           }
         }
 
@@ -315,12 +299,6 @@ export async function getBookDetailById(
             title
             slug
             order
-            chapterWordCount
-            hasPassword
-            chapterSourceKey
-            updatedAt
-            createdAt
-            _status
           }
         }
 

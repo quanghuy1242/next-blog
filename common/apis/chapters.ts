@@ -39,42 +39,25 @@ interface ChapterFetchOptions {
   cache?: PayloadCacheSettings;
 }
 
-const CHAPTER_MATCH_FIELDS = `
+const CHAPTER_LOOKUP_FIELDS = `
   id
   title
   slug
-  order
-  chapterWordCount
-  hasPassword
-  chapterSourceKey
-  chapterSourceHash
-  importBatchId
-  manualEditedAt
-  content
-  updatedAt
-  createdAt
-  _status
 `;
 
 const CHAPTER_DETAIL_FIELDS = `
-  ${CHAPTER_MATCH_FIELDS}
+  ${CHAPTER_LOOKUP_FIELDS}
+  content
   book {
     ... on Book {
       id
       title
       slug
-      author
-      description
-      language
-      visibility
-      chapterCount
-      totalWordCount
+      origin
+      sourceType
       cover {
-        id
         url
-        alt
-        width
-        height
+        optimizedUrl
       }
     }
   }
@@ -85,12 +68,11 @@ const CHAPTER_LIST_FIELDS = `
   title
   slug
   order
-  chapterWordCount
-  hasPassword
+`;
+
+const CHAPTER_PAGE_LIST_FIELDS = `
+  ${CHAPTER_LIST_FIELDS}
   chapterSourceKey
-  updatedAt
-  createdAt
-  _status
 `;
 
 export async function getChaptersByBookId(
@@ -206,7 +188,7 @@ export async function getChapterByBookAndSlug(
           limit: 1
         ) {
           docs {
-            ${CHAPTER_MATCH_FIELDS}
+            ${CHAPTER_LOOKUP_FIELDS}
           }
         }
 
@@ -287,7 +269,7 @@ export async function getChapterPageByBookId(
           limit: 200
         ) {
           docs {
-            ${CHAPTER_LIST_FIELDS}
+            ${CHAPTER_PAGE_LIST_FIELDS}
           }
         }
 
