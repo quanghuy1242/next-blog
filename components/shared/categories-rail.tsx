@@ -72,6 +72,7 @@ export function CategoriesRail({
             className="mb-0 w-56 flex-shrink-0 snap-start sm:w-64"
             alwaysShowDescription={true}
             simpleImage={item.key === 'books'}
+            ssrPrefetch={item.key === 'books'}
           />
         ))}
       </div>

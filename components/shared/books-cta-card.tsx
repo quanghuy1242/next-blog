@@ -29,6 +29,7 @@ export function BooksCtaCard({
       href="/books"
       className={cn('mb-4', className)}
       simpleImage={true}
+      ssrPrefetch={true}
     />
   );
 }

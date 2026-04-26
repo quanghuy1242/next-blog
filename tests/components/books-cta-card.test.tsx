@@ -1,6 +1,11 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import { BooksCtaCard } from 'components/shared/books-cta-card';
+
+vi.mock('common/utils/book-route-prefetch', () => ({
+  requestBookRouteWarmup: vi.fn(),
+}));
 
 describe('BooksCtaCard component', () => {
   test('renders books CTA link and reveals text on hover', () => {
@@ -16,7 +21,7 @@ describe('BooksCtaCard component', () => {
 
     expect(shelfText.className).toContain('opacity-0');
 
-    fireEvent.mouseOver(booksLink);
+    fireEvent.mouseEnter(booksLink);
 
     expect(shelfText.className).toContain('opacity-100');
     expect(screen.getByAltText('Books banner')).toHaveAttribute(

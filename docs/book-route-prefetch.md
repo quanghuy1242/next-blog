@@ -56,6 +56,7 @@ This warmup is applied to the book and chapter surfaces only:
 - Chapter table-of-contents links.
 - Chapter previous/next links.
 - Chapter content links that resolve to another chapter.
+- The homepage `Books` CTA card and the mobile books card in the category rail.
 
 ## Notes
 

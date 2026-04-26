@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { LinkProps } from 'next/link';
 import type { Category as CategoryData } from 'types/cms';
+import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 
 export interface CategoryCardProps {
   name: string;
@@ -14,6 +15,7 @@ export interface CategoryCardProps {
   className?: string;
   alwaysShowDescription?: boolean;
   simpleImage?: boolean;
+  ssrPrefetch?: boolean;
 }
 
 export function CategoryCard({
@@ -24,6 +26,7 @@ export function CategoryCard({
   className,
   alwaysShowDescription = false,
   simpleImage = false,
+  ssrPrefetch = false,
 }: CategoryCardProps) {
   const [show, setShow] = useState(false);
   const descriptionText = description ?? '';
@@ -35,15 +38,8 @@ export function CategoryCard({
     ? 'opacity-100'
     : 'opacity-0';
 
-  return (
-    <Link
-      href={href}
-      className={cn(className, 'block relative mb-2')}
-      onMouseOver={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
-      onFocus={() => setShow(true)}
-      onBlur={() => setShow(false)}
-    >
+  const cardContent = (
+    <>
       {image ? (
         <CoverImage media={image} simple={simpleImage} />
       ) : (
@@ -74,6 +70,28 @@ export function CategoryCard({
           {descriptionText.slice(0, 35)}
         </div>
       </div>
+    </>
+  );
+
+  const commonProps = {
+    className: cn(className, 'block relative mb-2'),
+    onMouseEnter: () => setShow(true),
+    onMouseLeave: () => setShow(false),
+    onFocus: () => setShow(true),
+    onBlur: () => setShow(false),
+  };
+
+  if (ssrPrefetch && typeof href === 'string') {
+    return (
+      <SSRPrefetchLink href={href} {...commonProps}>
+        {cardContent}
+      </SSRPrefetchLink>
+    );
+  }
+
+  return (
+    <Link href={href} {...commonProps}>
+      {cardContent}
     </Link>
   );
 }

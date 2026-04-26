@@ -1,7 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import { CategoriesRail } from 'components/shared/categories-rail';
 import type { Category, Media } from 'types/cms';
+
+vi.mock('common/utils/book-route-prefetch', () => ({
+  requestBookRouteWarmup: vi.fn(),
+}));
 
 function createCategory(overrides: Partial<Category> = {}): Category {
   const image: Media = {
