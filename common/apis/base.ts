@@ -1,4 +1,9 @@
-import { buildPayloadCacheKey, readThroughCloudflareCache, type PayloadCacheSettings } from './cache';
+import {
+  buildPayloadCacheKey,
+  readThroughCloudflareCache,
+  type PayloadCacheSettings,
+} from './cache';
+import { getAuthCacheSubjectFromToken } from 'common/utils/auth';
 
 // PayloadCMS GraphQL API Configuration
 const PAYLOAD_BASE_URL = process.env.PAYLOAD_BASE_URL;
@@ -73,14 +78,31 @@ export async function fetchAPI<TData>(
     return json.data;
   };
 
-  if (authToken || !cache) {
+  const authCacheSubject =
+    authToken && cache ? getAuthCacheSubjectFromToken(authToken) : null;
+
+  if (authToken && cache && !authCacheSubject) {
     return fetchFresh();
   }
 
+  if (!cache) {
+    return fetchFresh();
+  }
+
+  const cacheFingerprint = authCacheSubject
+    ? {
+        authSubject: authCacheSubject,
+        query,
+        variables,
+      }
+    : {
+        query,
+        useApiKey,
+        variables,
+      };
+
   const cacheKey = buildPayloadCacheKey(API_URL, {
-    query,
-    variables,
-    useApiKey,
+    ...cacheFingerprint,
   });
 
   return readThroughCloudflareCache({

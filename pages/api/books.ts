@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPaginatedBooks } from 'common/apis/books';
+import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
 import { normalizeLimit, normalizeOffset } from 'common/utils/number';
 
@@ -19,6 +20,7 @@ export default async function handler(
   const limit = normalizeLimit(req.query.limit, DEFAULT_LIMIT, MAX_LIMIT);
   const offset = normalizeOffset(req.query.offset);
   const sessionToken = getBetterAuthTokenFromRequest(req);
+  const payloadCache = sessionToken ? AUTH_PAYLOAD_CACHE : ONE_HOUR_PAYLOAD_CACHE;
 
   try {
     const { books, hasMore } = await getPaginatedBooks({
@@ -26,6 +28,7 @@ export default async function handler(
       skip: offset,
     }, {
       authToken: sessionToken,
+      cache: payloadCache,
     });
 
     res.status(200).json({

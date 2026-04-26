@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { createMocks } from 'node-mocks-http';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { getPaginatedBooks } from 'common/apis/books';
+import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { BETTER_AUTH_TOKEN_COOKIE } from 'common/utils/auth';
 
 vi.mock('common/apis/books', () => ({
@@ -54,6 +55,7 @@ describe('GET /api/books', () => {
       skip: 0,
     }, {
       authToken: null,
+      cache: ONE_HOUR_PAYLOAD_CACHE,
     });
 
     expect(res.statusCode).toBe(200);
@@ -82,6 +84,7 @@ describe('GET /api/books', () => {
       skip: 0,
     }, {
       authToken: 'token-123',
+      cache: AUTH_PAYLOAD_CACHE,
     });
   });
 

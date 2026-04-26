@@ -2,6 +2,7 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 const DEFAULT_FRESH_TTL_SECONDS = 60 * 60;
 const DEFAULT_STALE_TTL_SECONDS = 24 * 60 * 60;
+const AUTH_STALE_TTL_SECONDS = 5 * 60 * 60;
 const CACHE_KEY_PARAM = '__payload_cache_key';
 const CACHE_NAMESPACE = 'payload-graphql';
 
@@ -21,6 +22,12 @@ interface WaitUntilContext {
 
 export const ONE_HOUR_PAYLOAD_CACHE: PayloadCacheSettings = Object.freeze({
   freshTtlSeconds: DEFAULT_FRESH_TTL_SECONDS,
+  staleTtlSeconds: DEFAULT_STALE_TTL_SECONDS,
+});
+
+export const AUTH_PAYLOAD_CACHE: PayloadCacheSettings = Object.freeze({
+  freshTtlSeconds: DEFAULT_FRESH_TTL_SECONDS,
+  staleTtlSeconds: AUTH_STALE_TTL_SECONDS,
 });
 
 export function buildPayloadCacheKey(

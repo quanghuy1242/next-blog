@@ -32,6 +32,20 @@ function createCachedResponse<T>(data: T, cachedAt: number) {
   );
 }
 
+function createJwtToken(
+  payload: Record<string, unknown>,
+  header: Record<string, unknown> = { alg: 'HS256', typ: 'JWT' }
+): string {
+  const encode = (value: Record<string, unknown>) =>
+    Buffer.from(JSON.stringify(value))
+      .toString('base64')
+      .replace(/=/g, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
+
+  return `${encode(header)}.${encode(payload)}.signature`;
+}
+
 describe('fetchAPI', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -112,12 +126,14 @@ describe('fetchAPI', () => {
     vi.spyOn(Date, 'now').mockReturnValue(now);
 
     const cacheMock = createCacheMock();
-    cacheMock.match.mockResolvedValue(
-      createCachedResponse(
-        {
-          title: 'cached',
-        },
-        Math.floor(now / 1000) - 60
+    cacheMock.match.mockImplementation(() =>
+      Promise.resolve(
+        createCachedResponse(
+          {
+            title: 'cached',
+          },
+          Math.floor(now / 1000) - 60
+        )
       )
     );
 
@@ -196,14 +212,98 @@ describe('fetchAPI', () => {
     expect(cacheMock.put).toHaveBeenCalledTimes(1);
   });
 
-  test('bypasses Cloudflare cache entirely when an auth token is present', async () => {
+  test('uses the JWT subject to share auth cache entries across valid tokens', async () => {
+    const now = 1_700_000_000_000;
+    vi.spyOn(Date, 'now').mockReturnValue(now);
+
+    const createFreshCacheHitMock = () => {
+      const cacheMock = createCacheMock();
+
+      cacheMock.match.mockImplementation(() =>
+        Promise.resolve(
+          createCachedResponse(
+            {
+              title: 'cached',
+            },
+            Math.floor(now / 1000) - 60
+          )
+        )
+      );
+
+      return cacheMock;
+    };
+
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { fetchAPIWithAuthToken } = await import('common/apis/base');
+    const firstToken = createJwtToken({
+      sub: 'user-123',
+      exp: Math.floor(now / 1000) + 3_600,
+      jti: 'session-a',
+    });
+    const secondToken = createJwtToken({
+      sub: 'user-123',
+      exp: Math.floor(now / 1000) + 3_600,
+      jti: 'session-b',
+    });
+
+    const firstCacheMock = createFreshCacheHitMock();
+    vi.stubGlobal('caches', {
+      default: firstCacheMock,
+    });
+
+    const firstResult = await fetchAPIWithAuthToken<{ title: string }>(
+      'query Test { title }',
+      {
+        authToken: firstToken,
+        cache: {},
+      }
+    );
+
+    const firstCacheKey = firstCacheMock.match.mock.calls[0]?.[0];
+
+    const secondCacheMock = createFreshCacheHitMock();
+    vi.stubGlobal('caches', {
+      default: secondCacheMock,
+    });
+
+    const secondResult = await fetchAPIWithAuthToken<{ title: string }>(
+      'query Test { title }',
+      {
+        authToken: secondToken,
+        cache: {},
+      }
+    );
+
+    const secondCacheKey = secondCacheMock.match.mock.calls[0]?.[0];
+
+    expect(firstResult).toEqual({
+      title: 'cached',
+    });
+    expect(secondResult).toEqual({
+      title: 'cached',
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(firstCacheMock.put).not.toHaveBeenCalled();
+    expect(secondCacheMock.put).not.toHaveBeenCalled();
+
+    expect(firstCacheKey).toBeInstanceOf(Request);
+    expect(secondCacheKey).toBeInstanceOf(Request);
+    expect((firstCacheKey as Request).url).toBe((secondCacheKey as Request).url);
+  });
+
+  test('bypasses Cloudflare cache when the auth JWT is expired', async () => {
+    const now = 1_700_000_000_000;
+    vi.spyOn(Date, 'now').mockReturnValue(now);
+
     const cacheMock = createCacheMock();
     cacheMock.match.mockResolvedValue(
       createCachedResponse(
         {
           title: 'cached',
         },
-        Math.floor(Date.now() / 1000)
+        Math.floor(now / 1000)
       )
     );
 
@@ -221,11 +321,19 @@ describe('fetchAPI', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    const { fetchAPI } = await import('common/apis/base');
-    const result = await fetchAPI<{ title: string }>('query Test { title }', {
-      authToken: 'token-123',
-      cache: {},
+    const { fetchAPIWithAuthToken } = await import('common/apis/base');
+    const expiredToken = createJwtToken({
+      sub: 'user-123',
+      exp: Math.floor(now / 1000) - 1,
     });
+
+    const result = await fetchAPIWithAuthToken<{ title: string }>(
+      'query Test { title }',
+      {
+        authToken: expiredToken,
+        cache: {},
+      }
+    );
 
     expect(result).toEqual({
       title: 'fresh',
@@ -236,7 +344,7 @@ describe('fetchAPI', () => {
       `${PAYLOAD_BASE_URL}/api/graphql`,
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: 'Bearer token-123',
+          Authorization: `Bearer ${expiredToken}`,
         }),
       })
     );

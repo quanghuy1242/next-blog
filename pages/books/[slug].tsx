@@ -2,7 +2,7 @@ import React from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { getBookBySlug, getBookDetailById } from 'common/apis/books';
-import { ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
+import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { getCoverImageUrl } from 'common/utils/image';
 import { generateMetaTags } from 'common/utils/meta-tags';
 import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async ({ params, req }) => {
   const slugParam = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug;
   const sessionToken = getBetterAuthTokenFromRequest(req);
-  const payloadCache = sessionToken ? undefined : ONE_HOUR_PAYLOAD_CACHE;
+  const payloadCache = sessionToken ? AUTH_PAYLOAD_CACHE : ONE_HOUR_PAYLOAD_CACHE;
 
   if (!slugParam) {
     return {
