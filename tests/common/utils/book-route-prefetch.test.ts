@@ -99,6 +99,54 @@ describe('common/utils/book-route-prefetch', () => {
     expect(await response.text()).toBe('ok');
   });
 
+  test('reuses a completed warmup for a later book navigation request', async () => {
+    const deferreds: Array<(response: Response) => void> = [];
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          deferreds.push(resolve);
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const nextDataWindow = window as unknown as {
+      __NEXT_DATA__?: {
+        buildId?: string;
+      };
+    };
+    nextDataWindow.__NEXT_DATA__ = {
+      buildId: 'test-build',
+    };
+
+    requestBookRouteWarmup('/books/1~sample-book');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    deferreds[0]?.(new Response('ok', { status: 200 }));
+
+    await waitFor(() => {
+      expect(getBookRouteWarmupState().recentHrefs).toContain(
+        '/books/1~sample-book'
+      );
+    });
+
+    const sharedFetch = fetch(
+      '/_next/data/test-build/books/1~sample-book.json?slug=1%7Esample-book',
+      {
+        credentials: 'same-origin',
+        headers: {
+          'x-nextjs-data': '1',
+        },
+        method: 'GET',
+      }
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const response = await sharedFetch;
+
+    expect(await response.text()).toBe('ok');
+  });
+
   test('reuses the in-flight Next data request for a clicked chapter route', async () => {
     const deferreds: Array<(response: Response) => void> = [];
     const fetchMock = vi.fn(

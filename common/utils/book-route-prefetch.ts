@@ -4,6 +4,7 @@ const MAX_CONCURRENT_WARMUPS = 2;
 const MAX_PENDING_WARMUPS = 32;
 const MAX_TRACKED_WARMUPS = 128;
 const RECENT_WARMUP_TTL_MS = 15 * 60 * 1000;
+const SHARED_WARMUP_RESPONSE_TTL_MS = 5 * 1000;
 
 export type BookRouteWarmSource = 'hover' | 'pointer' | 'viewport';
 
@@ -28,6 +29,7 @@ const pendingWarmups: BookRouteWarmTask[] = [];
 const inflightWarmups = new Set<string>();
 const tasksByHref = new Map<string, BookRouteWarmTask>();
 const sharedWarmupFetches = new Map<string, Promise<Response>>();
+const sharedWarmupFetchExpiryTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
 let activeWarmups = 0;
 let warmupSequence = 0;
@@ -238,20 +240,51 @@ function registerSharedWarmupFetch(
   }
 
   sharedWarmupFetches.set(normalizedRequestKey, promise);
+
+  const existingTimer = sharedWarmupFetchExpiryTimers.get(normalizedRequestKey);
+
+  if (typeof existingTimer !== 'undefined') {
+    clearTimeout(existingTimer);
+    sharedWarmupFetchExpiryTimers.delete(normalizedRequestKey);
+  }
 }
 
 function unregisterSharedWarmupFetch(
   requestKey: string,
-  promise: Promise<Response>
+  promise: Promise<Response>,
+  retainForMs = 0
 ): void {
   const normalizedRequestKey = normalizeSharedWarmupFetchKey(requestKey);
 
-  if (
-    normalizedRequestKey &&
-    sharedWarmupFetches.get(normalizedRequestKey) === promise
-  ) {
-    sharedWarmupFetches.delete(normalizedRequestKey);
+  if (!normalizedRequestKey) {
+    return;
   }
+
+  const existingTimer = sharedWarmupFetchExpiryTimers.get(normalizedRequestKey);
+
+  if (typeof existingTimer !== 'undefined') {
+    clearTimeout(existingTimer);
+    sharedWarmupFetchExpiryTimers.delete(normalizedRequestKey);
+  }
+
+  if (sharedWarmupFetches.get(normalizedRequestKey) !== promise) {
+    return;
+  }
+
+  if (retainForMs <= 0) {
+    sharedWarmupFetches.delete(normalizedRequestKey);
+    return;
+  }
+
+  const expiryTimer = setTimeout(() => {
+    if (sharedWarmupFetches.get(normalizedRequestKey) === promise) {
+      sharedWarmupFetches.delete(normalizedRequestKey);
+    }
+
+    sharedWarmupFetchExpiryTimers.delete(normalizedRequestKey);
+  }, retainForMs);
+
+  sharedWarmupFetchExpiryTimers.set(normalizedRequestKey, expiryTimer);
 }
 
 function normalizeBookRouteHref(rawHref: string): string | null {
@@ -426,6 +459,13 @@ function drainWarmups(): void {
           !nextTask.controller?.signal.aborted
         ) {
           rememberWarmup(nextTask.href);
+          unregisterSharedWarmupFetch(
+            nextTask.requestKey,
+            requestPromise,
+            SHARED_WARMUP_RESPONSE_TTL_MS
+          );
+        } else {
+          unregisterSharedWarmupFetch(nextTask.requestKey, requestPromise);
         }
       } catch (error) {
         if (
@@ -434,8 +474,8 @@ function drainWarmups(): void {
         ) {
           // Ignore network failures and aborts. Warmups are best-effort only.
         }
-      } finally {
         unregisterSharedWarmupFetch(nextTask.requestKey, requestPromise);
+      } finally {
         settleWarmupTask(nextTask);
       }
     })();
@@ -566,6 +606,10 @@ export function clearBookRouteWarmupState(): void {
   inflightWarmups.clear();
   tasksByHref.clear();
   sharedWarmupFetches.clear();
+  for (const timerId of sharedWarmupFetchExpiryTimers.values()) {
+    clearTimeout(timerId);
+  }
+  sharedWarmupFetchExpiryTimers.clear();
   activeWarmups = 0;
   restoreBookRouteFetchInterceptor();
 }
