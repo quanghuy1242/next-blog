@@ -1,0 +1,4999 @@
+{
+  "root": {
+    "type": "root",
+    "version": 1,
+    "format": "",
+    "indent": 0,
+    "direction": "ltr",
+    "children": [
+      {
+        "type": "heading",
+        "tag": "h1",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1 An urgent need for efficiency in data processing",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_3",
+        "fields": {
+          "anchorIds": [
+            "heading_id_3",
+            "pgfId-1019418",
+            "pgfId-1016250"
+          ]
+        }
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "This chapter covers",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "version": 1,
+        "listType": "bullet",
+        "tag": "ul",
+        "start": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 1,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The challenges of dealing with the exponential growth of data",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 2,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Comparing traditional and recent computing architectures",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 3,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The role and shortcomings of Python in modern data analytics",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 4,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Techniques for delivering efficient Python computing solutions",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "An enormous amount of data is being collected all the time, at intense speeds, and from a broad scope of sources. It is collected whether or not there is currently a use for it. It is collected whether or not there is a way to process, store, access, or learn from it. Before data scientists can analyze it, before designers and developers and policymakers can use it to create products, services, and programs, software engineers must find ways to store and process it. Now more than ever those engineers need efficient ways to improve performance and optimize storage.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "In this book, I share a collection of strategies for performance and storage optimization that I use in my own work. Simply throwing more machines at the problem is often neither possible nor helpful. So the solutions I introduce here rely more on understanding and exploiting what we all have at hand: coding approaches, hardware and system architectures, available software, and, of course, nuances of the Python language, libraries, and ecosystem.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Python has emerged as the language of choice to do, or at least glue, all the heavy lifting around this data ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "deluge",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": ", as the cliches call it. Indeed, Python’s popularity in data science and data engineering is one of the main drivers of the language’s growth, helping to push it to one of the top three most popular languages, according to a majority of developer surveys. Python has its own unique set of advantages and limitations for dealing with big data, and its lack of speed certainly presents challenges. On the plus side, as you’ll see, there are many different angles, approaches, and workarounds to making Python work more efficiently with large amounts of data.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Before we get to the solutions, we need to fully comprehend the problem(s), and that is what we’ll do in much of this first chapter. We will spend a few moments looking more closely at the computing challenges presented by the deluge of data to orient ourselves to what exactly we are dealing with. Next, we’ll examine the role of hardware, network, and cloud architectures to see why the old solutions, such as increasing CPU speed, are no longer adequate. Then we’ll turn to the particular challenges that Python faces when dealing with big data, including Python’s threading and CPython’s Global ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Interpreter Lock (GIL). Once we’ve fully understood the need for new approaches to making Python perform better, I’ll present an overview of the solutions that you’ll learn in this book.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.1 How bad is the data deluge?",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_4",
+        "fields": {
+          "anchorIds": [
+            "heading_id_4",
+            "pgfId-1011845"
+          ]
+        }
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "You may be aware of two computing laws, Moore’s and Edholm’s, that together offer a dramatic picture of the exponential growth of data along with the lagging ability of computing systems to deal with that data. Edholm’s Law states that data rates in telecommunications double every 18 months, while Moore’s law predicts that the number of transistors that can fit on a microchip doubles every two years. We can take Edholm’s data transfer rate as a proxy for the amount of data collected and Moore’s transistor density as an indicator of speed and capacity in computing hardware. When we put them together we find a six-month lag between how fast and how much data we collect, and our ability to process and store it. Because exponential growth can be tricky to understand in words, I’ve plotted the two laws against each other in one graph, shown in figure 1.1",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "upload",
+            "version": 3,
+            "format": "",
+            "id": "40e0d145",
+            "relationTo": "media",
+            "value": 82,
+            "fields": {
+              "alt": "Image from book Fast Python: High performance techniques for large datasets (for True Epub) - ID 1 - ddceea5f - Image 1 from 1 An urgent need for efficiency in data processing > 1.2 Modern computing architectures and high-performance computing > 1.2.1 Changes inside the computer"
+            }
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Figure 1.1 The ratio between Moore’s law and Edholm’s law suggests that hardware will always lag behind the amount of data being generated. Moreover, the gap will increase over time.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "The situation described by this graph can be seen as a fight between what we need to analyze (Edholm’s law) versus the power that we have to do that analysis (Moore’s law). The graph actually paints a rosier picture than what we have in reality. We will see why in chapter 6 when we discuss Moore’s law in the context of modern CPU architectures. To focus here on data growth, let’s look at one example, internet traffic, which is an indirect measure of data available. As you can see in figure 1.2, the growth of internet traffic over the years tracks Edholm’s law quite well.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "upload",
+            "version": 3,
+            "format": "",
+            "id": "82edcb25",
+            "relationTo": "media",
+            "value": 87,
+            "fields": {
+              "alt": "Image from book Fast Python: High performance techniques for large datasets (for True Epub) - ID 2 - ddceea5f - Image 2 from 1 An urgent need for efficiency in data processing > 1.2 Modern computing architectures and high-performance computing > 1.2.1 Changes inside the computer"
+            }
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Figure 1.2 The growth of global internet traffic over the years, measured in petabytes per month. (Source: ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "link",
+            "version": 3,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "linkType": "custom",
+              "url": "https://en.wikipedia.org/wiki/Internet_traffic",
+              "newTab": false
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "https://en.wikipedia.org/wiki/Internet_traffic",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": ".)",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "In addition, 90% of the data humankind has produced happened in the last two years (see “Big Data and What It Means,” ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "link",
+            "version": 3,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "linkType": "custom",
+              "url": "http://mng.bz/v1ya",
+              "newTab": false
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "http://mng.bz/v1ya",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "). Whether the quality of this new data is proportional to its size is another matter altogether. The point is that data produced will need to be processed and that processing will require resources.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "It’s not just the amount of available data that presents software engineers with obstacles. The way all this new data is represented is also changing in nature. Some project that by 2025, around 80% of data could be unstructured, (“Tapping the power of unstructured data,” ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "link",
+            "version": 3,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "linkType": "custom",
+              "url": "http://mng.bz/BlP0",
+              "newTab": false
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "http://mng.bz/BlP0",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "). We will get into the details later in the book, but simply put, unstructured data makes data processing more demanding from a computational perspective.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "How do we deal with all this growth in data? It turns out that we mostly don’t. More than 99% of data produced is never analyzed, according to ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "The Guardian",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " (",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "link",
+            "version": 3,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "linkType": "custom",
+              "url": "http://mng.bz/Q8M4",
+              "newTab": false
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "http://mng.bz/Q8M4",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "). Part of what holds us back from making use of so much of our data is that we lack efficient procedures to analyze it.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "The growth of data and the concomitant need for more processing has developed into one of the most pernicious mantras about computing: “If you have more data, just throw more servers at it.” For many reasons, that is not often a viable or appropriate solution. Instead, when we need to increase the performance of an existing system, we can look at the system architecture and implementation and find places where we can optimize for performance. I have lost count of how many times I have been able to get ten-fold increases in performance just by being mindful of efficiency problems when reviewing existing code.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "What is crucial to understand is that the relationship between the amount of increased data to analyze, and the complexity of the infrastructure needed to analyze it, is hardly linear. Solving these problems requires more time and ingenuity on the developer’s part than in machines. This is true not only with cloud environments but also with in-house clusters and even with single-machine implementations. A few use cases will help to make this clear. For example:",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "version": 1,
+        "listType": "bullet",
+        "tag": "ul",
+        "start": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 1,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Your solution requires only a single computer, but suddenly you need more machines.",
+                "format": 2,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              },
+              {
+                "type": "text",
+                "version": 1,
+                "text": " Adding machines means you will have to manage the number of machines, distribute the workload across them, and make sure the data is partitioned correctly. You might also need a file system server to add to your list of machines. The cost of maintaining a server farm, or just a cloud, is ",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              },
+              {
+                "type": "text",
+                "version": 1,
+                "text": "qualitatively",
+                "format": 2,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              },
+              {
+                "type": "text",
+                "version": 1,
+                "text": " much more than maintaining a single computer.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 2,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Your solution works well in-memory but then the amount of data increases and no longer fits your memory.",
+                "format": 2,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              },
+              {
+                "type": "text",
+                "version": 1,
+                "text": " To handle the new amount of data stored in disk will normally entail a major rewrite of your code. And, of course, the code itself will grow in complexity. For instance, if the main database is now on disk, you may need to create a cache policy. Or you may need to do concurrent reads from multiple processes, or, even worse, concurrent writes.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 3,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "You use a SQL database and suddenly you reach the maximum throughput capacity of the server.",
+                "format": 2,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              },
+              {
+                "type": "text",
+                "version": 1,
+                "text": " If it’s only a read capacity problem, then you might survive by just creating a few read replicas. But if it is a write problem, what do you do? Maybe you set up sharding.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              },
+              {
+                "type": "epub-internal-link",
+                "version": 1,
+                "format": "",
+                "indent": 0,
+                "direction": "ltr",
+                "fields": {
+                  "epubHref": "#pgfId-1012022"
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "version": 1,
+                    "text": "1",
+                    "format": 64,
+                    "mode": "normal",
+                    "style": "",
+                    "detail": 0
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "version": 1,
+                "text": " Or do you decide to completely change your database technology in favor of some supposedly better performant NoSQL variant?",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 4,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "If you are dependent on a system in the cloud based on vendor proprietary technologies, you might discover that the ability to scale indefinitely is more marketing talk than technological reality.",
+                "format": 2,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              },
+              {
+                "type": "text",
+                "version": 1,
+                "text": " In many cases, if you hit performance limits, the only realistic solution is to change the technology that you are using, a change that requires enormous time, money, and human energy.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "I hope these examples make the case that growth is not just a question of “adding more machines,” but instead entails substantial work on several fronts to deal with the increased complexity. Even something as “simple” as a parallel solution implemented on a single computer can bring with it all the problems of parallel processing (races, deadlocks, and more). These more efficient solutions can have a dramatic effect on complexity, reliability, and cost.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Finally, we could make the case that even if we ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "could",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " scale our infrastructure linearly (we can’t, really), there would be ethical and ecological problems to consider: forecasts put energy consumption related to a “tsunami of data” at 20% of global electricity production (“Tsunami of Data",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": ",” ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "link",
+            "version": 3,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "linkType": "custom",
+              "url": "http://mng.bz/X5GE",
+              "newTab": false
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "http://mng.bz/X5GE",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "), and there is also a problem of landfill disposal as we update hardware.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "The good news is that becoming computationally more efficient when handling big data helps us to reduce our computing bill, the complexity of the architecture for our solution, our storage needs, our time to market, and our energy footprint. And sometimes, more efficient solutions might even come with minimal implementation costs. For example, the judicious use of data structures might reduce computing time at no substantial development cost.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "On the other hand, many of the solutions we’ll look at will have a development cost and will add an amount of complexity themselves. When you look at ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "your",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " data and forecasts for its growth, you will have to make a judgment call on where to optimize, as there are no clear-cut recipes or one-size-fits-all solutions. That being said, there might be just one rule that can be applied across the board: if the solution is good for Netflix, Google, Amazon, Apple, or Facebook, then probably it is ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "not",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " good for you, unless, of course, you work for one of these companies.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "The amount of data that most of us will see will be substantially lower than the biggest technological companies use. It will still be enormous, and it will still be hard, but it will probably be a few orders of magnitude lower. The somewhat prevailing wisdom that what works for those companies is also a good fit for the rest of us is, in my opinion, just wrong. Generally, less complex solutions will be more appropriate for most of us.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "As you can see, this new world with extreme growth, both in quantity and complexity, of both data and algorithms requires more sophisticated techniques to perform computation and storage in an efficient and cost-conscious way. Don’t get me wrong: sometimes you ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "will",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " need to scale up your infrastructure. But when you architect and implement your solution, you can still use the same mindset of focusing on efficiency. It’s just that the techniques will be different. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.2 Modern computing architectures and high-performance computing",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_5",
+        "fields": {
+          "anchorIds": [
+            "heading_id_5",
+            "pgfId-1012138"
+          ]
+        }
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Creating more efficient solutions does not happen in an abstract void. First, we have our domain problem to consider—that is, what real problem you are trying to solve. Equally important is the computing architecture where our solution will be run. Computing architectures play a major role in determining the best optimization techniques, so we have to take them into consideration when we devise our software solutions. In this section, we will take a look at the main architectural problems that affect the design and implementation of our solutions.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.2.1 Changes inside the computer",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_6",
+        "fields": {
+          "anchorIds": [
+            "heading_id_6",
+            "pgfId-1012160"
+          ]
+        }
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Radical changes are happening ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "inside",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " the computer. First, we have CPUs that are increasing processing power mostly in the number of parallel units, not raw speed, as they did in the past. Computers can also be equipped with graphics processing units (GPUs), which were originally developed for graphics processing only but now can be used for general computing as well. Indeed, many efficient implementations of AI algorithms are done for GPUs. Unfortunately, at least from our perspective, GPUs have a completely different architecture than CPUs: they are composed of thousands of computing units that are expected to do the same “simple” computation across all units. The memory model is also completely different. These differences mean that programming GPUs require a radically different approach from programming CPUs.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "To understand how we can use GPUs for data processing, we need to understand their original purpose and architectural implications. GPUs, as the name indicates, were developed to help with graphics processing. Some of the most computationally demanding applications are actually games. Games, and graphic applications in general, are constantly updating millions of pixels on the screen. The hardware architecture devised to solve this problem has many small processing cores. Its quite easy for a GPU to have thousands of cores, while a CPU typically has less than 10. GPU cores are substantially simpler and mostly run the same code on each core. They are thus very good for running a massive number of similar tasks, like updating pixels.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Given the sheer amount of processing power in GPUs, there was an attempt to try to use that power for other tasks with the appearance of general-purpose computing on graphics ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "processing units (GPGPU). Because of the way GPU architectures are organized, they are mostly applicable to tasks that are massively parallel in nature. It turns out that many modern AI algorithms, like ones based on neural networks, tend to be massively parallel. So there was a natural fit between the two.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Unfortunately, the difference between CPUs and GPUs is not only in the number of cores and their complexity. GPU memory, especially on the most computationally powerful, is separated from the main memory. Thus, there is also the problem of transferring data between the main memory and GPU memory. So we have two massive problems to consider when targeting GPUs.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "For reasons that will become clear in chapter 9, programming GPUs with Python is substantially more difficult and less practical than targeting CPUs. Nonetheless, there is still more than enough scope to make use of GPUs from Python.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "While less fashionable than the advances in GPUs, monumental changes have also come to how CPUs can be programmed. And, unlike GPUs, we can easily use most of these CPU changes in Python. CPU performance increases are being delivered differently by manufacturers than in the past. Their solution, driven by the laws of physics, is to build in more parallel processing, not more speed. Moore’s law is sometimes stated as the doubling of speed every 24 months, but that is actually not the correct definition: it relates instead to the transistor density doubling every two years. The linear relationship between increased speed and transistor density broke more than a decade ago, and speed has mostly plateaued since then. Given that data has continued to grow along with algorithm complexity, we are in a pernicious situation. The first line of solutions coming from CPU manufacturers is allowing more parallelism: more CPUs per computer, more cores per CPU, and simultaneous multithreading. Processors are not really accelerating sequential computations anymore but allowing for more concurrent execution. This concurrent execution requires a paradigm shift in how we program computers. Before, the speed of a program would “magically” increase when you changed CPUs. Now, increasing speed depends on the programmer being aware of the shift in the underlying architecture to the parallel programming paradigm.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "There are many changes in the way we program modern CPUs, and as you will see in chapter 6, some of them are so counterintuitive they are worth keeping an eye on from the onset. For example, while CPU speeds have leveled in recent years, CPUs are still orders of magnitude faster than RAM. If CPU caches did not exist, then CPUs would be mostly idle, as they would spend most of the time waiting for RAM. This means that sometimes it is ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "faster",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " to work with compressed data, including the cost of decompression, than with raw data. Why? If you can put a compressed block on the CPU cache, then those cycles that otherwise would be idle waiting for RAM access could be used to decompress the data with CPU cycles to spare that could be used for computation! A similar argument could work for compressed file systems: they sometimes can be faster than raw file systems. There are direct applications of this in the Python world; for example, by changing a simple Boolean flag regarding the choice of the internal representation of NumPy arrays, you take advantage of cache locality problems and speed up your NumPy processing considerably. We have some access times and sizes for different kinds of memory in table 1.1, including CPU cache, RAM, local disk, and remote storage. The key point here is not the precise numbers but the orders of magnitude in difference in both size and access time.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Table 1.1 Memory ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "hierarchy with sizes and access times for a hypothetical, but realistic modern desktop",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "table",
+        "version": 1,
+        "direction": "ltr",
+        "format": "",
+        "indent": 0,
+        "children": [
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 1,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Type",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 1,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Size",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 1,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Access time",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 3,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "CPU",
+                        "format": 1,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "L1 cache",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "256 KB",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "2 ns",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "L2 cache",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "1 MB",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "5 ns",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "L3 cache",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "6 MB",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "30 ns",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 3,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "RAM",
+                        "format": 1,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "DIMM",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "8 GB",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "100 ns",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 3,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Secondary storage",
+                        "format": 1,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "SSD",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "256 GB",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "50 µs",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "HDD",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "2 TB",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "5 ms",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 3,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Tertiary storage",
+                        "format": 1,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "NAS - Network Access Server",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "100 TB",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Network dependent",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Cloud proprietary",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "1 PB",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Provider dependent",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Table 1.1 includes tertiary storage, which happens ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "outside",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " the computer. There have also been changes there, which we will address in the next section. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.2.2 Changes in the network",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_7",
+        "fields": {
+          "anchorIds": [
+            "heading_id_7",
+            "pgfId-1012568"
+          ]
+        }
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "In high-performance computing settings, we use the network as both a way to add more storage and, especially, to increase computing power. While we would like to solve our problems using a single computer, sometimes relying on a compute cluster is inevitable. Optimizing for the architectures with multiple computers—be it in the cloud or on-premises—will be a part of our journey to high performance.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Using many computers and external storage brings a whole new class of problems related to distributed computing: network topologies, sharing data across machines, and managing processes running across the network. There are many examples. For instance, what is the price of using REST APIs on services that require high performance and low latency? How can we deal with the penalties of having remote filesystems; can we mitigate those?",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "We will be trying to optimize our usage of the network stack and for that, we will have to be aware of it at all levels shown in figure 1.3. Outside the network, we have our code and Python libraries, which make choices about the layers below. At the top of the network stack, a typical choice for data transport is HTTPS with a payload based on JSON.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "While this is a perfectly reasonable choice for many applications, there are more performant alternatives for cases where network speed and lag matter. For example, a binary payload might be more efficient than JSON. Also, HTTP might be replaced by a direct TCP socket. But there are more radical alternatives like replacing the TCP transport layer: most internet application protocols use TCP, although there are a few exceptions like DNS and DHCP, which are both UDP based. The TCP protocol is highly reliable, but there is a performance penalty to be paid for that reliability. There will be times when the smaller overhead of UDP will be a more efficient alternative and the extra reliability is not needed.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "upload",
+            "version": 3,
+            "format": "",
+            "id": "156e0007",
+            "relationTo": "media",
+            "value": 91,
+            "fields": {
+              "alt": "Image from book Fast Python: High performance techniques for large datasets (for True Epub) - ID 3 - ddceea5f - Image 3 from 1 An urgent need for efficiency in data processing > 1.2 Modern computing architectures and high-performance computing > 1.2.1 Changes inside the computer"
+            }
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Figure 1.3 API calls via the network stack. Understanding the alternatives available for network communication can dramatically increase the speed of internet-based applications.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Below transport protocols, we have the ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "internet protocol (IP) and the physical infrastructure. The physical infrastructure can be important when we design our solutions. For example, if we have a very reliable local network, then UDP, which can lose data, will be more of an alternative than it would be in an unreliable network. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.2.3 The cloud",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_8",
+        "fields": {
+          "anchorIds": [
+            "heading_id_8",
+            "pgfId-1012635"
+          ]
+        }
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "In the past, most data processing implementations were made to function on a single computer or on an on-premises cluster maintained by the same organization that runs the workload. Currently, cloud-based infrastructure where all servers are “virtual” and maintained by an external entity, is becoming increasingly common. Sometimes, as with so-called serverless computing, we do not even deal with servers directly.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "The cloud is not just about adding more computers or network storage. It’s also about a set of proprietary extensions on how to deal with storage and compute resources, and those extensions have consequences in terms of performance. Furthermore, virtual computers can throw a wrench in some CPU optimizations. For example, in a bare metal machine, you can devise a solution that is considerate of cache locality problems, but in a virtual machine, you have no way of knowing whether your cache is being preempted by another virtual machine being executed concurrently. How do we keep our algorithms efficient in such an environment? Also, the cost model of cloud computing is completely different—time is literally money—and, as such, efficient solutions become even more important.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Many of the compute and storage solutions in the cloud are also proprietary and have very specific APIs and behaviors. Using such proprietary solutions also has consequences on performance that should be considered. As such, and while most problems pertaining to traditional clusters are also applicable to the cloud, sometimes there will be specific problems that will need to be dealt with separately. Now that we have a view of the architectural possibilities and limitations that will shape our applications, let’s turn to the advantages and disadvantages of Python for high-performance computing. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.3 Working with Python’s limitations",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_9",
+        "fields": {
+          "anchorIds": [
+            "heading_id_9",
+            "pgfId-1012696"
+          ]
+        }
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Python is widely used in modern data process applications. As with any language, it has its advantages and its drawbacks. There are great reasons to use Python, but here we are more concerned with dealing with Python’s limitations for high-performance data processing.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Let’s not sugarcoat reality: Python is spectacularly ill-equipped to handle high-performance computing. If performance and parallelism were the only consideration, nobody would use Python. Python has an amazing ecology of libraries for doing data analysis, great documentation, and a wonderfully supportive community. That is why we use it, not computational performance.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "There is a saying that goes something like this “There are no slow languages, only slow language implementations.” I hope you allow me to disagree. It is not fair to ask the implementors of a dynamic, high-level language like Python (or, say, JavaScript for that matter) to compete in terms of speed with lower-level languages like C, C++, Rust, or Go.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Features like dynamic typing and garbage collection will pay a price in terms of performance. And that is fine: there are many cases where programmer time is more valuable than compute time. But let’s not bury our heads in the sand: more declarative and dynamic languages will pay a price in computation and memory. It’s a balance.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "That being said, this is no excuse for poorly performant language implementations. In this regard, how does CPython, the flagship Python implementation that you are probably using, fare? A complete analysis would not be easy, but you can do a simple exercise: write a matrix multiplication function and time it. Then, for example, run it with another Python implementation like PyPy. Then convert your code to JavaScript (a fair comparison as the language is also dynamic; an unfair comparison would be would C) and time it again.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Spoiler alert: CPython will not fare well. We have a language that is naturally slow and a flagship implementation that does not seem to have speed as its main consideration. Now, the good news is that most of these problems can be overcome. Many people have produced applications and libraries that will mitigate most performance problems. You can still write code in Python that will perform very well with a small memory footprint. You just have to write code while attending to Python’s warts.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Note",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " In most of the book, when we talk about Python, we are referring to the CPython implementation. All exceptions to this rule will be explicitly called out.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Given Python’s limitations regarding performance, optimizing our Python code sometimes will not be enough. In those cases, we will end up rewriting that part in a lower-level language or, at the very least, annotating our code so that it gets rewritten in a lower-level language by some code conversion tool. The part of the code that we will need to rewrite is normally very small, so we are decidedly ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "not",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " ditching Python. When we do this last stage of optimization, probably more than 90% of the code will still be Python. This is what many core scientific libraries like NumPy, scikit-learn, and SciPy actually do: their most computationally demanding parts are usually implemented in C or Fortran.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.3.1 The Global Interpreter Lock",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_10",
+        "fields": {
+          "anchorIds": [
+            "heading_id_10",
+            "pgfId-1012779"
+          ]
+        }
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "In discussions about Python’s performance, its GIL, or Global Interpreter Lock, inevitably comes up. What exactly is the GIL? While Python has the concept of threads, CPython has a GIL, which only allows a single thread to execute at a point in time. Even on a multicore processor, you only get a single thread executing at a single point in time.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Other implementations of Python, like Jython and IronPython, do not have a GIL and can use all cores in modern multiprocessors. But CPython is still the reference implementation for which all the main libraries are developed. In addition, Jython and IronPython are, respectively, JVM and .NET dependent. As such, CPython, given its massive library base, ends up being the default Python implementation. We will briefly discuss other implementations in the book, most notably PyPy, but in practice, CPython is queen.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "To understand how to work around the GIL, it is useful to remember ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "the difference ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "between ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "concurrency",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " and ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "parallelism",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": ". Concurrency, you may recall, is when a certain number of tasks can ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "overlap",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " in time, though they may not be ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "running",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " at the same time. They can, for example, interleave. Parallelism is when tasks are executed at the same time. So, in Python, concurrency is possible, but parallelism is not . . . or is it?",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Concurrency without parallelism is still quite useful. The best example of this comes from the JavaScript world and Node.JS, which is overwhelmingly used to implement the backend of web servers. In many server-side web tasks, most of the time is actually spent waiting for IO; that is a great time for a thread to ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "voluntarily",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " relinquish control so that other threads can continue with computation. Modern Python has similar asynchronous facilities, and we will be discussing them.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "But back to the main problem: does the GIL impose a serious performance penalty? In most cases, the answer is a surprising no. There are two main reasons for this:",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "version": 1,
+        "listType": "bullet",
+        "tag": "ul",
+        "start": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 1,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Most of the high-performance code, those tight inner loops, will probably have to be written in a lower-level language as we’ve discussed.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 2,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Python provides mechanisms for lower-level languages to release the GIL.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "This means that when you enter a part of the code rewritten in a lower-level language, you can instruct Python to continue with other Python threads in parallel with your low-level implementation. You should only release the GIL if that is safe—for example, if you do not write to objects that may be in use by other threads.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Also, ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "multiprocessing",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " (i.e., running multiple processes simultaneously) is ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "not affected by the GIL, which only affects threads, so there is still plenty of space to deploy parallel solutions even in pure Python.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "So, in theory, the GIL is a concern with regard to performance, but in practice, it rarely is the source of problems that cannot be overcome. We will dive deep into this subject in chapter 3. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.4 A summary of the solutions",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_11",
+        "fields": {
+          "anchorIds": [
+            "heading_id_11",
+            "pgfId-1012970"
+          ]
+        }
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "This book is about getting high performance from Python, but code does not run in a vacuum. You can only devise efficient code if you take into consideration the broader perspective of data and algorithm demands as well as computing architectures. While it’s impossible to go into every architectural and algorithmic detail in one book, my aim with these is to help you understand the implications of CPU design, GPUs, storage alternatives, network protocols and cloud architectures, and other system considerations (figure 1.4) so you can make sound decisions for improving the performance of your Python code. This book should equip you to assess the advantages and drawbacks of your computing architecture, whether it is a single computer, a GPU-enabled computer, a cluster, or a cloud environment, and implement the necessary changes to take full advantage of it.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "upload",
+            "version": 3,
+            "format": "",
+            "id": "74b192c2",
+            "relationTo": "media",
+            "value": 95,
+            "fields": {
+              "alt": "Image from book Fast Python: High performance techniques for large datasets (for True Epub) - ID 4 - ddceea5f - Image 4 from 1 An urgent need for efficiency in data processing > 1.2 Modern computing architectures and high-performance computing > 1.2.1 Changes inside the computer"
+            }
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Figure 1.4 Underlying hardware architectures must be taken into account when choosing high-performance coding solutions.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "The goal of this book is to introduce you to a range of solutions and show you how and where each one is best applied, so you can select and implement the most efficient solution for your particular set of resources, goals, and problems. We will spend considerable time working through examples so you can see for yourself the effects, both positive and negative, of these approaches. There is no mandate to apply all the approaches, nor is there a prescribed order in which to apply them. Each approach has its greater or lesser gains in performance and efficiency, along with its tradeoffs. If you understand what you have at your disposal in your system and in available strategies for improving aspects of that system, you can pick and choose where to spend your time and resources. To help you make sense of the approaches, table 1.2 presents a summary of the techniques presented in the book and the component or domain of the system development process that they target.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Table 1.2 Purpose of each chapter in the book",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "table",
+        "version": 1,
+        "direction": "ltr",
+        "format": "",
+        "indent": 0,
+        "children": [
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 1,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Domain",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 1,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Application",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 1,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Chapter",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Getting the most of your Python interpreter",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Python interpreter",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "2 Extracting maximum performance from built-in features",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Understanding Python’s internal functionality to extract the most computing power from your computer",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Python interpreter",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "3 Concurrency, parallelism, and asynchronous processing",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Extracting the most performance from the fundamental library in data science",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Python libraries",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "4 High-performance NumPy",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Exploring the performance of low-level languages when Python is not enough",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Python libraries",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "5 Re-implementing critical code with Cython",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Understanding the implications of hardware on computational performance",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Hardware",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "6 Memory hierarchy, storage, and networking",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Extracting the most performance from tabular data",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Python libraries",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "7 High-performance pandas and Apache Arrow",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Increasing storage efficiency by using modern Python persistence libraries",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Python libraries",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "8 Storing big data",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Understanding the importance and using GPU computing from Python",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Hardware",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "9 Data analysis using GPU computing",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tablerow",
+            "version": 1,
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "children": [
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Dealing with applications that require more than a single computer to process",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "Python libraries and hardware",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              },
+              {
+                "type": "tablecell",
+                "version": 1,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "headerState": 0,
+                "width": null,
+                "backgroundColor": null,
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "version": 1,
+                    "format": "",
+                    "indent": 0,
+                    "direction": "ltr",
+                    "children": [
+                      {
+                        "type": "text",
+                        "version": 1,
+                        "text": "10 Analyzing big data with Dask",
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "detail": 0
+                      }
+                    ],
+                    "textFormat": 0,
+                    "textStyle": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "There’s a lot in that table, so let me emphasize the practical applications of the major focus areas. After reading this book, you will be able to look at native Python code and understand the performance implications of built-in data structures and algorithms. You will be able to detect and replace inefficient structures with more appropriate solutions: for example, replace lists with sets where a search is being repeated on a constant list or use nonobject arrays instead of lists of objects for speed. You will also be able to take an existing algorithm that is nonperformant and (1) profile the code to find the pieces that are causing performance problems and (2) determine the best way to optimize those pieces of code.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "As stated, the book addresses the widely used Python ecology of libraries for data processing and analysis (such as pandas and NumPy) with the aim of improving how we use them. On the computing side, this is a lot of material, so we will not discuss very high-level libraries. For example, we will not talk about optimizing the usage of, say, TensorFlow, but we will discuss techniques to make the underlying algorithms more efficient.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "With regard to data storage and transformation, you will be able to look at a data source and understand its drawbacks for efficient processing and storage. Then you will be able to transform the data in a way that all required information is still maintained but access patterns to the data will be substantially more efficient. Finally, you will also learn about Dask, a Python-based framework that allows you to develop parallel solutions that can scale from a single machine to very large clusters of computers or cloud computing solutions.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "This is not a recipe book so much as an introduction to ways of thinking about optimization and areas to investigate for performance gains. As such, the approaches discussed should, for the most part, weather changes in hardware, software, networking, systems, and even data itself. Although not every technique will be profitable, or even usable in every situation, reading the book from start to finish is the surest way to understand your options, open up your thinking, and perhaps come up with some solutions of your own. Once you have exposed yourself to the range of possibilities, you can use the book as a reference and cherry-pick the techniques you want to implement.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Note",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " Setting up the software: Before you continue, be sure to check appendix A for a description of options to set up your environment so you can run the code samples with each exercise. The code listings themselves are located at ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "link",
+            "version": 3,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "linkType": "custom",
+              "url": "https://github.com/tiagoantao/python-performance",
+              "newTab": false
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "https://github.com/tiagoantao/python-performance",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": ".",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Summary",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "id": "heading_id_12",
+        "fields": {
+          "anchorIds": [
+            "heading_id_12",
+            "pgfId-1013385"
+          ]
+        }
+      },
+      {
+        "type": "list",
+        "version": 1,
+        "listType": "bullet",
+        "tag": "ul",
+        "start": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 1,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Yes, the cliche is true: there is a lot of data, and we have to increase the efficiency in processing it if we want to stand a chance to extract the most value from it.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 2,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Increased algorithm complexity adds an extra strain to the computation cost, and we will have to find ways to mitigate the computational effect.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 3,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "There is a large heterogeneity of computing architectures: the network now also includes cloud-based approaches. Inside our computers, there are now powerful GPUs whose computing paradigm is substantially different from CPUs. We need to be able to harness those.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 4,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Python is an amazing language for data analysis surrounded by a complete ecology of data processing libraries and frameworks. But it also suffers from serious problems on the performance side. We will need to be able to circumvent those problems to process lots of data with sophisticated algorithms.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          },
+          {
+            "type": "listitem",
+            "version": 1,
+            "value": 5,
+            "checked": false,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "While some of the problems that we will be dealing with can be hard, they are mostly solvable. The goal of this book is to introduce you to plenty of alternative solutions and teach you how and where each one is best applied, so you can choose and implement the most efficient solution for any problem you encounter.",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "* * *",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1",
+            "format": 64,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Sharding",
+            "format": 2,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "text",
+            "version": 1,
+            "text": " is the partitioning of data so that parts of it reside in different servers.",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      }
+    ]
+  }
+}

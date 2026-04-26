@@ -1,0 +1,6705 @@
+{
+  "root": {
+    "type": "root",
+    "version": 1,
+    "format": "",
+    "indent": 0,
+    "direction": "ltr",
+    "children": [
+      {
+        "type": "heading",
+        "tag": "h1",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "contents",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/fm.htm#pgfId-1089211"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Front matter",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/fm.htm#pgfId-1089211"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "preface",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/fm.htm#pgfId-1089219"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "acknowledgments",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/fm.htm#pgfId-1089222"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "about this book",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/fm.htm#pgfId-1089271"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "about the author",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/fm.htm#pgfId-1089276"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "about the cover illustration",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Part 1. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/p1.htm#pgfId-998407"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Foundational Approaches",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "  1  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/01.htm#pgfId-1016250"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "An urgent need for efficiency in data processing",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/01.htm#pgfId-1011845"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "How bad is the data deluge?",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/01.htm#pgfId-1012138"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Modern computing architectures and high-performance computing",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/01.htm#pgfId-1012160"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Changes inside the computer",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/01.htm#pgfId-1012568"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Changes in the network",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/01.htm#pgfId-1012635"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The cloud",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/01.htm#pgfId-1012696"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Working with Python’s limitations",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/01.htm#pgfId-1012779"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The Global Interpreter Lock",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "1.4   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/01.htm#pgfId-1012970"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A summary of the solutions",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "  2  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1018665"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Extracting maximum performance from built-in features",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "2.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1011849"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Profiling applications with both IO and computing workloads",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1011878"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Downloading data and computing minimum temperatures",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1012481"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Python’s built-in profiling module",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1012793"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using local caches to reduce network usage",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "2.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1013128"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Profiling code to detect performance bottlenecks",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1013549"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Visualizing profiling information",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1013744"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Line profiling",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1014436"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The takeaway: Profiling code",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "2.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1014686"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Optimizing basic data structures for speed: Lists, sets, and dictionaries",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1014787"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Performance of list searches",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1014919"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Searching using sets",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1015052"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "List, set, and dictionary complexity in Python",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "2.4   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1015369"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Finding excessive memory allocation",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1015569"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Navigating the minefield of Python memory estimation",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1016267"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The memory footprint of some alternative representations",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1016604"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using arrays as a compact representation alternative to lists",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1016864"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Systematizing what we have learned: Estimating memory usage of Python objects",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1017368"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The takeaway: Estimating memory usage of Python objects",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "2.5   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1017404"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using laziness and generators for big-data pipelining",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/02.htm#pgfId-1017478"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using generators instead of standard functions",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "  3  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1021155"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Concurrency, parallelism, and asynchronous processing",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "3.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1012052"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Writing the scaffold of an asynchronous server",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1012226"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Implementing the scaffold for communicating with clients",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1012665"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Programming with coroutines",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1013132"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Sending complex data from a simple synchronous client",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1013746"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Alternative approaches to interprocess communication",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1013773"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The takeaway: Asynchronous programming",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "3.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1013860"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Implementing a basic MapReduce engine",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1013895"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Understanding MapReduce frameworks",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1014156"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Developing a very simple test scenario",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1014286"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A first attempt at implementing a MapReduce framework",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "3.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1014457"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Implementing a concurrent version of a MapReduce engine",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1014497"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using concurrent.futures to implement a threaded server",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1015025"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Asynchronous execution with futures",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1015901"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The GIL and multithreading",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "3.4   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1016044"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using multiprocessing to implement MapReduce",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1016068"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A solution based on concurrent.futures",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1016465"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A solution based on the multiprocessing module",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1016880"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Monitoring the progress of the multiprocessing solution",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1017506"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Transferring data in chunks",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "3.5   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1018617"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Tying it all together: An asynchronous multithreaded and multiprocessing MapReduce server",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1018639"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Architecting a complete high-performance solution",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/03.htm#pgfId-1019700"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Creating a robust version of the server",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "  4  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1019048"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "High-performance NumPy",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "4.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1011924"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Understanding NumPy from a performance perspective",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1011943"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Copies vs. views of existing arrays",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1013766"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Understanding NumPy’s view machinery",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1014819"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Making use of views for efficiency",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "4.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1015560"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using array programming",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1015757"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The takeaway",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1015779"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Broadcasting in NumPy",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1016368"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Applying array programming",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1016834"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Developing a vectorized mentality",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "4.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1017480"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Tuning NumPy’s internal architecture for performance",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1017511"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "An overview of NumPy dependencies",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1017841"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "How to tune NumPy in your Python distribution",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/04.htm#pgfId-1018014"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Threads in NumPy",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Part 2. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/p2.htm#pgfId-998407"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Hardware",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "  5  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1028154"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Re-implementing critical code with Cython",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "5.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1011847"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Overview of techniques for efficient code re-implementation",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "5.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1012216"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A whirlwind tour of Cython",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1012275"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A naive implementation in Cython",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1012889"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using Cython annotations to increase performance",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1013371"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Why annotations are fundamental to performance",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1014011"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Adding typing to function returns",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "5.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1014384"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Profiling Cython code",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1014424"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using Python’s built-in profiling infrastructure",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1014949"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using line_profiler",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "5.4   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1015788"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Optimizing array access with Cython memoryviews",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1016260"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The takeaway",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1016296"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Cleaning up all internal interactions with Python",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "5.5   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1016614"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Writing NumPy generalized universal functions in Cython",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1017427"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The takeaway",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "5.6   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1017450"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Advanced array access in Cython",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1017979"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Bypassing the GIL’s limitation on running multiple threads at a time",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1019292"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Basic performance analysis",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1019370"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A spacewar example using Quadlife",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "5.7   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/05.htm#pgfId-1019501"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Parallelism with Cython",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "  6  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1022153"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Memory hierarchy, storage, and networking",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "6.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1011915"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "How modern hardware architectures affect Python performance",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1011943"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The counterintuitive effect of modern architectures on performance",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1012139"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "How CPU caching affects algorithm efficiency",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1013111"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Modern persistent storage",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "6.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1013192"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Efficient data storage with Blosc",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1013214"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Compress data; save time",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1013954"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Read speeds (and memory buffers)",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1014278"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The effect of different compression algorithms on storage performance",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1014578"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using insights about data representation to increase compression",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "6.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1014727"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Accelerating NumPy with NumExpr",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1014776"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Fast expression processing",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1015282"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "How hardware architecture affects our results",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1015567"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "When NumExpr is not appropriate",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "6.4   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1015677"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The performance implications of using the local network",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1015721"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The sources of inefficiency with REST calls",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1015790"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A naive client based on UDP and msgpack",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1016195"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A UDP-based server",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1016565"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Dealing with basic recovery on the client side",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/06.htm#pgfId-1016846"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Other suggestions for optimizing network computing",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Part 3. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/p3.htm#pgfId-1023763"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Applications and Libraries for Modern Data Processing",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "  7  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1019511"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "High-performance pandas and Apache Arrow",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "7.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1011859"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Optimizing memory and time when loading data",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1011897"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Compressed vs. uncompressed data",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1012214"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Type inference of columns",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1012894"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The effect of data type precision",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1013338"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Recoding and reducing data",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "7.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1013955"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Techniques to increase data analysis speed",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1014069"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using indexing to accelerate access",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1014337"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Row iteration strategies",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "7.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1015241"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "pandas on top of NumPy, Cython, and NumExpr",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1015263"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Explicit use of NumPy",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1015499"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "pandas on top of NumExpr",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1015792"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Cython and pandas",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "7.4   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1016516"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Reading data into pandas with Arrow",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1016555"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The relationship between pandas and Apache Arrow",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1016648"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Reading a CSV file",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1017299"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Analyzing with Arrow",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "7.5   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1017424"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using Arrow interop to delegate work to more efficient languages and systems",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1017452"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Implications of Arrow’s language interop architecture",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/07.htm#pgfId-1017640"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Zero-copy operations on data with Arrow’s Plasma server",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "  8  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1018755"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Storing big data",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "8.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1011875"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A unified interface for file access: fsspec",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1011903"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using fsspec to search for files in a GitHub repo",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1012518"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using fsspec to inspect zip files",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1012717"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Accessing files using fsspec",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1012948"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using URL chaining to traverse different filesystems transparently",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1013105"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Replacing filesystem backends",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1013249"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Interfacing with PyArrow",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "8.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1013399"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Parquet: An efficient format to store columnar data",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1013530"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Inspecting Parquet metadata",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1013886"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Column encoding with Parquet",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1014390"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Partitioning with datasets",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "8.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1014904"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Dealing with larger-than-memory datasets the old-fashioned way",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1014923"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Memory mapping files with NumPy",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1015223"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Chunk reading and writing of data frames",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "8.4   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1015836"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Zarr for large-array persistence",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1015918"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Understanding Zarr’s internal structure",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1016656"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Storage of arrays in Zarr",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1017065"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Creating a new array",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/08.htm#pgfId-1017439"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Parallel reading and writing of Zarr arrays",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Part 4. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/p4.htm#pgfId-998407"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Advanced Topics",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "  9  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1017637"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Data analysis using GPU computing",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "9.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1011958"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Making sense of GPU computing power",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1011980"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Understanding the advantages of GPUs",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1012347"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The relationship between CPUs and GPUs",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1012523"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The internal architecture of GPUs",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1012604"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Software architecture considerations",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "9.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1012700"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using Numba to generate GPU code",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1012724"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Installation of GPU software for Python",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1013012"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The basics of GPU programming with Numba",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1013937"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Revisiting the Mandelbrot example using GPUs",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1014464"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A NumPy version of the Mandelbrot code",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "9.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1014820"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Performance analysis of GPU code: The case of a CuPy application",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1014866"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "GPU-based data analysis libraries",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1015142"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using CuPy: A GPU-based version of NumPy",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1015173"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A basic interaction with CuPy",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1015494"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Writing a Mandelbrot generator using Numba",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1015922"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Writing a Mandelbrot generator using CUDA C",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/09.htm#pgfId-1016397"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Profiling tools for GPU code",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "10  ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1017445"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Analyzing big data with Dask",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "10.1   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1011949"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Understanding Dask’s execution model",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1011985"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "A pandas baseline for comparison",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1012382"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Developing a Dask-based data frame solution",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "10.2   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1012815"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The computational cost of Dask operations",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1012984"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Partitioning data for processing",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1013138"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Persisting intermediate computations",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1013305"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Algorithm implementations over distributed data frames",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1013622"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Repartitioning the data",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1014165"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Persisting distributed data frames",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "10.3   ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1014457"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using Dask’s distributed scheduler",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1014640"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "The dask.distributed architecture",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1015374"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Running code using dask.distributed",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/10.htm#pgfId-1016493"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Dealing with datasets larger than memory",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Appendix A. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/A.htm#pgfId-1014068"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Setting up the environment",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "text",
+            "version": 1,
+            "text": "Appendix B. ",
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "detail": 0
+          },
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/B.htm#pgfId-1015814"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "Using Numba to generate efficient low-level code",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "version": 1,
+        "format": "",
+        "indent": 0,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "epub-internal-link",
+            "version": 1,
+            "format": "",
+            "indent": 0,
+            "direction": "ltr",
+            "fields": {
+              "epubHref": "../Text/index.htm#pgfId-503251"
+            },
+            "children": [
+              {
+                "type": "text",
+                "version": 1,
+                "text": "index",
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "detail": 0
+              }
+            ]
+          }
+        ],
+        "textFormat": 0,
+        "textStyle": ""
+      }
+    ]
+  }
+}
