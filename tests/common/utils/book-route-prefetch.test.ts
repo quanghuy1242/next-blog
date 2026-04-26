@@ -46,7 +46,7 @@ describe('common/utils/book-route-prefetch', () => {
     expect(getBookRouteWarmupState().recentHrefs).toContain('/books/1~sample-book');
   });
 
-  test('reuses the in-flight Next data request for a clicked route', async () => {
+  test('reuses the in-flight Next data request for a clicked book route', async () => {
     const deferreds: Array<(response: Response) => void> = [];
     const fetchMock = vi.fn(
       () =>
@@ -68,7 +68,7 @@ describe('common/utils/book-route-prefetch', () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
-      '/_next/data/test-build/books/1~sample-book.json',
+      '/_next/data/test-build/books/1~sample-book.json?slug=1~sample-book',
       expect.objectContaining({
         credentials: 'same-origin',
         headers: expect.objectContaining({
@@ -79,13 +79,69 @@ describe('common/utils/book-route-prefetch', () => {
       })
     );
 
-    const sharedFetch = fetch('/_next/data/test-build/books/1~sample-book.json', {
-      credentials: 'same-origin',
-      headers: {
-        'x-nextjs-data': '1',
-      },
-      method: 'GET',
-    });
+    const sharedFetch = fetch(
+      '/_next/data/test-build/books/1~sample-book.json?slug=1~sample-book',
+      {
+        credentials: 'same-origin',
+        headers: {
+          'x-nextjs-data': '1',
+        },
+        method: 'GET',
+      }
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    deferreds[0]?.(new Response('ok', { status: 200 }));
+
+    const response = await sharedFetch;
+
+    expect(await response.text()).toBe('ok');
+  });
+
+  test('reuses the in-flight Next data request for a clicked chapter route', async () => {
+    const deferreds: Array<(response: Response) => void> = [];
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          deferreds.push(resolve);
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const nextDataWindow = window as unknown as {
+      __NEXT_DATA__?: {
+        buildId?: string;
+      };
+    };
+    nextDataWindow.__NEXT_DATA__ = {
+      buildId: 'test-build',
+    };
+
+    requestBookRouteWarmup('/books/1~sample-book/chapters/intro-to-performance');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/_next/data/test-build/books/1~sample-book/chapters/intro-to-performance.json?slug=1~sample-book&chapterSlug=intro-to-performance',
+      expect.objectContaining({
+        credentials: 'same-origin',
+        headers: expect.objectContaining({
+          'x-nextjs-data': '1',
+        }),
+        method: 'GET',
+        signal: expect.any(AbortSignal),
+      })
+    );
+
+    const sharedFetch = fetch(
+      '/_next/data/test-build/books/1~sample-book/chapters/intro-to-performance.json?slug=1~sample-book&chapterSlug=intro-to-performance',
+      {
+        credentials: 'same-origin',
+        headers: {
+          'x-nextjs-data': '1',
+        },
+        method: 'GET',
+      }
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
 

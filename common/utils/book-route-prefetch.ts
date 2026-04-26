@@ -1,3 +1,5 @@
+import { parseBookRouteSegment } from 'common/utils/book-route';
+
 const MAX_CONCURRENT_WARMUPS = 2;
 const MAX_PENDING_WARMUPS = 32;
 const MAX_TRACKED_WARMUPS = 128;
@@ -53,6 +55,29 @@ function normalizePathname(pathname: string): string {
   return pathname.replace(/\/+$/, '');
 }
 
+function buildBookRouteDataSearch(pathname: string): string {
+  const segments = pathname.split('/').filter(Boolean);
+
+  if (segments[0] !== 'books') {
+    return '';
+  }
+
+  const bookSegment = segments[1];
+  const bookRoute = bookSegment ? parseBookRouteSegment(bookSegment) : null;
+
+  if (!bookRoute?.bookSlug) {
+    return '';
+  }
+
+  const queryParts = [`slug=${encodeURIComponent(bookSegment)}`];
+
+  if (segments.length === 4 && segments[2] === 'chapters' && segments[3]) {
+    queryParts.push(`chapterSlug=${encodeURIComponent(segments[3])}`);
+  }
+
+  return queryParts.join('&');
+}
+
 function getNextDataState(): NextDataState | null {
   if (typeof window === 'undefined') {
     return null;
@@ -87,6 +112,10 @@ function buildBookRouteRequestKey(rawHref: string): string | null {
     return `${normalizedPathname}${url.search}`;
   }
 
+  const routeDataSearch = buildBookRouteDataSearch(normalizedPathname);
+  const extraSearch = url.search ? url.search.slice(1) : '';
+  const combinedSearch = [routeDataSearch, extraSearch].filter(Boolean).join('&');
+
   const localePrefix =
     nextData?.locale &&
     nextData.locale !== nextData.defaultLocale &&
@@ -97,7 +126,9 @@ function buildBookRouteRequestKey(rawHref: string): string | null {
     normalizedPathname === '/'
       ? `${localePrefix}/index`
       : `${localePrefix}${normalizedPathname}`;
-  return `/_next/data/${buildId}${routePath}.json${url.search}`;
+  return `/_next/data/${buildId}${routePath}.json${
+    combinedSearch ? `?${combinedSearch}` : ''
+  }`;
 }
 
 function getSharedWarmupFetchKey(
