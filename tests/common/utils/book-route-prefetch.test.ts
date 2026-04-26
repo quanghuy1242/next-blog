@@ -147,6 +147,60 @@ describe('common/utils/book-route-prefetch', () => {
     expect(await response.text()).toBe('ok');
   });
 
+  test('shares matching book-route data fetches even when they start outside the scheduler', async () => {
+    const deferreds: Array<(response: Response) => void> = [];
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          deferreds.push(resolve);
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const nextDataWindow = window as unknown as {
+      __NEXT_DATA__?: {
+        buildId?: string;
+      };
+    };
+    nextDataWindow.__NEXT_DATA__ = {
+      buildId: 'test-build',
+    };
+
+    requestBookRouteWarmup('/books/seed~sample-book');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const sharedFetchA = fetch(
+      '/_next/data/test-build/books/2~sample-book.json?slug=2%7Esample-book',
+      {
+        credentials: 'same-origin',
+        headers: {
+          'x-nextjs-data': '1',
+        },
+        method: 'GET',
+      }
+    );
+    const sharedFetchB = fetch(
+      '/_next/data/test-build/books/2~sample-book.json?slug=2%7Esample-book',
+      {
+        credentials: 'same-origin',
+        headers: {
+          'x-nextjs-data': '1',
+        },
+        method: 'GET',
+      }
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    deferreds[1]?.(new Response('ok', { status: 200 }));
+    deferreds[0]?.(new Response('seed', { status: 200 }));
+
+    const [responseA, responseB] = await Promise.all([sharedFetchA, sharedFetchB]);
+
+    expect(await responseA.text()).toBe('ok');
+    expect(await responseB.text()).toBe('ok');
+  });
+
   test('reuses the in-flight Next data request for a clicked chapter route', async () => {
     const deferreds: Array<(response: Response) => void> = [];
     const fetchMock = vi.fn(

@@ -183,6 +183,27 @@ function normalizeSharedWarmupFetchKey(rawKey: string): string | null {
   }
 }
 
+function shouldShareBookRouteFetchKey(rawKey: string): boolean {
+  const normalizedKey = normalizeSharedWarmupFetchKey(rawKey);
+
+  if (!normalizedKey) {
+    return false;
+  }
+
+  try {
+    const url = new URL(normalizedKey, window.location.href);
+    const pathname = normalizePathname(url.pathname);
+
+    if (pathname.startsWith('/_next/data/')) {
+      return pathname.includes('/books/') && pathname.endsWith('.json');
+    }
+
+    return pathname === '/books' || pathname.startsWith('/books/');
+  } catch {
+    return false;
+  }
+}
+
 function installBookRouteFetchInterceptor(): void {
   if (
     fetchInterceptorInstalled ||
@@ -210,7 +231,25 @@ function installBookRouteFetchInterceptor(): void {
       return Promise.reject(new Error('Book route fetch interceptor is unavailable'));
     }
 
-    return nativeFetch(input, init);
+    const requestPromise = nativeFetch(input, init);
+
+    if (sharedKey && shouldShareBookRouteFetchKey(sharedKey)) {
+      registerSharedWarmupFetch(sharedKey, requestPromise);
+
+      void requestPromise
+        .then((response) => {
+          unregisterSharedWarmupFetch(
+            sharedKey,
+            requestPromise,
+            response.ok ? SHARED_WARMUP_RESPONSE_TTL_MS : 0
+          );
+        })
+        .catch(() => {
+          unregisterSharedWarmupFetch(sharedKey, requestPromise);
+        });
+    }
+
+    return requestPromise;
   }) as typeof fetch;
 
   fetchInterceptorInstalled = true;
@@ -441,13 +480,7 @@ function drainWarmups(): void {
       };
     }
 
-    if (!nativeFetch) {
-      throw new Error('Book route fetch interceptor is unavailable');
-    }
-
-    const requestPromise = nativeFetch(nextTask.requestKey, requestInit);
-
-    registerSharedWarmupFetch(nextTask.requestKey, requestPromise);
+    const requestPromise = window.fetch(nextTask.requestKey, requestInit);
 
     void (async () => {
       try {
@@ -459,13 +492,6 @@ function drainWarmups(): void {
           !nextTask.controller?.signal.aborted
         ) {
           rememberWarmup(nextTask.href);
-          unregisterSharedWarmupFetch(
-            nextTask.requestKey,
-            requestPromise,
-            SHARED_WARMUP_RESPONSE_TTL_MS
-          );
-        } else {
-          unregisterSharedWarmupFetch(nextTask.requestKey, requestPromise);
         }
       } catch (error) {
         if (
@@ -474,7 +500,6 @@ function drainWarmups(): void {
         ) {
           // Ignore network failures and aborts. Warmups are best-effort only.
         }
-        unregisterSharedWarmupFetch(nextTask.requestKey, requestPromise);
       } finally {
         settleWarmupTask(nextTask);
       }

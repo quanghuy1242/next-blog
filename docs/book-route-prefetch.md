@@ -22,6 +22,7 @@ The client uses a dedicated `SSRPrefetchLink` wrapper for book and chapter route
 - If the user clicks while a warmup is still only queued, the queued task is dropped and the navigation request proceeds on its own instead of letting the stale queued warmup create a second fetch later.
 - The wrapper disables native viewport prefetch on `next/link` for these routes so the custom scheduler owns the behavior we are tuning.
 - The warmup request uses the same Next data URL the pages router fetches on click, including the dynamic route query string Next adds for book and chapter pages and its `URLSearchParams` encoding, so an in-flight warmup can be reused by the navigation request instead of starting over.
+- Once the fetch interceptor is installed, any matching book-route data GET that reaches it also registers itself as shareable, so later identical requests can attach to the same response even if the scheduler was not the caller that started the first one.
 - Successful warmups are kept around briefly after completion so a click that lands just after the fetch resolves can still reuse the same response.
 - In environments where the Next build id is unavailable, the warmup falls back to the canonical route path to keep local tests and fallbacks working.
 - The request includes the current auth cookies, so the server can warm the correct auth-scoped payload cache entry.
