@@ -15,7 +15,7 @@ The goal is simple:
 The client uses a dedicated `SSRPrefetchLink` wrapper for book and chapter routes.
 
 - Hover or focus on a link schedules an immediate warmup.
-- When a link becomes visible in the viewport, it schedules a warmup once.
+- On mobile and other touch/coarse-pointer devices, when a link becomes visible in the viewport it schedules a warmup once.
 - The wrapper disables native viewport prefetch on `next/link` for these routes so the custom scheduler owns the behavior we are tuning.
 - The warmup request is a same-origin `GET` to the canonical route path.
 - The request includes the current auth cookies, so the server can warm the correct auth-scoped payload cache entry.
@@ -57,6 +57,8 @@ This warmup is applied to the book and chapter surfaces only:
 - Chapter previous/next links.
 - Chapter content links that resolve to another chapter.
 - The homepage `Books` CTA card and the mobile books card in the category rail.
+
+Desktop stays hover-first. Viewport warming is only enabled when the device reports a coarse pointer or no hover capability.
 
 ## Notes
 

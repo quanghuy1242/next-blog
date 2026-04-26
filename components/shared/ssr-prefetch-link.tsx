@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
 import { requestBookRouteWarmup } from 'common/utils/book-route-prefetch';
+
+const TOUCH_DEVICE_QUERY = '(hover: none), (pointer: coarse)';
 
 interface SSRPrefetchLinkProps
   extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
@@ -17,8 +19,18 @@ export function SSRPrefetchLink({
   onMouseEnter,
   ...rest
 }: SSRPrefetchLinkProps) {
+  const [shouldWarmOnViewport, setShouldWarmOnViewport] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+
+    setShouldWarmOnViewport(window.matchMedia(TOUCH_DEVICE_QUERY).matches);
+  }, []);
+
   const { ref, isIntersecting } = useIntersectionObserver<HTMLAnchorElement>({
-    enabled: Boolean(href),
+    enabled: Boolean(href) && shouldWarmOnViewport,
     rootMargin: '120px 0px',
     triggerOnce: true,
   });

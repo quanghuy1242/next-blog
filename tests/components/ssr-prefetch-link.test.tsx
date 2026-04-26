@@ -36,6 +36,7 @@ describe('SSRPrefetchLink component', () => {
   const observeMock = vi.fn();
   const disconnectMock = vi.fn();
   const originalIntersectionObserver = global.IntersectionObserver;
+  const originalMatchMedia = window.matchMedia;
 
   class MockIntersectionObserver {
     constructor(callback: IntersectionObserverCallback) {
@@ -48,17 +49,32 @@ describe('SSRPrefetchLink component', () => {
     unobserve = vi.fn();
   }
 
+  function setMatchMedia(matches: boolean) {
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as never;
+  }
+
   beforeEach(() => {
     mockedRequestBookRouteWarmup.mockReset();
     observeCallback = null;
     observeMock.mockClear();
     disconnectMock.mockClear();
 
+    setMatchMedia(false);
     global.IntersectionObserver = MockIntersectionObserver as never;
   });
 
   afterEach(() => {
     global.IntersectionObserver = originalIntersectionObserver as never;
+    window.matchMedia = originalMatchMedia;
     vi.restoreAllMocks();
   });
 
@@ -73,7 +89,18 @@ describe('SSRPrefetchLink component', () => {
     );
   });
 
-  test('warms once when the link enters the viewport', async () => {
+  test('does not observe viewport warming on desktop', async () => {
+    render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
+
+    await waitFor(() => {
+      expect(observeMock).not.toHaveBeenCalled();
+    });
+    expect(observeCallback).toBeNull();
+  });
+
+  test('warms once when the link enters the viewport on touch devices', async () => {
+    setMatchMedia(true);
+
     render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
 
     await waitFor(() => {
