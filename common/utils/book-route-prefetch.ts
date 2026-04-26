@@ -8,14 +8,19 @@ export type BookRouteWarmSource = 'hover' | 'viewport';
 interface BookRouteWarmTask {
   href: string;
   source: BookRouteWarmSource;
-  scheduledAt: number;
+  sequence: number;
+  state: 'pending' | 'inflight';
+  controller: AbortController | null;
+  canceled: boolean;
 }
 
 const recentWarmups = new Map<string, number>();
 const pendingWarmups: BookRouteWarmTask[] = [];
 const inflightWarmups = new Set<string>();
+const tasksByHref = new Map<string, BookRouteWarmTask>();
 
 let activeWarmups = 0;
+let warmupSequence = 0;
 
 function getSourcePriority(source: BookRouteWarmSource): number {
   return source === 'hover' ? 2 : 1;
@@ -109,27 +114,23 @@ function sortPendingWarmups(): void {
       return priorityDifference;
     }
 
-    return left.scheduledAt - right.scheduledAt;
+    return right.sequence - left.sequence;
   });
 }
 
-function enqueueWarmup(task: BookRouteWarmTask): void {
-  const existingIndex = pendingWarmups.findIndex(
-    (candidate) => candidate.href === task.href
-  );
+function touchWarmupTask(task: BookRouteWarmTask): void {
+  task.sequence = ++warmupSequence;
+}
 
-  if (existingIndex >= 0) {
-    const existingTask = pendingWarmups[existingIndex];
+function removePendingWarmup(task: BookRouteWarmTask): void {
+  const index = pendingWarmups.indexOf(task);
 
-    if (getSourcePriority(task.source) > getSourcePriority(existingTask.source)) {
-      existingTask.source = task.source;
-      existingTask.scheduledAt = task.scheduledAt;
-      sortPendingWarmups();
-    }
-
-    return;
+  if (index >= 0) {
+    pendingWarmups.splice(index, 1);
   }
+}
 
+function enqueueWarmup(task: BookRouteWarmTask): void {
   pendingWarmups.push(task);
   sortPendingWarmups();
 
@@ -138,21 +139,15 @@ function enqueueWarmup(task: BookRouteWarmTask): void {
   }
 }
 
-async function warmBookRoute(href: string): Promise<void> {
-  try {
-    const response = await fetch(href, {
-      credentials: 'same-origin',
-      method: 'GET',
-    });
+function settleWarmupTask(task: BookRouteWarmTask): void {
+  inflightWarmups.delete(task.href);
+  activeWarmups = Math.max(0, activeWarmups - 1);
 
-    if (!response.ok) {
-      return;
-    }
-
-    rememberWarmup(href);
-  } catch {
-    // Warmups are opportunistic. A failed warmup should not block navigation.
+  if (tasksByHref.get(task.href) === task) {
+    tasksByHref.delete(task.href);
   }
+
+  drainWarmups();
 }
 
 function drainWarmups(): void {
@@ -163,24 +158,44 @@ function drainWarmups(): void {
       return;
     }
 
-    const normalizedHref = normalizeBookRouteHref(nextTask.href);
-
-    if (!normalizedHref) {
+    if (nextTask.canceled || tasksByHref.get(nextTask.href) !== nextTask) {
       continue;
     }
 
-    if (inflightWarmups.has(normalizedHref) || hasRecentWarmup(normalizedHref)) {
+    if (inflightWarmups.has(nextTask.href) || hasRecentWarmup(nextTask.href)) {
+      if (tasksByHref.get(nextTask.href) === nextTask) {
+        tasksByHref.delete(nextTask.href);
+      }
       continue;
     }
 
-    inflightWarmups.add(normalizedHref);
+    nextTask.state = 'inflight';
+    nextTask.controller = new AbortController();
+    inflightWarmups.add(nextTask.href);
     activeWarmups += 1;
 
-    void warmBookRoute(normalizedHref).finally(() => {
-      inflightWarmups.delete(normalizedHref);
-      activeWarmups -= 1;
-      drainWarmups();
-    });
+    void (async () => {
+      try {
+        const response = await fetch(nextTask.href, {
+          credentials: 'same-origin',
+          method: 'GET',
+          signal: nextTask.controller?.signal,
+        });
+
+        if (response.ok && !nextTask.canceled && !nextTask.controller?.signal.aborted) {
+          rememberWarmup(nextTask.href);
+        }
+      } catch (error) {
+        if (
+          !(error instanceof DOMException && error.name === 'AbortError') &&
+          !(error instanceof Error && error.name === 'AbortError')
+        ) {
+          // Ignore network failures and aborts. Warmups are best-effort only.
+        }
+      } finally {
+        settleWarmupTask(nextTask);
+      }
+    })();
   }
 }
 
@@ -197,22 +212,91 @@ export function requestBookRouteWarmup(
   }
 
   if (hasRecentWarmup(normalizedHref) || inflightWarmups.has(normalizedHref)) {
+    const existingTask = tasksByHref.get(normalizedHref);
+
+    if (existingTask && getSourcePriority(source) > getSourcePriority(existingTask.source)) {
+      existingTask.source = source;
+      touchWarmupTask(existingTask);
+
+      if (existingTask.state === 'pending') {
+        sortPendingWarmups();
+      }
+    }
+
     return;
   }
 
-  enqueueWarmup({
+  const existingTask = tasksByHref.get(normalizedHref);
+
+  if (existingTask) {
+    if (existingTask.canceled) {
+      return;
+    }
+
+    if (getSourcePriority(source) > getSourcePriority(existingTask.source)) {
+      existingTask.source = source;
+      touchWarmupTask(existingTask);
+
+      if (existingTask.state === 'pending') {
+        sortPendingWarmups();
+      }
+    }
+
+    return;
+  }
+
+  const task: BookRouteWarmTask = {
     href: normalizedHref,
     source,
-    scheduledAt: Date.now(),
-  });
+    sequence: ++warmupSequence,
+    state: 'pending',
+    controller: null,
+    canceled: false,
+  };
+
+  tasksByHref.set(normalizedHref, task);
+  enqueueWarmup(task);
 
   drainWarmups();
 }
 
+export function cancelBookRouteWarmup(rawHref: string): void {
+  pruneExpiredWarmups();
+
+  const normalizedHref = normalizeBookRouteHref(rawHref);
+
+  if (!normalizedHref) {
+    return;
+  }
+
+  const task = tasksByHref.get(normalizedHref);
+
+  if (!task || task.source === 'hover') {
+    return;
+  }
+
+  task.canceled = true;
+
+  if (task.state === 'pending') {
+    removePendingWarmup(task);
+    tasksByHref.delete(normalizedHref);
+    return;
+  }
+
+  task.controller?.abort();
+  tasksByHref.delete(normalizedHref);
+}
+
 export function clearBookRouteWarmupState(): void {
+  for (const task of tasksByHref.values()) {
+    task.canceled = true;
+    task.controller?.abort();
+  }
+
   recentWarmups.clear();
   pendingWarmups.length = 0;
   inflightWarmups.clear();
+  tasksByHref.clear();
   activeWarmups = 0;
 }
 

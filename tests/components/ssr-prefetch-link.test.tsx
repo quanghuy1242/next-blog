@@ -2,9 +2,13 @@ import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
-import { requestBookRouteWarmup } from 'common/utils/book-route-prefetch';
+import {
+  cancelBookRouteWarmup,
+  requestBookRouteWarmup,
+} from 'common/utils/book-route-prefetch';
 
 vi.mock('common/utils/book-route-prefetch', () => ({
+  cancelBookRouteWarmup: vi.fn(),
   requestBookRouteWarmup: vi.fn(),
 }));
 
@@ -30,6 +34,7 @@ vi.mock('next/link', () => ({
 }));
 
 const mockedRequestBookRouteWarmup = vi.mocked(requestBookRouteWarmup);
+const mockedCancelBookRouteWarmup = vi.mocked(cancelBookRouteWarmup);
 
 describe('SSRPrefetchLink component', () => {
   let observeCallback: IntersectionObserverCallback | null = null;
@@ -64,6 +69,7 @@ describe('SSRPrefetchLink component', () => {
 
   beforeEach(() => {
     mockedRequestBookRouteWarmup.mockReset();
+    mockedCancelBookRouteWarmup.mockReset();
     observeCallback = null;
     observeMock.mockClear();
     disconnectMock.mockClear();
@@ -122,6 +128,44 @@ describe('SSRPrefetchLink component', () => {
       expect(mockedRequestBookRouteWarmup).toHaveBeenCalledWith(
         '/books/1~sample-book',
         'viewport'
+      );
+    });
+  });
+
+  test('cancels viewport warming when the link leaves the viewport on touch devices', async () => {
+    setMatchMedia(true);
+
+    render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
+
+    await waitFor(() => {
+      expect(observeCallback).toBeTruthy();
+    });
+
+    await act(async () => {
+      observeCallback?.(
+        [
+          {
+            isIntersecting: true,
+          } as IntersectionObserverEntry,
+        ],
+        {} as IntersectionObserver
+      );
+    });
+
+    await act(async () => {
+      observeCallback?.(
+        [
+          {
+            isIntersecting: false,
+          } as IntersectionObserverEntry,
+        ],
+        {} as IntersectionObserver
+      );
+    });
+
+    await waitFor(() => {
+      expect(mockedCancelBookRouteWarmup).toHaveBeenCalledWith(
+        '/books/1~sample-book'
       );
     });
   });

@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
-import { requestBookRouteWarmup } from 'common/utils/book-route-prefetch';
+import {
+  cancelBookRouteWarmup,
+  requestBookRouteWarmup,
+} from 'common/utils/book-route-prefetch';
 
 const TOUCH_DEVICE_QUERY = '(hover: none), (pointer: coarse)';
 
@@ -20,6 +23,7 @@ export function SSRPrefetchLink({
   ...rest
 }: SSRPrefetchLinkProps) {
   const [shouldWarmOnViewport, setShouldWarmOnViewport] = useState(false);
+  const hasViewportWarmup = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
@@ -32,16 +36,29 @@ export function SSRPrefetchLink({
   const { ref, isIntersecting } = useIntersectionObserver<HTMLAnchorElement>({
     enabled: Boolean(href) && shouldWarmOnViewport,
     rootMargin: '120px 0px',
-    triggerOnce: true,
+    triggerOnce: false,
   });
 
   useEffect(() => {
-    if (!isIntersecting) {
+    if (!shouldWarmOnViewport) {
       return;
     }
 
-    requestBookRouteWarmup(href, 'viewport');
-  }, [href, isIntersecting]);
+    if (isIntersecting) {
+      hasViewportWarmup.current = true;
+      requestBookRouteWarmup(href, 'viewport');
+    } else if (hasViewportWarmup.current) {
+      cancelBookRouteWarmup(href);
+      hasViewportWarmup.current = false;
+    }
+
+    return () => {
+      if (hasViewportWarmup.current) {
+        cancelBookRouteWarmup(href);
+        hasViewportWarmup.current = false;
+      }
+    };
+  }, [href, isIntersecting, shouldWarmOnViewport]);
 
   return (
     <Link

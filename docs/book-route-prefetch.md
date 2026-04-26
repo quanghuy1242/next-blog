@@ -15,7 +15,8 @@ The goal is simple:
 The client uses a dedicated `SSRPrefetchLink` wrapper for book and chapter routes.
 
 - Hover or focus on a link schedules an immediate warmup.
-- On mobile and other touch/coarse-pointer devices, when a link becomes visible in the viewport it schedules a warmup once.
+- On mobile and other touch/coarse-pointer devices, when a link becomes visible in the viewport it schedules a warmup immediately.
+- If that link scrolls back out of view before the warmup completes, the pending request is canceled and the scheduler gives priority to the newly visible links.
 - The wrapper disables native viewport prefetch on `next/link` for these routes so the custom scheduler owns the behavior we are tuning.
 - The warmup request is a same-origin `GET` to the canonical route path.
 - The request includes the current auth cookies, so the server can warm the correct auth-scoped payload cache entry.
@@ -37,6 +38,8 @@ Current bounds:
 - `128` recently warmed URLs.
 - `15 minutes` of client-side warmup memory.
 
+The queue is intentionally small so the latest visible window wins on mobile. If the user scrolls past a long list quickly, older viewport tasks should be dropped or aborted in favor of newer links that are actually on screen.
+
 The registry is a hint, not a cache oracle. The browser cannot reliably inspect Cloudflare KV or Cache API state, so the client only tracks what it has already asked the server to warm.
 
 ## Priority
@@ -46,6 +49,7 @@ Hover and focus are treated as higher priority than viewport warming.
 - Hover/focus should win when a route is both visible and actively targeted.
 - Viewport warming should fill the gaps for touch and tablet users.
 - The queue is throttled with a small semaphore-style pool so a large table of contents does not flood the origin.
+- Viewport warming is cancelable. When a link leaves the viewport before it warms, the scheduler aborts or drops that work and gives the next visible links priority.
 
 ## Routes Covered
 
