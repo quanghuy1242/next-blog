@@ -7,6 +7,9 @@ import {
   requestBookRouteWarmup,
 } from 'common/utils/book-route-prefetch';
 
+const TOUCH_DEVICE_QUERY = '(hover: none), (pointer: coarse)';
+const DESKTOP_POINTER_QUERY = '(hover: hover) and (pointer: fine)';
+
 vi.mock('common/utils/book-route-prefetch', () => ({
   cancelBookRouteWarmup: vi.fn(),
   requestBookRouteWarmup: vi.fn(),
@@ -42,6 +45,8 @@ describe('SSRPrefetchLink component', () => {
   const disconnectMock = vi.fn();
   const originalIntersectionObserver = global.IntersectionObserver;
   const originalMatchMedia = window.matchMedia;
+  const originalRequestAnimationFrame = window.requestAnimationFrame;
+  const originalCancelAnimationFrame = window.cancelAnimationFrame;
 
   class MockIntersectionObserver {
     constructor(callback: IntersectionObserverCallback) {
@@ -54,9 +59,9 @@ describe('SSRPrefetchLink component', () => {
     unobserve = vi.fn();
   }
 
-  function setMatchMedia(matches: boolean) {
+  function setMatchMedia(matches: boolean | ((query: string) => boolean)) {
     window.matchMedia = vi.fn().mockImplementation((query: string) => ({
-      matches,
+      matches: typeof matches === 'function' ? matches(query) : matches,
       media: query,
       onchange: null,
       addListener: vi.fn(),
@@ -73,14 +78,26 @@ describe('SSRPrefetchLink component', () => {
     observeCallback = null;
     observeMock.mockClear();
     disconnectMock.mockClear();
+    window.requestAnimationFrame = vi
+      .fn((callback: FrameRequestCallback) => {
+        const timeoutId = window.setTimeout(() => {
+          callback(0);
+        }, 0);
+        return timeoutId as unknown as number;
+      }) as never;
+    window.cancelAnimationFrame = vi.fn((timeoutId: number) => {
+      window.clearTimeout(timeoutId);
+    }) as never;
 
-    setMatchMedia(false);
+    setMatchMedia(() => false);
     global.IntersectionObserver = MockIntersectionObserver as never;
   });
 
   afterEach(() => {
     global.IntersectionObserver = originalIntersectionObserver as never;
     window.matchMedia = originalMatchMedia;
+    window.requestAnimationFrame = originalRequestAnimationFrame;
+    window.cancelAnimationFrame = originalCancelAnimationFrame;
     vi.restoreAllMocks();
   });
 
@@ -105,7 +122,7 @@ describe('SSRPrefetchLink component', () => {
   });
 
   test('warms once when the link enters the viewport on touch devices', async () => {
-    setMatchMedia(true);
+    setMatchMedia((query) => query === TOUCH_DEVICE_QUERY);
 
     render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
 
@@ -133,7 +150,7 @@ describe('SSRPrefetchLink component', () => {
   });
 
   test('cancels viewport warming when the link leaves the viewport on touch devices', async () => {
-    setMatchMedia(true);
+    setMatchMedia((query) => query === TOUCH_DEVICE_QUERY);
 
     render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
 
@@ -161,6 +178,73 @@ describe('SSRPrefetchLink component', () => {
         ],
         {} as IntersectionObserver
       );
+    });
+
+    await waitFor(() => {
+      expect(mockedCancelBookRouteWarmup).toHaveBeenCalledWith(
+        '/books/1~sample-book'
+      );
+    });
+  });
+
+  test('warms and cancels pointer proximity warming on desktop', async () => {
+    setMatchMedia((query) => query === DESKTOP_POINTER_QUERY);
+    const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+
+    render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
+
+    const link = screen.getByRole('link', { name: 'Sample Book' });
+    Object.defineProperty(link, 'getBoundingClientRect', {
+      configurable: true,
+      value: () =>
+        ({
+          bottom: 160,
+          height: 80,
+          left: 40,
+          right: 260,
+          top: 80,
+          width: 220,
+          x: 40,
+          y: 80,
+          toJSON: () => ({}),
+        }) as DOMRect,
+    });
+
+    await waitFor(() => {
+      expect(window.requestAnimationFrame).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(
+        addEventListenerSpy.mock.calls.some(([type]) => type === 'pointermove')
+      ).toBe(true);
+    });
+
+    const pointerMoveHandler = addEventListenerSpy.mock.calls.find(
+      ([type]) => type === 'pointermove'
+    )?.[1] as ((event: PointerEvent) => void) | undefined;
+
+    await act(async () => {
+      pointerMoveHandler?.({
+        clientX: 120,
+        clientY: 110,
+        pointerType: 'mouse',
+      } as PointerEvent);
+    });
+
+    await waitFor(() => {
+      expect(mockedRequestBookRouteWarmup).toHaveBeenCalledWith(
+        '/books/1~sample-book',
+        'pointer'
+      );
+    });
+
+    await act(async () => {
+      pointerMoveHandler?.({
+        clientX: 1000,
+        clientY: 1000,
+        pointerType: 'mouse',
+      } as PointerEvent);
     });
 
     await waitFor(() => {

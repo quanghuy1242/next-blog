@@ -3,7 +3,7 @@ const MAX_PENDING_WARMUPS = 32;
 const MAX_TRACKED_WARMUPS = 128;
 const RECENT_WARMUP_TTL_MS = 15 * 60 * 1000;
 
-export type BookRouteWarmSource = 'hover' | 'viewport';
+export type BookRouteWarmSource = 'hover' | 'pointer' | 'viewport';
 
 interface BookRouteWarmTask {
   href: string;
@@ -23,7 +23,16 @@ let activeWarmups = 0;
 let warmupSequence = 0;
 
 function getSourcePriority(source: BookRouteWarmSource): number {
-  return source === 'hover' ? 2 : 1;
+  switch (source) {
+    case 'hover':
+      return 3;
+    case 'pointer':
+      return 2;
+    case 'viewport':
+      return 1;
+    default:
+      return 1;
+  }
 }
 
 function normalizePathname(pathname: string): string {

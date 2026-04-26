@@ -70,6 +70,36 @@ describe('common/utils/book-route-prefetch', () => {
     await Promise.resolve();
   });
 
+  test('prioritizes pointer warmups over viewport warmups', async () => {
+    const deferreds: Array<(response: Response) => void> = [];
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          deferreds.push(resolve);
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    requestBookRouteWarmup('/books/1~sample-book', 'viewport');
+    requestBookRouteWarmup('/books/2~sample-book', 'viewport');
+    requestBookRouteWarmup('/books/3~sample-book', 'pointer');
+    requestBookRouteWarmup('/books/4~sample-book', 'viewport');
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    deferreds[0]?.(new Response('ok', { status: 200 }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    });
+
+    const thirdCall = fetchMock.mock.calls[2] as unknown as
+      | [string, RequestInit?]
+      | undefined;
+
+    expect(thirdCall?.[0]).toBe('/books/3~sample-book');
+  });
+
   test('cancels a pending warmup before it starts', async () => {
     const deferreds: Array<(response: Response) => void> = [];
     const fetchMock = vi.fn(

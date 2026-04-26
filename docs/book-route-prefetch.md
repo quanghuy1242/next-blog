@@ -17,6 +17,7 @@ The client uses a dedicated `SSRPrefetchLink` wrapper for book and chapter route
 - Hover or focus on a link schedules an immediate warmup.
 - On mobile and other touch/coarse-pointer devices, when a link becomes visible in the viewport it schedules a warmup immediately.
 - If that link scrolls back out of view before the warmup completes, the pending request is canceled and the scheduler gives priority to the newly visible links.
+- On desktop fine-pointer devices, a pointer-proximity window around the mouse behaves the same way: nearby visible links warm immediately, and stale ones are canceled when the pointer moves away.
 - The wrapper disables native viewport prefetch on `next/link` for these routes so the custom scheduler owns the behavior we are tuning.
 - The warmup request is a same-origin `GET` to the canonical route path.
 - The request includes the current auth cookies, so the server can warm the correct auth-scoped payload cache entry.
@@ -44,12 +45,14 @@ The registry is a hint, not a cache oracle. The browser cannot reliably inspect 
 
 ## Priority
 
-Hover and focus are treated as higher priority than viewport warming.
+Hover and focus are treated as higher priority than pointer-proximity warming, which is higher priority than viewport warming.
 
 - Hover/focus should win when a route is both visible and actively targeted.
+- Pointer warming should fill the gaps for desktop users who move the cursor through dense link lists.
 - Viewport warming should fill the gaps for touch and tablet users.
 - The queue is throttled with a small semaphore-style pool so a large table of contents does not flood the origin.
-- Viewport warming is cancelable. When a link leaves the viewport before it warms, the scheduler aborts or drops that work and gives the next visible links priority.
+- Pointer warming is cancelable. When the pointer moves away before a warmup completes, the scheduler aborts or drops that work and gives the next visible links priority.
+- Viewport warming is cancelable for the same reason on mobile.
 
 ## Routes Covered
 
@@ -62,7 +65,7 @@ This warmup is applied to the book and chapter surfaces only:
 - Chapter content links that resolve to another chapter.
 - The homepage `Books` CTA card and the mobile books card in the category rail.
 
-Desktop stays hover-first. Viewport warming is only enabled when the device reports a coarse pointer or no hover capability.
+Desktop stays hover-first, then pointer-proximity aware. Viewport warming is only enabled when the device reports a coarse pointer or no hover capability.
 
 ## Notes
 

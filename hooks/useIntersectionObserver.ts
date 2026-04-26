@@ -8,7 +8,9 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-export interface UseIntersectionObserverOptions {
+export interface UseIntersectionObserverOptions<
+  T extends HTMLElement = HTMLElement
+> {
   /**
    * Margin around the root element (viewport by default)
    * @example '0px 0px 200px 0px' - Trigger 200px before entering viewport
@@ -43,6 +45,12 @@ export interface UseIntersectionObserverOptions {
    * @default true
    */
   enabled?: boolean;
+
+  /**
+   * Optional external ref to observe.
+   * If omitted, the hook creates its own ref.
+   */
+  targetRef?: React.RefObject<T | null>;
 }
 
 export interface UseIntersectionObserverResult<
@@ -84,7 +92,7 @@ export interface UseIntersectionObserverResult<
  * ```
  */
 export function useIntersectionObserver<T extends HTMLElement = HTMLElement>(
-  options: UseIntersectionObserverOptions = {}
+  options: UseIntersectionObserverOptions<T> = {}
 ): UseIntersectionObserverResult<T> {
   const {
     rootMargin = '0px',
@@ -92,9 +100,11 @@ export function useIntersectionObserver<T extends HTMLElement = HTMLElement>(
     root = null,
     triggerOnce = false,
     enabled = true,
+    targetRef,
   } = options;
 
-  const ref = useRef<T>(null);
+  const internalRef = useRef<T>(null);
+  const ref = targetRef ?? internalRef;
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [entry, setEntry] = useState<IntersectionObserverEntry>();
 
@@ -140,7 +150,7 @@ export function useIntersectionObserver<T extends HTMLElement = HTMLElement>(
     return () => {
       observer.disconnect();
     };
-  }, [rootMargin, threshold, root, triggerOnce, enabled]);
+  }, [rootMargin, threshold, root, triggerOnce, enabled, ref]);
 
   return {
     ref,
