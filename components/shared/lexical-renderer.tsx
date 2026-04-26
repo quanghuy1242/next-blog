@@ -9,7 +9,6 @@
  */
 
 import React from 'react';
-import Link from 'next/link';
 import {
   RichText,
   type JSXConvertersFunction,
@@ -19,6 +18,7 @@ import type {
   SerializedUploadNode,
 } from '@payloadcms/richtext-lexical';
 import { ResponsiveImage } from './responsive-image';
+import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 import {
   resolveEpubHref,
   type ChapterLinkTarget,
@@ -341,7 +341,7 @@ const createLexicalConverters = (
       );
 
       if (resolution.kind === 'chapter') {
-        return <Link href={resolution.href}>{children}</Link>;
+        return <SSRPrefetchLink href={resolution.href}>{children}</SSRPrefetchLink>;
       }
 
       if (resolution.kind === 'anchor') {

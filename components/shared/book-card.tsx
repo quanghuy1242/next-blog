@@ -1,7 +1,7 @@
 import React from 'react';
-import Link from 'next/link';
 import type { Book } from 'types/cms';
 import { buildBookHref } from 'common/utils/book-route';
+import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 import { CoverImage } from './cover-image';
 
 interface BookCardProps {
@@ -11,18 +11,18 @@ interface BookCardProps {
 export function BookCard({ book }: BookCardProps) {
   return (
     <article className="flex flex-col gap-2">
-      <Link href={buildBookHref(book.id, book.slug)} className="block">
+      <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} className="block">
         {book.cover ? (
           <CoverImage media={book.cover} title={book.title} className="mb-0" />
         ) : (
           <div className="h-40 w-full rounded-sm bg-gradient-to-br from-blue to-darkBlue shadow-small" />
         )}
-      </Link>
+      </SSRPrefetchLink>
 
       <h3 className="text-2xl leading-snug">
-        <Link href={buildBookHref(book.id, book.slug)} className="hover:underline">
+        <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} className="hover:underline">
           {book.title}
-        </Link>
+        </SSRPrefetchLink>
       </h3>
 
       {book.author && <p className="text-sm text-gray-700">{book.author}</p>}

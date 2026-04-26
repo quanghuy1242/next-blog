@@ -1,7 +1,7 @@
 import React from 'react';
-import Link from 'next/link';
 import type { Chapter } from 'types/cms';
 import { buildChapterHref } from 'common/utils/book-route';
+import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 
 interface ChapterListProps {
   chapters: Chapter[];
@@ -18,7 +18,7 @@ export function ChapterList({ chapters, bookId, bookSlug }: ChapterListProps) {
     <ol className="space-y-2">
       {chapters.map((chapter) => (
         <li key={`${chapter.slug}-${chapter.order}`}>
-          <Link
+          <SSRPrefetchLink
             href={buildChapterHref(bookId, bookSlug, chapter.slug)}
             className="flex items-center justify-between rounded border border-gray-200 px-3 py-2 hover:border-gray-300"
           >
@@ -26,7 +26,7 @@ export function ChapterList({ chapters, bookId, bookSlug }: ChapterListProps) {
             <span className="flex-1 text-sm font-medium text-gray-900">
               {chapter.title}
             </span>
-          </Link>
+          </SSRPrefetchLink>
         </li>
       ))}
     </ol>

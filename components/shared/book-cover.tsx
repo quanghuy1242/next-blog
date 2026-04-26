@@ -1,9 +1,8 @@
 import React from 'react';
-import Link from 'next/link';
 import cn from 'classnames';
-import type { LinkProps } from 'next/link';
 import type { Media } from 'types/cms';
 import { ResponsiveImage } from './responsive-image';
+import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 
 const BOOK_COVER_WIDTH = 1026;
 const BOOK_COVER_HEIGHT = 1500;
@@ -15,7 +14,7 @@ interface BookCoverProps {
   title: string;
   className?: string;
   priority?: boolean;
-  href?: LinkProps['href'];
+  href?: string;
 }
 
 export function BookCover({
@@ -55,8 +54,8 @@ export function BookCover({
   }
 
   return (
-    <Link href={href} className="block">
+    <SSRPrefetchLink href={href} className="block">
       {cover}
-    </Link>
+    </SSRPrefetchLink>
   );
 }

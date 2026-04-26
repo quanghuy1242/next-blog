@@ -2,7 +2,6 @@ import React from 'react';
 import { useMemo, useState } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
 import { getBookBySlug } from 'common/apis/books';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { getChapterByBookAndSlug, getChapterPageByBookId } from 'common/apis/chapters';
@@ -16,6 +15,7 @@ import { renderMetaTags } from 'components/core/metadata';
 import { ChapterContent } from 'components/pages/books/chapter-content';
 import { ChapterToc } from 'components/pages/books/chapter-toc';
 import { ChapterTocDrawer } from 'components/pages/books/chapter-toc-drawer';
+import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 import type { Book, Chapter, Homepage } from 'types/cms';
 
 interface ChapterPageProps {
@@ -80,9 +80,9 @@ export default function ChapterPage({
               <div className="mb-4 flex items-center justify-between gap-2">
                 <div>
                   <p className="text-xs uppercase tracking-wide text-gray-500">
-                    <Link href={buildBookHref(book.id, book.slug)} className="hover:underline">
+                    <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} className="hover:underline">
                       {book.title}
-                    </Link>
+                    </SSRPrefetchLink>
                   </p>
                   {shouldRenderChapterTitle ? (
                     <h1 className="text-3xl font-bold leading-tight">{chapter.title}</h1>
@@ -107,22 +107,22 @@ export default function ChapterPage({
               <div className="mt-8 flex items-center justify-between gap-4 border-t border-gray-200 pt-4 text-sm">
                 <div>
                   {previousChapter ? (
-                    <Link
+                    <SSRPrefetchLink
                       href={buildChapterHref(book.id, book.slug, previousChapter.slug)}
                       className="text-blue hover:underline"
                     >
                       Previous: {previousChapter.title}
-                    </Link>
+                    </SSRPrefetchLink>
                   ) : null}
                 </div>
                 <div className="text-right">
                   {nextChapter ? (
-                    <Link
+                    <SSRPrefetchLink
                       href={buildChapterHref(book.id, book.slug, nextChapter.slug)}
                       className="text-blue hover:underline"
                     >
                       Next: {nextChapter.title}
-                    </Link>
+                    </SSRPrefetchLink>
                   ) : null}
                 </div>
               </div>

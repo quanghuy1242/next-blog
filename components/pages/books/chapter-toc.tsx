@@ -1,8 +1,8 @@
 import React from 'react';
-import Link from 'next/link';
 import cn from 'classnames';
 import type { Chapter } from 'types/cms';
 import { buildChapterHref } from 'common/utils/book-route';
+import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 
 interface ChapterTocProps {
   chapters: Chapter[];
@@ -24,7 +24,7 @@ export function ChapterToc({
       <ul className="space-y-2">
         {chapters.map((chapter) => (
           <li key={`${chapter.slug}-${chapter.order}`}>
-            <Link
+            <SSRPrefetchLink
               href={buildChapterHref(bookId, bookSlug, chapter.slug)}
               onClick={onNavigate}
               className={cn(
@@ -35,7 +35,7 @@ export function ChapterToc({
               )}
             >
               {chapter.title}
-            </Link>
+            </SSRPrefetchLink>
           </li>
         ))}
       </ul>

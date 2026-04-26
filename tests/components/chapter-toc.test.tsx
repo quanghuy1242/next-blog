@@ -1,7 +1,36 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { ChapterToc } from 'components/pages/books/chapter-toc';
 import type { Chapter } from 'types/cms';
+import { requestBookRouteWarmup } from 'common/utils/book-route-prefetch';
+
+vi.mock('common/utils/book-route-prefetch', () => ({
+  requestBookRouteWarmup: vi.fn(),
+}));
+
+vi.mock('next/link', () => ({
+  default: React.forwardRef<
+    HTMLAnchorElement,
+    React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
+  >(function MockLink({ href, children, ...rest }, ref) {
+    return (
+      <a
+        ref={ref}
+        href={href}
+        {...rest}
+        onClick={(event) => {
+          rest.onClick?.(event);
+          event.preventDefault();
+        }}
+      >
+        {children}
+      </a>
+    );
+  }),
+}));
+
+const mockedRequestBookRouteWarmup = vi.mocked(requestBookRouteWarmup);
 
 function createChapter(overrides: Partial<Chapter> = {}): Chapter {
   return {
@@ -34,6 +63,10 @@ function createChapter(overrides: Partial<Chapter> = {}): Chapter {
 }
 
 describe('ChapterToc component', () => {
+  beforeEach(() => {
+    mockedRequestBookRouteWarmup.mockReset();
+  });
+
   test('highlights current chapter with simple sidebar styling', () => {
     const chapters = [
       createChapter({ slug: 'ch-1', title: 'One', order: 1 }),
