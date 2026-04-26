@@ -6,6 +6,7 @@ import type { Chapter } from 'types/cms';
 import { requestBookRouteWarmup } from 'common/utils/book-route-prefetch';
 
 vi.mock('common/utils/book-route-prefetch', () => ({
+  claimBookRouteWarmup: vi.fn(),
   requestBookRouteWarmup: vi.fn(),
 }));
 

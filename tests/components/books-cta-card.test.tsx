@@ -4,6 +4,7 @@ import { vi } from 'vitest';
 import { BooksCtaCard } from 'components/shared/books-cta-card';
 
 vi.mock('common/utils/book-route-prefetch', () => ({
+  claimBookRouteWarmup: vi.fn(),
   requestBookRouteWarmup: vi.fn(),
 }));
 

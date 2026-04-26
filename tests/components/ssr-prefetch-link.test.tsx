@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 import {
+  claimBookRouteWarmup,
   cancelBookRouteWarmup,
   requestBookRouteWarmup,
 } from 'common/utils/book-route-prefetch';
@@ -11,6 +12,7 @@ const TOUCH_DEVICE_QUERY = '(hover: none), (pointer: coarse)';
 const DESKTOP_POINTER_QUERY = '(hover: hover) and (pointer: fine)';
 
 vi.mock('common/utils/book-route-prefetch', () => ({
+  claimBookRouteWarmup: vi.fn(),
   cancelBookRouteWarmup: vi.fn(),
   requestBookRouteWarmup: vi.fn(),
 }));
@@ -18,7 +20,10 @@ vi.mock('common/utils/book-route-prefetch', () => ({
 vi.mock('next/link', () => ({
   default: React.forwardRef<
     HTMLAnchorElement,
-    React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
+    React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+      href: string;
+      onNavigate?: (event: { preventDefault: () => void }) => void;
+    }
   >(function MockLink({ href, children, ...rest }, ref) {
     return (
       <a
@@ -27,6 +32,32 @@ vi.mock('next/link', () => ({
         {...rest}
         onClick={(event) => {
           rest.onClick?.(event);
+
+          if (event.defaultPrevented) {
+            return;
+          }
+
+          if (
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey ||
+            event.button === 1
+          ) {
+            return;
+          }
+
+          let navigatePrevented = false;
+          rest.onNavigate?.({
+            preventDefault: () => {
+              navigatePrevented = true;
+            },
+          });
+
+          if (navigatePrevented) {
+            return;
+          }
+
           event.preventDefault();
         }}
       >
@@ -37,6 +68,7 @@ vi.mock('next/link', () => ({
 }));
 
 const mockedRequestBookRouteWarmup = vi.mocked(requestBookRouteWarmup);
+const mockedClaimBookRouteWarmup = vi.mocked(claimBookRouteWarmup);
 const mockedCancelBookRouteWarmup = vi.mocked(cancelBookRouteWarmup);
 
 describe('SSRPrefetchLink component', () => {
@@ -74,6 +106,7 @@ describe('SSRPrefetchLink component', () => {
 
   beforeEach(() => {
     mockedRequestBookRouteWarmup.mockReset();
+    mockedClaimBookRouteWarmup.mockReset();
     mockedCancelBookRouteWarmup.mockReset();
     observeCallback = null;
     observeMock.mockClear();
@@ -110,6 +143,33 @@ describe('SSRPrefetchLink component', () => {
       '/books/1~sample-book',
       'hover'
     );
+  });
+
+  test('claims an existing warmup on click', () => {
+    const onClick = vi.fn();
+
+    render(
+      <SSRPrefetchLink href="/books/1~sample-book" onClick={onClick}>
+        Sample Book
+      </SSRPrefetchLink>
+    );
+
+    fireEvent.click(screen.getByRole('link', { name: 'Sample Book' }));
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(mockedClaimBookRouteWarmup).toHaveBeenCalledWith(
+      '/books/1~sample-book'
+    );
+  });
+
+  test('does not claim on a modified click', () => {
+    render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
+
+    fireEvent.click(screen.getByRole('link', { name: 'Sample Book' }), {
+      ctrlKey: true,
+    });
+
+    expect(mockedClaimBookRouteWarmup).not.toHaveBeenCalled();
   });
 
   test('does not observe viewport warming on desktop', async () => {

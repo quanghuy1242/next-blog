@@ -7,6 +7,7 @@ export type BookRouteWarmSource = 'hover' | 'pointer' | 'viewport';
 
 interface BookRouteWarmTask {
   href: string;
+  requestKey: string;
   source: BookRouteWarmSource;
   sequence: number;
   state: 'pending' | 'inflight';
@@ -14,13 +15,22 @@ interface BookRouteWarmTask {
   canceled: boolean;
 }
 
+interface NextDataState {
+  buildId?: string;
+  locale?: string;
+  defaultLocale?: string;
+}
+
 const recentWarmups = new Map<string, number>();
 const pendingWarmups: BookRouteWarmTask[] = [];
 const inflightWarmups = new Set<string>();
 const tasksByHref = new Map<string, BookRouteWarmTask>();
+const sharedWarmupFetches = new Map<string, Promise<Response>>();
 
 let activeWarmups = 0;
 let warmupSequence = 0;
+let nativeFetch: typeof fetch | null = null;
+let fetchInterceptorInstalled = false;
 
 function getSourcePriority(source: BookRouteWarmSource): number {
   switch (source) {
@@ -41,6 +51,175 @@ function normalizePathname(pathname: string): string {
   }
 
   return pathname.replace(/\/+$/, '');
+}
+
+function getNextDataState(): NextDataState | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return (window as Window & { __NEXT_DATA__?: NextDataState }).__NEXT_DATA__ ?? null;
+}
+
+function buildBookRouteRequestKey(rawHref: string): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const trimmedHref = rawHref.trim();
+  if (!trimmedHref) {
+    return null;
+  }
+
+  let url: URL;
+
+  try {
+    url = new URL(trimmedHref, window.location.href);
+  } catch {
+    return null;
+  }
+
+  const nextData = getNextDataState();
+  const buildId = nextData?.buildId?.trim();
+  const normalizedPathname = normalizePathname(url.pathname);
+
+  if (!buildId) {
+    return `${normalizedPathname}${url.search}`;
+  }
+
+  const localePrefix =
+    nextData?.locale &&
+    nextData.locale !== nextData.defaultLocale &&
+    !normalizedPathname.startsWith(`/${nextData.locale}/`)
+      ? `/${nextData.locale}`
+      : '';
+  const routePath =
+    normalizedPathname === '/'
+      ? `${localePrefix}/index`
+      : `${localePrefix}${normalizedPathname}`;
+  return `/_next/data/${buildId}${routePath}.json${url.search}`;
+}
+
+function getSharedWarmupFetchKey(
+  input: RequestInfo | URL,
+  init?: RequestInit
+): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const method = init?.method ?? (input instanceof Request ? input.method : 'GET');
+
+  if (method.toUpperCase() !== 'GET') {
+    return null;
+  }
+
+  let rawUrl: string;
+
+  if (typeof input === 'string') {
+    rawUrl = input;
+  } else if (input instanceof URL) {
+    rawUrl = input.href;
+  } else {
+    rawUrl = input.url;
+  }
+
+  try {
+    const normalizedUrl = new URL(rawUrl, window.location.href);
+
+    if (normalizedUrl.origin !== window.location.origin) {
+      return null;
+    }
+
+    return normalizedUrl.href;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeSharedWarmupFetchKey(rawKey: string): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    return new URL(rawKey, window.location.href).href;
+  } catch {
+    return null;
+  }
+}
+
+function installBookRouteFetchInterceptor(): void {
+  if (
+    fetchInterceptorInstalled ||
+    typeof window === 'undefined' ||
+    typeof window.fetch !== 'function'
+  ) {
+    return;
+  }
+
+  nativeFetch = window.fetch.bind(window);
+
+  // Reuse the same in-flight request whenever the router asks for the same URL.
+  window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+    const sharedKey = getSharedWarmupFetchKey(input, init);
+
+    if (sharedKey) {
+      const sharedPromise = sharedWarmupFetches.get(sharedKey);
+
+      if (sharedPromise) {
+        return sharedPromise.then((response) => response.clone());
+      }
+    }
+
+    if (!nativeFetch) {
+      return Promise.reject(new Error('Book route fetch interceptor is unavailable'));
+    }
+
+    return nativeFetch(input, init);
+  }) as typeof fetch;
+
+  fetchInterceptorInstalled = true;
+}
+
+function restoreBookRouteFetchInterceptor(): void {
+  if (!fetchInterceptorInstalled || typeof window === 'undefined') {
+    return;
+  }
+
+  if (nativeFetch) {
+    window.fetch = nativeFetch;
+  }
+
+  nativeFetch = null;
+  fetchInterceptorInstalled = false;
+}
+
+function registerSharedWarmupFetch(
+  requestKey: string,
+  promise: Promise<Response>
+): void {
+  const normalizedRequestKey = normalizeSharedWarmupFetchKey(requestKey);
+
+  if (!normalizedRequestKey) {
+    return;
+  }
+
+  sharedWarmupFetches.set(normalizedRequestKey, promise);
+}
+
+function unregisterSharedWarmupFetch(
+  requestKey: string,
+  promise: Promise<Response>
+): void {
+  const normalizedRequestKey = normalizeSharedWarmupFetchKey(requestKey);
+
+  if (
+    normalizedRequestKey &&
+    sharedWarmupFetches.get(normalizedRequestKey) === promise
+  ) {
+    sharedWarmupFetches.delete(normalizedRequestKey);
+  }
 }
 
 function normalizeBookRouteHref(rawHref: string): string | null {
@@ -182,16 +361,38 @@ function drainWarmups(): void {
     nextTask.controller = new AbortController();
     inflightWarmups.add(nextTask.href);
     activeWarmups += 1;
+    installBookRouteFetchInterceptor();
+
+    // Start the actual network request once and let later callers attach to it.
+    const requestInit: RequestInit = {
+      credentials: 'same-origin',
+      method: 'GET',
+      signal: nextTask.controller?.signal,
+    };
+
+    if (nextTask.requestKey !== nextTask.href) {
+      requestInit.headers = {
+        'x-nextjs-data': '1',
+      };
+    }
+
+    if (!nativeFetch) {
+      throw new Error('Book route fetch interceptor is unavailable');
+    }
+
+    const requestPromise = nativeFetch(nextTask.requestKey, requestInit);
+
+    registerSharedWarmupFetch(nextTask.requestKey, requestPromise);
 
     void (async () => {
       try {
-        const response = await fetch(nextTask.href, {
-          credentials: 'same-origin',
-          method: 'GET',
-          signal: nextTask.controller?.signal,
-        });
+        const response = await requestPromise;
 
-        if (response.ok && !nextTask.canceled && !nextTask.controller?.signal.aborted) {
+        if (
+          response.ok &&
+          !nextTask.canceled &&
+          !nextTask.controller?.signal.aborted
+        ) {
           rememberWarmup(nextTask.href);
         }
       } catch (error) {
@@ -202,6 +403,7 @@ function drainWarmups(): void {
           // Ignore network failures and aborts. Warmups are best-effort only.
         }
       } finally {
+        unregisterSharedWarmupFetch(nextTask.requestKey, requestPromise);
         settleWarmupTask(nextTask);
       }
     })();
@@ -256,6 +458,7 @@ export function requestBookRouteWarmup(
 
   const task: BookRouteWarmTask = {
     href: normalizedHref,
+    requestKey: buildBookRouteRequestKey(normalizedHref) ?? normalizedHref,
     source,
     sequence: ++warmupSequence,
     state: 'pending',
@@ -267,6 +470,30 @@ export function requestBookRouteWarmup(
   enqueueWarmup(task);
 
   drainWarmups();
+}
+
+export function claimBookRouteWarmup(rawHref: string): void {
+  pruneExpiredWarmups();
+
+  const normalizedHref = normalizeBookRouteHref(rawHref);
+
+  if (!normalizedHref) {
+    return;
+  }
+
+  const task = tasksByHref.get(normalizedHref);
+
+  if (!task || task.source === 'hover') {
+    return;
+  }
+
+  task.source = 'hover';
+
+  if (task.state === 'pending') {
+    touchWarmupTask(task);
+    sortPendingWarmups();
+    drainWarmups();
+  }
 }
 
 export function cancelBookRouteWarmup(rawHref: string): void {
@@ -306,7 +533,9 @@ export function clearBookRouteWarmupState(): void {
   pendingWarmups.length = 0;
   inflightWarmups.clear();
   tasksByHref.clear();
+  sharedWarmupFetches.clear();
   activeWarmups = 0;
+  restoreBookRouteFetchInterceptor();
 }
 
 export function getBookRouteWarmupState() {

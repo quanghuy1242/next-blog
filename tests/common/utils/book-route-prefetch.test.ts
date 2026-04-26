@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import {
   clearBookRouteWarmupState,
+  claimBookRouteWarmup,
   cancelBookRouteWarmup,
   getBookRouteWarmupState,
   requestBookRouteWarmup,
@@ -10,6 +11,7 @@ import {
 describe('common/utils/book-route-prefetch', () => {
   beforeEach(() => {
     clearBookRouteWarmupState();
+    Reflect.deleteProperty(window as Window & { __NEXT_DATA__?: unknown }, '__NEXT_DATA__');
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     window.history.pushState({}, '', '/');
@@ -17,6 +19,7 @@ describe('common/utils/book-route-prefetch', () => {
 
   afterEach(() => {
     clearBookRouteWarmupState();
+    Reflect.deleteProperty(window as Window & { __NEXT_DATA__?: unknown }, '__NEXT_DATA__');
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -41,6 +44,56 @@ describe('common/utils/book-route-prefetch', () => {
     await Promise.resolve();
 
     expect(getBookRouteWarmupState().recentHrefs).toContain('/books/1~sample-book');
+  });
+
+  test('reuses the in-flight Next data request for a clicked route', async () => {
+    const deferreds: Array<(response: Response) => void> = [];
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          deferreds.push(resolve);
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const nextDataWindow = window as unknown as {
+      __NEXT_DATA__?: {
+        buildId?: string;
+      };
+    };
+    nextDataWindow.__NEXT_DATA__ = {
+      buildId: 'test-build',
+    };
+
+    requestBookRouteWarmup('/books/1~sample-book');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/_next/data/test-build/books/1~sample-book.json',
+      expect.objectContaining({
+        credentials: 'same-origin',
+        headers: expect.objectContaining({
+          'x-nextjs-data': '1',
+        }),
+        method: 'GET',
+        signal: expect.any(AbortSignal),
+      })
+    );
+
+    const sharedFetch = fetch('/_next/data/test-build/books/1~sample-book.json', {
+      credentials: 'same-origin',
+      headers: {
+        'x-nextjs-data': '1',
+      },
+      method: 'GET',
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    deferreds[0]?.(new Response('ok', { status: 200 }));
+
+    const response = await sharedFetch;
+
+    expect(await response.text()).toBe('ok');
   });
 
   test('limits concurrent warmups with a small pool', async () => {
@@ -160,6 +213,40 @@ describe('common/utils/book-route-prefetch', () => {
       expect(getBookRouteWarmupState().activeWarmups).toBe(0);
       expect(getBookRouteWarmupState().inflightHrefs).toHaveLength(0);
     });
+  });
+
+  test('promotes an inflight warmup on click so cleanup does not abort it', async () => {
+    const abortSignals: AbortSignal[] = [];
+    const fetchMock = vi.fn(
+      (_input, init) =>
+        new Promise<Response>((_resolve, reject) => {
+          const signal = init?.signal;
+
+          if (signal) {
+            abortSignals.push(signal);
+            signal.addEventListener(
+              'abort',
+              () => {
+                reject(new DOMException('Aborted', 'AbortError'));
+              },
+              { once: true }
+            );
+          }
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    requestBookRouteWarmup('/books/1~sample-book', 'viewport');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    claimBookRouteWarmup('/books/1~sample-book');
+    cancelBookRouteWarmup('/books/1~sample-book');
+
+    expect(abortSignals[0]?.aborted).toBe(false);
+    expect(getBookRouteWarmupState().inflightHrefs).toContain(
+      '/books/1~sample-book'
+    );
   });
 
   test('prioritizes the most recently scheduled viewport warmup once a slot opens', async () => {

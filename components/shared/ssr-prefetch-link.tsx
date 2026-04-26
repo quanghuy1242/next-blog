@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
 import { usePointerProximityObserver } from 'hooks/usePointerProximityObserver';
 import {
+  claimBookRouteWarmup,
   cancelBookRouteWarmup,
   requestBookRouteWarmup,
 } from 'common/utils/book-route-prefetch';
@@ -15,11 +16,14 @@ interface SSRPrefetchLinkProps
   extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   href: string;
   children: ReactNode;
+  onNavigate?: (event: { preventDefault: () => void }) => void;
 }
 
 export function SSRPrefetchLink({
   href,
   children,
+  onClick,
+  onNavigate,
   onFocus,
   onMouseEnter,
   ...rest
@@ -103,6 +107,27 @@ export function SSRPrefetchLink({
       ref={anchorRef}
       href={href}
       prefetch={false}
+      onClick={(event) => {
+        onClick?.(event);
+
+        if (event.defaultPrevented) {
+          return;
+        }
+      }}
+      onNavigate={(event) => {
+        let navigatePrevented = false;
+
+        onNavigate?.({
+          preventDefault: () => {
+            navigatePrevented = true;
+            event.preventDefault();
+          },
+        });
+
+        if (!navigatePrevented) {
+          claimBookRouteWarmup(href);
+        }
+      }}
       onFocus={(event) => {
         onFocus?.(event);
         requestBookRouteWarmup(href, 'hover');
