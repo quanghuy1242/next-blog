@@ -353,6 +353,38 @@ describe('common/utils/book-route-prefetch', () => {
     );
   });
 
+  test('drops a pending warmup on click so it cannot start after navigation', async () => {
+    const deferreds: Array<(response: Response) => void> = [];
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          deferreds.push(resolve);
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    requestBookRouteWarmup('/books/1~sample-book', 'viewport');
+    requestBookRouteWarmup('/books/2~sample-book', 'viewport');
+    requestBookRouteWarmup('/books/3~sample-book', 'viewport');
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(getBookRouteWarmupState().pendingHrefs).toContain(
+      '/books/3~sample-book'
+    );
+
+    claimBookRouteWarmup('/books/3~sample-book');
+
+    expect(getBookRouteWarmupState().pendingHrefs).not.toContain(
+      '/books/3~sample-book'
+    );
+
+    deferreds[0]?.(new Response('ok', { status: 200 }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+  });
+
   test('prioritizes the most recently scheduled viewport warmup once a slot opens', async () => {
     const deferreds: Array<(response: Response) => void> = [];
     const fetchMock = vi.fn(

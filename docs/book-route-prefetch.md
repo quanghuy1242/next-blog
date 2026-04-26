@@ -18,7 +18,8 @@ The client uses a dedicated `SSRPrefetchLink` wrapper for book and chapter route
 - On mobile and other touch/coarse-pointer devices, when a link becomes visible in the viewport it schedules a warmup immediately.
 - If that link scrolls back out of view before the warmup completes, the pending request is canceled and the scheduler gives priority to the newly visible links.
 - On desktop fine-pointer devices, a pointer-proximity window around the mouse behaves the same way: nearby visible links warm immediately, and stale ones are canceled when the pointer moves away.
-- If the user clicks a link while its warmup is still in progress, that click claims the existing warmup so unmount cleanup does not abort it.
+- If the user clicks a link while its warmup is already in flight, that click claims the existing warmup so unmount cleanup does not abort it.
+- If the user clicks while a warmup is still only queued, the queued task is dropped and the navigation request proceeds on its own instead of letting the stale queued warmup create a second fetch later.
 - The wrapper disables native viewport prefetch on `next/link` for these routes so the custom scheduler owns the behavior we are tuning.
 - The warmup request uses the same Next data URL the pages router fetches on click, including the dynamic route query string Next adds for book and chapter pages and its `URLSearchParams` encoding, so an in-flight warmup can be reused by the navigation request instead of starting over.
 - Successful warmups are kept around briefly after completion so a click that lands just after the fetch resolves can still reuse the same response.
@@ -51,7 +52,7 @@ The registry is a hint, not a cache oracle. The browser cannot reliably inspect 
 Hover and focus are treated as higher priority than pointer-proximity warming, which is higher priority than viewport warming.
 
 - Hover/focus should win when a route is both visible and actively targeted.
-- Clicks should promote an existing warmup to hover priority so navigation can inherit the in-flight work.
+- Clicks should keep an in-flight warmup alive, but they should discard a queued warmup that has not started yet.
 - Pointer warming should fill the gaps for desktop users who move the cursor through dense link lists.
 - Viewport warming should fill the gaps for touch and tablet users.
 - The queue is throttled with a small semaphore-style pool so a large table of contents does not flood the origin.

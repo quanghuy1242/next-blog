@@ -559,13 +559,14 @@ export function claimBookRouteWarmup(rawHref: string): void {
     return;
   }
 
-  task.source = 'hover';
-
   if (task.state === 'pending') {
-    touchWarmupTask(task);
-    sortPendingWarmups();
-    drainWarmups();
+    task.canceled = true;
+    removePendingWarmup(task);
+    tasksByHref.delete(normalizedHref);
+    return;
   }
+
+  task.source = 'hover';
 }
 
 export function cancelBookRouteWarmup(rawHref: string): void {
