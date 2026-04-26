@@ -1,4 +1,3 @@
-import { unstable_cache } from 'next/cache';
 import type {
   HomePageData,
   Post,
@@ -6,17 +5,17 @@ import type {
   Author,
   Homepage,
 } from '../../types/cms';
-import { fetchAPI } from './base';
+import { fetchAPI, type FetchApiOptions } from './base';
 import { createPostsWhere } from './posts';
 
 const DEFAULT_HOME_POST_LIMIT = 5;
-const HOME_DATA_REVALIDATE_SECONDS = 60;
 const AUTHOR_ID = 1; // quanghuy1242
 
 export interface GetDataForHomeOptions {
   limit?: number;
   categoryId?: string | null;
   tags?: string[] | null;
+  cache?: FetchApiOptions['cache'];
 }
 
 export interface GetDataForHomeResult {
@@ -28,6 +27,7 @@ interface NormalizedHomeOptions {
   limit: number;
   categoryId: string | null;
   tags: string[] | null;
+  cache?: FetchApiOptions['cache'];
 }
 
 interface HomePageResponse {
@@ -46,6 +46,7 @@ async function fetchHomeData({
   limit,
   categoryId,
   tags,
+  cache,
 }: NormalizedHomeOptions): Promise<GetDataForHomeResult> {
   const where = createPostsWhere(categoryId, tags);
   const queryLimit = limit + 1;
@@ -157,7 +158,7 @@ async function fetchHomeData({
         where,
         authorId: AUTHOR_ID,
       },
-      next: { revalidate: HOME_DATA_REVALIDATE_SECONDS },
+      cache,
     }
   );
 
@@ -191,19 +192,13 @@ function normalizeHomeOptions(
     limit,
     categoryId,
     tags,
+    cache: options.cache,
   };
 }
-
-const cachedGetDataForHome = unstable_cache(
-  async (options: NormalizedHomeOptions) => fetchHomeData(options),
-  ['getDataForHome'],
-  { revalidate: HOME_DATA_REVALIDATE_SECONDS }
-);
 
 export async function getDataForHome(
   options: GetDataForHomeOptions = {}
 ): Promise<GetDataForHomeResult> {
   const normalizedOptions = normalizeHomeOptions(options);
-
-  return cachedGetDataForHome(normalizedOptions);
+  return fetchHomeData(normalizedOptions);
 }

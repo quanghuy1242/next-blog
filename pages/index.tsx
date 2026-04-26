@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { getDataForHome } from 'common/apis/index';
 import { getCategoryIdBySlug } from 'common/apis/categories';
+import { ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
@@ -195,13 +196,16 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (
   let categoryId: number | null = null;
 
   if (initialCategory) {
-    categoryId = await getCategoryIdBySlug(initialCategory);
+    categoryId = await getCategoryIdBySlug(initialCategory, {
+      cache: ONE_HOUR_PAYLOAD_CACHE,
+    });
   }
 
   const { data, hasMore } = await getDataForHome({
     limit: POSTS_PAGE_SIZE,
     categoryId: categoryId ? String(categoryId) : null,
     tags,
+    cache: ONE_HOUR_PAYLOAD_CACHE,
   });
 
   const categoryIsValid = !initialCategory || Boolean(categoryId);

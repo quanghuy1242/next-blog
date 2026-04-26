@@ -1,4 +1,5 @@
 import { fetchAPI } from './base';
+import type { PayloadCacheSettings } from './cache';
 import type { Category } from 'types/cms';
 
 interface CategoryBySlugResponse {
@@ -7,21 +8,16 @@ interface CategoryBySlugResponse {
   };
 }
 
-const categoryIdCache = new Map<string, number>();
-
 export async function getCategoryIdBySlug(
-  slug: string
+  slug: string,
+  options: {
+    cache?: PayloadCacheSettings;
+  } = {}
 ): Promise<number | null> {
   const trimmedSlug = slug.trim();
 
   if (!trimmedSlug) {
     return null;
-  }
-
-  const cached = categoryIdCache.get(trimmedSlug);
-
-  if (cached) {
-    return cached;
   }
 
   const data = await fetchAPI<CategoryBySlugResponse>(
@@ -39,15 +35,10 @@ export async function getCategoryIdBySlug(
       variables: {
         slug: trimmedSlug,
       },
+      cache: options.cache,
     }
   );
 
   const category = data?.Categories?.docs?.[0] ?? null;
-  const categoryId = category?.id ?? null;
-
-  if (categoryId) {
-    categoryIdCache.set(trimmedSlug, categoryId);
-  }
-
-  return categoryId;
+  return category?.id ?? null;
 }

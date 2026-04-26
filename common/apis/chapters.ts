@@ -1,5 +1,6 @@
 import type { Chapter } from 'types/cms';
 import { fetchAPIWithAuthToken } from './base';
+import type { PayloadCacheSettings } from './cache';
 
 interface ChaptersResponse {
   Chapters: {
@@ -18,6 +19,7 @@ interface ChapterReaderResponse {
 
 interface ChapterFetchOptions {
   authToken?: string | null;
+  cache?: PayloadCacheSettings;
 }
 
 const CHAPTER_FIELDS = `
@@ -74,6 +76,7 @@ export async function getChaptersByBookId(
         bookID,
       },
       authToken: options.authToken,
+      cache: options.cache,
     }
   );
 
@@ -134,6 +137,7 @@ export async function getChapterByBookAndSlug(
         chapterSlug: trimmedSlug,
       },
       authToken: options.authToken,
+      cache: options.cache,
     }
   );
 

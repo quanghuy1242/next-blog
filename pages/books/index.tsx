@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { getDataForBooksPage } from 'common/apis/books';
+import { ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
@@ -99,8 +100,10 @@ export default function BooksPage({
 
 export const getServerSideProps: GetServerSideProps<BooksPageProps> = async ({ req }) => {
   const sessionToken = getBetterAuthTokenFromRequest(req);
+  const payloadCache = sessionToken ? undefined : ONE_HOUR_PAYLOAD_CACHE;
   const data = await getDataForBooksPage(BOOKS_PAGE_SIZE, {
     authToken: sessionToken,
+    cache: payloadCache,
   });
 
   return {

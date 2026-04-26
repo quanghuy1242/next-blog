@@ -5,6 +5,7 @@ import type {
   PaginatedResponse,
 } from 'types/cms';
 import { fetchAPIWithAuthToken } from './base';
+import type { PayloadCacheSettings } from './cache';
 
 const AUTHOR_ID = 1; // quanghuy1242
 const DEFAULT_BOOKS_LIMIT = 6;
@@ -27,6 +28,7 @@ interface BookBySlugResponse {
 
 interface BookFetchOptions {
   authToken?: string | null;
+  cache?: PayloadCacheSettings;
 }
 
 const BOOK_FIELDS = `
@@ -122,6 +124,7 @@ export async function getPaginatedBooks(
         where: createBooksWhere(),
       },
       authToken: options.authToken,
+      cache: options.cache,
     }
   );
 
@@ -163,6 +166,7 @@ export async function getDataForBooksPage(
         where: createBooksWhere(),
       },
       authToken: options.authToken,
+      cache: options.cache,
     }
   );
 
@@ -213,6 +217,7 @@ export async function getBookBySlug(
         slug: trimmedSlug,
       },
       authToken: options.authToken,
+      cache: options.cache,
     }
   );
 

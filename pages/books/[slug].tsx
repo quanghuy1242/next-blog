@@ -2,6 +2,7 @@ import React from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { getBookBySlug } from 'common/apis/books';
+import { ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { getChaptersByBookId } from 'common/apis/chapters';
 import { getCoverImageUrl } from 'common/utils/image';
 import { generateMetaTags } from 'common/utils/meta-tags';
@@ -51,6 +52,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async ({ params, req }) => {
   const slugParam = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug;
   const sessionToken = getBetterAuthTokenFromRequest(req);
+  const payloadCache = sessionToken ? undefined : ONE_HOUR_PAYLOAD_CACHE;
 
   if (!slugParam) {
     return {
@@ -60,6 +62,7 @@ export const getServerSideProps: GetServerSideProps<
 
   const accessibleResult = await getBookBySlug(slugParam, {
     authToken: sessionToken,
+    cache: payloadCache,
   });
 
   const { book, homepage } = accessibleResult;
@@ -72,6 +75,7 @@ export const getServerSideProps: GetServerSideProps<
 
   const chapters = await getChaptersByBookId(book.id, {
     authToken: sessionToken,
+    cache: payloadCache,
   });
 
   return {

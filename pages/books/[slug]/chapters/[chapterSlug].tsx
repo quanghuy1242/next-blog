@@ -4,6 +4,7 @@ import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { getBookBySlug } from 'common/apis/books';
+import { ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { getChapterByBookAndSlug } from 'common/apis/chapters';
 import { getCoverImageUrl } from 'common/utils/image';
 import { generateMetaTags } from 'common/utils/meta-tags';
@@ -155,6 +156,7 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
     ? params?.chapterSlug[0]
     : params?.chapterSlug;
   const sessionToken = getBetterAuthTokenFromRequest(req);
+  const payloadCache = sessionToken ? undefined : ONE_HOUR_PAYLOAD_CACHE;
 
   if (!bookSlug || !chapterSlug) {
     return {
@@ -164,6 +166,7 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
 
   const accessibleResult = await getBookBySlug(bookSlug, {
     authToken: sessionToken,
+    cache: payloadCache,
   });
 
   let { book, homepage } = accessibleResult;
@@ -176,6 +179,7 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
 
   const chapterData = await getChapterByBookAndSlug(book.id, chapterSlug, {
     authToken: sessionToken,
+    cache: payloadCache,
   });
 
   if (!chapterData.chapter) {
