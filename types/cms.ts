@@ -87,8 +87,12 @@ export interface Book {
   id: number;
   title: string;
   author?: string | null;
+  description?: string | null;
+  language?: string | null;
   slug: string;
   visibility?: 'public' | 'private';
+  chapterCount?: number | null;
+  totalWordCount?: number | null;
   cover?: Media | null;
   origin: BookOrigin;
   sourceType: BookSourceType;
@@ -118,10 +122,12 @@ export interface Chapter {
   book: Book | number;
   order: number;
   slug: string;
+  chapterWordCount?: number | null;
   chapterSourceKey?: string | null;
   chapterSourceHash?: string | null;
   importBatchId?: string | null;
   manualEditedAt?: string | null;
+  hasPassword?: boolean | null;
   content: SerializedEditorState;
   createdBy?: Author | number | null;
   _status?: PostStatus;

@@ -36,16 +36,16 @@ describe('epub link resolver', () => {
 
   test('resolves chapter links and preserves hash fragments', () => {
     expect(
-      resolveEpubHref('../Text/02.htm#pgfId-1011849', chapters, 'sample-book')
+      resolveEpubHref('../Text/02.htm#pgfId-1011849', chapters, 1, 'sample-book')
     ).toEqual({
       kind: 'chapter',
-      href: '/books/sample-book/chapters/chapter-two#pgfId-1011849',
+      href: '/books/1~sample-book/chapters/chapter-two#pgfId-1011849',
       fragment: 'pgfId-1011849',
     });
   });
 
   test('resolves fragment-only anchors without chapter lookup', () => {
-    expect(resolveEpubHref('#section-3', chapters, 'sample-book')).toEqual({
+    expect(resolveEpubHref('#section-3', chapters, 1, 'sample-book')).toEqual({
       kind: 'anchor',
       href: '#section-3',
       fragment: 'section-3',
@@ -53,7 +53,7 @@ describe('epub link resolver', () => {
   });
 
   test('falls back to unresolved when the source chapter cannot be matched', () => {
-    expect(resolveEpubHref('../Text/missing.htm#section', chapters, 'sample-book')).toEqual({
+    expect(resolveEpubHref('../Text/missing.htm#section', chapters, 1, 'sample-book')).toEqual({
       kind: 'unresolved',
     });
   });
@@ -72,6 +72,7 @@ describe('epub link resolver', () => {
             chapterSourceKey: 'toc-b::OEBPS/Other/index.htm::chapter-10',
           },
         ],
+        1,
         'sample-book'
       )
     ).toEqual({

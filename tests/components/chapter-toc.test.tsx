@@ -43,6 +43,7 @@ describe('ChapterToc component', () => {
     render(
       <ChapterToc
         chapters={chapters}
+        bookId={1}
         bookSlug="sample-book"
         currentChapterSlug="ch-2"
       />
@@ -50,7 +51,7 @@ describe('ChapterToc component', () => {
 
     const activeLink = screen.getByRole('link', { name: /Two/i });
     expect(activeLink.className).toContain('font-semibold');
-    expect(activeLink).toHaveAttribute('href', '/books/sample-book/chapters/ch-2');
+    expect(activeLink).toHaveAttribute('href', '/books/1~sample-book/chapters/ch-2');
     expect(activeLink.className).toContain('text-gray-900');
     expect(activeLink.className).not.toContain('bg-blue');
   });
@@ -62,6 +63,7 @@ describe('ChapterToc component', () => {
     render(
       <ChapterToc
         chapters={chapters}
+        bookId={1}
         bookSlug="sample-book"
         currentChapterSlug="ch-1"
         onNavigate={onNavigate}

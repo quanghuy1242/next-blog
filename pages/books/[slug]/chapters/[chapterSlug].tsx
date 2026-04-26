@@ -5,7 +5,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { getBookBySlug } from 'common/apis/books';
 import { ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
-import { getChapterByBookAndSlug } from 'common/apis/chapters';
+import { getChapterByBookAndSlug, getChapterPageByBookId } from 'common/apis/chapters';
+import { buildBookHref, buildChapterHref, parseBookRouteSegment } from 'common/utils/book-route';
 import { getCoverImageUrl } from 'common/utils/image';
 import { generateMetaTags } from 'common/utils/meta-tags';
 import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
@@ -68,6 +69,7 @@ export default function ChapterPage({
             <p className="mb-3 text-sm font-semibold text-gray-900">Chapters</p>
             <ChapterToc
               chapters={chapters}
+              bookId={book.id}
               bookSlug={book.slug}
               currentChapterSlug={chapter.slug}
             />
@@ -78,7 +80,7 @@ export default function ChapterPage({
               <div className="mb-4 flex items-center justify-between gap-2">
                 <div>
                   <p className="text-xs uppercase tracking-wide text-gray-500">
-                    <Link href={`/books/${book.slug}`} className="hover:underline">
+                    <Link href={buildBookHref(book.id, book.slug)} className="hover:underline">
                       {book.title}
                     </Link>
                   </p>
@@ -97,6 +99,7 @@ export default function ChapterPage({
 
               <ChapterContent
                 content={chapter.content}
+                bookId={book.id}
                 bookSlug={book.slug}
                 chapters={chapters}
               />
@@ -105,7 +108,7 @@ export default function ChapterPage({
                 <div>
                   {previousChapter ? (
                     <Link
-                      href={`/books/${book.slug}/chapters/${previousChapter.slug}`}
+                      href={buildChapterHref(book.id, book.slug, previousChapter.slug)}
                       className="text-blue hover:underline"
                     >
                       Previous: {previousChapter.title}
@@ -115,7 +118,7 @@ export default function ChapterPage({
                 <div className="text-right">
                   {nextChapter ? (
                     <Link
-                      href={`/books/${book.slug}/chapters/${nextChapter.slug}`}
+                      href={buildChapterHref(book.id, book.slug, nextChapter.slug)}
                       className="text-blue hover:underline"
                     >
                       Next: {nextChapter.title}
@@ -136,6 +139,7 @@ export default function ChapterPage({
       >
         <ChapterToc
           chapters={chapters}
+          bookId={book.id}
           bookSlug={book.slug}
           currentChapterSlug={chapter.slug}
           onNavigate={() => {
@@ -164,12 +168,38 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
     };
   }
 
-  const accessibleResult = await getBookBySlug(bookSlug, {
+  const parsedBookRoute = parseBookRouteSegment(bookSlug);
+
+  if (parsedBookRoute.bookId) {
+    const accessibleResult = await getChapterPageByBookId(parsedBookRoute.bookId, chapterSlug, {
+      authToken: sessionToken,
+      cache: payloadCache,
+    });
+
+    const { book, chapter, chapters, homepage } = accessibleResult;
+
+    if (!book || !chapter || book.slug !== parsedBookRoute.bookSlug) {
+      return {
+        notFound: true,
+      };
+    }
+
+    return {
+      props: {
+        book,
+        chapter,
+        chapters,
+        homepage,
+      },
+    };
+  }
+
+  const accessibleResult = await getBookBySlug(parsedBookRoute.bookSlug, {
     authToken: sessionToken,
     cache: payloadCache,
   });
 
-  let { book, homepage } = accessibleResult;
+  const { book } = accessibleResult;
 
   if (!book) {
     return {
@@ -189,11 +219,9 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
   }
 
   return {
-    props: {
-      book,
-      chapter: chapterData.chapter,
-      chapters: chapterData.chapters,
-      homepage,
+    redirect: {
+      destination: buildChapterHref(book.id, book.slug, chapterData.chapter.slug),
+      permanent: false,
     },
   };
 };

@@ -133,7 +133,7 @@ If you want chapter counts, query `Chapters` with `where: { book: { equals: <boo
 
 ### Book detail page
 
-Use the book slug route to fetch the book and then fetch the chapters in order.
+Use the canonical `bookId~bookSlug` route to fetch the book and chapters in one request.
 
 Recommended page shape:
 
@@ -141,10 +141,13 @@ Recommended page shape:
 - Status badge for `manual`, `epub-imported`, or `synced`.
 - Ordered chapter list.
 - Optional read-only preview of the first chapter.
+- If the fetched book slug does not match the slug embedded in the URL, reject the request with `404`.
 
 ### Chapter page
 
-Use the chapter slug route to fetch the chapter content, then render the Lexical JSON in read-only mode.
+Use the canonical `bookId~bookSlug/chapters/chapterSlug` route to fetch the chapter content in one request, then render the Lexical JSON in read-only mode.
+
+The slug-only variant should be treated as legacy and redirected to the canonical URL.
 
 Keep the preview and reading UI read-only. Editing should happen in the admin shell.
 

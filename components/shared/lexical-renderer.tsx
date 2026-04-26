@@ -45,6 +45,7 @@ export interface LexicalRendererProps {
    * Optional book/chapter context used to resolve epub-internal-link nodes to chapter URLs.
    */
   epubLinkContext?: {
+    bookId: number
     bookSlug: string;
     chapters: ChapterLinkTarget[];
   } | null;
@@ -335,6 +336,7 @@ const createLexicalConverters = (
       const resolution = resolveEpubHref(
         epubHref,
         epubLinkContext?.chapters ?? [],
+        epubLinkContext?.bookId ?? null,
         epubLinkContext?.bookSlug ?? ''
       );
 

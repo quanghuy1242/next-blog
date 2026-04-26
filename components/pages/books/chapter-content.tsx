@@ -5,11 +5,12 @@ import type { ChapterLinkTarget } from 'common/utils/epub-link-resolver';
 
 interface ChapterContentProps {
   content: SerializedEditorState | null | undefined;
+  bookId: number;
   bookSlug: string;
   chapters: ChapterLinkTarget[];
 }
 
-export function ChapterContent({ content, bookSlug, chapters }: ChapterContentProps) {
+export function ChapterContent({ content, bookId, bookSlug, chapters }: ChapterContentProps) {
   return (
     <div className="max-w-3xl mx-auto w-full">
       <LexicalRenderer
@@ -17,6 +18,7 @@ export function ChapterContent({ content, bookSlug, chapters }: ChapterContentPr
         className="max-w-none"
         fallback={<div className="text-gray-500 italic">No content available.</div>}
         epubLinkContext={{
+          bookId,
           bookSlug,
           chapters,
         }}

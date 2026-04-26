@@ -1,3 +1,5 @@
+import { buildChapterHref } from 'common/utils/book-route'
+
 export interface ChapterLinkTarget {
   slug: string
   chapterSourceKey?: string | null
@@ -84,20 +86,6 @@ export function chapterSourceKeyToSpineHref(chapterSourceKey: string): string | 
   return spineHref ? spineHref : null
 }
 
-export function buildChapterHref(bookSlug: string, chapterSlug: string, fragment = ''): string {
-  const normalizedBookSlug = bookSlug.trim()
-  const normalizedChapterSlug = chapterSlug.trim()
-  const normalizedFragment = fragment.trim()
-
-  if (!normalizedBookSlug || !normalizedChapterSlug) {
-    return ''
-  }
-
-  const baseHref = `/books/${normalizedBookSlug}/chapters/${normalizedChapterSlug}`
-
-  return normalizedFragment ? `${baseHref}#${normalizedFragment}` : baseHref
-}
-
 function getPathBasename(path: string): string {
   const normalizedPath = normalizeEpubPath(path)
 
@@ -147,6 +135,7 @@ function isBasenameMatch(inputPath: string, candidatePath: string): boolean {
 export function resolveEpubHref(
   epubHref: string,
   chapters: ChapterLinkTarget[],
+  bookId: number | null,
   bookSlug: string,
 ): ResolvedEpubInternalLink {
   const { pathPart, fragment } = splitEpubHref(epubHref)
@@ -165,8 +154,9 @@ export function resolveEpubHref(
   }
 
   const normalizedBookSlug = bookSlug.trim()
+  const normalizedBookId = Number.isInteger(bookId) && (bookId ?? 0) > 0 ? bookId : null
 
-  if (!normalizedBookSlug) {
+  if (!normalizedBookSlug || !normalizedBookId) {
     return { kind: 'unresolved' }
   }
 
@@ -209,7 +199,7 @@ export function resolveEpubHref(
     return { kind: 'unresolved' }
   }
 
-  const href = buildChapterHref(normalizedBookSlug, resolvedChapter.slug, normalizedFragment)
+  const href = buildChapterHref(normalizedBookId, normalizedBookSlug, resolvedChapter.slug, normalizedFragment)
 
   if (!href) {
     return { kind: 'unresolved' }

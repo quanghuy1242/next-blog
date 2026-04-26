@@ -1,12 +1,12 @@
 import React from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import { getBookBySlug } from 'common/apis/books';
+import { getBookBySlug, getBookDetailById } from 'common/apis/books';
 import { ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
-import { getChaptersByBookId } from 'common/apis/chapters';
 import { getCoverImageUrl } from 'common/utils/image';
 import { generateMetaTags } from 'common/utils/meta-tags';
 import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
+import { buildBookHref, parseBookRouteSegment } from 'common/utils/book-route';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
@@ -40,7 +40,7 @@ export default function BookDetailPage({
         <div className="mx-auto w-full md:w-2/3">
           <BookHeader book={book} />
           <Text text="Chapters" />
-          <ChapterList chapters={chapters} bookSlug={book.slug} />
+          <ChapterList chapters={chapters} bookId={book.id} bookSlug={book.slug} />
         </div>
       </Container>
     </Layout>
@@ -60,12 +60,37 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const accessibleResult = await getBookBySlug(slugParam, {
+  const parsedBookRoute = parseBookRouteSegment(slugParam);
+
+  if (parsedBookRoute.bookId) {
+    const accessibleResult = await getBookDetailById(parsedBookRoute.bookId, {
+      authToken: sessionToken,
+      cache: payloadCache,
+    });
+
+    const { book, chapters, homepage } = accessibleResult;
+
+    if (!book || book.slug !== parsedBookRoute.bookSlug) {
+      return {
+        notFound: true,
+      };
+    }
+
+    return {
+      props: {
+        book,
+        chapters,
+        homepage,
+      },
+    };
+  }
+
+  const accessibleResult = await getBookBySlug(parsedBookRoute.bookSlug, {
     authToken: sessionToken,
     cache: payloadCache,
   });
 
-  const { book, homepage } = accessibleResult;
+  const { book } = accessibleResult;
 
   if (!book) {
     return {
@@ -73,16 +98,10 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const chapters = await getChaptersByBookId(book.id, {
-    authToken: sessionToken,
-    cache: payloadCache,
-  });
-
   return {
-    props: {
-      book,
-      chapters,
-      homepage,
+    redirect: {
+      destination: buildBookHref(book.id, book.slug),
+      permanent: false,
     },
   };
 };

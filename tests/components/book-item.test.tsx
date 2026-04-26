@@ -46,8 +46,8 @@ describe('BookItem component', () => {
     const item = screen.getByText('Sample Book').closest('article');
 
     expect(bookLinks).toHaveLength(2);
-    expect(bookLinks[0]).toHaveAttribute('href', '/books/sample-book');
-    expect(bookLinks[1]).toHaveAttribute('href', '/books/sample-book');
+    expect(bookLinks[0]).toHaveAttribute('href', '/books/1~sample-book');
+    expect(bookLinks[1]).toHaveAttribute('href', '/books/1~sample-book');
     expect(item).toHaveClass('w-40');
     expect(item).toHaveClass('sm:w-48');
     expect(screen.getByText('Author')).toBeInTheDocument();

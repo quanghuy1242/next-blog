@@ -44,7 +44,7 @@ describe('BookCard component', () => {
 
     expect(screen.getByRole('link', { name: /Sample Book/i })).toHaveAttribute(
       'href',
-      '/books/sample-book'
+      '/books/1~sample-book'
     );
     expect(screen.getByText('Author')).toBeInTheDocument();
     expect(screen.getByText('manual')).toBeInTheDocument();

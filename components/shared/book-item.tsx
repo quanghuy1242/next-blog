@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Book } from 'types/cms';
+import { buildBookHref } from 'common/utils/book-route';
 import { BookCover } from './book-cover';
 
 interface BookItemProps {
@@ -13,12 +14,12 @@ export function BookItem({ book }: BookItemProps) {
       <BookCover
         media={book.cover}
         title={book.title}
-        href={`/books/${book.slug}`}
+        href={buildBookHref(book.id, book.slug)}
         className="w-full"
       />
 
       <h3 className="text-sm font-medium leading-snug sm:text-base">
-        <Link href={`/books/${book.slug}`} className="hover:underline">
+        <Link href={buildBookHref(book.id, book.slug)} className="hover:underline">
           {book.title}
         </Link>
       </h3>

@@ -77,15 +77,17 @@ No code is included in this file; this is a detailed design and execution plan.
 
 ## 4.3 Book detail
 
-- New route: `/books/[slug]`
+- New route: `/books/[bookId]~[bookSlug]`
 - Purpose: show book metadata + chapter list.
-- The page should treat the book slug as the stable public identifier for the bookshelf experience.
+- The page should validate that the slug in the URL matches the fetched book slug and reject mismatches with `404`.
+- Keep the slug-only form as a legacy compatibility route that redirects to the canonical `id~slug` URL.
 
 ## 4.4 Chapter reader
 
-- New route: `/books/[slug]/chapters/[chapterSlug]`
+- New route: `/books/[bookId]~[bookSlug]/chapters/[chapterSlug]`
 - Purpose: show chapter content and book-level chapter ToC.
-- Chapter slugs are generated from the title and preserved after publish, but they are not globally unique in the data model. The resolver for this route must scope chapter lookup by book slug plus chapter slug, not chapter slug alone.
+- Chapter slugs are generated from the title and preserved after publish, but they are not globally unique in the data model. The resolver for this route must scope chapter lookup by book ID plus chapter slug, then reject if the fetched book slug does not match the slug in the URL.
+- Keep the slug-only form as a legacy compatibility route that redirects to the canonical `id~slug` URL.
 
 ## 5. UX Design and Behavior
 
@@ -161,7 +163,7 @@ No code is included in this file; this is a detailed design and execution plan.
 - Use sentinel-based loading with existing `useIntersectionObserver`.
 - Add dedicated books pagination hook, mirroring `useHomePosts` behavior for request state and dedupe.
 
-## 5.4 Book detail `/books/[slug]` (Requirement #4)
+## 5.4 Book detail `/books/[bookId]~[bookSlug]` (Requirement #4)
 
 ### Page structure
 
@@ -179,15 +181,15 @@ No code is included in this file; this is a detailed design and execution plan.
   - Optional failure summary using `importErrorSummary`
 3. Ordered chapters block:
   - List all chapters sorted by `order`
-  - Each chapter links to `/books/[slug]/chapters/[chapterSlug]`
+  - Each chapter links to `/books/[bookId]~[bookSlug]/chapters/[chapterSlug]`
 
 ### Behavior
 
-- If book slug not found -> 404.
+- If the URL slug does not match the fetched book slug -> 404.
 - If book exists but no chapters -> render empty-state with clear message.
 - Treat `sourceType`, `sourceId`, `sourceHash`, `sourceVersion`, `importBatchId`, `importStartedAt`, `importFinishedAt`, `importFailedAt`, `lastImportedAt`, and `createdBy` as detail- or debug-level metadata, not all as primary hero content.
 
-## 5.5 Chapter reader `/books/[slug]/chapters/[chapterSlug]` (Requirement #5)
+## 5.5 Chapter reader `/books/[bookId]~[bookSlug]/chapters/[chapterSlug]` (Requirement #5)
 
 ### Rendering tech
 
@@ -235,10 +237,12 @@ Follow existing pattern in `common/apis/posts.ts` and `common/apis/posts.slug.ts
   - `getBooksPage({ limit, skip })`
   - `getBookBySlug(slug)`
   - `getChaptersByBookId(bookId)`
-  - Optional composed helper `getBookDetailBySlug(slug)`
+  - `getBookDetailById(bookId)` for canonical book detail loads
+  - Optional composed helper `getBookDetailBySlug(slug)` for legacy slug-only redirects and callers that do not yet have the book ID
 - New `common/apis/chapters.ts` (optional split if file size grows)
   - `getChapterBySlug(chapterSlug)`
-  - `getChapterByBookAndSlug(bookSlug, chapterSlug)` for route safety
+  - `getChapterByBookAndSlug(bookId, chapterSlug)` for legacy route safety
+  - `getChapterPageByBookId(bookId, chapterSlug)` for canonical one-request chapter loads
 - The API layer should continue using the authenticated Payload GraphQL client pattern already in `common/apis/base.ts`, because the backend `Books` and `Chapters` collections are read-protected with authenticated access.
 - Query selection should mirror the generated `BooksSelect` and `ChaptersSelect` shapes so the frontend only requests fields the backend actually exposes.
 
@@ -255,7 +259,7 @@ Follow existing pattern in `common/apis/posts.ts` and `common/apis/posts.slug.ts
 - The backend repo confirms those collections exist and are registered in `payload.config.ts`.
 - The current frontend implementation must still verify the live GraphQL schema at runtime because the checked-in schema snapshot here is stale.
 - If field names differ between the blog app and the live backend, align the frontend query + types to the backend as source of truth.
-- The chapter reader route must resolve chapter records with both the book slug and chapter slug, because chapter slugs are not globally unique.
+- The chapter reader route must resolve chapter records with both the book ID and chapter slug, then validate the URL slug against the fetched book slug because chapter slugs are not globally unique and the public slug must still be enforced.
 
 ## 7. Component and File Plan
 
@@ -294,7 +298,7 @@ Follow existing pattern in `common/apis/posts.ts` and `common/apis/posts.slug.ts
 
 ### Create
 
-- `pages/books/[slug].tsx`
+- `pages/books/[bookId]~[bookSlug].tsx`
 - `components/pages/books/book-header.tsx`
 - `components/pages/books/chapter-list.tsx`
 
@@ -302,7 +306,7 @@ Follow existing pattern in `common/apis/posts.ts` and `common/apis/posts.slug.ts
 
 ### Create
 
-- `pages/books/[slug]/chapters/[chapterSlug].tsx`
+- `pages/books/[bookId]~[bookSlug]/chapters/[chapterSlug].tsx`
 - `components/pages/books/chapter-content.tsx` (wraps `LexicalRenderer`)
 - `components/pages/books/chapter-toc.tsx`
 - `components/pages/books/chapter-toc-drawer.tsx`
@@ -367,7 +371,7 @@ Follow existing pattern in `common/apis/posts.ts` and `common/apis/posts.slug.ts
 
 - Extend existing `renderMetaTags` patterns:
   - `/books`: title/description for bookshelf.
-  - `/books/[slug]`: book title + summary.
+  - `/books/[bookId]~[bookSlug]`: book title + summary.
   - chapter page: chapter title + book context.
 - Canonical URL pattern should match route hierarchy.
 
@@ -415,8 +419,8 @@ Follow existing pattern in `common/apis/posts.ts` and `common/apis/posts.slug.ts
 
 - `/` mobile and desktop rendering order.
 - `/books` infinite scroll behavior.
-- `/books/[slug]` detail + chapter links.
-- `/books/[slug]/chapters/[chapterSlug]` content + ToC behavior.
+- `/books/[bookId]~[bookSlug]` detail + chapter links.
+- `/books/[bookId]~[bookSlug]/chapters/[chapterSlug]` content + ToC behavior.
 
 ## 13. Rollout Phases
 
@@ -439,7 +443,7 @@ Follow existing pattern in `common/apis/posts.ts` and `common/apis/posts.slug.ts
 
 ## Phase D: Book and Chapter detail
 
-1. Build `/books/[slug]` page.
+1. Build `/books/[bookId]~[bookSlug]` page.
 2. Build chapter route with Lexical-rendered content.
 3. Build desktop ToC sidebar + mobile drawer.
 

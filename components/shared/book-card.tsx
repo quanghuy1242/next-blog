@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Book } from 'types/cms';
+import { buildBookHref } from 'common/utils/book-route';
 import { CoverImage } from './cover-image';
 
 interface BookCardProps {
@@ -10,7 +11,7 @@ interface BookCardProps {
 export function BookCard({ book }: BookCardProps) {
   return (
     <article className="flex flex-col gap-2">
-      <Link href={`/books/${book.slug}`} className="block">
+      <Link href={buildBookHref(book.id, book.slug)} className="block">
         {book.cover ? (
           <CoverImage media={book.cover} title={book.title} className="mb-0" />
         ) : (
@@ -19,7 +20,7 @@ export function BookCard({ book }: BookCardProps) {
       </Link>
 
       <h3 className="text-2xl leading-snug">
-        <Link href={`/books/${book.slug}`} className="hover:underline">
+        <Link href={buildBookHref(book.id, book.slug)} className="hover:underline">
           {book.title}
         </Link>
       </h3>

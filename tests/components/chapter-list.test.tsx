@@ -37,6 +37,7 @@ describe('ChapterList component', () => {
   test('renders chapter links', () => {
     render(
       <ChapterList
+        bookId={1}
         bookSlug="sample-book"
         chapters={[createChapter({ slug: 'chapter-1', order: 1, title: 'Intro' })]}
       />
@@ -44,12 +45,12 @@ describe('ChapterList component', () => {
 
     expect(screen.getByRole('link', { name: /Intro/i })).toHaveAttribute(
       'href',
-      '/books/sample-book/chapters/chapter-1'
+      '/books/1~sample-book/chapters/chapter-1'
     );
   });
 
   test('renders empty state when no chapters are available', () => {
-    render(<ChapterList bookSlug="sample-book" chapters={[]} />);
+    render(<ChapterList bookId={1} bookSlug="sample-book" chapters={[]} />);
 
     expect(screen.getByText('No chapters are available yet.')).toBeInTheDocument();
   });

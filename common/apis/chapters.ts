@@ -1,4 +1,4 @@
-import type { Chapter } from 'types/cms';
+import type { Book, Chapter, ChapterSlugData, Homepage } from 'types/cms';
 import { fetchAPIWithAuthToken } from './base';
 import type { PayloadCacheSettings } from './cache';
 
@@ -6,6 +6,13 @@ interface ChaptersResponse {
   Chapters: {
     docs: Chapter[];
   };
+}
+
+interface ChapterDetailResponse {
+  Chapters: {
+    docs: Chapter[];
+  };
+  Homepage: Pick<Homepage, 'header'> | null;
 }
 
 interface ChapterReaderResponse {
@@ -17,16 +24,28 @@ interface ChapterReaderResponse {
   };
 }
 
+interface ChapterPageByBookIdResponse {
+  ChapterMatch: {
+    docs: Chapter[];
+  };
+  ChaptersByBook: {
+    docs: Chapter[];
+  };
+  Homepage: Pick<Homepage, 'header'> | null;
+}
+
 interface ChapterFetchOptions {
   authToken?: string | null;
   cache?: PayloadCacheSettings;
 }
 
-const CHAPTER_FIELDS = `
+const CHAPTER_MATCH_FIELDS = `
   id
   title
   slug
   order
+  chapterWordCount
+  hasPassword
   chapterSourceKey
   chapterSourceHash
   importBatchId
@@ -37,11 +56,37 @@ const CHAPTER_FIELDS = `
   _status
 `;
 
-const CHAPTER_TOC_FIELDS = `
+const CHAPTER_DETAIL_FIELDS = `
+  ${CHAPTER_MATCH_FIELDS}
+  book {
+    ... on Book {
+      id
+      title
+      slug
+      author
+      description
+      language
+      visibility
+      chapterCount
+      totalWordCount
+      cover {
+        id
+        url
+        alt
+        width
+        height
+      }
+    }
+  }
+`;
+
+const CHAPTER_LIST_FIELDS = `
   id
   title
   slug
   order
+  chapterWordCount
+  hasPassword
   chapterSourceKey
   updatedAt
   createdAt
@@ -66,7 +111,7 @@ export async function getChaptersByBookId(
           limit: 200
         ) {
           docs {
-            ${CHAPTER_FIELDS}
+            ${CHAPTER_LIST_FIELDS}
           }
         }
       }
@@ -81,6 +126,56 @@ export async function getChaptersByBookId(
   );
 
   return sortChapters(data?.Chapters?.docs ?? []);
+}
+
+export async function getChapterBySlug(
+  chapterSlug: string,
+  options: ChapterFetchOptions = {}
+): Promise<{ chapter: Chapter | null; homepage: Pick<Homepage, 'header'> | null }> {
+  const trimmedSlug = chapterSlug.trim();
+
+  if (!trimmedSlug) {
+    return {
+      chapter: null,
+      homepage: null,
+    };
+  }
+
+  const data = await fetchAPIWithAuthToken<ChapterDetailResponse>(
+    `#graphql
+      query ChapterDetailBySlug($chapterSlug: String!) {
+        Chapters(
+          where: {
+            AND: [
+              { slug: { equals: $chapterSlug } }
+              { _status: { equals: published } }
+            ]
+          }
+          limit: 1
+        ) {
+          docs {
+            ${CHAPTER_DETAIL_FIELDS}
+          }
+        }
+
+        Homepage {
+          header
+        }
+      }
+    `,
+    {
+      variables: {
+        chapterSlug: trimmedSlug,
+      },
+      authToken: options.authToken,
+      cache: options.cache,
+    }
+  );
+
+  return {
+    chapter: data?.Chapters?.docs?.[0] ?? null,
+    homepage: data?.Homepage ?? null,
+  };
 }
 
 export async function getChapterByBookAndSlug(
@@ -111,7 +206,7 @@ export async function getChapterByBookAndSlug(
           limit: 1
         ) {
           docs {
-            ${CHAPTER_FIELDS}
+            ${CHAPTER_MATCH_FIELDS}
           }
         }
 
@@ -126,7 +221,7 @@ export async function getChapterByBookAndSlug(
           limit: 200
         ) {
           docs {
-            ${CHAPTER_TOC_FIELDS}
+            ${CHAPTER_LIST_FIELDS}
           }
         }
       }
@@ -144,6 +239,81 @@ export async function getChapterByBookAndSlug(
   return {
     chapter: data?.ChapterMatch?.docs?.[0] ?? null,
     chapters: sortChapters(data?.ChaptersByBook?.docs ?? []),
+  };
+}
+
+export async function getChapterPageByBookId(
+  bookID: number,
+  chapterSlug: string,
+  options: ChapterFetchOptions = {}
+): Promise<ChapterSlugData> {
+  const trimmedSlug = chapterSlug.trim();
+
+  if (!Number.isInteger(bookID) || bookID <= 0 || !trimmedSlug) {
+    return {
+      book: null,
+      chapter: null,
+      chapters: [],
+      homepage: null,
+    };
+  }
+
+  const data = await fetchAPIWithAuthToken<ChapterPageByBookIdResponse>(
+    `#graphql
+      query ChapterDetailWithChaptersByBookId($bookID: JSON!, $chapterSlug: String!) {
+        ChapterMatch: Chapters(
+          where: {
+            AND: [
+              { book: { equals: $bookID } }
+              { slug: { equals: $chapterSlug } }
+              { _status: { equals: published } }
+            ]
+          }
+          limit: 1
+        ) {
+          docs {
+            ${CHAPTER_DETAIL_FIELDS}
+          }
+        }
+
+        ChaptersByBook: Chapters(
+          where: {
+            AND: [
+              { book: { equals: $bookID } }
+              { _status: { equals: published } }
+            ]
+          }
+          sort: "order"
+          limit: 200
+        ) {
+          docs {
+            ${CHAPTER_LIST_FIELDS}
+          }
+        }
+
+        Homepage {
+          header
+        }
+      }
+    `,
+    {
+      variables: {
+        bookID,
+        chapterSlug: trimmedSlug,
+      },
+      authToken: options.authToken,
+      cache: options.cache,
+    }
+  );
+
+  const chapter = data?.ChapterMatch?.docs?.[0] ?? null;
+  const book = chapter && chapter.book && typeof chapter.book === 'object' ? (chapter.book as Book) : null;
+
+  return {
+    book,
+    chapter,
+    chapters: sortChapters(data?.ChaptersByBook?.docs ?? []),
+    homepage: data?.Homepage ?? null,
   };
 }
 

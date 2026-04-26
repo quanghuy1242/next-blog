@@ -128,6 +128,7 @@ describe('LexicalRenderer', () => {
       <LexicalRenderer
         data={data}
         epubLinkContext={{
+          bookId: 1,
           bookSlug: 'sample-book',
           chapters: [
             {
@@ -141,7 +142,7 @@ describe('LexicalRenderer', () => {
 
     expect(screen.getByRole('link', { name: 'Next chapter' })).toHaveAttribute(
       'href',
-      '/books/sample-book/chapters/chapter-two#section-3',
+      '/books/1~sample-book/chapters/chapter-two#section-3',
     );
   });
 
