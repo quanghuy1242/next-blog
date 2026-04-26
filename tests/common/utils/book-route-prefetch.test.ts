@@ -68,7 +68,7 @@ describe('common/utils/book-route-prefetch', () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
-      '/_next/data/test-build/books/1~sample-book.json?slug=1~sample-book',
+      '/_next/data/test-build/books/1~sample-book.json?slug=1%7Esample-book',
       expect.objectContaining({
         credentials: 'same-origin',
         headers: expect.objectContaining({
@@ -80,7 +80,7 @@ describe('common/utils/book-route-prefetch', () => {
     );
 
     const sharedFetch = fetch(
-      '/_next/data/test-build/books/1~sample-book.json?slug=1~sample-book',
+      '/_next/data/test-build/books/1~sample-book.json?slug=1%7Esample-book',
       {
         credentials: 'same-origin',
         headers: {
@@ -121,7 +121,7 @@ describe('common/utils/book-route-prefetch', () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
-      '/_next/data/test-build/books/1~sample-book/chapters/intro-to-performance.json?slug=1~sample-book&chapterSlug=intro-to-performance',
+      '/_next/data/test-build/books/1~sample-book/chapters/intro-to-performance.json?slug=1%7Esample-book&chapterSlug=intro-to-performance',
       expect.objectContaining({
         credentials: 'same-origin',
         headers: expect.objectContaining({
@@ -133,7 +133,7 @@ describe('common/utils/book-route-prefetch', () => {
     );
 
     const sharedFetch = fetch(
-      '/_next/data/test-build/books/1~sample-book/chapters/intro-to-performance.json?slug=1~sample-book&chapterSlug=intro-to-performance',
+      '/_next/data/test-build/books/1~sample-book/chapters/intro-to-performance.json?slug=1%7Esample-book&chapterSlug=intro-to-performance',
       {
         credentials: 'same-origin',
         headers: {

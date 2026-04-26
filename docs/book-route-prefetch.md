@@ -20,7 +20,7 @@ The client uses a dedicated `SSRPrefetchLink` wrapper for book and chapter route
 - On desktop fine-pointer devices, a pointer-proximity window around the mouse behaves the same way: nearby visible links warm immediately, and stale ones are canceled when the pointer moves away.
 - If the user clicks a link while its warmup is still in progress, that click claims the existing warmup so unmount cleanup does not abort it.
 - The wrapper disables native viewport prefetch on `next/link` for these routes so the custom scheduler owns the behavior we are tuning.
-- The warmup request uses the same Next data URL the pages router fetches on click, including the dynamic route query string Next adds for book and chapter pages, so an in-flight warmup can be reused by the navigation request instead of starting over.
+- The warmup request uses the same Next data URL the pages router fetches on click, including the dynamic route query string Next adds for book and chapter pages and its `URLSearchParams` encoding, so an in-flight warmup can be reused by the navigation request instead of starting over.
 - In environments where the Next build id is unavailable, the warmup falls back to the canonical route path to keep local tests and fallbacks working.
 - The request includes the current auth cookies, so the server can warm the correct auth-scoped payload cache entry.
 - External links, malformed URLs, and self-links are ignored.

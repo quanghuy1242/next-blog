@@ -69,13 +69,14 @@ function buildBookRouteDataSearch(pathname: string): string {
     return '';
   }
 
-  const queryParts = [`slug=${encodeURIComponent(bookSegment)}`];
+  const searchParams = new URLSearchParams();
+  searchParams.set('slug', bookSegment);
 
   if (segments.length === 4 && segments[2] === 'chapters' && segments[3]) {
-    queryParts.push(`chapterSlug=${encodeURIComponent(segments[3])}`);
+    searchParams.set('chapterSlug', segments[3]);
   }
 
-  return queryParts.join('&');
+  return searchParams.toString();
 }
 
 function getNextDataState(): NextDataState | null {
