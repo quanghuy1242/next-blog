@@ -39,7 +39,7 @@ export function Banner({
           src={lowResUrl}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover object-bottom"
+          className="absolute inset-0 w-full h-full object-cover object-top"
           style={{
             filter: 'blur(20px)',
             transform: 'scale(1.1)',
@@ -53,7 +53,7 @@ export function Banner({
         alt={bannerAlt}
         loading="eager"
         fetchPriority="high"
-        className="absolute inset-0 w-full h-full object-cover object-bottom"
+        className="absolute inset-0 w-full h-full object-cover object-top"
         style={{
           aspectRatio: '2000 / 800',
         }}
