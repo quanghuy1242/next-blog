@@ -269,7 +269,7 @@ export async function getBookDetailById(
 
   const data = await fetchAPIWithAuthToken<BookDetailByIdResponse>(
     `#graphql
-      query BookDetailWithChaptersByBookId($bookId: Int!) {
+      query BookDetailWithChaptersByBookId($bookId: Int!, $bookRelationId: JSON!) {
         Books(
           where: {
             AND: [
@@ -287,7 +287,7 @@ export async function getBookDetailById(
         Chapters(
           where: {
             AND: [
-              { book: { equals: $bookId } }
+              { book: { equals: $bookRelationId } }
               { _status: { equals: published } }
             ]
           }
@@ -310,6 +310,7 @@ export async function getBookDetailById(
     {
       variables: {
         bookId,
+        bookRelationId: bookId,
       },
       authToken: options.authToken,
       cache: options.cache,

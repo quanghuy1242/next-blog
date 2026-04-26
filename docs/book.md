@@ -42,11 +42,11 @@ query ChapterDetailBySlug($chapterSlug: String!) {
 
 for book detail and toc loading, use:
 ```
-query BookDetailWithChaptersByBookId($bookSlug: String!, $bookId: JSON!) {
+query BookDetailWithChaptersByBookId($bookId: Int!, $bookRelationId: JSON!) {
   Books(
     where: {
-      slug: {
-        equals: $bookSlug
+      id: {
+        equals: $bookId
       }
     }
     limit: 1
@@ -77,7 +77,7 @@ query BookDetailWithChaptersByBookId($bookSlug: String!, $bookId: JSON!) {
   Chapters(
     where: {
       book: {
-        equals: $bookId
+        equals: $bookRelationId
       }
     }
     sort: "order"

@@ -119,5 +119,14 @@ describe('common/apis/books', () => {
       'second-chapter',
     ]);
     expect(mockedFetchAPIWithAuthToken).toHaveBeenCalledTimes(1);
+
+    const [query, config] = mockedFetchAPIWithAuthToken.mock.calls[0] ?? [];
+    expect(String(query)).toContain(
+      'query BookDetailWithChaptersByBookId($bookId: Int!, $bookRelationId: JSON!)'
+    );
+    expect(config?.variables).toEqual({
+      bookId: 42,
+      bookRelationId: 42,
+    });
   });
 });

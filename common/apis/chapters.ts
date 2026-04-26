@@ -76,16 +76,16 @@ const CHAPTER_PAGE_LIST_FIELDS = `
 `;
 
 export async function getChaptersByBookId(
-  bookID: number,
+  bookId: number,
   options: ChapterFetchOptions = {}
 ): Promise<Chapter[]> {
   const data = await fetchAPIWithAuthToken<ChaptersResponse>(
     `#graphql
-      query ChaptersByBook($bookID: JSON!) {
+      query ChaptersByBook($bookRelationId: JSON!) {
         Chapters(
           where: {
             AND: [
-              { book: { equals: $bookID } }
+              { book: { equals: $bookRelationId } }
               { _status: { equals: published } }
             ]
           }
@@ -100,7 +100,7 @@ export async function getChaptersByBookId(
     `,
     {
       variables: {
-        bookID,
+        bookRelationId: bookId,
       },
       authToken: options.authToken,
       cache: options.cache,
@@ -161,7 +161,7 @@ export async function getChapterBySlug(
 }
 
 export async function getChapterByBookAndSlug(
-  bookID: number,
+  bookId: number,
   chapterSlug: string,
   options: ChapterFetchOptions = {}
 ): Promise<{ chapter: Chapter | null; chapters: Chapter[] }> {
@@ -176,11 +176,11 @@ export async function getChapterByBookAndSlug(
 
   const data = await fetchAPIWithAuthToken<ChapterReaderResponse>(
     `#graphql
-      query ChapterByBookAndSlug($bookID: JSON!, $chapterSlug: String!) {
+      query ChapterByBookAndSlug($bookRelationId: JSON!, $chapterSlug: String!) {
         ChapterMatch: Chapters(
           where: {
             AND: [
-              { book: { equals: $bookID } }
+              { book: { equals: $bookRelationId } }
               { slug: { equals: $chapterSlug } }
               { _status: { equals: published } }
             ]
@@ -195,7 +195,7 @@ export async function getChapterByBookAndSlug(
         ChaptersByBook: Chapters(
           where: {
             AND: [
-              { book: { equals: $bookID } }
+              { book: { equals: $bookRelationId } }
               { _status: { equals: published } }
             ]
           }
@@ -210,7 +210,7 @@ export async function getChapterByBookAndSlug(
     `,
     {
       variables: {
-        bookID,
+        bookRelationId: bookId,
         chapterSlug: trimmedSlug,
       },
       authToken: options.authToken,
@@ -225,13 +225,13 @@ export async function getChapterByBookAndSlug(
 }
 
 export async function getChapterPageByBookId(
-  bookID: number,
+  bookId: number,
   chapterSlug: string,
   options: ChapterFetchOptions = {}
 ): Promise<ChapterSlugData> {
   const trimmedSlug = chapterSlug.trim();
 
-  if (!Number.isInteger(bookID) || bookID <= 0 || !trimmedSlug) {
+  if (!Number.isInteger(bookId) || bookId <= 0 || !trimmedSlug) {
     return {
       book: null,
       chapter: null,
@@ -242,11 +242,11 @@ export async function getChapterPageByBookId(
 
   const data = await fetchAPIWithAuthToken<ChapterPageByBookIdResponse>(
     `#graphql
-      query ChapterDetailWithChaptersByBookId($bookID: JSON!, $chapterSlug: String!) {
+      query ChapterDetailWithChaptersByBookId($bookRelationId: JSON!, $chapterSlug: String!) {
         ChapterMatch: Chapters(
           where: {
             AND: [
-              { book: { equals: $bookID } }
+              { book: { equals: $bookRelationId } }
               { slug: { equals: $chapterSlug } }
               { _status: { equals: published } }
             ]
@@ -261,7 +261,7 @@ export async function getChapterPageByBookId(
         ChaptersByBook: Chapters(
           where: {
             AND: [
-              { book: { equals: $bookID } }
+              { book: { equals: $bookRelationId } }
               { _status: { equals: published } }
             ]
           }
@@ -280,7 +280,7 @@ export async function getChapterPageByBookId(
     `,
     {
       variables: {
-        bookID,
+        bookRelationId: bookId,
         chapterSlug: trimmedSlug,
       },
       authToken: options.authToken,
