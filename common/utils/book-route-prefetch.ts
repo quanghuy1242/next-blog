@@ -1,5 +1,36 @@
 import { parseBookRouteSegment } from 'common/utils/book-route';
 
+/**
+ * Scheduler and fetch-sharing state for book and chapter route warmups.
+ *
+ * Lifecycle overview:
+ *
+ * 1. A UI event such as hover, pointer proximity, or viewport visibility calls
+ *    {@link requestBookRouteWarmup}.
+ * 2. The href is normalized to a canonical same-origin route, then converted to
+ *    the exact `/_next/data/...json?...` URL that the Next.js Pages Router will
+ *    use for navigation when the build id is available.
+ * 3. The scheduler puts that work into a small priority queue. Hover wins over
+ *    pointer, and pointer wins over viewport. Only a small number of warmups
+ *    are allowed to run at once so long lists do not flood the origin.
+ * 4. When a warmup starts, this module installs a `window.fetch` interceptor.
+ *    The interceptor is intentionally narrow: it only shares same-origin GET
+ *    requests for book-related routes and their `/_next/data` equivalents.
+ * 5. If a later caller asks for the same URL while the first fetch is still in
+ *    progress, the interceptor returns a clone of the original response
+ *    promise instead of starting a second network request.
+ * 6. If the warmup completes successfully, the route is remembered in a short
+ *    TTL registry so repeated hovers in the same session do not keep rewarming
+ *    the same destination.
+ * 7. If a click happens while a warmup is already in flight, the click claims
+ *    that warmup so component cleanup does not abort it. If the task was only
+ *    queued and had not started yet, the claim drops it so it cannot start too
+ *    late and race behind the real navigation request.
+ *
+ * This module is intentionally client-only. On the server all entry points
+ * return early because the scheduler depends on `window`, current location, and
+ * the browser fetch implementation.
+ */
 const MAX_CONCURRENT_WARMUPS = 2;
 const MAX_PENDING_WARMUPS = 32;
 const MAX_TRACKED_WARMUPS = 128;
@@ -8,6 +39,17 @@ const SHARED_WARMUP_RESPONSE_TTL_MS = 5 * 1000;
 
 export type BookRouteWarmSource = 'hover' | 'pointer' | 'viewport';
 
+/**
+ * A single scheduler entry keyed by canonical href.
+ *
+ * `href` is the human-facing canonical route such as `/books/1~sample-book`.
+ * `requestKey` is the actual fetch URL, which is usually the Next data URL.
+ * `source` drives priority.
+ * `sequence` lets us favor newer tasks inside the same priority bucket.
+ * `state` describes whether the task is still queued or already owns a fetch.
+ * `controller` exists only after the task has started so inflight work can be
+ * aborted when the originating signal goes stale.
+ */
 interface BookRouteWarmTask {
   href: string;
   requestKey: string;
@@ -24,10 +66,40 @@ interface NextDataState {
   defaultLocale?: string;
 }
 
+/**
+ * Recently completed route warms, keyed by canonical href.
+ *
+ * This is not a browser-cache mirror. It is only a local hint that we already
+ * warmed the route recently, so repeated hovers in the same session can be
+ * ignored until the TTL expires.
+ */
 const recentWarmups = new Map<string, number>();
+
+/**
+ * Tasks waiting for a concurrency slot. Ordering is maintained by
+ * {@link sortPendingWarmups}.
+ */
 const pendingWarmups: BookRouteWarmTask[] = [];
+
+/**
+ * Canonical hrefs that already own an inflight warmup request.
+ */
 const inflightWarmups = new Set<string>();
+
+/**
+ * The authoritative lookup table for task lifecycle by canonical href.
+ *
+ * A task can exist here while pending or inflight. Once it settles or gets
+ * canceled, the entry is removed.
+ */
 const tasksByHref = new Map<string, BookRouteWarmTask>();
+
+/**
+ * Shared network requests keyed by fully normalized request URL.
+ *
+ * Every consumer receives a clone of the original response so callers can read
+ * the body independently without tripping "body already used" errors.
+ */
 const sharedWarmupFetches = new Map<string, Promise<Response>>();
 const sharedWarmupFetchExpiryTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
@@ -36,6 +108,13 @@ let warmupSequence = 0;
 let nativeFetch: typeof fetch | null = null;
 let fetchInterceptorInstalled = false;
 
+/**
+ * Converts the UI signal into queue priority.
+ *
+ * The guiding rule is "intent beats speculation": hover is the strongest sign
+ * of intent, pointer proximity is weaker, and viewport visibility is the most
+ * speculative signal.
+ */
 function getSourcePriority(source: BookRouteWarmSource): number {
   switch (source) {
     case 'hover':
@@ -57,6 +136,18 @@ function normalizePathname(pathname: string): string {
   return pathname.replace(/\/+$/, '');
 }
 
+/**
+ * Builds the dynamic route query string that Next Pages Router appends to the
+ * data URL for book and chapter routes.
+ *
+ * Example:
+ * `/books/1~sample-book/chapters/intro`
+ * becomes:
+ * `slug=1%7Esample-book&chapterSlug=intro`
+ *
+ * `URLSearchParams` is used deliberately because it matches Next's own
+ * serialization semantics, including its `%7E` encoding for `~`.
+ */
 function buildBookRouteDataSearch(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean);
 
@@ -89,6 +180,15 @@ function getNextDataState(): NextDataState | null {
   return (window as Window & { __NEXT_DATA__?: NextDataState }).__NEXT_DATA__ ?? null;
 }
 
+/**
+ * Converts a navigable href into the exact request URL we want to warm.
+ *
+ * When the Next build id is known, this returns the same `/_next/data` URL the
+ * Pages Router uses during client navigation. That identity is what makes
+ * fetch handoff possible. When the build id is unavailable, the function falls
+ * back to the canonical route path so local tests and degraded environments
+ * still behave sensibly.
+ */
 function buildBookRouteRequestKey(rawHref: string): string | null {
   if (typeof window === 'undefined') {
     return null;
@@ -134,6 +234,12 @@ function buildBookRouteRequestKey(rawHref: string): string | null {
   }`;
 }
 
+/**
+ * Normalizes a fetch call into a fully qualified same-origin GET key.
+ *
+ * The fetch interceptor uses this to determine whether a later caller is
+ * asking for exactly the same resource as an already shared request.
+ */
 function getSharedWarmupFetchKey(
   input: RequestInfo | URL,
   init?: RequestInit
@@ -171,6 +277,13 @@ function getSharedWarmupFetchKey(
   }
 }
 
+/**
+ * Converts a relative or absolute request key into one stable absolute URL.
+ *
+ * Shared fetch registration always uses the normalized absolute form so calls
+ * like `/books/x` and `https://site.test/books/x` cannot create parallel map
+ * entries for the same underlying resource.
+ */
 function normalizeSharedWarmupFetchKey(rawKey: string): string | null {
   if (typeof window === 'undefined') {
     return null;
@@ -183,6 +296,13 @@ function normalizeSharedWarmupFetchKey(rawKey: string): string | null {
   }
 }
 
+/**
+ * Restricts fetch sharing to the small surface this feature owns.
+ *
+ * We intentionally do not share every same-origin GET. Only book-route page
+ * URLs and their Next data equivalents are eligible, which keeps the
+ * interception behavior predictable and local to this feature.
+ */
 function shouldShareBookRouteFetchKey(rawKey: string): boolean {
   const normalizedKey = normalizeSharedWarmupFetchKey(rawKey);
 
@@ -204,6 +324,20 @@ function shouldShareBookRouteFetchKey(rawKey: string): boolean {
   }
 }
 
+/**
+ * Monkey-patches `window.fetch` so matching later requests can reuse the first
+ * response promise instead of going back to the network.
+ *
+ * Important behavior:
+ *
+ * - The patch is lazy. It is installed only when the first warmup actually
+ *   starts.
+ * - Sharing happens by normalized URL match, not by "this came from a warmup"
+ *   identity. That means even a router-triggered fetch can become the shared
+ *   owner if it reaches the interceptor first.
+ * - Shared responses are always cloned for consumers because multiple readers
+ *   may need to consume the body independently.
+ */
 function installBookRouteFetchInterceptor(): void {
   if (
     fetchInterceptorInstalled ||
@@ -215,7 +349,6 @@ function installBookRouteFetchInterceptor(): void {
 
   nativeFetch = window.fetch.bind(window);
 
-  // Reuse the same in-flight request whenever the router asks for the same URL.
   window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
     const sharedKey = getSharedWarmupFetchKey(input, init);
 
@@ -223,6 +356,8 @@ function installBookRouteFetchInterceptor(): void {
       const sharedPromise = sharedWarmupFetches.get(sharedKey);
 
       if (sharedPromise) {
+        // A matching request is already inflight. Hand back a cloned response
+        // so the later caller can consume the body independently.
         return sharedPromise.then((response) => response.clone());
       }
     }
@@ -234,6 +369,8 @@ function installBookRouteFetchInterceptor(): void {
     const requestPromise = nativeFetch(input, init);
 
     if (sharedKey && shouldShareBookRouteFetchKey(sharedKey)) {
+      // Whichever caller starts the first eligible request becomes the shared
+      // owner. Later identical requests will attach to this promise.
       registerSharedWarmupFetch(sharedKey, requestPromise);
 
       void requestPromise
@@ -255,6 +392,12 @@ function installBookRouteFetchInterceptor(): void {
   fetchInterceptorInstalled = true;
 }
 
+/**
+ * Restores the browser's original fetch implementation.
+ *
+ * The module keeps the interceptor installed while warmup state is active.
+ * Tests and explicit cleanup use this to guarantee isolation between runs.
+ */
 function restoreBookRouteFetchInterceptor(): void {
   if (!fetchInterceptorInstalled || typeof window === 'undefined') {
     return;
@@ -268,6 +411,13 @@ function restoreBookRouteFetchInterceptor(): void {
   fetchInterceptorInstalled = false;
 }
 
+/**
+ * Publishes an inflight request into the shared request table.
+ *
+ * Re-registering the same key clears any previous expiry timer. This matters
+ * when a recently completed request becomes active again before its retention
+ * window expires.
+ */
 function registerSharedWarmupFetch(
   requestKey: string,
   promise: Promise<Response>
@@ -288,6 +438,13 @@ function registerSharedWarmupFetch(
   }
 }
 
+/**
+ * Removes a shared request immediately or after a short retention period.
+ *
+ * The retention window lets a click that happens just after a warmup resolved
+ * reuse the already-fetched response instead of immediately issuing a second
+ * network request.
+ */
 function unregisterSharedWarmupFetch(
   requestKey: string,
   promise: Promise<Response>,
@@ -326,6 +483,12 @@ function unregisterSharedWarmupFetch(
   sharedWarmupFetchExpiryTimers.set(normalizedRequestKey, expiryTimer);
 }
 
+/**
+ * Normalizes a candidate href into the canonical same-origin route we track.
+ *
+ * This strips trailing slashes, rejects malformed or external URLs, and avoids
+ * warming the page the user is already on.
+ */
 function normalizeBookRouteHref(rawHref: string): string | null {
   if (typeof window === 'undefined') {
     return null;
@@ -359,6 +522,9 @@ function normalizeBookRouteHref(rawHref: string): string | null {
   return canonicalHref;
 }
 
+/**
+ * Drops recently warmed entries once their TTL expires.
+ */
 function pruneExpiredWarmups(now = Date.now()): void {
   for (const [href, warmedAt] of recentWarmups.entries()) {
     if (now - warmedAt > RECENT_WARMUP_TTL_MS) {
@@ -367,6 +533,10 @@ function pruneExpiredWarmups(now = Date.now()): void {
   }
 }
 
+/**
+ * Returns whether the canonical href was warmed recently enough to skip a new
+ * warmup request.
+ */
 function hasRecentWarmup(href: string, now = Date.now()): boolean {
   const warmedAt = recentWarmups.get(href);
 
@@ -382,6 +552,9 @@ function hasRecentWarmup(href: string, now = Date.now()): boolean {
   return true;
 }
 
+/**
+ * Records a successful warmup and maintains the bounded LRU-like registry.
+ */
 function rememberWarmup(href: string, warmedAt = Date.now()): void {
   recentWarmups.delete(href);
   recentWarmups.set(href, warmedAt);
@@ -397,6 +570,10 @@ function rememberWarmup(href: string, warmedAt = Date.now()): void {
   }
 }
 
+/**
+ * Orders pending work by priority first, then by recency inside the same
+ * priority class.
+ */
 function sortPendingWarmups(): void {
   pendingWarmups.sort((left, right) => {
     const priorityDifference =
@@ -410,10 +587,16 @@ function sortPendingWarmups(): void {
   });
 }
 
+/**
+ * Bumps a task's recency marker whenever new user intent arrives for it.
+ */
 function touchWarmupTask(task: BookRouteWarmTask): void {
   task.sequence = ++warmupSequence;
 }
 
+/**
+ * Removes a task from the pending queue without touching other state tables.
+ */
 function removePendingWarmup(task: BookRouteWarmTask): void {
   const index = pendingWarmups.indexOf(task);
 
@@ -422,6 +605,10 @@ function removePendingWarmup(task: BookRouteWarmTask): void {
   }
 }
 
+/**
+ * Pushes work into the queue and trims old low-value tail entries if the queue
+ * grows beyond the configured cap.
+ */
 function enqueueWarmup(task: BookRouteWarmTask): void {
   pendingWarmups.push(task);
   sortPendingWarmups();
@@ -431,6 +618,10 @@ function enqueueWarmup(task: BookRouteWarmTask): void {
   }
 }
 
+/**
+ * Finalizes a task after success, failure, or cancellation and then gives the
+ * scheduler a chance to start more work.
+ */
 function settleWarmupTask(task: BookRouteWarmTask): void {
   inflightWarmups.delete(task.href);
   activeWarmups = Math.max(0, activeWarmups - 1);
@@ -442,6 +633,18 @@ function settleWarmupTask(task: BookRouteWarmTask): void {
   drainWarmups();
 }
 
+/**
+ * Main scheduler loop.
+ *
+ * This function keeps pulling from the queue until the concurrency pool is
+ * full or there is no eligible work left. A task may be skipped here even if
+ * it was valid when enqueued, for example because:
+ *
+ * - it was canceled while waiting,
+ * - it was replaced by newer task state,
+ * - another inflight request now owns the same href, or
+ * - the route finished warming recently enough that another warm is pointless.
+ */
 function drainWarmups(): void {
   while (activeWarmups < MAX_CONCURRENT_WARMUPS) {
     const nextTask = pendingWarmups.shift();
@@ -467,7 +670,9 @@ function drainWarmups(): void {
     activeWarmups += 1;
     installBookRouteFetchInterceptor();
 
-    // Start the actual network request once and let later callers attach to it.
+    // Once the task owns a slot, it also owns an AbortController so stale
+    // viewport/pointer work can be canceled if the originating UI state goes
+    // away before the fetch finishes.
     const requestInit: RequestInit = {
       credentials: 'same-origin',
       method: 'GET',
@@ -498,7 +703,8 @@ function drainWarmups(): void {
           !(error instanceof DOMException && error.name === 'AbortError') &&
           !(error instanceof Error && error.name === 'AbortError')
         ) {
-          // Ignore network failures and aborts. Warmups are best-effort only.
+          // Warmups are opportunistic. They should never surface visible errors
+          // because navigation itself will still perform its own real request.
         }
       } finally {
         settleWarmupTask(nextTask);
@@ -507,6 +713,20 @@ function drainWarmups(): void {
   }
 }
 
+/**
+ * Requests a warmup for a book or chapter route.
+ *
+ * This is the normal entry point for UI code. The function is intentionally
+ * idempotent from the caller's perspective:
+ *
+ * - duplicate requests for a recent or inflight route are ignored,
+ * - stronger intent can upgrade an existing task's priority,
+ * - malformed, external, or self-targeting hrefs are ignored.
+ *
+ * @param rawHref Human-facing href such as `/books/1~sample-book`.
+ * @param source UI signal that triggered the request. Higher intent gets
+ * higher queue priority.
+ */
 export function requestBookRouteWarmup(
   rawHref: string,
   source: BookRouteWarmSource = 'viewport'
@@ -569,6 +789,17 @@ export function requestBookRouteWarmup(
   drainWarmups();
 }
 
+/**
+ * Claims an existing warmup because a real navigation is about to happen.
+ *
+ * Behavior depends on task state:
+ *
+ * - `inflight`: keep the task alive by upgrading it to hover priority so later
+ *   cleanup from viewport/pointer observers does not abort the request.
+ * - `pending`: drop the queued task entirely. The real navigation request is
+ *   already happening, so allowing the stale queued warmup to start later would
+ *   create a second fetch instead of helping.
+ */
 export function claimBookRouteWarmup(rawHref: string): void {
   pruneExpiredWarmups();
 
@@ -594,6 +825,13 @@ export function claimBookRouteWarmup(rawHref: string): void {
   task.source = 'hover';
 }
 
+/**
+ * Cancels speculative work once the UI signal that justified it disappears.
+ *
+ * Hover-claimed work is intentionally immune here because after a click it is
+ * no longer speculative. Pending tasks are simply removed from the queue;
+ * inflight tasks are aborted through their controller.
+ */
 export function cancelBookRouteWarmup(rawHref: string): void {
   pruneExpiredWarmups();
 
@@ -621,6 +859,12 @@ export function cancelBookRouteWarmup(rawHref: string): void {
   tasksByHref.delete(normalizedHref);
 }
 
+/**
+ * Resets all scheduler and fetch-sharing state.
+ *
+ * This is mainly used by tests, but it is also the single place that guarantees
+ * the original browser fetch implementation is restored.
+ */
 export function clearBookRouteWarmupState(): void {
   for (const task of tasksByHref.values()) {
     task.canceled = true;
@@ -640,6 +884,10 @@ export function clearBookRouteWarmupState(): void {
   restoreBookRouteFetchInterceptor();
 }
 
+/**
+ * Exposes a small snapshot of internal scheduler state for tests and manual
+ * debugging.
+ */
 export function getBookRouteWarmupState() {
   return {
     activeWarmups,
