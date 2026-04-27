@@ -3,11 +3,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { ChapterToc } from 'components/pages/books/chapter-toc';
 import type { Chapter } from 'types/cms';
-import { requestBookRouteWarmup } from 'common/utils/book-route-prefetch';
+import { requestRouteWarmup } from 'common/utils/route-prefetch';
 
-vi.mock('common/utils/book-route-prefetch', () => ({
-  claimBookRouteWarmup: vi.fn(),
-  requestBookRouteWarmup: vi.fn(),
+vi.mock('common/utils/route-prefetch', () => ({
+  claimRouteWarmup: vi.fn(),
+  requestRouteWarmup: vi.fn(),
 }));
 
 vi.mock('next/link', () => ({
@@ -31,7 +31,7 @@ vi.mock('next/link', () => ({
   }),
 }));
 
-const mockedRequestBookRouteWarmup = vi.mocked(requestBookRouteWarmup);
+const mockedRequestRouteWarmup = vi.mocked(requestRouteWarmup);
 
 function createChapter(overrides: Partial<Chapter> = {}): Chapter {
   return {
@@ -65,7 +65,7 @@ function createChapter(overrides: Partial<Chapter> = {}): Chapter {
 
 describe('ChapterToc component', () => {
   beforeEach(() => {
-    mockedRequestBookRouteWarmup.mockReset();
+    mockedRequestRouteWarmup.mockReset();
   });
 
   test('highlights current chapter with simple sidebar styling', () => {

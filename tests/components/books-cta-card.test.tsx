@@ -3,9 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { BooksCtaCard } from 'components/shared/books-cta-card';
 
-vi.mock('common/utils/book-route-prefetch', () => ({
-  claimBookRouteWarmup: vi.fn(),
-  requestBookRouteWarmup: vi.fn(),
+vi.mock('common/utils/route-prefetch', () => ({
+  claimRouteWarmup: vi.fn(),
+  requestRouteWarmup: vi.fn(),
 }));
 
 describe('BooksCtaCard component', () => {

@@ -1,35 +1,142 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
+import PageLoader from 'next/dist/client/page-loader';
+import { formatWithValidation } from 'next/dist/shared/lib/router/utils/format-url';
 import {
-  clearBookRouteWarmupState,
-  claimBookRouteWarmup,
-  cancelBookRouteWarmup,
-  getBookRouteWarmupState,
-  requestBookRouteWarmup,
-} from 'common/utils/book-route-prefetch';
+  clearRouteWarmupState,
+  claimRouteWarmup,
+  cancelRouteWarmup,
+  getRouteWarmupState,
+  requestRouteWarmup,
+} from 'common/utils/route-prefetch';
 
-describe('common/utils/book-route-prefetch', () => {
+describe('common/utils/route-prefetch', () => {
   beforeEach(() => {
-    clearBookRouteWarmupState();
-    Reflect.deleteProperty(window as Window & { __NEXT_DATA__?: unknown }, '__NEXT_DATA__');
+    clearRouteWarmupState();
+    const nextWindow = window as Window & {
+      __NEXT_DATA__?: unknown;
+      __BUILD_MANIFEST?: { sortedPages?: string[] };
+      __DEV_PAGES_MANIFEST?: { pages?: string[] };
+    };
+    Reflect.deleteProperty(nextWindow, '__NEXT_DATA__');
+    Reflect.deleteProperty(nextWindow, '__BUILD_MANIFEST');
+    Reflect.deleteProperty(nextWindow, '__DEV_PAGES_MANIFEST');
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     window.history.pushState({}, '', '/');
+
+    nextWindow.__BUILD_MANIFEST = {
+      sortedPages: [
+        '/',
+        '/articles/[slug]',
+        '/books',
+        '/books/[slug]',
+        '/books/[slug]/chapters/[chapterSlug]',
+      ],
+    };
   });
 
   afterEach(() => {
-    clearBookRouteWarmupState();
-    Reflect.deleteProperty(window as Window & { __NEXT_DATA__?: unknown }, '__NEXT_DATA__');
+    clearRouteWarmupState();
+    const nextWindow = window as Window & {
+      __NEXT_DATA__?: unknown;
+      __BUILD_MANIFEST?: { sortedPages?: string[] };
+      __DEV_PAGES_MANIFEST?: { pages?: string[] };
+    };
+    Reflect.deleteProperty(nextWindow, '__NEXT_DATA__');
+    Reflect.deleteProperty(nextWindow, '__BUILD_MANIFEST');
+    Reflect.deleteProperty(nextWindow, '__DEV_PAGES_MANIFEST');
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+  });
+
+  test.each([
+    {
+      name: 'article route',
+      asPath: '/articles/hello-world?from=home',
+      href: '/articles/hello-world?from=home',
+      pathname: '/articles/[slug]',
+      query: {
+        slug: 'hello-world',
+        from: 'home',
+      },
+    },
+    {
+      name: 'book route',
+      asPath: '/books/1~sample-book?from=rail',
+      href: '/books/1~sample-book?from=rail',
+      pathname: '/books/[slug]',
+      query: {
+        slug: '1~sample-book',
+        from: 'rail',
+      },
+    },
+    {
+      name: 'chapter route',
+      asPath: '/books/1~sample-book/chapters/intro-to-performance?from=toc',
+      href: '/books/1~sample-book/chapters/intro-to-performance?from=toc',
+      pathname: '/books/[slug]/chapters/[chapterSlug]',
+      query: {
+        slug: '1~sample-book',
+        chapterSlug: 'intro-to-performance',
+        from: 'toc',
+      },
+    },
+  ])('matches Next Pages Router data URL generation for $name', async ({
+    asPath,
+    href,
+    pathname,
+    query,
+  }) => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('ok', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const nextDataWindow = window as unknown as {
+      __NEXT_DATA__?: {
+        buildId?: string;
+      };
+      __SSG_MANIFEST?: Set<string>;
+    };
+    nextDataWindow.__NEXT_DATA__ = {
+      buildId: 'test-build',
+    };
+    nextDataWindow.__SSG_MANIFEST = new Set();
+
+    requestRouteWarmup(href);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const pageLoader = new PageLoader('test-build', '');
+    const expectedDataHref = pageLoader.getDataHref({
+      asPath,
+      href: formatWithValidation({
+        pathname,
+        query,
+      }),
+      skipInterpolation: true,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expectedDataHref,
+      expect.objectContaining({
+        credentials: 'same-origin',
+        headers: expect.objectContaining({
+          'x-nextjs-data': '1',
+        }),
+        method: 'GET',
+        signal: expect.any(AbortSignal),
+      })
+    );
+
+    await Promise.resolve();
   });
 
   test('warms a canonical internal route once even when requested repeatedly', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response('ok', { status: 200 }));
     vi.stubGlobal('fetch', fetchMock);
 
-    requestBookRouteWarmup('/books/1~sample-book');
-    requestBookRouteWarmup('/books/1~sample-book');
+    requestRouteWarmup('/books/1~sample-book');
+    requestRouteWarmup('/books/1~sample-book');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
@@ -43,7 +150,56 @@ describe('common/utils/book-route-prefetch', () => {
 
     await Promise.resolve();
 
-    expect(getBookRouteWarmupState().recentHrefs).toContain('/books/1~sample-book');
+    expect(getRouteWarmupState().recentHrefs).toContain('/books/1~sample-book');
+  });
+
+  test('builds Next data query params from any matched dynamic route pattern', async () => {
+    const deferreds: Array<(response: Response) => void> = [];
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          deferreds.push(resolve);
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const nextDataWindow = window as unknown as {
+      __NEXT_DATA__?: {
+        buildId?: string;
+      };
+    };
+    nextDataWindow.__NEXT_DATA__ = {
+      buildId: 'test-build',
+    };
+
+    requestRouteWarmup('/articles/hello-world');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/_next/data/test-build/articles/hello-world.json?slug=hello-world',
+      expect.objectContaining({
+        credentials: 'same-origin',
+        headers: expect.objectContaining({
+          'x-nextjs-data': '1',
+        }),
+        method: 'GET',
+        signal: expect.any(AbortSignal),
+      })
+    );
+
+    deferreds[0]?.(new Response('ok', { status: 200 }));
+
+    const response = await fetch(
+      '/_next/data/test-build/articles/hello-world.json?slug=hello-world',
+      {
+        credentials: 'same-origin',
+        headers: {
+          'x-nextjs-data': '1',
+        },
+        method: 'GET',
+      }
+    );
+
+    expect(await response.text()).toBe('ok');
   });
 
   test('reuses the in-flight Next data request for a clicked book route', async () => {
@@ -64,7 +220,7 @@ describe('common/utils/book-route-prefetch', () => {
       buildId: 'test-build',
     };
 
-    requestBookRouteWarmup('/books/1~sample-book');
+    requestRouteWarmup('/books/1~sample-book');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
@@ -117,14 +273,14 @@ describe('common/utils/book-route-prefetch', () => {
       buildId: 'test-build',
     };
 
-    requestBookRouteWarmup('/books/1~sample-book');
+    requestRouteWarmup('/books/1~sample-book');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     deferreds[0]?.(new Response('ok', { status: 200 }));
 
     await waitFor(() => {
-      expect(getBookRouteWarmupState().recentHrefs).toContain(
+      expect(getRouteWarmupState().recentHrefs).toContain(
         '/books/1~sample-book'
       );
     });
@@ -165,7 +321,7 @@ describe('common/utils/book-route-prefetch', () => {
       buildId: 'test-build',
     };
 
-    requestBookRouteWarmup('/books/seed~sample-book');
+    requestRouteWarmup('/books/seed~sample-book');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
@@ -223,7 +379,7 @@ describe('common/utils/book-route-prefetch', () => {
       buildId: 'test-build',
     };
 
-    requestBookRouteWarmup('/books/seed~sample-book');
+    requestRouteWarmup('/books/seed~sample-book');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
@@ -277,7 +433,7 @@ describe('common/utils/book-route-prefetch', () => {
       buildId: 'test-build',
     };
 
-    requestBookRouteWarmup('/books/1~sample-book/chapters/intro-to-performance');
+    requestRouteWarmup('/books/1~sample-book/chapters/intro-to-performance');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
@@ -322,9 +478,9 @@ describe('common/utils/book-route-prefetch', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
-    requestBookRouteWarmup('/books/1~sample-book');
-    requestBookRouteWarmup('/books/2~sample-book');
-    requestBookRouteWarmup('/books/3~sample-book');
+    requestRouteWarmup('/books/1~sample-book');
+    requestRouteWarmup('/books/2~sample-book');
+    requestRouteWarmup('/books/3~sample-book');
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
@@ -349,10 +505,10 @@ describe('common/utils/book-route-prefetch', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
-    requestBookRouteWarmup('/books/1~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/2~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/3~sample-book', 'pointer');
-    requestBookRouteWarmup('/books/4~sample-book', 'viewport');
+    requestRouteWarmup('/books/1~sample-book', 'viewport');
+    requestRouteWarmup('/books/2~sample-book', 'viewport');
+    requestRouteWarmup('/books/3~sample-book', 'pointer');
+    requestRouteWarmup('/books/4~sample-book', 'viewport');
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
@@ -379,18 +535,18 @@ describe('common/utils/book-route-prefetch', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
-    requestBookRouteWarmup('/books/1~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/2~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/3~sample-book', 'viewport');
+    requestRouteWarmup('/books/1~sample-book', 'viewport');
+    requestRouteWarmup('/books/2~sample-book', 'viewport');
+    requestRouteWarmup('/books/3~sample-book', 'viewport');
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
-    cancelBookRouteWarmup('/books/3~sample-book');
+    cancelRouteWarmup('/books/3~sample-book');
     deferreds[0]?.(new Response('ok', { status: 200 }));
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledTimes(2);
-      expect(getBookRouteWarmupState().pendingHrefs).not.toContain(
+      expect(getRouteWarmupState().pendingHrefs).not.toContain(
         '/books/3~sample-book'
       );
     });
@@ -417,17 +573,17 @@ describe('common/utils/book-route-prefetch', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
-    requestBookRouteWarmup('/books/1~sample-book', 'viewport');
+    requestRouteWarmup('/books/1~sample-book', 'viewport');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    cancelBookRouteWarmup('/books/1~sample-book');
+    cancelRouteWarmup('/books/1~sample-book');
 
     expect(abortSignals[0]?.aborted).toBe(true);
 
     await waitFor(() => {
-      expect(getBookRouteWarmupState().activeWarmups).toBe(0);
-      expect(getBookRouteWarmupState().inflightHrefs).toHaveLength(0);
+      expect(getRouteWarmupState().activeWarmups).toBe(0);
+      expect(getRouteWarmupState().inflightHrefs).toHaveLength(0);
     });
   });
 
@@ -452,15 +608,15 @@ describe('common/utils/book-route-prefetch', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
-    requestBookRouteWarmup('/books/1~sample-book', 'viewport');
+    requestRouteWarmup('/books/1~sample-book', 'viewport');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    claimBookRouteWarmup('/books/1~sample-book');
-    cancelBookRouteWarmup('/books/1~sample-book');
+    claimRouteWarmup('/books/1~sample-book');
+    cancelRouteWarmup('/books/1~sample-book');
 
     expect(abortSignals[0]?.aborted).toBe(false);
-    expect(getBookRouteWarmupState().inflightHrefs).toContain(
+    expect(getRouteWarmupState().inflightHrefs).toContain(
       '/books/1~sample-book'
     );
   });
@@ -475,18 +631,18 @@ describe('common/utils/book-route-prefetch', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
-    requestBookRouteWarmup('/books/1~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/2~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/3~sample-book', 'viewport');
+    requestRouteWarmup('/books/1~sample-book', 'viewport');
+    requestRouteWarmup('/books/2~sample-book', 'viewport');
+    requestRouteWarmup('/books/3~sample-book', 'viewport');
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(getBookRouteWarmupState().pendingHrefs).toContain(
+    expect(getRouteWarmupState().pendingHrefs).toContain(
       '/books/3~sample-book'
     );
 
-    claimBookRouteWarmup('/books/3~sample-book');
+    claimRouteWarmup('/books/3~sample-book');
 
-    expect(getBookRouteWarmupState().pendingHrefs).not.toContain(
+    expect(getRouteWarmupState().pendingHrefs).not.toContain(
       '/books/3~sample-book'
     );
 
@@ -507,11 +663,11 @@ describe('common/utils/book-route-prefetch', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
-    requestBookRouteWarmup('/books/1~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/2~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/3~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/4~sample-book', 'viewport');
-    requestBookRouteWarmup('/books/5~sample-book', 'viewport');
+    requestRouteWarmup('/books/1~sample-book', 'viewport');
+    requestRouteWarmup('/books/2~sample-book', 'viewport');
+    requestRouteWarmup('/books/3~sample-book', 'viewport');
+    requestRouteWarmup('/books/4~sample-book', 'viewport');
+    requestRouteWarmup('/books/5~sample-book', 'viewport');
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
@@ -533,8 +689,8 @@ describe('common/utils/book-route-prefetch', () => {
     vi.stubGlobal('fetch', fetchMock);
     window.history.pushState({}, '', '/books/1~sample-book');
 
-    requestBookRouteWarmup('https://example.com/books/1~sample-book');
-    requestBookRouteWarmup('/books/1~sample-book');
+    requestRouteWarmup('https://example.com/books/1~sample-book');
+    requestRouteWarmup('/books/1~sample-book');
 
     expect(fetchMock).not.toHaveBeenCalled();
   });

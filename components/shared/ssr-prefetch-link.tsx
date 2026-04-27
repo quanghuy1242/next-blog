@@ -4,17 +4,17 @@ import type { ReactNode } from 'react';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
 import { usePointerProximityObserver } from 'hooks/usePointerProximityObserver';
 import {
-  claimBookRouteWarmup,
-  cancelBookRouteWarmup,
-  requestBookRouteWarmup,
-} from 'common/utils/book-route-prefetch';
+  claimRouteWarmup,
+  cancelRouteWarmup,
+  requestRouteWarmup,
+} from 'common/utils/route-prefetch';
 
 const TOUCH_DEVICE_QUERY = '(hover: none), (pointer: coarse)';
 const DESKTOP_POINTER_QUERY = '(hover: hover) and (pointer: fine)';
 
 /**
- * Props for the book/chapter link wrapper that coordinates UI intent with the
- * warmup scheduler.
+ * Props for the route link wrapper that coordinates UI intent with the warmup
+ * scheduler.
  *
  * `onNavigate` is modeled after Next's `Link` callback instead of the browser
  * click event because this component needs to distinguish "a real client-side
@@ -29,8 +29,7 @@ interface SSRPrefetchLinkProps
 }
 
 /**
- * Link wrapper for book and chapter routes that layers warmup behavior on top
- * of `next/link`.
+ * Link wrapper for routes that layers warmup behavior on top of `next/link`.
  *
  * Lifecycle overview:
  *
@@ -98,19 +97,19 @@ export function SSRPrefetchLink({
       // Touch and coarse-pointer devices do not have a reliable hover stage,
       // so visibility becomes the speculative warm signal.
       hasViewportWarmup.current = true;
-      requestBookRouteWarmup(href, 'viewport');
+      requestRouteWarmup(href, 'viewport');
     } else if (hasViewportWarmup.current) {
       // Once the link leaves the viewport, the original reason for warming it
       // is gone. Pending work is dropped and inflight work is aborted unless a
       // stronger signal, such as a click claim, already took ownership.
-      cancelBookRouteWarmup(href);
+      cancelRouteWarmup(href);
       hasViewportWarmup.current = false;
     }
 
     return () => {
       // Component unmount should clean up any speculation it originated.
       if (hasViewportWarmup.current) {
-        cancelBookRouteWarmup(href);
+        cancelRouteWarmup(href);
         hasViewportWarmup.current = false;
       }
     };
@@ -125,18 +124,18 @@ export function SSRPrefetchLink({
       // On desktop, pointer proximity gets a head start before explicit hover
       // without warming the entire visible list.
       hasPointerWarmup.current = true;
-      requestBookRouteWarmup(href, 'pointer');
+      requestRouteWarmup(href, 'pointer');
     } else if (hasPointerWarmup.current) {
       // As with viewport warming, pointer warming is only justified while the
       // pointer is still nearby.
-      cancelBookRouteWarmup(href);
+      cancelRouteWarmup(href);
       hasPointerWarmup.current = false;
     }
 
     return () => {
       // Unmount cleanup mirrors the viewport lifecycle.
       if (hasPointerWarmup.current) {
-        cancelBookRouteWarmup(href);
+        cancelRouteWarmup(href);
         hasPointerWarmup.current = false;
       }
     };
@@ -171,20 +170,20 @@ export function SSRPrefetchLink({
           // The scheduler will keep an inflight request alive or drop a queued
           // task that would otherwise fire too late and duplicate the router's
           // own fetch.
-          claimBookRouteWarmup(href);
+          claimRouteWarmup(href);
         }
       }}
       onFocus={(event) => {
         onFocus?.(event);
         // Keyboard focus is treated like hover because it is a strong signal of
         // immediate navigation intent.
-        requestBookRouteWarmup(href, 'hover');
+        requestRouteWarmup(href, 'hover');
       }}
       onMouseEnter={(event) => {
         onMouseEnter?.(event);
         // Hover gets the highest speculative priority because it usually means
         // the next user action is a click.
-        requestBookRouteWarmup(href, 'hover');
+        requestRouteWarmup(href, 'hover');
       }}
       {...rest}
     >

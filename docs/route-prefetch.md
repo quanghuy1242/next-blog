@@ -1,10 +1,16 @@
-# Book Route Prefetch
+# Route Prefetch
 
-This document describes the custom warmup behavior for book and chapter links.
+This document describes the generic warmup behavior for route links.
+
+The implementation lives in `common/utils/route-prefetch.ts`.
+
+It is generic across route families in this project, but it currently assumes
+the Next.js Pages Router data model. If this app migrates to App Router, the
+warmup request construction and fetch-sharing contract will need to be updated.
 
 The goal is simple:
 
-- Warm the SSR payload cache for book and chapter pages.
+- Warm the SSR payload cache for supported pages.
 - Do it immediately on hover and when a link enters the viewport.
 - Keep the number of concurrent warmups bounded.
 - Keep a small local registry so we do not warm the same route repeatedly in one session.
@@ -12,7 +18,7 @@ The goal is simple:
 
 ## Behavior
 
-The client uses a dedicated `SSRPrefetchLink` wrapper for book and chapter routes.
+The client uses a dedicated `SSRPrefetchLink` wrapper for routes that opt in to this warmup flow.
 
 - Hover or focus on a link schedules an immediate warmup.
 - On mobile and other touch/coarse-pointer devices, when a link becomes visible in the viewport it schedules a warmup immediately.
@@ -21,8 +27,8 @@ The client uses a dedicated `SSRPrefetchLink` wrapper for book and chapter route
 - If the user clicks a link while its warmup is already in flight, that click claims the existing warmup so unmount cleanup does not abort it.
 - If the user clicks while a warmup is still only queued, the queued task is dropped and the navigation request proceeds on its own instead of letting the stale queued warmup create a second fetch later.
 - The wrapper disables native viewport prefetch on `next/link` for these routes so the custom scheduler owns the behavior we are tuning.
-- The warmup request uses the same Next data URL the pages router fetches on click, including the dynamic route query string Next adds for book and chapter pages and its `URLSearchParams` encoding, so an in-flight warmup can be reused by the navigation request instead of starting over.
-- Once the fetch interceptor is installed, any matching book-route data GET that reaches it also registers itself as shareable, so later identical requests can attach to the same response even if the scheduler was not the caller that started the first one.
+- The warmup request uses the same Next data URL the pages router fetches on click, including any dynamic route query string and its `URLSearchParams` encoding, so an in-flight warmup can be reused by the navigation request instead of starting over.
+- Once the fetch interceptor is installed, any matching warmup-capable data GET that reaches it also registers itself as shareable, so later identical requests can attach to the same response even if the scheduler was not the caller that started the first one.
 - Successful warmups are kept around briefly after completion so a click that lands just after the fetch resolves can still reuse the same response.
 - In environments where the Next build id is unavailable, the warmup falls back to the canonical route path to keep local tests and fallbacks working.
 - The request includes the current auth cookies, so the server can warm the correct auth-scoped payload cache entry.
@@ -62,7 +68,7 @@ Hover and focus are treated as higher priority than pointer-proximity warming, w
 
 ## Routes Covered
 
-This warmup is applied to the book and chapter surfaces only:
+The current app usage is currently focused on book and chapter surfaces:
 
 - Book cards and book covers.
 - Chapter lists.
@@ -70,6 +76,8 @@ This warmup is applied to the book and chapter surfaces only:
 - Chapter previous/next links.
 - Chapter content links that resolve to another chapter.
 - The homepage `Books` CTA card and the mobile books card in the category rail.
+
+The scheduler itself is route-agnostic, so new route families can opt in later without changing the component contract.
 
 Desktop stays hover-first, then pointer-proximity aware. Viewport warming is only enabled when the device reports a coarse pointer or no hover capability.
 

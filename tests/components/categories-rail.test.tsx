@@ -4,9 +4,9 @@ import { vi } from 'vitest';
 import { CategoriesRail } from 'components/shared/categories-rail';
 import type { Category, Media } from 'types/cms';
 
-vi.mock('common/utils/book-route-prefetch', () => ({
-  claimBookRouteWarmup: vi.fn(),
-  requestBookRouteWarmup: vi.fn(),
+vi.mock('common/utils/route-prefetch', () => ({
+  claimRouteWarmup: vi.fn(),
+  requestRouteWarmup: vi.fn(),
 }));
 
 function createCategory(overrides: Partial<Category> = {}): Category {

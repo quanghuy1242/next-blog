@@ -3,18 +3,18 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 import {
-  claimBookRouteWarmup,
-  cancelBookRouteWarmup,
-  requestBookRouteWarmup,
-} from 'common/utils/book-route-prefetch';
+  claimRouteWarmup,
+  cancelRouteWarmup,
+  requestRouteWarmup,
+} from 'common/utils/route-prefetch';
 
 const TOUCH_DEVICE_QUERY = '(hover: none), (pointer: coarse)';
 const DESKTOP_POINTER_QUERY = '(hover: hover) and (pointer: fine)';
 
-vi.mock('common/utils/book-route-prefetch', () => ({
-  claimBookRouteWarmup: vi.fn(),
-  cancelBookRouteWarmup: vi.fn(),
-  requestBookRouteWarmup: vi.fn(),
+vi.mock('common/utils/route-prefetch', () => ({
+  claimRouteWarmup: vi.fn(),
+  cancelRouteWarmup: vi.fn(),
+  requestRouteWarmup: vi.fn(),
 }));
 
 vi.mock('next/link', () => ({
@@ -67,9 +67,9 @@ vi.mock('next/link', () => ({
   }),
 }));
 
-const mockedRequestBookRouteWarmup = vi.mocked(requestBookRouteWarmup);
-const mockedClaimBookRouteWarmup = vi.mocked(claimBookRouteWarmup);
-const mockedCancelBookRouteWarmup = vi.mocked(cancelBookRouteWarmup);
+const mockedRequestRouteWarmup = vi.mocked(requestRouteWarmup);
+const mockedClaimRouteWarmup = vi.mocked(claimRouteWarmup);
+const mockedCancelRouteWarmup = vi.mocked(cancelRouteWarmup);
 
 describe('SSRPrefetchLink component', () => {
   let observeCallback: IntersectionObserverCallback | null = null;
@@ -105,9 +105,9 @@ describe('SSRPrefetchLink component', () => {
   }
 
   beforeEach(() => {
-    mockedRequestBookRouteWarmup.mockReset();
-    mockedClaimBookRouteWarmup.mockReset();
-    mockedCancelBookRouteWarmup.mockReset();
+    mockedRequestRouteWarmup.mockReset();
+    mockedClaimRouteWarmup.mockReset();
+    mockedCancelRouteWarmup.mockReset();
     observeCallback = null;
     observeMock.mockClear();
     disconnectMock.mockClear();
@@ -139,7 +139,7 @@ describe('SSRPrefetchLink component', () => {
 
     fireEvent.mouseEnter(screen.getByRole('link', { name: 'Sample Book' }));
 
-    expect(mockedRequestBookRouteWarmup).toHaveBeenCalledWith(
+    expect(mockedRequestRouteWarmup).toHaveBeenCalledWith(
       '/books/1~sample-book',
       'hover'
     );
@@ -157,7 +157,7 @@ describe('SSRPrefetchLink component', () => {
     fireEvent.click(screen.getByRole('link', { name: 'Sample Book' }));
 
     expect(onClick).toHaveBeenCalledTimes(1);
-    expect(mockedClaimBookRouteWarmup).toHaveBeenCalledWith(
+    expect(mockedClaimRouteWarmup).toHaveBeenCalledWith(
       '/books/1~sample-book'
     );
   });
@@ -169,7 +169,7 @@ describe('SSRPrefetchLink component', () => {
       ctrlKey: true,
     });
 
-    expect(mockedClaimBookRouteWarmup).not.toHaveBeenCalled();
+    expect(mockedClaimRouteWarmup).not.toHaveBeenCalled();
   });
 
   test('does not observe viewport warming on desktop', async () => {
@@ -202,7 +202,7 @@ describe('SSRPrefetchLink component', () => {
     });
 
     await waitFor(() => {
-      expect(mockedRequestBookRouteWarmup).toHaveBeenCalledWith(
+      expect(mockedRequestRouteWarmup).toHaveBeenCalledWith(
         '/books/1~sample-book',
         'viewport'
       );
@@ -241,7 +241,7 @@ describe('SSRPrefetchLink component', () => {
     });
 
     await waitFor(() => {
-      expect(mockedCancelBookRouteWarmup).toHaveBeenCalledWith(
+      expect(mockedCancelRouteWarmup).toHaveBeenCalledWith(
         '/books/1~sample-book'
       );
     });
@@ -293,7 +293,7 @@ describe('SSRPrefetchLink component', () => {
     });
 
     await waitFor(() => {
-      expect(mockedRequestBookRouteWarmup).toHaveBeenCalledWith(
+      expect(mockedRequestRouteWarmup).toHaveBeenCalledWith(
         '/books/1~sample-book',
         'pointer'
       );
@@ -308,7 +308,7 @@ describe('SSRPrefetchLink component', () => {
     });
 
     await waitFor(() => {
-      expect(mockedCancelBookRouteWarmup).toHaveBeenCalledWith(
+      expect(mockedCancelRouteWarmup).toHaveBeenCalledWith(
         '/books/1~sample-book'
       );
     });
