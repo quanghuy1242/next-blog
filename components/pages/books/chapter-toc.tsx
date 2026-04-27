@@ -35,7 +35,7 @@ export function ChapterToc({
                   : ''
               )}
             >
-              <span className="break-words">{chapter.title}</span>
+              <span className="break-words relative -top-[2px]">{chapter.title}</span>
               {chapter.hasPassword ? <ChapterLockBadge compact className="ml-1 align-text-bottom" /> : null}
             </SSRPrefetchLink>
           </li>
