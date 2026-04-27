@@ -47,12 +47,12 @@ describe('usePointerProximityObserver', () => {
       configurable: true,
       value: () =>
         ({
-          bottom: 180,
-          height: 120,
+          bottom: 150,
+          height: 90,
           left: 40,
-          right: 280,
+          right: 160,
           top: 60,
-          width: 240,
+          width: 120,
           x: 40,
           y: 60,
           toJSON: () => ({}),
@@ -71,7 +71,7 @@ describe('usePointerProximityObserver', () => {
 
     await act(async () => {
       pointerMoveHandler?.({
-        clientX: 120,
+        clientX: 100,
         clientY: 100,
         pointerType: 'mouse',
       } as PointerEvent);

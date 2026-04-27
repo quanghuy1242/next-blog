@@ -18,13 +18,13 @@ export interface UsePointerProximityObserverOptions<
 
   /**
    * Horizontal margin around the pointer.
-   * @default 240
+   * @default 120
    */
   xMargin?: number;
 
   /**
    * Vertical margin around the pointer.
-   * @default 180
+   * @default 90
    */
   yMargin?: number;
 }
@@ -56,8 +56,8 @@ interface PointerProximitySubscription {
   onChange: (isProximate: boolean) => void;
 }
 
-const DEFAULT_X_MARGIN = 240;
-const DEFAULT_Y_MARGIN = 180;
+const DEFAULT_X_MARGIN = 120;
+const DEFAULT_Y_MARGIN = 90;
 
 const subscriptions = new Set<PointerProximitySubscription>();
 
