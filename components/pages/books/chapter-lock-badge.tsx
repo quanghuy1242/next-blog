@@ -9,7 +9,7 @@ export function ChapterLockBadge({ className }: ChapterLockBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700',
+        'inline-flex shrink-0 items-center gap-1 rounded-full border border-blue/20 bg-blue/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-blue',
         className
       )}
     >

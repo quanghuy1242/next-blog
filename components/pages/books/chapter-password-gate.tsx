@@ -14,12 +14,7 @@ type UnlockChapterPasswordResponse = {
 
 function PasswordIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-10 w-10 text-blue-600"
-    >
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-8 w-8 text-blue">
       <rect
         x="5.25"
         y="10.25"
@@ -156,32 +151,31 @@ export function ChapterPasswordGate({
   };
 
   return (
-    <section className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-10">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.12),_transparent_55%)]"
-      />
-      <div className="relative flex flex-col items-center">
-        <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-blue-50 ring-8 ring-blue-50/70">
+    <section className="mx-auto w-full max-w-xl rounded-2xl border border-slate-200 bg-white px-4 py-5 sm:px-6 sm:py-6">
+      <div className="flex flex-col items-center">
+        <div className="flex items-center justify-center">
           <PasswordIcon />
         </div>
 
-        <h2 className="text-center text-3xl font-semibold tracking-tight text-slate-900">
+        <h2 className="mt-3 text-center text-2xl font-semibold tracking-tight text-slate-900">
           Chapter locked
         </h2>
 
-        <p className="mt-3 max-w-lg text-center text-sm leading-6 text-slate-600 sm:text-base">
+        <p className="mt-2 max-w-md text-center text-sm leading-6 text-slate-600">
           This chapter is protected by a password. Enter it to continue reading.
         </p>
 
-        <form className="mt-8 w-full max-w-lg space-y-5" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label htmlFor={`chapter-password-${chapterId}`} className="text-sm font-medium text-slate-700">
+        <form className="mt-5 w-full max-w-md space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-1.5">
+            <label
+              htmlFor={`chapter-password-${chapterId}`}
+              className="text-sm font-medium text-slate-700"
+            >
               Password
             </label>
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400">
-                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+              <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-blue/70">
+                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5">
                   <rect
                     x="4.25"
                     y="8.25"
@@ -216,16 +210,16 @@ export function ChapterPasswordGate({
                 }}
                 placeholder="Enter password"
                 className={cn(
-                  'h-14 w-full rounded-2xl border bg-white pl-11 pr-12 text-slate-900 outline-none transition',
-                  'placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100',
-                  error ? 'border-red-300 ring-4 ring-red-50' : 'border-slate-200'
+                  'h-11 w-full rounded-xl border bg-white pl-9 pr-10 text-sm text-slate-900 outline-none transition',
+                  'placeholder:text-slate-400 focus:border-blue focus:ring-0',
+                  error ? 'border-red-300' : 'border-slate-200'
                 )}
               />
 
               <button
                 type="button"
                 onClick={() => setShowPassword((current) => !current)}
-                className="absolute inset-y-0 right-3 flex items-center rounded-full px-2 text-slate-400 transition hover:text-slate-700"
+                className="absolute inset-y-0 right-2 flex items-center rounded-full px-2 text-slate-400 transition hover:text-slate-700"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 disabled={isSubmitting}
               >
@@ -244,17 +238,15 @@ export function ChapterPasswordGate({
             type="submit"
             disabled={!canSubmit}
             className={cn(
-              'inline-flex h-14 w-full items-center justify-center rounded-2xl px-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition',
-              canSubmit
-                ? 'bg-blue-600 hover:bg-blue-700 active:scale-[0.99]'
-                : 'cursor-not-allowed bg-blue-300'
+              'inline-flex h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-semibold text-white transition-colors',
+              canSubmit ? 'bg-blue hover:bg-darkBlue' : 'cursor-not-allowed bg-blue/60'
             )}
           >
             {isSubmitting ? 'Unlocking...' : 'Unlock and read'}
           </button>
         </form>
 
-        <p className="mt-8 max-w-lg border-t border-slate-100 pt-6 text-center text-sm leading-6 text-slate-500">
+        <p className="mt-5 max-w-md border-t border-slate-100 pt-4 text-center text-sm leading-6 text-slate-500">
           If you do not have the password, contact the author or site owner for access.
         </p>
       </div>
