@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import ChapterPage from 'pages/books/[slug]/chapters/[chapterSlug]';
 import type { Book, Chapter, Homepage } from 'types/cms';
 
@@ -19,6 +20,10 @@ vi.mock('components/pages/books/chapter-content', () => ({
   ChapterContent: () => <h1>CHƯƠNG 24</h1>,
 }));
 
+vi.mock('components/pages/books/chapter-password-gate', () => ({
+  ChapterPasswordGate: () => <div>Chapter password gate</div>,
+}));
+
 vi.mock('components/pages/books/chapter-toc', () => ({
   ChapterToc: () => <nav aria-label="Chapter table of contents" />, 
 }));
@@ -33,6 +38,13 @@ vi.mock('common/utils/image', () => ({
 
 vi.mock('common/utils/meta-tags', () => ({
   generateMetaTags: () => ({}),
+}));
+
+vi.mock('next/router', () => ({
+  useRouter: () => ({
+    asPath: '/books/1~the-wild-robot-escapes/chapters/chapter-24',
+    replace: vi.fn().mockResolvedValue(true),
+  }),
 }));
 
 function createBook(overrides: Partial<Book> = {}): Book {
@@ -71,6 +83,17 @@ function createBook(overrides: Partial<Book> = {}): Book {
 }
 
 function createChapter(overrides: Partial<Chapter> = {}): Chapter {
+  const defaultContent = {
+    root: {
+      children: [],
+      direction: null,
+      format: '',
+      indent: 0,
+      type: 'root',
+      version: 1,
+    },
+  } as never;
+
   return {
     id: overrides.id ?? 1,
     title: overrides.title ?? 'CHƯƠNG 24',
@@ -81,18 +104,8 @@ function createChapter(overrides: Partial<Chapter> = {}): Chapter {
     chapterSourceHash: overrides.chapterSourceHash ?? null,
     importBatchId: overrides.importBatchId ?? null,
     manualEditedAt: overrides.manualEditedAt ?? null,
-    content:
-      overrides.content ??
-      ({
-        root: {
-          children: [],
-          direction: null,
-          format: '',
-          indent: 0,
-          type: 'root',
-          version: 1,
-        },
-      } as never),
+    content: overrides.content !== undefined ? overrides.content : defaultContent,
+    hasPassword: overrides.hasPassword ?? false,
     createdBy: overrides.createdBy ?? null,
     _status: overrides._status ?? 'published',
     updatedAt: overrides.updatedAt ?? '2024-01-01',
@@ -128,6 +141,20 @@ describe('ChapterPage', () => {
       />
     );
 
+    expect(screen.getAllByRole('heading', { name: 'CHƯƠNG 24', level: 1 })).toHaveLength(1);
+  });
+
+  test('renders the chapter password gate when locked content is unavailable', () => {
+    render(
+      <ChapterPage
+        book={createBook({ origin: 'manual' })}
+        chapter={createChapter({ content: null, hasPassword: true })}
+        chapters={[createChapter({ content: null, hasPassword: true })]}
+        homepage={createHomepage()}
+      />
+    );
+
+    expect(screen.getByText('Chapter password gate')).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { name: 'CHƯƠNG 24', level: 1 })).toHaveLength(1);
   });
 });

@@ -8,6 +8,27 @@ vi.mock('common/apis/base', () => ({
 
 const mockedFetchAPIWithAuthToken = vi.mocked(fetchAPIWithAuthToken);
 
+function createChapterPasswordProof({
+  chapterId,
+  expiresAt,
+  passwordVersion,
+}: {
+  chapterId: string;
+  expiresAt: number;
+  passwordVersion: number;
+}): string {
+  const payload = Buffer.from(
+    JSON.stringify({
+      chapterId,
+      expiresAt,
+      passwordVersion,
+    })
+  )
+    .toString('base64url');
+
+  return `v1.${payload}.signature`;
+}
+
 describe('common/apis/chapters', () => {
   afterEach(() => {
     vi.resetAllMocks();
@@ -144,5 +165,31 @@ describe('common/apis/chapters', () => {
       'chapter:slug:missing-chapter',
       'chapters:book:42',
     ]);
+  });
+
+  test('threads the chapter password proof through chapter content fetches', async () => {
+    mockedFetchAPIWithAuthToken.mockResolvedValueOnce({
+      Chapters: {
+        docs: [],
+      },
+      Homepage: null,
+    } as never);
+
+    const proof = createChapterPasswordProof({
+      chapterId: '7',
+      expiresAt: Date.now() + 60_000,
+      passwordVersion: 3,
+    });
+
+    await getChapterBySlug('chapter-seven', {
+      chapterPasswordProof: proof,
+    });
+
+    const [, config] = mockedFetchAPIWithAuthToken.mock.calls[0] ?? [];
+
+    expect(config?.requestHeaders).toEqual({
+      'x-chapter-password-proof': proof,
+    });
+    expect(config?.cacheKeySuffix).toBe(proof);
   });
 });

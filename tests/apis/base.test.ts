@@ -121,6 +121,66 @@ describe('fetchAPI', () => {
     );
   });
 
+  test('partitions cache entries by chapter password proof cache key', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: { ok: true } }),
+    });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    const cacheMock = createCacheMock();
+    cacheMock.match.mockResolvedValue(null);
+
+    vi.stubGlobal('caches', {
+      default: cacheMock,
+    });
+
+    const { fetchAPI } = await import('common/apis/base');
+
+    await fetchAPI<{ ok: boolean }>('query Test { ok }', {
+      cache: {},
+      cacheKeySuffix: 'proof-a',
+      requestHeaders: {
+        'x-chapter-password-proof': 'proof-a',
+      },
+    });
+
+    await fetchAPI<{ ok: boolean }>('query Test { ok }', {
+      cache: {},
+      cacheKeySuffix: 'proof-b',
+      requestHeaders: {
+        'x-chapter-password-proof': 'proof-b',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      `${PAYLOAD_BASE_URL}/api/graphql`,
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'x-chapter-password-proof': 'proof-a',
+        }),
+      })
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      `${PAYLOAD_BASE_URL}/api/graphql`,
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'x-chapter-password-proof': 'proof-b',
+        }),
+      })
+    );
+
+    const firstCacheKey = cacheMock.match.mock.calls[0]?.[0] as Request | undefined;
+    const secondCacheKey = cacheMock.match.mock.calls[1]?.[0] as Request | undefined;
+
+    expect(firstCacheKey).toBeInstanceOf(Request);
+    expect(secondCacheKey).toBeInstanceOf(Request);
+    expect(firstCacheKey?.url).not.toBe(secondCacheKey?.url);
+  });
+
   test('returns a fresh Cloudflare cache hit without calling Payload', async () => {
     const now = 1_700_000_000_000;
     vi.spyOn(Date, 'now').mockReturnValue(now);

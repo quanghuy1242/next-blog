@@ -1,6 +1,10 @@
 import type { Book, Chapter, ChapterSlugData, Homepage } from 'types/cms';
 import { fetchAPIWithAuthToken } from './base';
 import {
+  buildChapterPasswordProofCacheKey,
+  normalizeChapterPasswordProofCookieValue,
+} from 'common/utils/chapter-password-proof';
+import {
   buildChapterPageCacheTags,
   buildChapterPageLookupCacheTags,
   buildChapterSlugCacheTags,
@@ -44,12 +48,36 @@ interface ChapterPageByBookIdResponse {
 interface ChapterFetchOptions {
   authToken?: string | null;
   cache?: PayloadCacheSettings;
+  chapterPasswordProof?: string | null;
+}
+
+function buildChapterPasswordProofRequestOptions(options: ChapterFetchOptions): {
+  cacheKeySuffix?: unknown;
+  requestHeaders?: Record<string, string>;
+} {
+  if (options.authToken) {
+    return {};
+  }
+
+  const normalizedProof = normalizeChapterPasswordProofCookieValue(options.chapterPasswordProof);
+
+  if (!normalizedProof) {
+    return {};
+  }
+
+  return {
+    cacheKeySuffix: buildChapterPasswordProofCacheKey(normalizedProof),
+    requestHeaders: {
+      'x-chapter-password-proof': normalizedProof,
+    },
+  };
 }
 
 const CHAPTER_LOOKUP_FIELDS = `
   id
   title
   slug
+  hasPassword
 `;
 
 const CHAPTER_DETAIL_FIELDS = `
@@ -75,6 +103,7 @@ const CHAPTER_LIST_FIELDS = `
   title
   slug
   order
+  hasPassword
 `;
 
 const CHAPTER_PAGE_LIST_FIELDS = `
@@ -169,6 +198,7 @@ export async function getChapterBySlug(
       },
       authToken: options.authToken,
       cache: options.cache,
+      ...buildChapterPasswordProofRequestOptions(options),
     }
   );
 
@@ -319,6 +349,7 @@ export async function getChapterPageByBookId(
       },
       authToken: options.authToken,
       cache: options.cache,
+      ...buildChapterPasswordProofRequestOptions(options),
     }
   );
 

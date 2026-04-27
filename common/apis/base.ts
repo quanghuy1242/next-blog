@@ -17,6 +17,8 @@ export interface FetchApiOptions<TData = unknown> {
   useApiKey?: boolean;
   cache?: PayloadCacheSettings;
   getCacheTags?: (data: TData) => string[] | null | undefined;
+  requestHeaders?: Record<string, string>;
+  cacheKeySuffix?: unknown;
   next?: {
     revalidate?: number;
     tags?: string[];
@@ -33,7 +35,16 @@ interface PayloadCMSResponse<TData> {
  */
 export async function fetchAPI<TData>(
   query: string,
-  { variables, authToken, useApiKey = true, cache, getCacheTags, next }: FetchApiOptions<TData> = {}
+  {
+    variables,
+    authToken,
+    useApiKey = true,
+    cache,
+    getCacheTags,
+    requestHeaders,
+    cacheKeySuffix,
+    next,
+  }: FetchApiOptions<TData> = {}
 ): Promise<TData> {
   if (!PAYLOAD_BASE_URL) {
     console.warn('PAYLOAD_BASE_URL is not set. Returning empty response.');
@@ -52,6 +63,14 @@ export async function fetchAPI<TData>(
     headers.Authorization = `Bearer ${authToken}`;
   } else if (useApiKey && PAYLOAD_API_KEY) {
     headers['Authorization'] = `users API-Key ${PAYLOAD_API_KEY}`;
+  }
+
+  if (requestHeaders) {
+    for (const [headerName, headerValue] of Object.entries(requestHeaders)) {
+      if (typeof headerValue === 'string' && headerValue.trim().length > 0) {
+        headers[headerName] = headerValue;
+      }
+    }
   }
 
   const fetchFresh = async (): Promise<TData> => {
@@ -95,11 +114,13 @@ export async function fetchAPI<TData>(
         authSubject: authCacheSubject,
         query,
         variables,
+        ...(cacheKeySuffix != null ? { cacheKeySuffix } : {}),
       }
     : {
         query,
         useApiKey,
         variables,
+        ...(cacheKeySuffix != null ? { cacheKeySuffix } : {}),
       };
 
   const cacheKey = buildPayloadCacheKey(API_URL, {
@@ -121,6 +142,8 @@ export async function fetchAPIWithAuthToken<TData>(
     authToken,
     cache,
     getCacheTags,
+    requestHeaders,
+    cacheKeySuffix,
     next,
   }: Omit<FetchApiOptions<TData>, 'useApiKey'> = {}
 ): Promise<TData> {
@@ -130,6 +153,8 @@ export async function fetchAPIWithAuthToken<TData>(
     useApiKey: false,
     cache,
     getCacheTags,
+    requestHeaders,
+    cacheKeySuffix,
     next,
   });
 }

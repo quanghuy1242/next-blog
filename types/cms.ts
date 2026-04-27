@@ -128,7 +128,7 @@ export interface Chapter {
   importBatchId?: string | null;
   manualEditedAt?: string | null;
   hasPassword?: boolean | null;
-  content: SerializedEditorState;
+  content: SerializedEditorState | null;
   createdBy?: Author | number | null;
   _status?: PostStatus;
   updatedAt?: string;

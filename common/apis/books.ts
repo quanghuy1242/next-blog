@@ -316,6 +316,7 @@ export async function getBookDetailById(
             title
             slug
             order
+            hasPassword
           }
         }
 

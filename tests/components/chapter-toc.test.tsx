@@ -46,6 +46,17 @@ vi.mock('next/link', () => ({
 const mockedRequestRouteWarmup = vi.mocked(requestRouteWarmup);
 
 function createChapter(overrides: Partial<Chapter> = {}): Chapter {
+  const defaultContent = {
+    root: {
+      children: [],
+      direction: null,
+      format: '',
+      indent: 0,
+      type: 'root',
+      version: 1,
+    },
+  } as never;
+
   return {
     id: overrides.id ?? 1,
     title: overrides.title ?? 'Chapter 1',
@@ -56,18 +67,8 @@ function createChapter(overrides: Partial<Chapter> = {}): Chapter {
     chapterSourceHash: overrides.chapterSourceHash ?? null,
     importBatchId: overrides.importBatchId ?? null,
     manualEditedAt: overrides.manualEditedAt ?? null,
-    content:
-      overrides.content ??
-      ({
-        root: {
-          children: [],
-          direction: null,
-          format: '',
-          indent: 0,
-          type: 'root',
-          version: 1,
-        },
-      } as never),
+    content: overrides.content !== undefined ? overrides.content : defaultContent,
+    hasPassword: overrides.hasPassword ?? false,
     createdBy: overrides.createdBy ?? null,
     _status: overrides._status ?? 'published',
     updatedAt: overrides.updatedAt ?? '2024-01-01',
@@ -119,5 +120,18 @@ describe('ChapterToc component', () => {
     fireEvent.click(screen.getByRole('link', { name: /One/i }));
 
     expect(onNavigate).toHaveBeenCalledTimes(1);
+  });
+
+  test('marks protected chapters as locked', () => {
+    render(
+      <ChapterToc
+        chapters={[createChapter({ title: 'Locked chapter', hasPassword: true })]}
+        bookId={1}
+        bookSlug="sample-book"
+        currentChapterSlug="chapter-1"
+      />
+    );
+
+    expect(screen.getByText('Locked')).toBeInTheDocument();
   });
 });

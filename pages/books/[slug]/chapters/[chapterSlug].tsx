@@ -2,6 +2,7 @@ import React from 'react';
 import { useMemo, useState } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { getBookBySlug } from 'common/apis/books';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { getChapterByBookAndSlug, getChapterPageByBookId } from 'common/apis/chapters';
@@ -9,10 +10,14 @@ import { buildBookHref, buildChapterHref, parseBookRouteSegment } from 'common/u
 import { getCoverImageUrl } from 'common/utils/image';
 import { generateMetaTags } from 'common/utils/meta-tags';
 import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
+import {
+  getChapterPasswordProofCookieValueFromRequest,
+} from 'common/utils/chapter-password-proof';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
 import { ChapterContent } from 'components/pages/books/chapter-content';
+import { ChapterPasswordGate } from 'components/pages/books/chapter-password-gate';
 import { ChapterToc } from 'components/pages/books/chapter-toc';
 import { ChapterTocDrawer } from 'components/pages/books/chapter-toc-drawer';
 import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
@@ -32,9 +37,11 @@ export default function ChapterPage({
   homepage,
 }: ChapterPageProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const router = useRouter();
   const shouldRenderChapterTitle =
     (book.origin as string) !== 'epub_imported' &&
     (book.sourceType as string) !== 'epub_upload';
+  const isChapterLocked = chapter.hasPassword === true && chapter.content == null;
 
   const { previousChapter, nextChapter } = useMemo(() => {
     const currentIndex = chapters.findIndex(
@@ -132,12 +139,21 @@ export default function ChapterPage({
                 </button>
               </div>
 
-              <ChapterContent
-                content={chapter.content}
-                bookId={book.id}
-                bookSlug={book.slug}
-                chapters={chapters}
-              />
+              {isChapterLocked ? (
+                <ChapterPasswordGate
+                  chapterId={chapter.id}
+                  onUnlocked={async () => {
+                    await router.replace(router.asPath);
+                  }}
+                />
+              ) : (
+                <ChapterContent
+                  content={chapter.content}
+                  bookId={book.id}
+                  bookSlug={book.slug}
+                  chapters={chapters}
+                />
+              )}
 
               <div className="mt-8 flex items-center justify-between gap-4 border-t border-gray-200 pt-4 text-sm">
                 <div>
@@ -194,8 +210,6 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
   const chapterSlug = Array.isArray(params?.chapterSlug)
     ? params?.chapterSlug[0]
     : params?.chapterSlug;
-  const sessionToken = getBetterAuthTokenFromRequest(req);
-  const payloadCache = sessionToken ? AUTH_PAYLOAD_CACHE : ONE_HOUR_PAYLOAD_CACHE;
 
   if (!bookSlug || !chapterSlug) {
     return {
@@ -204,11 +218,16 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
   }
 
   const parsedBookRoute = parseBookRouteSegment(bookSlug);
+  const sessionToken = getBetterAuthTokenFromRequest(req);
+  const chapterPasswordProof = sessionToken ? null : getChapterPasswordProofCookieValueFromRequest(req);
+  const payloadCache =
+    sessionToken || chapterPasswordProof ? AUTH_PAYLOAD_CACHE : ONE_HOUR_PAYLOAD_CACHE;
 
   if (parsedBookRoute.bookId) {
     const accessibleResult = await getChapterPageByBookId(parsedBookRoute.bookId, chapterSlug, {
       authToken: sessionToken,
       cache: payloadCache,
+      chapterPasswordProof,
     });
 
     const { book, chapter, chapters, homepage } = accessibleResult;
@@ -245,6 +264,7 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
   const chapterData = await getChapterByBookAndSlug(book.id, chapterSlug, {
     authToken: sessionToken,
     cache: payloadCache,
+    chapterPasswordProof,
   });
 
   if (!chapterData.chapter) {

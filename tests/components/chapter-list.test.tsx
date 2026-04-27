@@ -4,6 +4,17 @@ import { ChapterList } from 'components/pages/books/chapter-list';
 import type { Chapter } from 'types/cms';
 
 function createChapter(overrides: Partial<Chapter> = {}): Chapter {
+  const defaultContent = {
+    root: {
+      children: [],
+      direction: null,
+      format: '',
+      indent: 0,
+      type: 'root',
+      version: 1,
+    },
+  } as never;
+
   return {
     id: overrides.id ?? 1,
     title: overrides.title ?? 'Chapter 1',
@@ -14,18 +25,8 @@ function createChapter(overrides: Partial<Chapter> = {}): Chapter {
     chapterSourceHash: overrides.chapterSourceHash ?? null,
     importBatchId: overrides.importBatchId ?? null,
     manualEditedAt: overrides.manualEditedAt ?? null,
-    content:
-      overrides.content ??
-      ({
-        root: {
-          children: [],
-          direction: null,
-          format: '',
-          indent: 0,
-          type: 'root',
-          version: 1,
-        },
-      } as never),
+    content: overrides.content !== undefined ? overrides.content : defaultContent,
+    hasPassword: overrides.hasPassword ?? false,
     createdBy: overrides.createdBy ?? null,
     _status: overrides._status ?? 'published',
     updatedAt: overrides.updatedAt ?? '2024-01-01',
@@ -53,5 +54,17 @@ describe('ChapterList component', () => {
     render(<ChapterList bookId={1} bookSlug="sample-book" chapters={[]} />);
 
     expect(screen.getByText('No chapters are available yet.')).toBeInTheDocument();
+  });
+
+  test('marks protected chapters as locked', () => {
+    render(
+      <ChapterList
+        bookId={1}
+        bookSlug="sample-book"
+        chapters={[createChapter({ title: 'Locked chapter', hasPassword: true })]}
+      />
+    );
+
+    expect(screen.getByText('Locked')).toBeInTheDocument();
   });
 });
