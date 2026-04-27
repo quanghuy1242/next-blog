@@ -7,6 +7,7 @@ import {
   claimRouteWarmup,
   cancelRouteWarmup,
   getRouteWarmupState,
+  pauseSpeculativeRouteWarmupsUntilUserActivity,
   requestRouteWarmup,
 } from 'common/utils/route-prefetch';
 
@@ -21,6 +22,9 @@ describe('common/utils/route-prefetch', () => {
     Reflect.deleteProperty(nextWindow, '__NEXT_DATA__');
     Reflect.deleteProperty(nextWindow, '__BUILD_MANIFEST');
     Reflect.deleteProperty(nextWindow, '__DEV_PAGES_MANIFEST');
+    Reflect.deleteProperty(navigator, 'connection');
+    Reflect.deleteProperty(navigator, 'mozConnection');
+    Reflect.deleteProperty(navigator, 'webkitConnection');
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     window.history.pushState({}, '', '/');
@@ -46,6 +50,9 @@ describe('common/utils/route-prefetch', () => {
     Reflect.deleteProperty(nextWindow, '__NEXT_DATA__');
     Reflect.deleteProperty(nextWindow, '__BUILD_MANIFEST');
     Reflect.deleteProperty(nextWindow, '__DEV_PAGES_MANIFEST');
+    Reflect.deleteProperty(navigator, 'connection');
+    Reflect.deleteProperty(navigator, 'mozConnection');
+    Reflect.deleteProperty(navigator, 'webkitConnection');
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -151,6 +158,85 @@ describe('common/utils/route-prefetch', () => {
     await Promise.resolve();
 
     expect(getRouteWarmupState().recentHrefs).toContain('/books/1~sample-book');
+  });
+
+  test.each([
+    {
+      connection: {
+        effectiveType: '4g',
+        saveData: true,
+      },
+      name: 'Save-Data is enabled',
+    },
+    {
+      connection: {
+        effectiveType: '2g',
+        saveData: false,
+      },
+      name: 'effectiveType is 2g',
+    },
+  ])('skips all warmups when $name', ({ connection }) => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('ok', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    Object.defineProperty(navigator, 'connection', {
+      configurable: true,
+      value: {
+        ...connection,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      },
+    });
+
+    requestRouteWarmup('/books/1~sample-book', 'hover');
+    requestRouteWarmup('/books/2~sample-book', 'pointer');
+    requestRouteWarmup('/books/3~sample-book', 'viewport');
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(getRouteWarmupState().disableWarmup).toBe(true);
+  });
+
+  test('pauses speculative warmups after navigation until fresh user activity', () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('ok', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    pauseSpeculativeRouteWarmupsUntilUserActivity();
+
+    expect(getRouteWarmupState().pauseSpeculativeWarmup).toBe(true);
+
+    requestRouteWarmup('/books/1~sample-book', 'viewport');
+    requestRouteWarmup('/books/2~sample-book', 'pointer');
+
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    window.dispatchEvent(new Event('scroll'));
+
+    expect(getRouteWarmupState().pauseSpeculativeWarmup).toBe(false);
+
+    requestRouteWarmup('/books/1~sample-book', 'viewport');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/books/1~sample-book',
+      expect.objectContaining({
+        credentials: 'same-origin',
+        method: 'GET',
+        signal: expect.any(AbortSignal),
+      })
+    );
+  });
+
+  test('hover intent resumes a paused policy immediately', () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('ok', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    pauseSpeculativeRouteWarmupsUntilUserActivity();
+
+    expect(getRouteWarmupState().pauseSpeculativeWarmup).toBe(true);
+
+    requestRouteWarmup('/books/1~sample-book', 'hover');
+
+    expect(getRouteWarmupState().pauseSpeculativeWarmup).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   test('builds Next data query params from any matched dynamic route pattern', async () => {
@@ -621,6 +707,73 @@ describe('common/utils/route-prefetch', () => {
     );
   });
 
+  test('aborts an inflight hover warmup when it is not claimed by navigation', async () => {
+    const abortSignals: AbortSignal[] = [];
+    const fetchMock = vi.fn(
+      (_input, init) =>
+        new Promise<Response>((_resolve, reject) => {
+          const signal = init?.signal;
+
+          if (signal) {
+            abortSignals.push(signal);
+            signal.addEventListener(
+              'abort',
+              () => {
+                reject(new DOMException('Aborted', 'AbortError'));
+              },
+              { once: true }
+            );
+          }
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    requestRouteWarmup('/books/1~sample-book', 'hover');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    cancelRouteWarmup('/books/1~sample-book');
+
+    expect(abortSignals[0]?.aborted).toBe(true);
+
+    await waitFor(() => {
+      expect(getRouteWarmupState().activeWarmups).toBe(0);
+      expect(getRouteWarmupState().inflightHrefs).toHaveLength(0);
+    });
+  });
+
+  test('drops a pending hover warmup on click so it cannot start after navigation', async () => {
+    const deferreds: Array<(response: Response) => void> = [];
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          deferreds.push(resolve);
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    requestRouteWarmup('/books/1~sample-book', 'viewport');
+    requestRouteWarmup('/books/2~sample-book', 'viewport');
+    requestRouteWarmup('/books/3~sample-book', 'hover');
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(getRouteWarmupState().pendingHrefs).toContain(
+      '/books/3~sample-book'
+    );
+
+    claimRouteWarmup('/books/3~sample-book');
+
+    expect(getRouteWarmupState().pendingHrefs).not.toContain(
+      '/books/3~sample-book'
+    );
+
+    deferreds[0]?.(new Response('ok', { status: 200 }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+  });
+
   test('drops a pending warmup on click so it cannot start after navigation', async () => {
     const deferreds: Array<(response: Response) => void> = [];
     const fetchMock = vi.fn(
@@ -682,6 +835,26 @@ describe('common/utils/route-prefetch', () => {
       | undefined;
 
     expect(thirdCall?.[0]).toBe('/books/5~sample-book');
+  });
+
+  test('re-enqueues a route cleanly after queue trimming drops its old pending task', () => {
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>(() => {
+          // Keep the concurrency pool full so the queue state stays observable.
+        })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    for (let index = 1; index <= 35; index += 1) {
+      requestRouteWarmup(`/books/${index}~sample-book`, 'viewport');
+    }
+
+    expect(getRouteWarmupState().pendingHrefs).not.toContain('/books/3~sample-book');
+
+    requestRouteWarmup('/books/3~sample-book', 'viewport');
+
+    expect(getRouteWarmupState().pendingHrefs).toContain('/books/3~sample-book');
   });
 
   test('skips external urls and the current page', () => {

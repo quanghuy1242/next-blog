@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
@@ -6,7 +6,10 @@ import { usePointerProximityObserver } from 'hooks/usePointerProximityObserver';
 import {
   claimRouteWarmup,
   cancelRouteWarmup,
+  getRouteWarmupPolicyState,
+  pauseSpeculativeRouteWarmupsUntilUserActivity,
   requestRouteWarmup,
+  subscribeRouteWarmupPolicy,
 } from 'common/utils/route-prefetch';
 
 const TOUCH_DEVICE_QUERY = '(hover: none), (pointer: coarse)';
@@ -52,19 +55,26 @@ export function SSRPrefetchLink({
   children,
   onClick,
   onNavigate,
+  onBlur,
   onFocus,
   onMouseEnter,
+  onMouseLeave,
   ...rest
 }: SSRPrefetchLinkProps) {
   const anchorRef = useRef<HTMLAnchorElement>(null);
-  const [shouldWarmOnViewport] = useState(() => {
+  const warmupPolicyState = useSyncExternalStore(
+    subscribeRouteWarmupPolicy,
+    getRouteWarmupPolicyState,
+    getRouteWarmupPolicyState
+  );
+  const [supportsViewportWarmup] = useState(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
       return false;
     }
 
     return window.matchMedia(TOUCH_DEVICE_QUERY).matches;
   });
-  const [shouldWarmOnPointer] = useState(() => {
+  const [supportsPointerWarmup] = useState(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
       return false;
     }
@@ -75,6 +85,11 @@ export function SSRPrefetchLink({
   });
   const hasViewportWarmup = useRef(false);
   const hasPointerWarmup = useRef(false);
+  const hasHoverWarmup = useRef(false);
+  const shouldWarmOnViewport =
+    supportsViewportWarmup && warmupPolicyState.allowViewportWarmup;
+  const shouldWarmOnPointer =
+    supportsPointerWarmup && warmupPolicyState.allowPointerWarmup;
 
   const { isIntersecting } = useIntersectionObserver<HTMLAnchorElement>({
     enabled: Boolean(href) && shouldWarmOnViewport,
@@ -90,6 +105,10 @@ export function SSRPrefetchLink({
 
   useEffect(() => {
     if (!shouldWarmOnViewport) {
+      if (hasViewportWarmup.current) {
+        cancelRouteWarmup(href);
+        hasViewportWarmup.current = false;
+      }
       return;
     }
 
@@ -117,6 +136,10 @@ export function SSRPrefetchLink({
 
   useEffect(() => {
     if (!shouldWarmOnPointer) {
+      if (hasPointerWarmup.current) {
+        cancelRouteWarmup(href);
+        hasPointerWarmup.current = false;
+      }
       return;
     }
 
@@ -140,6 +163,26 @@ export function SSRPrefetchLink({
       }
     };
   }, [href, isProximate, shouldWarmOnPointer]);
+
+  useEffect(() => {
+    if (warmupPolicyState.allowHoverWarmup) {
+      return;
+    }
+
+    if (hasHoverWarmup.current) {
+      cancelRouteWarmup(href);
+      hasHoverWarmup.current = false;
+    }
+  }, [href, warmupPolicyState.allowHoverWarmup]);
+
+  useEffect(() => {
+    return () => {
+      if (hasHoverWarmup.current) {
+        cancelRouteWarmup(href);
+        hasHoverWarmup.current = false;
+      }
+    };
+  }, [href]);
 
   return (
     <Link
@@ -171,19 +214,48 @@ export function SSRPrefetchLink({
           // task that would otherwise fire too late and duplicate the router's
           // own fetch.
           claimRouteWarmup(href);
+          pauseSpeculativeRouteWarmupsUntilUserActivity();
         }
       }}
       onFocus={(event) => {
         onFocus?.(event);
+
+        if (!warmupPolicyState.allowHoverWarmup) {
+          return;
+        }
+
         // Keyboard focus is treated like hover because it is a strong signal of
         // immediate navigation intent.
+        hasHoverWarmup.current = true;
         requestRouteWarmup(href, 'hover');
+      }}
+      onBlur={(event) => {
+        onBlur?.(event);
+
+        if (hasHoverWarmup.current) {
+          cancelRouteWarmup(href);
+          hasHoverWarmup.current = false;
+        }
       }}
       onMouseEnter={(event) => {
         onMouseEnter?.(event);
+
+        if (!warmupPolicyState.allowHoverWarmup) {
+          return;
+        }
+
         // Hover gets the highest speculative priority because it usually means
         // the next user action is a click.
+        hasHoverWarmup.current = true;
         requestRouteWarmup(href, 'hover');
+      }}
+      onMouseLeave={(event) => {
+        onMouseLeave?.(event);
+
+        if (hasHoverWarmup.current) {
+          cancelRouteWarmup(href);
+          hasHoverWarmup.current = false;
+        }
       }}
       {...rest}
     >

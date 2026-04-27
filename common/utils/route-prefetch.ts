@@ -70,6 +70,7 @@ interface RouteWarmTask {
   state: 'pending' | 'inflight';
   controller: AbortController | null;
   canceled: boolean;
+  claimedByNavigation: boolean;
 }
 
 interface NextDataState {
@@ -84,6 +85,23 @@ interface ClientBuildManifestState {
 
 interface DevPagesManifestState {
   pages?: string[];
+}
+
+interface NetworkInformationState {
+  effectiveType?: string;
+  saveData?: boolean;
+  addEventListener?: (type: 'change', listener: () => void) => void;
+  removeEventListener?: (type: 'change', listener: () => void) => void;
+  addListener?: (listener: () => void) => void;
+  removeListener?: (listener: () => void) => void;
+}
+
+interface RouteWarmupPolicyState {
+  allowHoverWarmup: boolean;
+  allowPointerWarmup: boolean;
+  allowViewportWarmup: boolean;
+  disableWarmup: boolean;
+  pauseSpeculativeWarmup: boolean;
 }
 
 /**
@@ -129,6 +147,241 @@ let activeWarmups = 0;
 let warmupSequence = 0;
 let nativeFetch: typeof fetch | null = null;
 let fetchInterceptorInstalled = false;
+let pauseSpeculativeWarmupAfterNavigation = false;
+let connectionListenerState:
+  | {
+      connection: NetworkInformationState;
+      listener: () => void;
+    }
+  | null = null;
+let resumeListenersAttached = false;
+let cachedRouteWarmupPolicyState: RouteWarmupPolicyState | null = null;
+
+const routeWarmupPolicySubscribers = new Set<() => void>();
+
+function notifyRouteWarmupPolicySubscribers(): void {
+  for (const subscriber of routeWarmupPolicySubscribers) {
+    subscriber();
+  }
+}
+
+function getNavigatorConnection(): NetworkInformationState | null {
+  if (typeof navigator === 'undefined') {
+    return null;
+  }
+
+  const browserNavigator = navigator as Navigator & {
+    connection?: NetworkInformationState;
+    mozConnection?: NetworkInformationState;
+    webkitConnection?: NetworkInformationState;
+  };
+
+  return (
+    browserNavigator.connection ??
+    browserNavigator.mozConnection ??
+    browserNavigator.webkitConnection ??
+    null
+  );
+}
+
+function isConnectionConstrained(connection = getNavigatorConnection()): boolean {
+  const effectiveType = connection?.effectiveType?.toLowerCase();
+
+  return (
+    Boolean(connection?.saveData) ||
+    effectiveType === 'slow-2g' ||
+    effectiveType === '2g'
+  );
+}
+
+function handleRouteWarmupPolicyConnectionChange(): void {
+  notifyRouteWarmupPolicySubscribers();
+}
+
+function attachConnectionListener(): void {
+  const connection = getNavigatorConnection();
+
+  if (!connection) {
+    if (connectionListenerState) {
+      detachConnectionListener();
+    }
+    return;
+  }
+
+  if (connectionListenerState?.connection === connection) {
+    return;
+  }
+
+  detachConnectionListener();
+
+  const listener = handleRouteWarmupPolicyConnectionChange;
+
+  if (typeof connection.addEventListener === 'function') {
+    connection.addEventListener('change', listener);
+  } else if (typeof connection.addListener === 'function') {
+    connection.addListener(listener);
+  } else {
+    return;
+  }
+
+  connectionListenerState = {
+    connection,
+    listener,
+  };
+}
+
+function detachConnectionListener(): void {
+  if (!connectionListenerState) {
+    return;
+  }
+
+  const { connection, listener } = connectionListenerState;
+
+  if (typeof connection.removeEventListener === 'function') {
+    connection.removeEventListener('change', listener);
+  } else if (typeof connection.removeListener === 'function') {
+    connection.removeListener(listener);
+  }
+
+  connectionListenerState = null;
+}
+
+function resumeSpeculativeRouteWarmups(): void {
+  if (!pauseSpeculativeWarmupAfterNavigation) {
+    return;
+  }
+
+  pauseSpeculativeWarmupAfterNavigation = false;
+  detachSpeculativeWarmupResumeListeners();
+  notifyRouteWarmupPolicySubscribers();
+}
+
+function handleSpeculativeWarmupResumeActivity(): void {
+  resumeSpeculativeRouteWarmups();
+}
+
+function attachSpeculativeWarmupResumeListeners(): void {
+  if (resumeListenersAttached || typeof window === 'undefined') {
+    return;
+  }
+
+  window.addEventListener('pointermove', handleSpeculativeWarmupResumeActivity, {
+    capture: true,
+    passive: true,
+  });
+  window.addEventListener('touchstart', handleSpeculativeWarmupResumeActivity, {
+    capture: true,
+    passive: true,
+  });
+  // Scroll is only an approximation of renewed intent. Browser or framework
+  // scroll restoration can also trigger it, so this may resume speculation
+  // slightly earlier than ideal.
+  window.addEventListener('scroll', handleSpeculativeWarmupResumeActivity, {
+    capture: true,
+    passive: true,
+  });
+  window.addEventListener('wheel', handleSpeculativeWarmupResumeActivity, {
+    capture: true,
+    passive: true,
+  });
+  window.addEventListener('keydown', handleSpeculativeWarmupResumeActivity, {
+    capture: true,
+  });
+
+  resumeListenersAttached = true;
+}
+
+function detachSpeculativeWarmupResumeListeners(): void {
+  if (!resumeListenersAttached || typeof window === 'undefined') {
+    return;
+  }
+
+  window.removeEventListener(
+    'pointermove',
+    handleSpeculativeWarmupResumeActivity,
+    true
+  );
+  window.removeEventListener(
+    'touchstart',
+    handleSpeculativeWarmupResumeActivity,
+    true
+  );
+  window.removeEventListener(
+    'scroll',
+    handleSpeculativeWarmupResumeActivity,
+    true
+  );
+  window.removeEventListener(
+    'wheel',
+    handleSpeculativeWarmupResumeActivity,
+    true
+  );
+  window.removeEventListener(
+    'keydown',
+    handleSpeculativeWarmupResumeActivity,
+    true
+  );
+
+  resumeListenersAttached = false;
+}
+
+export function getRouteWarmupPolicyState(): RouteWarmupPolicyState {
+  const disableWarmup = isConnectionConstrained();
+  const nextRouteWarmupPolicyState: RouteWarmupPolicyState = {
+    allowHoverWarmup: !disableWarmup,
+    allowPointerWarmup:
+      !disableWarmup && !pauseSpeculativeWarmupAfterNavigation,
+    allowViewportWarmup:
+      !disableWarmup && !pauseSpeculativeWarmupAfterNavigation,
+    disableWarmup,
+    pauseSpeculativeWarmup: pauseSpeculativeWarmupAfterNavigation,
+  };
+
+  if (
+    cachedRouteWarmupPolicyState &&
+    cachedRouteWarmupPolicyState.allowHoverWarmup ===
+      nextRouteWarmupPolicyState.allowHoverWarmup &&
+    cachedRouteWarmupPolicyState.allowPointerWarmup ===
+      nextRouteWarmupPolicyState.allowPointerWarmup &&
+    cachedRouteWarmupPolicyState.allowViewportWarmup ===
+      nextRouteWarmupPolicyState.allowViewportWarmup &&
+    cachedRouteWarmupPolicyState.disableWarmup ===
+      nextRouteWarmupPolicyState.disableWarmup &&
+    cachedRouteWarmupPolicyState.pauseSpeculativeWarmup ===
+      nextRouteWarmupPolicyState.pauseSpeculativeWarmup
+  ) {
+    return cachedRouteWarmupPolicyState;
+  }
+
+  cachedRouteWarmupPolicyState = nextRouteWarmupPolicyState;
+
+  return cachedRouteWarmupPolicyState;
+}
+
+export function subscribeRouteWarmupPolicy(
+  subscriber: () => void
+): () => void {
+  routeWarmupPolicySubscribers.add(subscriber);
+  attachConnectionListener();
+
+  return () => {
+    routeWarmupPolicySubscribers.delete(subscriber);
+
+    if (routeWarmupPolicySubscribers.size === 0) {
+      detachConnectionListener();
+    }
+  };
+}
+
+export function pauseSpeculativeRouteWarmupsUntilUserActivity(): void {
+  if (typeof window === 'undefined' || pauseSpeculativeWarmupAfterNavigation) {
+    return;
+  }
+
+  pauseSpeculativeWarmupAfterNavigation = true;
+  attachSpeculativeWarmupResumeListeners();
+  notifyRouteWarmupPolicySubscribers();
+}
 
 /**
  * Converts the UI signal into queue priority.
@@ -743,7 +996,15 @@ function enqueueWarmup(task: RouteWarmTask): void {
   sortPendingWarmups();
 
   if (pendingWarmups.length > MAX_PENDING_WARMUPS) {
-    pendingWarmups.length = MAX_PENDING_WARMUPS;
+    const droppedWarmups = pendingWarmups.splice(MAX_PENDING_WARMUPS);
+
+    for (const droppedWarmup of droppedWarmups) {
+      droppedWarmup.canceled = true;
+
+      if (tasksByHref.get(droppedWarmup.href) === droppedWarmup) {
+        tasksByHref.delete(droppedWarmup.href);
+      }
+    }
   }
 }
 
@@ -862,6 +1123,20 @@ export function requestRouteWarmup(
 ): void {
   pruneExpiredWarmups();
 
+  const routeWarmupPolicyState = getRouteWarmupPolicyState();
+
+  if (routeWarmupPolicyState.disableWarmup) {
+    return;
+  }
+
+  if (routeWarmupPolicyState.pauseSpeculativeWarmup) {
+    if (source === 'hover') {
+      resumeSpeculativeRouteWarmups();
+    } else {
+      return;
+    }
+  }
+
   const normalizedHref = normalizeWarmupHref(rawHref);
 
   if (!normalizedHref) {
@@ -910,6 +1185,7 @@ export function requestRouteWarmup(
     state: 'pending',
     controller: null,
     canceled: false,
+    claimedByNavigation: false,
   };
 
   tasksByHref.set(normalizedHref, task);
@@ -923,8 +1199,8 @@ export function requestRouteWarmup(
  *
  * Behavior depends on task state:
  *
- * - `inflight`: keep the task alive by upgrading it to hover priority so later
- *   cleanup from viewport/pointer observers does not abort the request.
+ * - `inflight`: mark the task as owned by real navigation so later speculative
+ *   cleanup does not abort the request.
  * - `pending`: drop the queued task entirely. The real navigation request is
  *   already happening, so allowing the stale queued warmup to start later would
  *   create a second fetch instead of helping.
@@ -940,7 +1216,7 @@ export function claimRouteWarmup(rawHref: string): void {
 
   const task = tasksByHref.get(normalizedHref);
 
-  if (!task || task.source === 'hover') {
+  if (!task) {
     return;
   }
 
@@ -951,14 +1227,14 @@ export function claimRouteWarmup(rawHref: string): void {
     return;
   }
 
-  task.source = 'hover';
+  task.claimedByNavigation = true;
 }
 
 /**
  * Cancels speculative work once the UI signal that justified it disappears.
  *
- * Hover-claimed work is intentionally immune here because after a click it is
- * no longer speculative. Pending tasks are simply removed from the queue;
+ * Navigation-claimed work is intentionally immune here because after a click it
+ * is no longer speculative. Pending tasks are simply removed from the queue;
  * inflight tasks are aborted through their controller.
  */
 export function cancelRouteWarmup(rawHref: string): void {
@@ -972,7 +1248,7 @@ export function cancelRouteWarmup(rawHref: string): void {
 
   const task = tasksByHref.get(normalizedHref);
 
-  if (!task || task.source === 'hover') {
+  if (!task || task.claimedByNavigation) {
     return;
   }
 
@@ -1010,7 +1286,11 @@ export function clearRouteWarmupState(): void {
   }
   sharedWarmupFetchExpiryTimers.clear();
   activeWarmups = 0;
+  cachedRouteWarmupPolicyState = null;
+  pauseSpeculativeWarmupAfterNavigation = false;
+  detachSpeculativeWarmupResumeListeners();
   restoreWarmupFetchInterceptor();
+  notifyRouteWarmupPolicySubscribers();
 }
 
 /**
@@ -1018,9 +1298,13 @@ export function clearRouteWarmupState(): void {
  * debugging.
  */
 export function getRouteWarmupState() {
+  const routeWarmupPolicyState = getRouteWarmupPolicyState();
+
   return {
     activeWarmups,
+    disableWarmup: routeWarmupPolicyState.disableWarmup,
     inflightHrefs: Array.from(inflightWarmups),
+    pauseSpeculativeWarmup: routeWarmupPolicyState.pauseSpeculativeWarmup,
     pendingHrefs: pendingWarmups.map((task) => task.href),
     recentHrefs: Array.from(recentWarmups.keys()),
   };

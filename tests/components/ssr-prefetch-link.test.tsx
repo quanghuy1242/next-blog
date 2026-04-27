@@ -5,7 +5,10 @@ import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 import {
   claimRouteWarmup,
   cancelRouteWarmup,
+  getRouteWarmupPolicyState,
+  pauseSpeculativeRouteWarmupsUntilUserActivity,
   requestRouteWarmup,
+  subscribeRouteWarmupPolicy,
 } from 'common/utils/route-prefetch';
 
 const TOUCH_DEVICE_QUERY = '(hover: none), (pointer: coarse)';
@@ -14,7 +17,16 @@ const DESKTOP_POINTER_QUERY = '(hover: hover) and (pointer: fine)';
 vi.mock('common/utils/route-prefetch', () => ({
   claimRouteWarmup: vi.fn(),
   cancelRouteWarmup: vi.fn(),
+  getRouteWarmupPolicyState: vi.fn(() => ({
+    allowHoverWarmup: true,
+    allowPointerWarmup: true,
+    allowViewportWarmup: true,
+    disableWarmup: false,
+    pauseSpeculativeWarmup: false,
+  })),
+  pauseSpeculativeRouteWarmupsUntilUserActivity: vi.fn(),
   requestRouteWarmup: vi.fn(),
+  subscribeRouteWarmupPolicy: vi.fn(() => () => {}),
 }));
 
 vi.mock('next/link', () => ({
@@ -70,6 +82,11 @@ vi.mock('next/link', () => ({
 const mockedRequestRouteWarmup = vi.mocked(requestRouteWarmup);
 const mockedClaimRouteWarmup = vi.mocked(claimRouteWarmup);
 const mockedCancelRouteWarmup = vi.mocked(cancelRouteWarmup);
+const mockedGetRouteWarmupPolicyState = vi.mocked(getRouteWarmupPolicyState);
+const mockedPauseSpeculativeRouteWarmupsUntilUserActivity = vi.mocked(
+  pauseSpeculativeRouteWarmupsUntilUserActivity
+);
+const mockedSubscribeRouteWarmupPolicy = vi.mocked(subscribeRouteWarmupPolicy);
 
 describe('SSRPrefetchLink component', () => {
   let observeCallback: IntersectionObserverCallback | null = null;
@@ -108,6 +125,17 @@ describe('SSRPrefetchLink component', () => {
     mockedRequestRouteWarmup.mockReset();
     mockedClaimRouteWarmup.mockReset();
     mockedCancelRouteWarmup.mockReset();
+    mockedPauseSpeculativeRouteWarmupsUntilUserActivity.mockReset();
+    mockedSubscribeRouteWarmupPolicy.mockReset();
+    mockedSubscribeRouteWarmupPolicy.mockReturnValue(() => {});
+    mockedGetRouteWarmupPolicyState.mockReset();
+    mockedGetRouteWarmupPolicyState.mockReturnValue({
+      allowHoverWarmup: true,
+      allowPointerWarmup: true,
+      allowViewportWarmup: true,
+      disableWarmup: false,
+      pauseSpeculativeWarmup: false,
+    });
     observeCallback = null;
     observeMock.mockClear();
     disconnectMock.mockClear();
@@ -145,6 +173,28 @@ describe('SSRPrefetchLink component', () => {
     );
   });
 
+  test('cancels an unclaimed hover warmup on mouse leave', () => {
+    render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
+
+    const link = screen.getByRole('link', { name: 'Sample Book' });
+
+    fireEvent.mouseEnter(link);
+    fireEvent.mouseLeave(link);
+
+    expect(mockedCancelRouteWarmup).toHaveBeenCalledWith('/books/1~sample-book');
+  });
+
+  test('cancels an unclaimed focus warmup on blur', () => {
+    render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
+
+    const link = screen.getByRole('link', { name: 'Sample Book' });
+
+    fireEvent.focus(link);
+    fireEvent.blur(link);
+
+    expect(mockedCancelRouteWarmup).toHaveBeenCalledWith('/books/1~sample-book');
+  });
+
   test('claims an existing warmup on click', () => {
     const onClick = vi.fn();
 
@@ -160,6 +210,9 @@ describe('SSRPrefetchLink component', () => {
     expect(mockedClaimRouteWarmup).toHaveBeenCalledWith(
       '/books/1~sample-book'
     );
+    expect(mockedPauseSpeculativeRouteWarmupsUntilUserActivity).toHaveBeenCalledTimes(
+      1
+    );
   });
 
   test('does not claim on a modified click', () => {
@@ -170,6 +223,29 @@ describe('SSRPrefetchLink component', () => {
     });
 
     expect(mockedClaimRouteWarmup).not.toHaveBeenCalled();
+    expect(
+      mockedPauseSpeculativeRouteWarmupsUntilUserActivity
+    ).not.toHaveBeenCalled();
+  });
+
+  test('does not pause speculation when navigation is prevented', () => {
+    render(
+      <SSRPrefetchLink
+        href="/books/1~sample-book"
+        onNavigate={(event) => {
+          event.preventDefault();
+        }}
+      >
+        Sample Book
+      </SSRPrefetchLink>
+    );
+
+    fireEvent.click(screen.getByRole('link', { name: 'Sample Book' }));
+
+    expect(mockedClaimRouteWarmup).not.toHaveBeenCalled();
+    expect(
+      mockedPauseSpeculativeRouteWarmupsUntilUserActivity
+    ).not.toHaveBeenCalled();
   });
 
   test('does not observe viewport warming on desktop', async () => {
@@ -207,6 +283,24 @@ describe('SSRPrefetchLink component', () => {
         'viewport'
       );
     });
+  });
+
+  test('does not warm speculatively when policy disables viewport warming', async () => {
+    setMatchMedia((query) => query === TOUCH_DEVICE_QUERY);
+    mockedGetRouteWarmupPolicyState.mockReturnValue({
+      allowHoverWarmup: false,
+      allowPointerWarmup: false,
+      allowViewportWarmup: false,
+      disableWarmup: true,
+      pauseSpeculativeWarmup: false,
+    });
+
+    render(<SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>);
+
+    await waitFor(() => {
+      expect(observeMock).not.toHaveBeenCalled();
+    });
+    expect(observeCallback).toBeNull();
   });
 
   test('cancels viewport warming when the link leaves the viewport on touch devices', async () => {

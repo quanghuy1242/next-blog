@@ -5,9 +5,21 @@ import { ChapterToc } from 'components/pages/books/chapter-toc';
 import type { Chapter } from 'types/cms';
 import { requestRouteWarmup } from 'common/utils/route-prefetch';
 
+const defaultRouteWarmupPolicyState = {
+  allowHoverWarmup: true,
+  allowPointerWarmup: true,
+  allowViewportWarmup: true,
+  disableWarmup: false,
+  pauseSpeculativeWarmup: false,
+};
+
 vi.mock('common/utils/route-prefetch', () => ({
+  cancelRouteWarmup: vi.fn(),
   claimRouteWarmup: vi.fn(),
+  getRouteWarmupPolicyState: vi.fn(() => defaultRouteWarmupPolicyState),
+  pauseSpeculativeRouteWarmupsUntilUserActivity: vi.fn(),
   requestRouteWarmup: vi.fn(),
+  subscribeRouteWarmupPolicy: vi.fn(() => () => {}),
 }));
 
 vi.mock('next/link', () => ({
