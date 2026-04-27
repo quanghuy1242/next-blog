@@ -77,10 +77,10 @@ export default function ChapterPage({
 
           <article className="min-w-0 lg:col-span-9 lg:self-start xl:col-span-10">
             <div className="mx-auto max-w-3xl">
-              <div className="mb-4 flex items-center justify-between gap-2">
-                <div>
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 flex-1">
                   <nav aria-label="Breadcrumb" className="mb-2">
-                    <ol className="flex flex-wrap items-center gap-2 text-xs text-gray-500 sm:text-sm">
+                    <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-gray-500 sm:text-sm">
                       <li>
                         <SSRPrefetchLink href="/books" className="font-medium text-blue hover:underline">
                           Books
@@ -89,10 +89,10 @@ export default function ChapterPage({
                       <li aria-hidden="true" className="text-gray-400">
                         &gt;
                       </li>
-                      <li>
+                      <li className="min-w-0">
                         <SSRPrefetchLink
                           href={buildBookHref(book.id, book.slug)}
-                          className="font-medium text-blue hover:underline"
+                          className="font-medium break-words text-blue hover:underline"
                         >
                           {book.title}
                         </SSRPrefetchLink>
@@ -100,7 +100,7 @@ export default function ChapterPage({
                       <li aria-hidden="true" className="text-gray-400">
                         &gt;
                       </li>
-                      <li className="text-gray-500">{chapter.title}</li>
+                      <li className="min-w-0 break-words text-gray-500">{chapter.title}</li>
                     </ol>
                   </nav>
                   {shouldRenderChapterTitle ? (
@@ -110,9 +110,25 @@ export default function ChapterPage({
                 <button
                   type="button"
                   onClick={() => setIsTocOpen(true)}
-                  className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-700 lg:hidden"
+                  className="inline-flex shrink-0 items-center gap-2 self-start rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 lg:hidden"
                 >
-                  Table of contents
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className="h-4 w-4 text-gray-500"
+                  >
+                    <circle cx="3.5" cy="5" r="1.25" fill="currentColor" />
+                    <circle cx="3.5" cy="10" r="1.25" fill="currentColor" />
+                    <circle cx="3.5" cy="15" r="1.25" fill="currentColor" />
+                    <path
+                      d="M7 5h9M7 10h9M7 15h9"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span>Table of contents</span>
                 </button>
               </div>
 
