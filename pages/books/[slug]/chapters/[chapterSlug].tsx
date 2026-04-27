@@ -79,11 +79,30 @@ export default function ChapterPage({
             <div className="mx-auto max-w-3xl">
               <div className="mb-4 flex items-center justify-between gap-2">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-gray-500">
-                    <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} className="hover:underline">
-                      {book.title}
-                    </SSRPrefetchLink>
-                  </p>
+                  <nav aria-label="Breadcrumb" className="mb-2">
+                    <ol className="flex flex-wrap items-center gap-2 text-xs text-gray-500 sm:text-sm">
+                      <li>
+                        <SSRPrefetchLink href="/books" className="font-medium text-blue hover:underline">
+                          Books
+                        </SSRPrefetchLink>
+                      </li>
+                      <li aria-hidden="true" className="text-gray-400">
+                        &gt;
+                      </li>
+                      <li>
+                        <SSRPrefetchLink
+                          href={buildBookHref(book.id, book.slug)}
+                          className="font-medium text-blue hover:underline"
+                        >
+                          {book.title}
+                        </SSRPrefetchLink>
+                      </li>
+                      <li aria-hidden="true" className="text-gray-400">
+                        &gt;
+                      </li>
+                      <li className="text-gray-500">{chapter.title}</li>
+                    </ol>
+                  </nav>
                   {shouldRenderChapterTitle ? (
                     <h1 className="text-3xl font-bold leading-tight">{chapter.title}</h1>
                   ) : null}
