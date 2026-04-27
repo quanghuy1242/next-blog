@@ -29,14 +29,14 @@ export function ChapterToc({
               href={buildChapterHref(bookId, bookSlug, chapter.slug)}
               onClick={onNavigate}
               className={cn(
-                'flex items-center justify-between gap-3 text-sm text-gray-700 hover:underline',
+                'block text-sm text-gray-700 hover:underline',
                 chapter.slug === currentChapterSlug
                   ? 'font-semibold text-gray-900'
                   : ''
               )}
             >
-              <span className="min-w-0 flex-1">{chapter.title}</span>
-              {chapter.hasPassword ? <ChapterLockBadge /> : null}
+              <span className="break-words">{chapter.title}</span>
+              {chapter.hasPassword ? <ChapterLockBadge compact className="ml-1 align-text-bottom" /> : null}
             </SSRPrefetchLink>
           </li>
         ))}

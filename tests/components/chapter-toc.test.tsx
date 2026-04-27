@@ -81,7 +81,7 @@ describe('ChapterToc component', () => {
     mockedRequestRouteWarmup.mockReset();
   });
 
-  test('highlights current chapter with simple sidebar styling', () => {
+  test('highlights current chapter with inline sidebar styling', () => {
     const chapters = [
       createChapter({ slug: 'ch-1', title: 'One', order: 1 }),
       createChapter({ id: 2, slug: 'ch-2', title: 'Two', order: 2 }),
@@ -97,10 +97,11 @@ describe('ChapterToc component', () => {
     );
 
     const activeLink = screen.getByRole('link', { name: /Two/i });
+    expect(activeLink.className).toContain('block');
     expect(activeLink.className).toContain('font-semibold');
     expect(activeLink).toHaveAttribute('href', '/books/1~sample-book/chapters/ch-2');
     expect(activeLink.className).toContain('text-gray-900');
-    expect(activeLink.className).not.toContain('bg-blue');
+    expect(activeLink.className).not.toContain('justify-between');
   });
 
   test('calls onNavigate when a chapter is clicked', () => {
@@ -122,16 +123,21 @@ describe('ChapterToc component', () => {
     expect(onNavigate).toHaveBeenCalledTimes(1);
   });
 
-  test('marks protected chapters as locked', () => {
+  test('renders protected chapters with a compact inline lock badge', () => {
+    const longTitle = 'Chung to la nhung con bo cuc vui nhon nhe ban iu heheheheheheheh';
+
     render(
       <ChapterToc
-        chapters={[createChapter({ title: 'Locked chapter', hasPassword: true })]}
+        chapters={[createChapter({ title: longTitle, hasPassword: true })]}
         bookId={1}
         bookSlug="sample-book"
         currentChapterSlug="chapter-1"
       />
     );
 
-    expect(screen.getByText('Locked')).toBeInTheDocument();
+    const lockedLink = screen.getByRole('link', { name: new RegExp(longTitle, 'i') });
+    expect(lockedLink.className).not.toContain('justify-between');
+    expect(lockedLink.querySelector('svg')).toBeInTheDocument();
+    expect(screen.getByText('Locked')).toHaveClass('sr-only');
   });
 });
