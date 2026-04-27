@@ -65,6 +65,11 @@ See `.env.local.example` for a template.
 - Images are stored in Cloudflare R2 and transformed on-the-fly using URL parameters.
 - Rich text content is rendered with a custom Lexical renderer and local CSS styles.
 - All posts are filtered by author (ID=1, quanghuy1242) and published status.
+- Route warmups are handled by a custom Pages Router-aware scheduler instead of `next/link`'s default prefetch behavior.
+- The warmup layer is shared across books, chapters, and other opted-in routes through `components/shared/SSRPrefetchLink`.
+- Warmups are gated by user intent and network hints, including `navigator.connection.saveData` and slow connection types.
+- Real navigations can claim an inflight warmup so the click reuses the same request instead of starting over.
+- The implementation is Pages Router specific today; if the app migrates to App Router, this part of the route contract needs to be revisited.
 
 ## TypeScript & linting
 
@@ -143,6 +148,7 @@ This project deploys to Cloudflare Workers through GitHub Actions.
 - **Image utilities**: `common/utils/image.ts` - Cloudflare R2 transformations
 - **Meta tags**: `common/utils/meta-tags.ts` - SEO meta tag generation
 - **Pages and routing**: `pages/*`, dynamic post at `posts/[slug].tsx`
+- **Route warmups**: `common/utils/route-prefetch.ts`, `components/shared/ssr-prefetch-link.tsx`
 - **Styling**: `styles/index.css`, `tailwind.config.js`, `postcss.config.js`
 - **Types**: `types/cms.ts` - PayloadCMS type definitions
 - **Tests**: `tests/**/*.test.{ts,tsx}` - Component and utility tests
