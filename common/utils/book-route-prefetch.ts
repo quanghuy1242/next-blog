@@ -97,8 +97,10 @@ const tasksByHref = new Map<string, BookRouteWarmTask>();
 /**
  * Shared network requests keyed by fully normalized request URL.
  *
- * Every consumer receives a clone of the original response so callers can read
- * the body independently without tripping "body already used" errors.
+ * Each entry resolves to a preserved clone created as soon as the owner
+ * request resolves. Later consumers clone that preserved copy instead of the
+ * owner's original response, which avoids races once the owner starts reading
+ * its body.
  */
 const sharedWarmupFetches = new Map<string, Promise<Response>>();
 const sharedWarmupFetchExpiryTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -337,6 +339,8 @@ function shouldShareBookRouteFetchKey(rawKey: string): boolean {
  *   owner if it reaches the interceptor first.
  * - Shared responses are always cloned for consumers because multiple readers
  *   may need to consume the body independently.
+ * - The share table stores a clone created immediately when the owner
+ *   response resolves, not the owner's original `Response`.
  */
 function installBookRouteFetchInterceptor(): void {
   if (
@@ -369,20 +373,22 @@ function installBookRouteFetchInterceptor(): void {
     const requestPromise = nativeFetch(input, init);
 
     if (sharedKey && shouldShareBookRouteFetchKey(sharedKey)) {
+      const sharedResponsePromise = requestPromise.then((response) => response.clone());
+
       // Whichever caller starts the first eligible request becomes the shared
       // owner. Later identical requests will attach to this promise.
-      registerSharedWarmupFetch(sharedKey, requestPromise);
+      registerSharedWarmupFetch(sharedKey, sharedResponsePromise);
 
-      void requestPromise
+      void sharedResponsePromise
         .then((response) => {
           unregisterSharedWarmupFetch(
             sharedKey,
-            requestPromise,
+            sharedResponsePromise,
             response.ok ? SHARED_WARMUP_RESPONSE_TTL_MS : 0
           );
         })
         .catch(() => {
-          unregisterSharedWarmupFetch(sharedKey, requestPromise);
+          unregisterSharedWarmupFetch(sharedKey, sharedResponsePromise);
         });
     }
 
@@ -412,7 +418,7 @@ function restoreBookRouteFetchInterceptor(): void {
 }
 
 /**
- * Publishes an inflight request into the shared request table.
+ * Publishes a preserved shared response into the shared request table.
  *
  * Re-registering the same key clears any previous expiry timer. This matters
  * when a recently completed request becomes active again before its retention
@@ -420,7 +426,7 @@ function restoreBookRouteFetchInterceptor(): void {
  */
 function registerSharedWarmupFetch(
   requestKey: string,
-  promise: Promise<Response>
+  preservedResponsePromise: Promise<Response>
 ): void {
   const normalizedRequestKey = normalizeSharedWarmupFetchKey(requestKey);
 
@@ -428,7 +434,7 @@ function registerSharedWarmupFetch(
     return;
   }
 
-  sharedWarmupFetches.set(normalizedRequestKey, promise);
+  sharedWarmupFetches.set(normalizedRequestKey, preservedResponsePromise);
 
   const existingTimer = sharedWarmupFetchExpiryTimers.get(normalizedRequestKey);
 
@@ -447,7 +453,7 @@ function registerSharedWarmupFetch(
  */
 function unregisterSharedWarmupFetch(
   requestKey: string,
-  promise: Promise<Response>,
+  preservedResponsePromise: Promise<Response>,
   retainForMs = 0
 ): void {
   const normalizedRequestKey = normalizeSharedWarmupFetchKey(requestKey);
@@ -463,7 +469,7 @@ function unregisterSharedWarmupFetch(
     sharedWarmupFetchExpiryTimers.delete(normalizedRequestKey);
   }
 
-  if (sharedWarmupFetches.get(normalizedRequestKey) !== promise) {
+  if (sharedWarmupFetches.get(normalizedRequestKey) !== preservedResponsePromise) {
     return;
   }
 
@@ -473,7 +479,9 @@ function unregisterSharedWarmupFetch(
   }
 
   const expiryTimer = setTimeout(() => {
-    if (sharedWarmupFetches.get(normalizedRequestKey) === promise) {
+    if (
+      sharedWarmupFetches.get(normalizedRequestKey) === preservedResponsePromise
+    ) {
       sharedWarmupFetches.delete(normalizedRequestKey);
     }
 
