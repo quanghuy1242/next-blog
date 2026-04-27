@@ -7,7 +7,6 @@
     "test": "vitest run",
     "test:ci": "cross-env NODE_ENV=test vitest run",
     "test:watch": "vitest",
-    "prebuild": "pnpm lint && pnpm test:ci",
     "dev": "next dev",
     "build": "next build --webpack",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
