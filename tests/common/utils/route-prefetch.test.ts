@@ -225,6 +225,16 @@ describe('common/utils/route-prefetch', () => {
     );
   });
 
+  test('resumes a paused policy on mouse movement as a fallback signal', () => {
+    pauseSpeculativeRouteWarmupsUntilUserActivity();
+
+    expect(getRouteWarmupState().pauseSpeculativeWarmup).toBe(true);
+
+    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 10, clientY: 10 }));
+
+    expect(getRouteWarmupState().pauseSpeculativeWarmup).toBe(false);
+  });
+
   test('hover intent resumes a paused policy immediately', () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response('ok', { status: 200 }));
     vi.stubGlobal('fetch', fetchMock);

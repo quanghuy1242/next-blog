@@ -7,6 +7,7 @@ import {
   claimRouteWarmup,
   cancelRouteWarmup,
   getRouteWarmupPolicyState,
+  isSameWarmupHref,
   pauseSpeculativeRouteWarmupsUntilUserActivity,
   requestRouteWarmup,
   subscribeRouteWarmupPolicy,
@@ -208,7 +209,9 @@ export function SSRPrefetchLink({
           },
         });
 
-        if (!navigatePrevented) {
+        // Same-route clicks do not hand off an actual warmup to the router, so
+        // there is nothing to protect by pausing the speculative queue.
+        if (!navigatePrevented && !isSameWarmupHref(href)) {
           // This is the transition point from speculation to real navigation.
           // The scheduler will keep an inflight request alive or drop a queued
           // task that would otherwise fire too late and duplicate the router's

@@ -6,6 +6,7 @@ import {
   claimRouteWarmup,
   cancelRouteWarmup,
   getRouteWarmupPolicyState,
+  isSameWarmupHref,
   pauseSpeculativeRouteWarmupsUntilUserActivity,
   requestRouteWarmup,
   subscribeRouteWarmupPolicy,
@@ -24,6 +25,7 @@ vi.mock('common/utils/route-prefetch', () => ({
     disableWarmup: false,
     pauseSpeculativeWarmup: false,
   })),
+  isSameWarmupHref: vi.fn(() => false),
   pauseSpeculativeRouteWarmupsUntilUserActivity: vi.fn(),
   requestRouteWarmup: vi.fn(),
   subscribeRouteWarmupPolicy: vi.fn(() => () => {}),
@@ -83,6 +85,7 @@ const mockedRequestRouteWarmup = vi.mocked(requestRouteWarmup);
 const mockedClaimRouteWarmup = vi.mocked(claimRouteWarmup);
 const mockedCancelRouteWarmup = vi.mocked(cancelRouteWarmup);
 const mockedGetRouteWarmupPolicyState = vi.mocked(getRouteWarmupPolicyState);
+const mockedIsSameWarmupHref = vi.mocked(isSameWarmupHref);
 const mockedPauseSpeculativeRouteWarmupsUntilUserActivity = vi.mocked(
   pauseSpeculativeRouteWarmupsUntilUserActivity
 );
@@ -126,6 +129,7 @@ describe('SSRPrefetchLink component', () => {
     mockedClaimRouteWarmup.mockReset();
     mockedCancelRouteWarmup.mockReset();
     mockedPauseSpeculativeRouteWarmupsUntilUserActivity.mockReset();
+    mockedIsSameWarmupHref.mockReset();
     mockedSubscribeRouteWarmupPolicy.mockReset();
     mockedSubscribeRouteWarmupPolicy.mockReturnValue(() => {});
     mockedGetRouteWarmupPolicyState.mockReset();
@@ -136,6 +140,7 @@ describe('SSRPrefetchLink component', () => {
       disableWarmup: false,
       pauseSpeculativeWarmup: false,
     });
+    mockedIsSameWarmupHref.mockReturnValue(false);
     observeCallback = null;
     observeMock.mockClear();
     disconnectMock.mockClear();
@@ -213,6 +218,22 @@ describe('SSRPrefetchLink component', () => {
     expect(mockedPauseSpeculativeRouteWarmupsUntilUserActivity).toHaveBeenCalledTimes(
       1
     );
+  });
+
+  test('does not pause speculation when a same-route link is clicked', () => {
+    window.history.pushState({}, '', '/books/1~sample-book');
+    mockedIsSameWarmupHref.mockReturnValue(true);
+
+    render(
+      <SSRPrefetchLink href="/books/1~sample-book">Sample Book</SSRPrefetchLink>
+    );
+
+    fireEvent.click(screen.getByRole('link', { name: 'Sample Book' }));
+
+    expect(mockedClaimRouteWarmup).not.toHaveBeenCalled();
+    expect(
+      mockedPauseSpeculativeRouteWarmupsUntilUserActivity
+    ).not.toHaveBeenCalled();
   });
 
   test('does not claim on a modified click', () => {

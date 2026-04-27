@@ -269,6 +269,12 @@ function attachSpeculativeWarmupResumeListeners(): void {
     capture: true,
     passive: true,
   });
+  // Mousemove is a fallback for browsers or embedding contexts that do not
+  // reliably deliver Pointer Events to the top-level window.
+  window.addEventListener('mousemove', handleSpeculativeWarmupResumeActivity, {
+    capture: true,
+    passive: true,
+  });
   window.addEventListener('touchstart', handleSpeculativeWarmupResumeActivity, {
     capture: true,
     passive: true,
@@ -298,6 +304,11 @@ function detachSpeculativeWarmupResumeListeners(): void {
 
   window.removeEventListener(
     'pointermove',
+    handleSpeculativeWarmupResumeActivity,
+    true
+  );
+  window.removeEventListener(
+    'mousemove',
     handleSpeculativeWarmupResumeActivity,
     true
   );
@@ -409,6 +420,33 @@ function normalizePathname(pathname: string): string {
   }
 
   return pathname.replace(/\/+$/, '');
+}
+
+function getCanonicalWarmupHref(rawHref: string): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const trimmedHref = rawHref.trim();
+  if (!trimmedHref) {
+    return null;
+  }
+
+  let url: URL;
+
+  try {
+    url = new URL(trimmedHref, window.location.href);
+  } catch {
+    return null;
+  }
+
+  if (url.origin !== window.location.origin) {
+    return null;
+  }
+
+  const normalizedPathname = normalizePathname(url.pathname);
+
+  return `${normalizedPathname}${url.search}`;
 }
 
 /**
@@ -872,29 +910,10 @@ function unregisterSharedWarmupFetch(
  * warming the page the user is already on.
  */
 function normalizeWarmupHref(rawHref: string): string | null {
-  if (typeof window === 'undefined') {
+  const canonicalHref = getCanonicalWarmupHref(rawHref);
+  if (!canonicalHref) {
     return null;
   }
-
-  const trimmedHref = rawHref.trim();
-  if (!trimmedHref) {
-    return null;
-  }
-
-  let url: URL;
-
-  try {
-    url = new URL(trimmedHref, window.location.href);
-  } catch {
-    return null;
-  }
-
-  if (url.origin !== window.location.origin) {
-    return null;
-  }
-
-  const normalizedPathname = normalizePathname(url.pathname);
-  const canonicalHref = `${normalizedPathname}${url.search}`;
   const currentHref = `${normalizePathname(window.location.pathname)}${window.location.search}`;
 
   if (canonicalHref === currentHref) {
@@ -902,6 +921,18 @@ function normalizeWarmupHref(rawHref: string): string | null {
   }
 
   return canonicalHref;
+}
+
+export function isSameWarmupHref(rawHref: string): boolean {
+  const canonicalHref = getCanonicalWarmupHref(rawHref);
+
+  if (!canonicalHref) {
+    return false;
+  }
+
+  const currentHref = `${normalizePathname(window.location.pathname)}${window.location.search}`;
+
+  return canonicalHref === currentHref;
 }
 
 /**
