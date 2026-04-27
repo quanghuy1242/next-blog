@@ -7,6 +7,13 @@ import type {
   PaginatedResponse,
 } from 'types/cms';
 import { fetchAPIWithAuthToken } from './base';
+import {
+  buildBookCacheTags,
+  buildBookDetailCacheTags,
+  buildBooksListCacheTags,
+  buildBookSlugCacheTags,
+  normalizeCacheTags,
+} from './cache';
 import type { PayloadCacheSettings } from './cache';
 import { getChaptersByBookId, sortChapters } from './chapters';
 
@@ -128,6 +135,7 @@ export async function getPaginatedBooks(
         page,
         where: createBooksWhere(),
       },
+      getCacheTags: buildBooksListCacheTags,
       authToken: options.authToken,
       cache: options.cache,
     }
@@ -170,6 +178,7 @@ export async function getDataForBooksPage(
         limit: safeLimit,
         where: createBooksWhere(),
       },
+      getCacheTags: buildBooksListCacheTags,
       authToken: options.authToken,
       cache: options.cache,
     }
@@ -220,6 +229,14 @@ export async function getBookBySlug(
     {
       variables: {
         slug: trimmedSlug,
+      },
+      getCacheTags: (data) => {
+        const book = data?.Books?.docs?.[0] ?? null;
+
+        return normalizeCacheTags([
+          ...buildBookSlugCacheTags(trimmedSlug),
+          ...buildBookCacheTags(book?.id),
+        ]);
       },
       authToken: options.authToken,
       cache: options.cache,
@@ -312,6 +329,7 @@ export async function getBookDetailById(
         bookId,
         bookRelationId: bookId,
       },
+      getCacheTags: () => buildBookDetailCacheTags(bookId),
       authToken: options.authToken,
       cache: options.cache,
     }

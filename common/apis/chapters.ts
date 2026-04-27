@@ -1,5 +1,12 @@
 import type { Book, Chapter, ChapterSlugData, Homepage } from 'types/cms';
 import { fetchAPIWithAuthToken } from './base';
+import {
+  buildChapterPageCacheTags,
+  buildChapterPageLookupCacheTags,
+  buildChapterSlugCacheTags,
+  buildChaptersByBookCacheTags,
+  normalizeCacheTags,
+} from './cache';
 import type { PayloadCacheSettings } from './cache';
 
 interface ChaptersResponse {
@@ -102,6 +109,7 @@ export async function getChaptersByBookId(
       variables: {
         bookRelationId: bookId,
       },
+      getCacheTags: () => buildChaptersByBookCacheTags(bookId),
       authToken: options.authToken,
       cache: options.cache,
     }
@@ -148,6 +156,16 @@ export async function getChapterBySlug(
     {
       variables: {
         chapterSlug: trimmedSlug,
+      },
+      getCacheTags: (data) => {
+        const chapter = data?.Chapters?.docs?.[0] ?? null;
+
+        return normalizeCacheTags([
+          ...buildChapterSlugCacheTags(trimmedSlug),
+          ...(chapter?.id != null && chapter?.book && typeof chapter.book === 'object'
+            ? buildChapterPageCacheTags((chapter.book as Book).id, chapter.id)
+            : []),
+        ]);
       },
       authToken: options.authToken,
       cache: options.cache,
@@ -212,6 +230,14 @@ export async function getChapterByBookAndSlug(
       variables: {
         bookRelationId: bookId,
         chapterSlug: trimmedSlug,
+      },
+      getCacheTags: (data) => {
+        const chapter = data?.ChapterMatch?.docs?.[0] ?? null;
+
+        return normalizeCacheTags([
+          ...buildChapterPageLookupCacheTags(bookId, trimmedSlug),
+          ...buildChapterPageCacheTags(bookId, chapter?.id),
+        ]);
       },
       authToken: options.authToken,
       cache: options.cache,
@@ -282,6 +308,14 @@ export async function getChapterPageByBookId(
       variables: {
         bookRelationId: bookId,
         chapterSlug: trimmedSlug,
+      },
+      getCacheTags: (data) => {
+        const chapter = data?.ChapterMatch?.docs?.[0] ?? null;
+
+        return normalizeCacheTags([
+          ...buildChapterPageLookupCacheTags(bookId, trimmedSlug),
+          ...buildChapterPageCacheTags(bookId, chapter?.id),
+        ]);
       },
       authToken: options.authToken,
       cache: options.cache,

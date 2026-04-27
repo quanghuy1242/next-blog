@@ -47,6 +47,22 @@ describe('common/apis/chapters', () => {
     expect(mockedFetchAPIWithAuthToken).toHaveBeenCalledTimes(1);
   });
 
+  test('attaches slug cache tags even when a chapter lookup misses', async () => {
+    mockedFetchAPIWithAuthToken.mockResolvedValueOnce({
+      Chapters: {
+        docs: [],
+      },
+      Homepage: null,
+    } as never);
+
+    await getChapterBySlug('missing-chapter');
+
+    const [, config] = mockedFetchAPIWithAuthToken.mock.calls[0] ?? [];
+    expect(config?.getCacheTags?.({ Chapters: { docs: [] } } as never)).toEqual([
+      'chapter:slug:missing-chapter',
+    ]);
+  });
+
   test('loads the canonical chapter page in one request by book id', async () => {
     mockedFetchAPIWithAuthToken.mockResolvedValueOnce({
       ChapterMatch: {
@@ -102,5 +118,31 @@ describe('common/apis/chapters', () => {
     ]);
     expect(result.homepage).toEqual({ header: 'Books' });
     expect(mockedFetchAPIWithAuthToken).toHaveBeenCalledTimes(1);
+  });
+
+  test('attaches route cache tags even when the canonical chapter page misses', async () => {
+    mockedFetchAPIWithAuthToken.mockResolvedValueOnce({
+      ChapterMatch: {
+        docs: [],
+      },
+      ChaptersByBook: {
+        docs: [],
+      },
+      Homepage: null,
+    } as never);
+
+    await getChapterPageByBookId(42, 'missing-chapter');
+
+    const [, config] = mockedFetchAPIWithAuthToken.mock.calls[0] ?? [];
+    expect(config?.getCacheTags?.({
+      ChapterMatch: {
+        docs: [],
+      },
+    } as never)).toEqual([
+      'chapter-page:book:42:missing-chapter',
+      'book:42',
+      'chapter:slug:missing-chapter',
+      'chapters:book:42',
+    ]);
   });
 });

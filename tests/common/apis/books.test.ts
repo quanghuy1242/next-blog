@@ -73,6 +73,22 @@ describe('common/apis/books', () => {
     expect(mockedFetchAPIWithAuthToken).toHaveBeenCalledTimes(2);
   });
 
+  test('attaches slug cache tags even when a book lookup misses', async () => {
+    mockedFetchAPIWithAuthToken.mockResolvedValueOnce({
+      Books: {
+        docs: [],
+      },
+      Homepage: null,
+    } as never);
+
+    await getBookBySlug('missing-book');
+
+    const [, config] = mockedFetchAPIWithAuthToken.mock.calls[0] ?? [];
+    expect(config?.getCacheTags?.({ Books: { docs: [] } } as never)).toEqual([
+      'book:slug:missing-book',
+    ]);
+  });
+
   test('loads the canonical book detail page in one request by id', async () => {
     mockedFetchAPIWithAuthToken.mockResolvedValueOnce({
       Books: {

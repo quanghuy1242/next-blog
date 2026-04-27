@@ -11,11 +11,12 @@ const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY;
 
 const API_URL = PAYLOAD_BASE_URL ? `${PAYLOAD_BASE_URL}/api/graphql` : '';
 
-export interface FetchApiOptions {
+export interface FetchApiOptions<TData = unknown> {
   variables?: Record<string, unknown>;
   authToken?: string | null;
   useApiKey?: boolean;
   cache?: PayloadCacheSettings;
+  getCacheTags?: (data: TData) => string[] | null | undefined;
   next?: {
     revalidate?: number;
     tags?: string[];
@@ -32,7 +33,7 @@ interface PayloadCMSResponse<TData> {
  */
 export async function fetchAPI<TData>(
   query: string,
-  { variables, authToken, useApiKey = true, cache, next }: FetchApiOptions = {}
+  { variables, authToken, useApiKey = true, cache, getCacheTags, next }: FetchApiOptions<TData> = {}
 ): Promise<TData> {
   if (!PAYLOAD_BASE_URL) {
     console.warn('PAYLOAD_BASE_URL is not set. Returning empty response.');
@@ -108,6 +109,7 @@ export async function fetchAPI<TData>(
   return readThroughCloudflareCache({
     cacheKey,
     fetchFresh,
+    getCacheTags,
     settings: cache,
   });
 }
@@ -118,14 +120,16 @@ export async function fetchAPIWithAuthToken<TData>(
     variables,
     authToken,
     cache,
+    getCacheTags,
     next,
-  }: Omit<FetchApiOptions, 'useApiKey'> = {}
+  }: Omit<FetchApiOptions<TData>, 'useApiKey'> = {}
 ): Promise<TData> {
   return fetchAPI<TData>(query, {
     variables,
     authToken,
     useApiKey: false,
     cache,
+    getCacheTags,
     next,
   });
 }
