@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Book } from 'types/cms';
 
 interface UseBooksFeedParams {
@@ -50,6 +50,16 @@ export function useBooksFeed({
   });
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isFetchingRef = useRef(false);
+  const booksCountRef = useRef(initialBooks.length);
+
+  useEffect(() => {
+    isFetchingRef.current = isFetching;
+  }, [isFetching]);
+
+  useEffect(() => {
+    booksCountRef.current = booksState.books.length;
+  }, [booksState.books.length]);
 
   const loadMoreBooks = useCallback(async () => {
     if (isFetching || !booksState.hasMore) {
@@ -100,11 +110,11 @@ export function useBooksFeed({
   }, [loadMoreBooks]);
 
   const refreshBooks = useCallback(async () => {
-    if (isFetching) {
+    if (isFetchingRef.current) {
       return;
     }
 
-    const visibleCount = Math.max(pageSize, booksState.books.length);
+    const visibleCount = Math.max(pageSize, booksCountRef.current);
     const params = new URLSearchParams({
       limit: visibleCount.toString(),
       offset: '0',
@@ -136,7 +146,7 @@ export function useBooksFeed({
     } finally {
       setIsFetching(false);
     }
-  }, [booksState.books.length, fetchFn, isFetching, pageSize]);
+  }, [fetchFn, pageSize]);
 
   return {
     booksState,
