@@ -109,6 +109,7 @@ export interface Book {
   importFailedAt?: string | null;
   lastImportedAt?: string | null;
   importErrorSummary?: string | null;
+  readingProgressPct?: number | null;
   createdBy?: Author | number | null;
   _status?: PostStatus;
   updatedAt?: string;

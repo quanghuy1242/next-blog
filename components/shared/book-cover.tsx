@@ -16,6 +16,7 @@ interface BookCoverProps {
   priority?: boolean;
   href?: string;
   isBookmarked?: boolean;
+  readingProgressPct?: number | null;
 }
 
 export function BookCover({
@@ -25,6 +26,7 @@ export function BookCover({
   priority = false,
   href,
   isBookmarked = false,
+  readingProgressPct = null,
 }: BookCoverProps) {
   const fallbackStyles = {
     aspectRatio: `${BOOK_COVER_WIDTH} / ${BOOK_COVER_HEIGHT}`,
@@ -54,6 +56,11 @@ export function BookCover({
   const coverWithIndicator = (
     <div className="relative">
       {cover}
+      {typeof readingProgressPct === 'number' && readingProgressPct > 0 ? (
+        <span className="pointer-events-none absolute left-2 top-2 inline-flex min-w-11 items-center justify-center rounded-full bg-white/95 px-2 py-1 text-[11px] font-semibold tabular-nums text-gray-800 shadow-small">
+          {readingProgressPct}%
+        </span>
+      ) : null}
       {isBookmarked ? (
         <span className="pointer-events-none absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue text-white shadow-small">
           <svg

@@ -1,5 +1,6 @@
 import type { ReadingProgressResult } from 'types/cms';
 import { fetchAPIWithAuthToken } from './base';
+import type { PayloadCacheSettings } from './cache';
 
 const READING_PROGRESS_QUERY = `#graphql
   query ReadingProgress($bookId: ID!) {
@@ -46,7 +47,7 @@ interface SaveReadingProgressResponse {
 
 export async function getReadingProgress(
   bookId: string,
-  options: { authToken?: string | null } = {}
+  options: { authToken?: string | null; cache?: PayloadCacheSettings } = {}
 ): Promise<ReadingProgressResult['records']> {
   if (!options.authToken) {
     return [];
@@ -57,6 +58,7 @@ export async function getReadingProgress(
     {
       variables: { bookId },
       authToken: options.authToken,
+      cache: options.cache,
     }
   );
 

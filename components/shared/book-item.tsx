@@ -33,6 +33,7 @@ export function BookItem({
         href={buildBookHref(book.id, book.slug)}
         className="w-full"
         isBookmarked={showBookmarkBadge}
+        readingProgressPct={book.readingProgressPct}
       />
 
       <h3 className="text-sm font-medium leading-snug sm:text-base">

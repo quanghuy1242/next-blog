@@ -45,6 +45,21 @@ interface ChapterPageByBookIdResponse {
   Homepage: Pick<Homepage, 'header'> | null;
 }
 
+interface ChaptersProgressMetadataResponse {
+  Chapters: {
+    docs: Array<{
+      id: number;
+      chapterWordCount?: number | null;
+      book:
+        | {
+            id: number;
+          }
+        | number
+        | null;
+    }>;
+  };
+}
+
 interface ChapterFetchOptions {
   authToken?: string | null;
   cache?: PayloadCacheSettings;
@@ -119,6 +134,7 @@ const CHAPTER_LIST_FIELDS = `
   slug
   order
   hasPassword
+  chapterWordCount
 `;
 
 const CHAPTER_PAGE_LIST_FIELDS = `
@@ -163,6 +179,76 @@ export async function getChaptersByBookId(
   );
 
   return sortChapters(data?.Chapters?.docs ?? []);
+}
+
+export async function getChapterProgressMetadataByBookIds(
+  bookIds: number[],
+  options: ChapterFetchOptions = {}
+): Promise<Record<number, Array<Pick<Chapter, 'id' | 'chapterWordCount'>>>> {
+  const uniqueBookIds = [...new Set(bookIds.filter((bookId) => Number.isInteger(bookId) && bookId > 0))];
+
+  if (!uniqueBookIds.length) {
+    return {};
+  }
+
+  const fetcher = selectChapterFetcher(options);
+  const statusFilter = buildChapterStatusFilter(options.draftMode);
+
+  const data = await fetcher<ChaptersProgressMetadataResponse>(
+    `#graphql
+      query ChaptersProgressMetadataByBooks($bookRelationIds: [JSON]!) {
+        Chapters(
+          where: {
+            AND: [
+              { book: { in: $bookRelationIds } }
+              ${statusFilter}
+            ]
+          }
+          sort: "order"
+          limit: 2000
+        ) {
+          docs {
+            id
+            chapterWordCount
+            book {
+              ... on Book {
+                id
+              }
+            }
+          }
+        }
+      }
+    `,
+    {
+      variables: {
+        bookRelationIds: uniqueBookIds,
+      },
+      authToken: options.authToken,
+      cache: options.cache,
+    }
+  );
+
+  const chaptersByBookId: Record<number, Array<Pick<Chapter, 'id' | 'chapterWordCount'>>> = {};
+
+  for (const chapter of data?.Chapters?.docs ?? []) {
+    const resolvedBookId =
+      typeof chapter.book === 'number'
+        ? chapter.book
+        : chapter.book?.id;
+
+    if (!resolvedBookId) {
+      continue;
+    }
+
+    const entries = chaptersByBookId[resolvedBookId] ?? [];
+    entries.push({
+      id: chapter.id,
+      chapterWordCount: chapter.chapterWordCount ?? null,
+    });
+    chaptersByBookId[resolvedBookId] = entries;
+  }
+
+  return chaptersByBookId;
 }
 
 export async function getChapterBySlug(

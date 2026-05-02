@@ -17,6 +17,7 @@ import { Text } from 'components/shared/text';
 import type { Book, Chapter, Homepage } from 'types/cms';
 import { getReadingProgress } from 'common/apis/reading-progress';
 import type { ReadingProgressRecord } from 'types/cms';
+import { calculateWholeBookProgress } from 'common/utils/reading-progress';
 
 interface BookDetailPageProps {
   book: Book;
@@ -53,6 +54,12 @@ export default function BookDetailPage({
         )
       : undefined;
 
+  const wholeBookProgress = calculateWholeBookProgress({
+    chapters,
+    records: readingProgress,
+    totalWordCount: book.totalWordCount,
+  });
+
   return (
     <Layout header={homepage?.header} className="flex flex-col items-center" isDraftMode={isDraftMode}>
       <Head>{renderMetaTags(metaTags)}</Head>
@@ -68,14 +75,21 @@ export default function BookDetailPage({
               isAuthenticated={isAuthenticated}
             />
           </div>
-          {continueReadingChapterSlug ? (
-            <div className="mb-4">
-              <SSRPrefetchLink
-                href={`${buildBookHref(book.id, book.slug)}/chapters/${continueReadingChapterSlug}`}
-                className="inline-flex items-center gap-2 rounded bg-blue px-4 py-2 text-sm font-medium text-white hover:bg-darkBlue"
-              >
-                Continue reading
-              </SSRPrefetchLink>
+          {isAuthenticated || continueReadingChapterSlug ? (
+            <div className="mb-4 flex flex-wrap items-center gap-3">
+              {isAuthenticated ? (
+                <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-medium tabular-nums text-gray-700">
+                  Progress: {wholeBookProgress}%
+                </span>
+              ) : null}
+              {continueReadingChapterSlug ? (
+                <SSRPrefetchLink
+                  href={`${buildBookHref(book.id, book.slug)}/chapters/${continueReadingChapterSlug}`}
+                  className="inline-flex items-center gap-2 rounded bg-blue px-4 py-2 text-sm font-medium text-white hover:bg-darkBlue"
+                >
+                  Continue reading
+                </SSRPrefetchLink>
+              ) : null}
             </div>
           ) : null}
           <Text text="Chapters" />

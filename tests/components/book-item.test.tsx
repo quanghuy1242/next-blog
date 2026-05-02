@@ -31,6 +31,7 @@ function createBook(overrides: Partial<Book> = {}): Book {
     importFailedAt: overrides.importFailedAt ?? null,
     lastImportedAt: overrides.lastImportedAt ?? null,
     importErrorSummary: overrides.importErrorSummary ?? null,
+    readingProgressPct: overrides.readingProgressPct ?? null,
     createdBy: overrides.createdBy ?? null,
     _status: overrides._status ?? 'published',
     updatedAt: overrides.updatedAt ?? '2024-01-01',
@@ -54,5 +55,11 @@ describe('BookItem component', () => {
     expect(screen.getByAltText('Cover image for Sample Book')).toBeInTheDocument();
     expect(screen.queryByText('manual')).not.toBeInTheDocument();
     expect(screen.queryByText('idle')).not.toBeInTheDocument();
+  });
+
+  test('renders a whole-book progress badge on the cover when available', () => {
+    render(<BookItem book={createBook({ readingProgressPct: 61 })} />);
+
+    expect(screen.getByText('61%')).toBeInTheDocument();
   });
 });

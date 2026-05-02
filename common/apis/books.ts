@@ -15,7 +15,13 @@ import {
   normalizeCacheTags,
 } from './cache';
 import type { PayloadCacheSettings } from './cache';
-import { getChaptersByBookId, sortChapters } from './chapters';
+import {
+  getChapterProgressMetadataByBookIds,
+  getChaptersByBookId,
+  sortChapters,
+} from './chapters';
+import { getReadingProgress } from './reading-progress';
+import { calculateWholeBookProgress } from 'common/utils/reading-progress';
 
 const AUTHOR_ID = 1; // quanghuy1242
 const DEFAULT_BOOKS_LIMIT = 6;
@@ -62,6 +68,7 @@ const BOOK_LIST_FIELDS = `
   title
   author
   slug
+  totalWordCount
   cover {
     url
     optimizedUrl
@@ -73,6 +80,7 @@ const BOOK_DETAIL_FIELDS = `
   title
   author
   slug
+  totalWordCount
   cover {
     url
     optimizedUrl
@@ -88,6 +96,45 @@ export interface PaginatedBooksParams {
 export interface PaginatedBooksResult {
   books: Book[];
   hasMore: boolean;
+}
+
+async function attachWholeBookProgress(
+  books: Book[],
+  options: BookFetchOptions
+): Promise<Book[]> {
+  if (!options.authToken || books.length === 0) {
+    return books;
+  }
+
+  const bookIds = books.map((book) => book.id);
+
+  const [chaptersByBookId, progressEntries] = await Promise.all([
+    getChapterProgressMetadataByBookIds(bookIds, {
+      authToken: options.authToken,
+      cache: options.cache,
+      draftMode: options.draftMode,
+    }),
+    Promise.all(
+      bookIds.map(async (bookId) => [
+        bookId,
+        await getReadingProgress(String(bookId), {
+          authToken: options.authToken,
+          cache: options.cache,
+        }),
+      ] as const)
+    ),
+  ]);
+
+  const readingProgressByBookId = new Map(progressEntries);
+
+  return books.map((book) => ({
+    ...book,
+    readingProgressPct: calculateWholeBookProgress({
+      chapters: chaptersByBookId[book.id] ?? [],
+      records: readingProgressByBookId.get(book.id) ?? [],
+      totalWordCount: book.totalWordCount,
+    }),
+  }));
 }
 
 const BOOK_STATUS_PUBLISHED = '{ _status: { equals: published } }';
@@ -159,8 +206,10 @@ export async function getPaginatedBooks(
     }
   );
 
+  const books = await attachWholeBookProgress(data?.Books?.docs ?? [], options);
+
   return {
-    books: data?.Books?.docs ?? [],
+    books,
     hasMore: data?.Books?.hasNextPage ?? false,
   };
 }
@@ -202,8 +251,10 @@ export async function getDataForBooksPage(
     }
   );
 
+  const books = await attachWholeBookProgress(data?.Books?.docs ?? [], options);
+
   return {
-    books: data?.Books?.docs ?? [],
+    books,
     hasMore: data?.Books?.hasNextPage ?? false,
     homepage: data?.Homepage ?? null,
   };
@@ -344,6 +395,7 @@ export async function getBookDetailById(
             slug
             order
             hasPassword
+            chapterWordCount
           }
         }
 
