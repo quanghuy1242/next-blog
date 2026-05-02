@@ -58,18 +58,26 @@ export function useReadingProgress({
       window.innerHeight || document.documentElement.clientHeight || 0;
     const rect = target.getBoundingClientRect();
     const elementTop = rect.top + window.scrollY;
+    const elementBottom = rect.bottom + window.scrollY;
     const elementHeight = Math.max(target.scrollHeight, rect.height);
+    const viewportBottom = window.scrollY + viewportHeight;
 
     if (viewportHeight <= 0 || elementHeight <= 0) return 0;
 
-    const maxScrollableDistance = Math.max(elementHeight - viewportHeight, 0);
-
-    if (maxScrollableDistance === 0) {
-      return window.scrollY >= Math.max(elementTop - 8, 0) ? 100 : 0;
+    if (viewportBottom <= elementTop) {
+      return 0;
     }
 
-    const progress =
-      ((window.scrollY - elementTop) / maxScrollableDistance) * 100;
+    if (viewportBottom >= elementBottom) {
+      return 100;
+    }
+
+    const seenHeight = Math.min(
+      Math.max(viewportBottom - elementTop, 0),
+      elementHeight
+    );
+
+    const progress = (seenHeight / elementHeight) * 100;
 
     return Math.min(Math.max(Math.round(progress), 0), 100);
   }, [targetRef]);

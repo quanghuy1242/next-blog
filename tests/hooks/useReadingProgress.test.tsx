@@ -59,11 +59,11 @@ describe('useReadingProgress', () => {
       })
     );
 
-    expect(result.current).toBe(0);
+    expect(result.current).toBe(25);
     expect(global.fetch).not.toHaveBeenCalled();
 
     act(() => {
-      setScrollY(700);
+      setScrollY(400);
       window.dispatchEvent(new Event('scroll'));
     });
 
@@ -94,7 +94,7 @@ describe('useReadingProgress', () => {
     );
 
     act(() => {
-      setScrollY(700);
+      setScrollY(400);
       window.dispatchEvent(new Event('scroll'));
     });
 
