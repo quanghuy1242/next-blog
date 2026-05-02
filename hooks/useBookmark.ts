@@ -69,7 +69,7 @@ export function useBookmark({ contentType, contentId, enabled }: UseBookmarkOpti
         }
       } else {
         const optimisticBookmark: BookmarkRecord = {
-          id: '__optimistic__',
+          id: -1,
           contentType,
           chapter: contentType === 'chapter' ? { id: contentId, title: '', slug: '', book: null } : null,
           book: contentType === 'book' ? { id: contentId, title: '', slug: '' } : null,
@@ -91,7 +91,7 @@ export function useBookmark({ contentType, contentId, enabled }: UseBookmarkOpti
 
         if (response.ok) {
           const data = await response.json();
-          if (typeof data?.bookmarkId === 'string' && data.bookmarkId.length > 0) {
+          if (typeof data?.bookmarkId === 'number' && Number.isFinite(data.bookmarkId)) {
             setBookmark({
               ...optimisticBookmark,
               id: data.bookmarkId,

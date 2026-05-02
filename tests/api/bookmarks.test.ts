@@ -61,7 +61,7 @@ describe('bookmarks API route', () => {
   test('rejects book bookmark creation when chapterId is provided', async () => {
     mockedCreateBookmark.mockResolvedValue({
       created: true,
-      bookmarkId: 'bookmark-1',
+      bookmarkId: 1,
     });
 
     const { res } = await runHandler({

@@ -229,7 +229,7 @@ export interface ReadingProgressResult {
 
 // Bookmark Types
 export interface BookmarkRecord {
-  id: string;
+  id: number;
   contentType: 'chapter' | 'book';
   chapter: {
     id: number;

@@ -68,7 +68,7 @@ interface CreateBookmarkResponse {
   createBookmark: {
     created: boolean;
     bookmark: {
-      id: string;
+      id: number;
       contentType: string;
       chapter: { id: number; title: string; slug: string } | null;
       book: { id: number; title: string; slug: string } | null;
@@ -110,7 +110,7 @@ export async function getBookmarks(options?: {
 export async function createBookmark(
   input: { contentType: string; chapterId?: string; bookId?: string },
   options: { authToken: string }
-): Promise<{ created: boolean; bookmarkId?: string }> {
+): Promise<{ created: boolean; bookmarkId?: number }> {
   const data = await fetchAPIWithAuthToken<CreateBookmarkResponse>(
     CREATE_BOOKMARK_MUTATION,
     {
@@ -130,7 +130,7 @@ export async function createBookmark(
 }
 
 export async function deleteBookmark(
-  bookmarkId: string,
+  bookmarkId: string | number,
   options: { authToken: string }
 ): Promise<{ ok: boolean }> {
   const data = await fetchAPIWithAuthToken<DeleteBookmarkResponse>(
