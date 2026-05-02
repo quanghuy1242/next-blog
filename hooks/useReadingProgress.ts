@@ -18,18 +18,18 @@ export function useReadingProgress({
   targetRef,
   initialProgress = 0,
 }: UseReadingProgressOptions) {
-  const [currentProgress, setCurrentProgress] = useState(0);
-  const lastSentProgress = useRef(Math.max(0, Math.min(initialProgress, 100)));
+  const clampedInitialProgress = Math.max(0, Math.min(initialProgress, 100));
+  const [currentProgress, setCurrentProgress] = useState(clampedInitialProgress);
+  const lastSentProgress = useRef(clampedInitialProgress);
   const lastSentAt = useRef(0);
   const hasTrackedScroll = useRef(false);
 
   useEffect(() => {
-    const clampedInitialProgress = Math.max(0, Math.min(initialProgress, 100));
     lastSentProgress.current = clampedInitialProgress;
     lastSentAt.current = 0;
     hasTrackedScroll.current = false;
-    setCurrentProgress(0);
-  }, [bookId, chapterId, initialProgress]);
+    setCurrentProgress(clampedInitialProgress);
+  }, [bookId, chapterId, clampedInitialProgress]);
 
   const sendProgress = useCallback((progress: number, force = false) => {
     if (progress <= lastSentProgress.current) return;

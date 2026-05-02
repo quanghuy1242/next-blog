@@ -96,6 +96,16 @@ export default function ChapterPage({
     initialProgress: readingProgressByChapterId?.[chapter.id] ?? 0,
   });
 
+  const chapterProgressForDisplay = useMemo(
+    () => ({
+      ...(readingProgressByChapterId ?? {}),
+      [chapter.id]: shouldTrackProgress
+        ? currentReadingProgress
+        : (readingProgressByChapterId?.[chapter.id] ?? 0),
+    }),
+    [chapter.id, currentReadingProgress, readingProgressByChapterId, shouldTrackProgress]
+  );
+
   return (
     <Layout header={homepage?.header} className="flex flex-col items-center" isDraftMode={isDraftMode}>
       <Head>{renderMetaTags(metaTags)}</Head>
@@ -111,7 +121,7 @@ export default function ChapterPage({
               bookId={book.id}
               bookSlug={book.slug}
               currentChapterSlug={chapter.slug}
-              readingProgressByChapterId={readingProgressByChapterId}
+              readingProgressByChapterId={chapterProgressForDisplay}
             />
           </aside>
 
@@ -246,7 +256,7 @@ export default function ChapterPage({
           onNavigate={() => {
             setIsTocOpen(false);
           }}
-          readingProgressByChapterId={readingProgressByChapterId}
+          readingProgressByChapterId={chapterProgressForDisplay}
         />
       </ChapterTocDrawer>
     </Layout>
