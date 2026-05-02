@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { updateComment, deleteComment } from 'common/apis/comments';
+import { COMMENT_MAX_LENGTH } from 'common/constants/comments';
 import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
 import { getChapterPasswordProofCookieValueFromRequest } from 'common/utils/chapter-password-proof';
 
@@ -59,6 +60,11 @@ export default async function handler(
 
     if (!content) {
       res.status(400).json({ error: 'content is required.' });
+      return;
+    }
+
+    if (content.length > COMMENT_MAX_LENGTH) {
+      res.status(400).json({ error: `content must be at most ${COMMENT_MAX_LENGTH} characters.` });
       return;
     }
 

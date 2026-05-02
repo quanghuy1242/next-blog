@@ -195,9 +195,11 @@ export default function ChapterPage({
                 />
               )}
 
-              <CommentsSection
-                chapterId={String(chapter.id)}
-              />
+              {!isChapterLocked ? (
+                <CommentsSection
+                  chapterId={String(chapter.id)}
+                />
+              ) : null}
 
               <div className="mt-8 flex items-center justify-between gap-4 border-t border-gray-200 pt-4 text-sm">
                 <div>

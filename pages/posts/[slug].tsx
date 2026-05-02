@@ -67,7 +67,7 @@ export default function PostPage({ post, morePosts, homepage, isDraftMode }: Pos
       </article>
       {postId ? (
         <Container>
-          <div className="mx-auto max-w-2xl">
+          <div className="mx-auto max-w-3xl">
             <CommentsSection postId={String(postId)} />
           </div>
         </Container>

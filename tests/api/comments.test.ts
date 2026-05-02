@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { createMocks } from 'node-mocks-http';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { createComment, getComments } from 'common/apis/comments';
+import { COMMENT_MAX_LENGTH } from 'common/constants/comments';
 import { BETTER_AUTH_TOKEN_COOKIE } from 'common/utils/auth';
 
 vi.mock('common/apis/comments', () => ({
@@ -99,5 +100,24 @@ describe('comments API route', () => {
       }
     );
     expect(res.statusCode).toBe(200);
+  });
+
+  test('rejects comments longer than the configured limit', async () => {
+    const { res } = await runHandler({
+      method: 'POST',
+      body: {
+        postId: '22',
+        content: 'x'.repeat(COMMENT_MAX_LENGTH + 1),
+      },
+      cookies: {
+        [BETTER_AUTH_TOKEN_COOKIE]: 'reader-token',
+      },
+    });
+
+    expect(mockedCreateComment).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(400);
+    expect(res._getJSONData()).toEqual({
+      error: `content must be at most ${COMMENT_MAX_LENGTH} characters.`,
+    });
   });
 });

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { COMMENT_MAX_LENGTH } from 'common/constants/comments';
 
 interface CommentComposerProps {
   onSubmit: (content: string) => Promise<void>;
@@ -39,9 +40,13 @@ export function CommentComposer({
         placeholder={placeholder}
         disabled={disabled || submitting}
         rows={3}
+        maxLength={COMMENT_MAX_LENGTH}
         className="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue disabled:opacity-50"
       />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs text-gray-500">
+          {content.length}/{COMMENT_MAX_LENGTH}
+        </span>
         <button
           type="submit"
           disabled={!content.trim() || disabled || submitting}
