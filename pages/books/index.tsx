@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { getBookmarks } from 'common/apis/bookmarks';
@@ -44,7 +44,6 @@ export default function BooksPage({
       initialHasMore,
       pageSize: BOOKS_PAGE_SIZE,
     });
-  const [bookmarkedBookIds, setBookmarkedBookIds] = useState(initialBookmarkedBookIds);
 
   const { ref: loaderRef, isIntersecting } =
     useIntersectionObserver<HTMLDivElement>({
@@ -58,47 +57,6 @@ export default function BooksPage({
     }
   }, [booksState.hasMore, isIntersecting, loadMoreBooks]);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-
-    let cancelled = false;
-
-    async function loadBookmarkedBooks() {
-      try {
-        const response = await fetch('/api/bookmarks?limit=100', {
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          return;
-        }
-
-        const data = await response.json();
-        const nextBookmarkedBookIds = Array.isArray(data?.docs)
-          ? data.docs
-              .filter((bookmark: { contentType?: string; book?: { id?: number } | null }) => {
-                return bookmark.contentType === 'book' && typeof bookmark.book?.id === 'number';
-              })
-              .map((bookmark: { book: { id: number } }) => bookmark.book.id)
-          : [];
-
-        if (!cancelled) {
-          setBookmarkedBookIds(nextBookmarkedBookIds);
-        }
-      } catch {
-        // Ignore non-critical bookmark refresh failures on the listing page.
-      }
-    }
-
-    void loadBookmarkedBooks();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthenticated]);
-
   return (
     <Layout header={homepage?.header} className="flex flex-col items-center">
       <Head>{renderMetaTags(metaTags)}</Head>
@@ -107,7 +65,8 @@ export default function BooksPage({
           <Text text="Books" />
           <BooksGrid
             books={booksState.books}
-            bookmarkedBookIds={bookmarkedBookIds}
+            bookmarkedBookIds={initialBookmarkedBookIds}
+            isAuthenticated={isAuthenticated}
           />
 
           {!isFetching && !error && booksState.books.length === 0 && (

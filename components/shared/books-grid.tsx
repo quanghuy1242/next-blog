@@ -5,9 +5,14 @@ import { BookItem } from './book-item';
 interface BooksGridProps {
   books: Book[];
   bookmarkedBookIds?: number[];
+  isAuthenticated?: boolean;
 }
 
-export function BooksGrid({ books, bookmarkedBookIds = [] }: BooksGridProps) {
+export function BooksGrid({
+  books,
+  bookmarkedBookIds = [],
+  isAuthenticated = false,
+}: BooksGridProps) {
   const bookmarkedBookIdSet = new Set(bookmarkedBookIds);
 
   return (
@@ -17,6 +22,7 @@ export function BooksGrid({ books, bookmarkedBookIds = [] }: BooksGridProps) {
           key={book.slug}
           book={book}
           isBookmarked={bookmarkedBookIdSet.has(book.id)}
+          isAuthenticated={isAuthenticated}
         />
       ))}
     </div>
