@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { useAppContext } from 'context/state';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 interface NavigationItem {
   name: string;
@@ -62,6 +63,12 @@ interface HeaderProps {
 
 export function Header({ text }: HeaderProps) {
   const { header } = useAppContext();
+  const router = useRouter();
+  const returnTo = router.asPath || '/';
+  const authItems = [
+    { name: 'About me', href: '/about' },
+    { name: 'Sign in', href: `/auth/login?returnTo=${encodeURIComponent(returnTo)}` },
+  ];
 
   return (
     <div
@@ -74,7 +81,7 @@ export function Header({ text }: HeaderProps) {
     >
       <HeaderTitle text={text || header} link="/" />
       <div className="flex-grow" />
-      <Option items={[{ name: 'About me', href: '/about' }]} />
+      <Option items={authItems} />
     </div>
   );
 }
