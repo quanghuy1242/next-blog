@@ -6,7 +6,7 @@ import type {
   Homepage,
   PaginatedResponse,
 } from 'types/cms';
-import { fetchAPIWithAuthToken } from './base';
+import { fetchAPI, fetchAPIWithAuthToken } from './base';
 import {
   buildBookCacheTags,
   buildBookDetailCacheTags,
@@ -49,6 +49,7 @@ interface BookDetailByIdResponse {
 interface BookFetchOptions {
   authToken?: string | null;
   cache?: PayloadCacheSettings;
+  draftMode?: boolean;
 }
 
 const BOOK_LOOKUP_FIELDS = `
@@ -89,6 +90,22 @@ export interface PaginatedBooksResult {
   hasMore: boolean;
 }
 
+const BOOK_STATUS_PUBLISHED = '{ _status: { equals: published } }';
+
+function buildBookStatusFilter(draftMode?: boolean): string {
+  if (draftMode) {
+    return '{ _status: { in: [published, draft] } }';
+  }
+  return BOOK_STATUS_PUBLISHED;
+}
+
+function selectBookFetcher(options: BookFetchOptions) {
+  if (options.draftMode) {
+    return fetchAPI as typeof fetchAPIWithAuthToken;
+  }
+  return fetchAPIWithAuthToken;
+}
+
 export function createBooksWhere(): Record<string, unknown> {
   return {
     AND: [
@@ -112,8 +129,9 @@ export async function getPaginatedBooks(
 ): Promise<PaginatedBooksResult> {
   const safeLimit = Math.max(1, limit);
   const page = Math.floor(skip / safeLimit) + 1;
+  const fetcher = selectBookFetcher(options);
 
-  const data = await fetchAPIWithAuthToken<BooksResponse>(
+  const data = await fetcher<BooksResponse>(
     `#graphql
       query PaginatedBooks($limit: Int!, $page: Int!, $where: Book_where) {
         Books(limit: $limit, page: $page, where: $where, sort: "-updatedAt") {
@@ -204,14 +222,17 @@ export async function getBookBySlug(
     };
   }
 
-  const data = await fetchAPIWithAuthToken<BookBySlugResponse>(
+  const fetcher = selectBookFetcher(options);
+  const statusFilter = buildBookStatusFilter(options.draftMode);
+
+  const data = await fetcher<BookBySlugResponse>(
     `#graphql
       query BookBySlug($slug: String!) {
         Books(
           where: {
             AND: [
               { slug: { equals: $slug } }
-              { _status: { equals: published } }
+              ${statusFilter}
             ]
           }
           limit: 1
@@ -284,14 +305,20 @@ export async function getBookDetailById(
     };
   }
 
-  const data = await fetchAPIWithAuthToken<BookDetailByIdResponse>(
+  const fetcher = selectBookFetcher(options);
+  const bookStatusFilter = buildBookStatusFilter(options.draftMode);
+  const chapterStatusFilter = options.draftMode
+    ? '{ _status: { in: [published, draft] } }'
+    : '{ _status: { equals: published } }';
+
+  const data = await fetcher<BookDetailByIdResponse>(
     `#graphql
       query BookDetailWithChaptersByBookId($bookId: Int!, $bookRelationId: JSON!) {
         Books(
           where: {
             AND: [
               { id: { equals: $bookId } }
-              { _status: { equals: published } }
+              ${bookStatusFilter}
             ]
           }
           limit: 1
@@ -305,7 +332,7 @@ export async function getBookDetailById(
           where: {
             AND: [
               { book: { equals: $bookRelationId } }
-              { _status: { equals: published } }
+              ${chapterStatusFilter}
             ]
           }
           sort: "order"

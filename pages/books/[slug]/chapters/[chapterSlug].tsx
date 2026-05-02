@@ -1,4 +1,3 @@
-import React from 'react';
 import { useMemo, useState } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
@@ -13,6 +12,7 @@ import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
 import {
   getChapterPasswordProofCookieValueFromRequest,
 } from 'common/utils/chapter-password-proof';
+import { getReadingProgress } from 'common/apis/reading-progress';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
@@ -20,14 +20,21 @@ import { ChapterContent } from 'components/pages/books/chapter-content';
 import { ChapterPasswordGate } from 'components/pages/books/chapter-password-gate';
 import { ChapterToc } from 'components/pages/books/chapter-toc';
 import { ChapterTocDrawer } from 'components/pages/books/chapter-toc-drawer';
+import { BookmarkButton } from 'components/shared/bookmark-button';
 import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
-import type { Book, Chapter, Homepage } from 'types/cms';
+import { CommentsSection } from 'components/shared/comments/CommentsSection';
+import { ReadingProgressBar } from 'components/shared/reading-progress-bar';
+import { useReadingProgress } from 'hooks/useReadingProgress';
+import type { Book, Chapter, Homepage, ReadingProgressRecord } from 'types/cms';
 
 interface ChapterPageProps {
   book: Book;
   chapter: Chapter;
   chapters: Chapter[];
   homepage: Pick<Homepage, 'header'> | null;
+  isDraftMode: boolean;
+  isAuthenticated: boolean;
+  readingProgress: ReadingProgressRecord[];
 }
 
 export default function ChapterPage({
@@ -35,6 +42,9 @@ export default function ChapterPage({
   chapter,
   chapters,
   homepage,
+  isDraftMode,
+  isAuthenticated,
+  readingProgress,
 }: ChapterPageProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
   const router = useRouter();
@@ -42,6 +52,18 @@ export default function ChapterPage({
     (book.origin as string) !== 'epub_imported' &&
     (book.sourceType as string) !== 'epub_upload';
   const isChapterLocked = chapter.hasPassword === true && chapter.content == null;
+
+  const readingProgressByChapterId = useMemo(
+    () =>
+      readingProgress.length > 0
+        ? Object.fromEntries(
+            readingProgress
+              .filter((r) => r.chapterId != null && r.progress != null)
+              .map((r) => [Number(r.chapterId!), r.progress!])
+          )
+        : undefined,
+    [readingProgress]
+  );
 
   const { previousChapter, nextChapter } = useMemo(() => {
     const currentIndex = chapters.findIndex(
@@ -64,8 +86,16 @@ export default function ChapterPage({
     type: 'article',
   });
 
+  const shouldTrackProgress = isAuthenticated && !isChapterLocked;
+  const currentReadingProgress = useReadingProgress({
+    chapterId: chapter.id,
+    bookId: book.id,
+    enabled: shouldTrackProgress,
+    initialProgress: readingProgressByChapterId?.[chapter.id] ?? 0,
+  });
+
   return (
-    <Layout header={homepage?.header} className="flex flex-col items-center">
+    <Layout header={homepage?.header} className="flex flex-col items-center" isDraftMode={isDraftMode}>
       <Head>{renderMetaTags(metaTags)}</Head>
       <Container className="my-4 w-full md:px-20">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start lg:gap-10">
@@ -79,6 +109,7 @@ export default function ChapterPage({
               bookId={book.id}
               bookSlug={book.slug}
               currentChapterSlug={chapter.slug}
+              readingProgressByChapterId={readingProgressByChapterId}
             />
           </aside>
 
@@ -114,30 +145,39 @@ export default function ChapterPage({
                     <h1 className="text-3xl font-bold leading-tight">{chapter.title}</h1>
                   ) : null}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsTocOpen(true)}
-                  className="inline-flex shrink-0 items-center gap-2 self-start rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 lg:hidden"
-                >
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    className="h-4 w-4 text-gray-500"
+                <div className="flex shrink-0 items-center gap-2 self-start">
+                  <button
+                    type="button"
+                    onClick={() => setIsTocOpen(true)}
+                    className="inline-flex items-center gap-2 rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 lg:hidden"
                   >
-                    <circle cx="3.5" cy="5" r="1.25" fill="currentColor" />
-                    <circle cx="3.5" cy="10" r="1.25" fill="currentColor" />
-                    <circle cx="3.5" cy="15" r="1.25" fill="currentColor" />
-                    <path
-                      d="M7 5h9M7 10h9M7 15h9"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <span>Table of contents</span>
-                </button>
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      className="h-4 w-4 text-gray-500"
+                    >
+                      <circle cx="3.5" cy="5" r="1.25" fill="currentColor" />
+                      <circle cx="3.5" cy="10" r="1.25" fill="currentColor" />
+                      <circle cx="3.5" cy="15" r="1.25" fill="currentColor" />
+                      <path
+                        d="M7 5h9M7 10h9M7 15h9"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <span>Table of contents</span>
+                  </button>
+                  <BookmarkButton
+                    contentType="chapter"
+                    contentId={chapter.id}
+                    isAuthenticated={isAuthenticated}
+                  />
+                </div>
               </div>
+
+              <ReadingProgressBar progress={currentReadingProgress} />
 
               {isChapterLocked ? (
                 <ChapterPasswordGate
@@ -154,6 +194,10 @@ export default function ChapterPage({
                   chapters={chapters}
                 />
               )}
+
+              <CommentsSection
+                chapterId={String(chapter.id)}
+              />
 
               <div className="mt-8 flex items-center justify-between gap-4 border-t border-gray-200 pt-4 text-sm">
                 <div>
@@ -196,6 +240,7 @@ export default function ChapterPage({
           onNavigate={() => {
             setIsTocOpen(false);
           }}
+          readingProgressByChapterId={readingProgressByChapterId}
         />
       </ChapterTocDrawer>
     </Layout>
@@ -205,6 +250,7 @@ export default function ChapterPage({
 export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
   params,
   req,
+  draftMode,
 }) => {
   const bookSlug = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug;
   const chapterSlug = Array.isArray(params?.chapterSlug)
@@ -219,15 +265,23 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
 
   const parsedBookRoute = parseBookRouteSegment(bookSlug);
   const sessionToken = getBetterAuthTokenFromRequest(req);
-  const chapterPasswordProof = sessionToken ? null : getChapterPasswordProofCookieValueFromRequest(req);
-  const payloadCache =
-    sessionToken || chapterPasswordProof ? AUTH_PAYLOAD_CACHE : ONE_HOUR_PAYLOAD_CACHE;
+  const isDraftMode = draftMode === true;
+  const chapterPasswordProof =
+    !isDraftMode && !sessionToken
+      ? getChapterPasswordProofCookieValueFromRequest(req)
+      : null;
+  const payloadCache = isDraftMode
+    ? undefined
+    : sessionToken || chapterPasswordProof
+      ? AUTH_PAYLOAD_CACHE
+      : ONE_HOUR_PAYLOAD_CACHE;
 
   if (parsedBookRoute.bookId) {
     const accessibleResult = await getChapterPageByBookId(parsedBookRoute.bookId, chapterSlug, {
       authToken: sessionToken,
       cache: payloadCache,
       chapterPasswordProof,
+      draftMode: isDraftMode,
     });
 
     const { book, chapter, chapters, homepage } = accessibleResult;
@@ -238,12 +292,24 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
       };
     }
 
+    let readingProgress: ReadingProgressRecord[] = [];
+    if (sessionToken) {
+      try {
+        readingProgress = await getReadingProgress(String(book.id), { authToken: sessionToken });
+      } catch {
+        readingProgress = [];
+      }
+    }
+
     return {
       props: {
         book,
         chapter,
         chapters,
         homepage,
+        isDraftMode,
+        isAuthenticated: !!sessionToken,
+        readingProgress,
       },
     };
   }
@@ -251,6 +317,7 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
   const accessibleResult = await getBookBySlug(parsedBookRoute.bookSlug, {
     authToken: sessionToken,
     cache: payloadCache,
+    draftMode: isDraftMode,
   });
 
   const { book } = accessibleResult;
@@ -265,6 +332,7 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
     authToken: sessionToken,
     cache: payloadCache,
     chapterPasswordProof,
+    draftMode: isDraftMode,
   });
 
   if (!chapterData.chapter) {

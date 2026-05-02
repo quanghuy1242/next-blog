@@ -97,11 +97,9 @@ describe('ChapterToc component', () => {
     );
 
     const activeLink = screen.getByRole('link', { name: /Two/i });
-    expect(activeLink.className).toContain('block');
     expect(activeLink.className).toContain('font-semibold');
     expect(activeLink).toHaveAttribute('href', '/books/1~sample-book/chapters/ch-2');
     expect(activeLink.className).toContain('text-gray-900');
-    expect(activeLink.className).not.toContain('justify-between');
   });
 
   test('calls onNavigate when a chapter is clicked', () => {

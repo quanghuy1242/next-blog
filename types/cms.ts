@@ -214,3 +214,79 @@ export interface MetaTag {
 
 // Utility type for normalized tags (converting PostTag[] to string[])
 export type NormalizedTags = string[];
+
+// Reading Progress Types
+export interface ReadingProgressRecord {
+  chapterId: string | null;
+  progress: number | null;
+  completedAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface ReadingProgressResult {
+  records: ReadingProgressRecord[];
+}
+
+// Bookmark Types
+export interface BookmarkRecord {
+  id: string;
+  contentType: 'chapter' | 'book';
+  chapter: {
+    id: number;
+    title: string;
+    slug: string;
+    book: {
+      id: number;
+      title: string;
+      slug: string;
+    } | null;
+  } | null;
+  book: {
+    id: number;
+    title: string;
+    slug: string;
+  } | null;
+}
+
+export interface BookmarksResult {
+  docs: BookmarkRecord[];
+  totalDocs: number;
+}
+
+// Comment Types
+export type CommentStatus = 'pending' | 'approved' | 'rejected';
+
+export interface CommentAuthor {
+  id: number;
+  fullName: string;
+  avatar?: Media | null;
+}
+
+export interface PublicComment {
+  id: string;
+  content: string;
+  status: CommentStatus;
+  createdAt: string | null;
+  updatedAt: string | null;
+  parentCommentId: string | null;
+  chapterId: string | null;
+  postId: string | null;
+  isOwnPending: boolean;
+  isDeleted: boolean;
+  viewerCanEdit: boolean;
+  viewerCanDelete: boolean;
+  editWindowEndsAt: string | null;
+  author: CommentAuthor;
+}
+
+export interface CommentsResult {
+  docs: PublicComment[];
+  totalDocs: number;
+  viewerCanComment: boolean;
+}
+
+// Preview Token Types
+export interface PreviewTokenResult {
+  token: string;
+  slug: string;
+}

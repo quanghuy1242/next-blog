@@ -39,6 +39,18 @@ type Query {
   DeferredGrants(draft: Boolean, where: DeferredGrant_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): DeferredGrants
   countDeferredGrants(draft: Boolean, trash: Boolean, where: DeferredGrant_where): countDeferredGrants
   docAccessDeferredGrant(id: Int!): deferred_grantsDocAccess
+  ReadingProgress(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): ReadingProgress
+  ReadingProgresses(draft: Boolean, where: ReadingProgress_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): ReadingProgresses
+  countReadingProgresses(draft: Boolean, trash: Boolean, where: ReadingProgress_where): countReadingProgresses
+  docAccessReadingProgress(id: Int!): reading_progressDocAccess
+  Bookmark(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): Bookmark
+  Bookmarks(draft: Boolean, where: Bookmark_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): Bookmarks
+  countBookmarks(draft: Boolean, trash: Boolean, where: Bookmark_where): countBookmarks
+  docAccessBookmark(id: Int!): bookmarksDocAccess
+  Comment(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): Comment
+  Comments(draft: Boolean, where: Comment_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): Comments
+  countComments(draft: Boolean, trash: Boolean, where: Comment_where): countComments
+  docAccessComment(id: Int!): commentsDocAccess
   PayloadLockedDocument(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): PayloadLockedDocument
   PayloadLockedDocuments(draft: Boolean, where: PayloadLockedDocument_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): PayloadLockedDocuments
   countPayloadLockedDocuments(draft: Boolean, trash: Boolean, where: PayloadLockedDocument_where): countPayloadLockedDocuments
@@ -56,6 +68,12 @@ type Query {
     """Number of similar posts to return (1-10)"""
     limit: Int = 4
   ): SimilarPostsResult
+  previewToken(docType: String!, docId: ID!): PreviewTokenResult
+  readingProgress(bookId: ID!): ReadingProgressResult
+  bookmarks(contentType: String, contentId: ID, limit: Int = 50, page: Int = 1): BookmarksResult
+  comments(chapterId: ID, postId: ID): CommentsResult
+  bookExportManifest(bookId: ID!): BookExportManifestResult
+  bookExportChunk(bookId: ID!, page: Int!, limit: Int!): BookExportChunkResult
 }
 
 type User {
@@ -76,7 +94,7 @@ type User {
 """
 A field whose value conforms to the standard internet email address format as specified in HTML Spec: https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address.
 """
-scalar EmailAddress
+scalar EmailAddress @specifiedBy(url: "https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address")
 
 type Media {
   id: Int!
@@ -105,7 +123,7 @@ scalar DateTime
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
-scalar JSON
+scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 enum User_role {
   admin
@@ -548,7 +566,7 @@ type UsersCreateDocAccess {
 """
 The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
-scalar JSONObject
+scalar JSONObject @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 type UsersReadDocAccess {
   permission: Boolean!
@@ -3693,6 +3711,7 @@ type Chapter {
   content(depth: Int): JSON
   password: String
   hasPassword: Boolean
+  passwordVersion: Float
   createdBy: User
   updatedAt: DateTime
   createdAt: DateTime
@@ -3731,6 +3750,7 @@ input Chapter_where {
   content: Chapter_content_operator
   password: Chapter_password_operator
   hasPassword: Chapter_hasPassword_operator
+  passwordVersion: Chapter_passwordVersion_operator
   createdBy: Chapter_createdBy_operator
   updatedAt: Chapter_updatedAt_operator
   createdAt: Chapter_createdAt_operator
@@ -3855,6 +3875,16 @@ input Chapter_hasPassword_operator {
   exists: Boolean
 }
 
+input Chapter_passwordVersion_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
 input Chapter_createdBy_operator {
   equals: JSON
   not_equals: JSON
@@ -3922,6 +3952,7 @@ input Chapter_where_and {
   content: Chapter_content_operator
   password: Chapter_password_operator
   hasPassword: Chapter_hasPassword_operator
+  passwordVersion: Chapter_passwordVersion_operator
   createdBy: Chapter_createdBy_operator
   updatedAt: Chapter_updatedAt_operator
   createdAt: Chapter_createdAt_operator
@@ -3944,6 +3975,7 @@ input Chapter_where_or {
   content: Chapter_content_operator
   password: Chapter_password_operator
   hasPassword: Chapter_hasPassword_operator
+  passwordVersion: Chapter_passwordVersion_operator
   createdBy: Chapter_createdBy_operator
   updatedAt: Chapter_updatedAt_operator
   createdAt: Chapter_createdAt_operator
@@ -3979,6 +4011,7 @@ type ChaptersDocAccessFields {
   content: ChaptersDocAccessFields_content
   password: ChaptersDocAccessFields_password
   hasPassword: ChaptersDocAccessFields_hasPassword
+  passwordVersion: ChaptersDocAccessFields_passwordVersion
   createdBy: ChaptersDocAccessFields_createdBy
   updatedAt: ChaptersDocAccessFields_updatedAt
   createdAt: ChaptersDocAccessFields_createdAt
@@ -4261,6 +4294,29 @@ type ChaptersDocAccessFields_hasPassword_Delete {
   permission: Boolean!
 }
 
+type ChaptersDocAccessFields_passwordVersion {
+  create: ChaptersDocAccessFields_passwordVersion_Create
+  read: ChaptersDocAccessFields_passwordVersion_Read
+  update: ChaptersDocAccessFields_passwordVersion_Update
+  delete: ChaptersDocAccessFields_passwordVersion_Delete
+}
+
+type ChaptersDocAccessFields_passwordVersion_Create {
+  permission: Boolean!
+}
+
+type ChaptersDocAccessFields_passwordVersion_Read {
+  permission: Boolean!
+}
+
+type ChaptersDocAccessFields_passwordVersion_Update {
+  permission: Boolean!
+}
+
+type ChaptersDocAccessFields_passwordVersion_Delete {
+  permission: Boolean!
+}
+
 type ChaptersDocAccessFields_createdBy {
   create: ChaptersDocAccessFields_createdBy_Create
   read: ChaptersDocAccessFields_createdBy_Read
@@ -4401,6 +4457,7 @@ type ChapterVersion_Version {
   content(depth: Int): JSON
   password: String
   hasPassword: Boolean
+  passwordVersion: Float
   createdBy: User
   updatedAt: DateTime
   createdAt: DateTime
@@ -4440,6 +4497,7 @@ input versionsChapter_where {
   version__content: versionsChapter_version__content_operator
   version__password: versionsChapter_version__password_operator
   version__hasPassword: versionsChapter_version__hasPassword_operator
+  version__passwordVersion: versionsChapter_version__passwordVersion_operator
   version__createdBy: versionsChapter_version__createdBy_operator
   version__updatedAt: versionsChapter_version__updatedAt_operator
   version__createdAt: versionsChapter_version__createdAt_operator
@@ -4577,6 +4635,16 @@ input versionsChapter_version__hasPassword_operator {
   exists: Boolean
 }
 
+input versionsChapter_version__passwordVersion_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
 input versionsChapter_version__createdBy_operator {
   equals: JSON
   not_equals: JSON
@@ -4679,6 +4747,7 @@ input versionsChapter_where_and {
   version__content: versionsChapter_version__content_operator
   version__password: versionsChapter_version__password_operator
   version__hasPassword: versionsChapter_version__hasPassword_operator
+  version__passwordVersion: versionsChapter_version__passwordVersion_operator
   version__createdBy: versionsChapter_version__createdBy_operator
   version__updatedAt: versionsChapter_version__updatedAt_operator
   version__createdAt: versionsChapter_version__createdAt_operator
@@ -4706,6 +4775,7 @@ input versionsChapter_where_or {
   version__content: versionsChapter_version__content_operator
   version__password: versionsChapter_version__password_operator
   version__hasPassword: versionsChapter_version__hasPassword_operator
+  version__passwordVersion: versionsChapter_version__passwordVersion_operator
   version__createdBy: versionsChapter_version__createdBy_operator
   version__updatedAt: versionsChapter_version__updatedAt_operator
   version__createdAt: versionsChapter_version__createdAt_operator
@@ -7204,6 +7274,1206 @@ type DeferredGrantsDeleteDocAccess {
   where: JSONObject
 }
 
+type ReadingProgress {
+  id: Int!
+  user: User!
+  book(draft: Boolean): Book!
+  chapter(draft: Boolean): Chapter!
+  progress: Float
+  completedAt: DateTime
+  updatedAt: DateTime
+  createdAt: DateTime
+}
+
+type ReadingProgresses {
+  docs: [ReadingProgress!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input ReadingProgress_where {
+  user: ReadingProgress_user_operator
+  book: ReadingProgress_book_operator
+  chapter: ReadingProgress_chapter_operator
+  progress: ReadingProgress_progress_operator
+  completedAt: ReadingProgress_completedAt_operator
+  updatedAt: ReadingProgress_updatedAt_operator
+  createdAt: ReadingProgress_createdAt_operator
+  id: ReadingProgress_id_operator
+  AND: [ReadingProgress_where_and]
+  OR: [ReadingProgress_where_or]
+}
+
+input ReadingProgress_user_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+}
+
+input ReadingProgress_book_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+}
+
+input ReadingProgress_chapter_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+}
+
+input ReadingProgress_progress_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input ReadingProgress_completedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input ReadingProgress_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input ReadingProgress_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input ReadingProgress_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input ReadingProgress_where_and {
+  user: ReadingProgress_user_operator
+  book: ReadingProgress_book_operator
+  chapter: ReadingProgress_chapter_operator
+  progress: ReadingProgress_progress_operator
+  completedAt: ReadingProgress_completedAt_operator
+  updatedAt: ReadingProgress_updatedAt_operator
+  createdAt: ReadingProgress_createdAt_operator
+  id: ReadingProgress_id_operator
+  AND: [ReadingProgress_where_and]
+  OR: [ReadingProgress_where_or]
+}
+
+input ReadingProgress_where_or {
+  user: ReadingProgress_user_operator
+  book: ReadingProgress_book_operator
+  chapter: ReadingProgress_chapter_operator
+  progress: ReadingProgress_progress_operator
+  completedAt: ReadingProgress_completedAt_operator
+  updatedAt: ReadingProgress_updatedAt_operator
+  createdAt: ReadingProgress_createdAt_operator
+  id: ReadingProgress_id_operator
+  AND: [ReadingProgress_where_and]
+  OR: [ReadingProgress_where_or]
+}
+
+type countReadingProgresses {
+  totalDocs: Int
+}
+
+type reading_progressDocAccess {
+  fields: ReadingProgressDocAccessFields
+  create: ReadingProgressCreateDocAccess
+  read: ReadingProgressReadDocAccess
+  update: ReadingProgressUpdateDocAccess
+  delete: ReadingProgressDeleteDocAccess
+}
+
+type ReadingProgressDocAccessFields {
+  user: ReadingProgressDocAccessFields_user
+  book: ReadingProgressDocAccessFields_book
+  chapter: ReadingProgressDocAccessFields_chapter
+  progress: ReadingProgressDocAccessFields_progress
+  completedAt: ReadingProgressDocAccessFields_completedAt
+  updatedAt: ReadingProgressDocAccessFields_updatedAt
+  createdAt: ReadingProgressDocAccessFields_createdAt
+}
+
+type ReadingProgressDocAccessFields_user {
+  create: ReadingProgressDocAccessFields_user_Create
+  read: ReadingProgressDocAccessFields_user_Read
+  update: ReadingProgressDocAccessFields_user_Update
+  delete: ReadingProgressDocAccessFields_user_Delete
+}
+
+type ReadingProgressDocAccessFields_user_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_user_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_user_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_user_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_book {
+  create: ReadingProgressDocAccessFields_book_Create
+  read: ReadingProgressDocAccessFields_book_Read
+  update: ReadingProgressDocAccessFields_book_Update
+  delete: ReadingProgressDocAccessFields_book_Delete
+}
+
+type ReadingProgressDocAccessFields_book_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_book_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_book_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_book_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_chapter {
+  create: ReadingProgressDocAccessFields_chapter_Create
+  read: ReadingProgressDocAccessFields_chapter_Read
+  update: ReadingProgressDocAccessFields_chapter_Update
+  delete: ReadingProgressDocAccessFields_chapter_Delete
+}
+
+type ReadingProgressDocAccessFields_chapter_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_chapter_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_chapter_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_chapter_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_progress {
+  create: ReadingProgressDocAccessFields_progress_Create
+  read: ReadingProgressDocAccessFields_progress_Read
+  update: ReadingProgressDocAccessFields_progress_Update
+  delete: ReadingProgressDocAccessFields_progress_Delete
+}
+
+type ReadingProgressDocAccessFields_progress_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_progress_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_progress_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_progress_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_completedAt {
+  create: ReadingProgressDocAccessFields_completedAt_Create
+  read: ReadingProgressDocAccessFields_completedAt_Read
+  update: ReadingProgressDocAccessFields_completedAt_Update
+  delete: ReadingProgressDocAccessFields_completedAt_Delete
+}
+
+type ReadingProgressDocAccessFields_completedAt_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_completedAt_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_completedAt_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_completedAt_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_updatedAt {
+  create: ReadingProgressDocAccessFields_updatedAt_Create
+  read: ReadingProgressDocAccessFields_updatedAt_Read
+  update: ReadingProgressDocAccessFields_updatedAt_Update
+  delete: ReadingProgressDocAccessFields_updatedAt_Delete
+}
+
+type ReadingProgressDocAccessFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_createdAt {
+  create: ReadingProgressDocAccessFields_createdAt_Create
+  read: ReadingProgressDocAccessFields_createdAt_Read
+  update: ReadingProgressDocAccessFields_createdAt_Update
+  delete: ReadingProgressDocAccessFields_createdAt_Delete
+}
+
+type ReadingProgressDocAccessFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressDocAccessFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressCreateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type ReadingProgressReadDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type ReadingProgressUpdateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type ReadingProgressDeleteDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type Bookmark {
+  id: Int!
+  user: User!
+  contentType: Bookmark_contentType!
+  chapter(draft: Boolean): Chapter
+  book(draft: Boolean): Book
+  updatedAt: DateTime
+  createdAt: DateTime
+}
+
+enum Bookmark_contentType {
+  chapter
+  book
+}
+
+type Bookmarks {
+  docs: [Bookmark!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input Bookmark_where {
+  user: Bookmark_user_operator
+  contentType: Bookmark_contentType_operator
+  chapter: Bookmark_chapter_operator
+  book: Bookmark_book_operator
+  updatedAt: Bookmark_updatedAt_operator
+  createdAt: Bookmark_createdAt_operator
+  id: Bookmark_id_operator
+  AND: [Bookmark_where_and]
+  OR: [Bookmark_where_or]
+}
+
+input Bookmark_user_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+}
+
+input Bookmark_contentType_operator {
+  equals: Bookmark_contentType_Input
+  not_equals: Bookmark_contentType_Input
+  in: [Bookmark_contentType_Input]
+  not_in: [Bookmark_contentType_Input]
+  all: [Bookmark_contentType_Input]
+}
+
+enum Bookmark_contentType_Input {
+  chapter
+  book
+}
+
+input Bookmark_chapter_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input Bookmark_book_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input Bookmark_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input Bookmark_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input Bookmark_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input Bookmark_where_and {
+  user: Bookmark_user_operator
+  contentType: Bookmark_contentType_operator
+  chapter: Bookmark_chapter_operator
+  book: Bookmark_book_operator
+  updatedAt: Bookmark_updatedAt_operator
+  createdAt: Bookmark_createdAt_operator
+  id: Bookmark_id_operator
+  AND: [Bookmark_where_and]
+  OR: [Bookmark_where_or]
+}
+
+input Bookmark_where_or {
+  user: Bookmark_user_operator
+  contentType: Bookmark_contentType_operator
+  chapter: Bookmark_chapter_operator
+  book: Bookmark_book_operator
+  updatedAt: Bookmark_updatedAt_operator
+  createdAt: Bookmark_createdAt_operator
+  id: Bookmark_id_operator
+  AND: [Bookmark_where_and]
+  OR: [Bookmark_where_or]
+}
+
+type countBookmarks {
+  totalDocs: Int
+}
+
+type bookmarksDocAccess {
+  fields: BookmarksDocAccessFields
+  create: BookmarksCreateDocAccess
+  read: BookmarksReadDocAccess
+  update: BookmarksUpdateDocAccess
+  delete: BookmarksDeleteDocAccess
+}
+
+type BookmarksDocAccessFields {
+  user: BookmarksDocAccessFields_user
+  contentType: BookmarksDocAccessFields_contentType
+  chapter: BookmarksDocAccessFields_chapter
+  book: BookmarksDocAccessFields_book
+  updatedAt: BookmarksDocAccessFields_updatedAt
+  createdAt: BookmarksDocAccessFields_createdAt
+}
+
+type BookmarksDocAccessFields_user {
+  create: BookmarksDocAccessFields_user_Create
+  read: BookmarksDocAccessFields_user_Read
+  update: BookmarksDocAccessFields_user_Update
+  delete: BookmarksDocAccessFields_user_Delete
+}
+
+type BookmarksDocAccessFields_user_Create {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_user_Read {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_user_Update {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_user_Delete {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_contentType {
+  create: BookmarksDocAccessFields_contentType_Create
+  read: BookmarksDocAccessFields_contentType_Read
+  update: BookmarksDocAccessFields_contentType_Update
+  delete: BookmarksDocAccessFields_contentType_Delete
+}
+
+type BookmarksDocAccessFields_contentType_Create {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_contentType_Read {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_contentType_Update {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_contentType_Delete {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_chapter {
+  create: BookmarksDocAccessFields_chapter_Create
+  read: BookmarksDocAccessFields_chapter_Read
+  update: BookmarksDocAccessFields_chapter_Update
+  delete: BookmarksDocAccessFields_chapter_Delete
+}
+
+type BookmarksDocAccessFields_chapter_Create {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_chapter_Read {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_chapter_Update {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_chapter_Delete {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_book {
+  create: BookmarksDocAccessFields_book_Create
+  read: BookmarksDocAccessFields_book_Read
+  update: BookmarksDocAccessFields_book_Update
+  delete: BookmarksDocAccessFields_book_Delete
+}
+
+type BookmarksDocAccessFields_book_Create {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_book_Read {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_book_Update {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_book_Delete {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_updatedAt {
+  create: BookmarksDocAccessFields_updatedAt_Create
+  read: BookmarksDocAccessFields_updatedAt_Read
+  update: BookmarksDocAccessFields_updatedAt_Update
+  delete: BookmarksDocAccessFields_updatedAt_Delete
+}
+
+type BookmarksDocAccessFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_createdAt {
+  create: BookmarksDocAccessFields_createdAt_Create
+  read: BookmarksDocAccessFields_createdAt_Read
+  update: BookmarksDocAccessFields_createdAt_Update
+  delete: BookmarksDocAccessFields_createdAt_Delete
+}
+
+type BookmarksDocAccessFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type BookmarksDocAccessFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type BookmarksCreateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type BookmarksReadDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type BookmarksUpdateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type BookmarksDeleteDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type Comment {
+  id: Int!
+  chapter(draft: Boolean): Chapter
+  post(draft: Boolean): Post
+  author: User!
+  content: String!
+  status: Comment_status!
+  parentComment: Comment
+  moderatedAt: DateTime
+  moderatedBy: User
+  deletedAt: DateTime
+  deletedBy: User
+  updatedAt: DateTime
+  createdAt: DateTime
+}
+
+enum Comment_status {
+  pending
+  approved
+  rejected
+}
+
+type Comments {
+  docs: [Comment!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input Comment_where {
+  chapter: Comment_chapter_operator
+  post: Comment_post_operator
+  author: Comment_author_operator
+  content: Comment_content_operator
+  status: Comment_status_operator
+  parentComment: Comment_parentComment_operator
+  moderatedAt: Comment_moderatedAt_operator
+  moderatedBy: Comment_moderatedBy_operator
+  deletedAt: Comment_deletedAt_operator
+  deletedBy: Comment_deletedBy_operator
+  updatedAt: Comment_updatedAt_operator
+  createdAt: Comment_createdAt_operator
+  id: Comment_id_operator
+  AND: [Comment_where_and]
+  OR: [Comment_where_or]
+}
+
+input Comment_chapter_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input Comment_post_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input Comment_author_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+}
+
+input Comment_content_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+}
+
+input Comment_status_operator {
+  equals: Comment_status_Input
+  not_equals: Comment_status_Input
+  in: [Comment_status_Input]
+  not_in: [Comment_status_Input]
+  all: [Comment_status_Input]
+}
+
+enum Comment_status_Input {
+  pending
+  approved
+  rejected
+}
+
+input Comment_parentComment_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input Comment_moderatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input Comment_moderatedBy_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input Comment_deletedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input Comment_deletedBy_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input Comment_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input Comment_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input Comment_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input Comment_where_and {
+  chapter: Comment_chapter_operator
+  post: Comment_post_operator
+  author: Comment_author_operator
+  content: Comment_content_operator
+  status: Comment_status_operator
+  parentComment: Comment_parentComment_operator
+  moderatedAt: Comment_moderatedAt_operator
+  moderatedBy: Comment_moderatedBy_operator
+  deletedAt: Comment_deletedAt_operator
+  deletedBy: Comment_deletedBy_operator
+  updatedAt: Comment_updatedAt_operator
+  createdAt: Comment_createdAt_operator
+  id: Comment_id_operator
+  AND: [Comment_where_and]
+  OR: [Comment_where_or]
+}
+
+input Comment_where_or {
+  chapter: Comment_chapter_operator
+  post: Comment_post_operator
+  author: Comment_author_operator
+  content: Comment_content_operator
+  status: Comment_status_operator
+  parentComment: Comment_parentComment_operator
+  moderatedAt: Comment_moderatedAt_operator
+  moderatedBy: Comment_moderatedBy_operator
+  deletedAt: Comment_deletedAt_operator
+  deletedBy: Comment_deletedBy_operator
+  updatedAt: Comment_updatedAt_operator
+  createdAt: Comment_createdAt_operator
+  id: Comment_id_operator
+  AND: [Comment_where_and]
+  OR: [Comment_where_or]
+}
+
+type countComments {
+  totalDocs: Int
+}
+
+type commentsDocAccess {
+  fields: CommentsDocAccessFields
+  create: CommentsCreateDocAccess
+  read: CommentsReadDocAccess
+  update: CommentsUpdateDocAccess
+  delete: CommentsDeleteDocAccess
+}
+
+type CommentsDocAccessFields {
+  chapter: CommentsDocAccessFields_chapter
+  post: CommentsDocAccessFields_post
+  author: CommentsDocAccessFields_author
+  content: CommentsDocAccessFields_content
+  status: CommentsDocAccessFields_status
+  parentComment: CommentsDocAccessFields_parentComment
+  moderatedAt: CommentsDocAccessFields_moderatedAt
+  moderatedBy: CommentsDocAccessFields_moderatedBy
+  deletedAt: CommentsDocAccessFields_deletedAt
+  deletedBy: CommentsDocAccessFields_deletedBy
+  updatedAt: CommentsDocAccessFields_updatedAt
+  createdAt: CommentsDocAccessFields_createdAt
+}
+
+type CommentsDocAccessFields_chapter {
+  create: CommentsDocAccessFields_chapter_Create
+  read: CommentsDocAccessFields_chapter_Read
+  update: CommentsDocAccessFields_chapter_Update
+  delete: CommentsDocAccessFields_chapter_Delete
+}
+
+type CommentsDocAccessFields_chapter_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_chapter_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_chapter_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_chapter_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_post {
+  create: CommentsDocAccessFields_post_Create
+  read: CommentsDocAccessFields_post_Read
+  update: CommentsDocAccessFields_post_Update
+  delete: CommentsDocAccessFields_post_Delete
+}
+
+type CommentsDocAccessFields_post_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_post_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_post_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_post_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_author {
+  create: CommentsDocAccessFields_author_Create
+  read: CommentsDocAccessFields_author_Read
+  update: CommentsDocAccessFields_author_Update
+  delete: CommentsDocAccessFields_author_Delete
+}
+
+type CommentsDocAccessFields_author_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_author_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_author_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_author_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_content {
+  create: CommentsDocAccessFields_content_Create
+  read: CommentsDocAccessFields_content_Read
+  update: CommentsDocAccessFields_content_Update
+  delete: CommentsDocAccessFields_content_Delete
+}
+
+type CommentsDocAccessFields_content_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_content_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_content_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_content_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_status {
+  create: CommentsDocAccessFields_status_Create
+  read: CommentsDocAccessFields_status_Read
+  update: CommentsDocAccessFields_status_Update
+  delete: CommentsDocAccessFields_status_Delete
+}
+
+type CommentsDocAccessFields_status_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_status_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_status_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_status_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_parentComment {
+  create: CommentsDocAccessFields_parentComment_Create
+  read: CommentsDocAccessFields_parentComment_Read
+  update: CommentsDocAccessFields_parentComment_Update
+  delete: CommentsDocAccessFields_parentComment_Delete
+}
+
+type CommentsDocAccessFields_parentComment_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_parentComment_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_parentComment_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_parentComment_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_moderatedAt {
+  create: CommentsDocAccessFields_moderatedAt_Create
+  read: CommentsDocAccessFields_moderatedAt_Read
+  update: CommentsDocAccessFields_moderatedAt_Update
+  delete: CommentsDocAccessFields_moderatedAt_Delete
+}
+
+type CommentsDocAccessFields_moderatedAt_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_moderatedAt_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_moderatedAt_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_moderatedAt_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_moderatedBy {
+  create: CommentsDocAccessFields_moderatedBy_Create
+  read: CommentsDocAccessFields_moderatedBy_Read
+  update: CommentsDocAccessFields_moderatedBy_Update
+  delete: CommentsDocAccessFields_moderatedBy_Delete
+}
+
+type CommentsDocAccessFields_moderatedBy_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_moderatedBy_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_moderatedBy_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_moderatedBy_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_deletedAt {
+  create: CommentsDocAccessFields_deletedAt_Create
+  read: CommentsDocAccessFields_deletedAt_Read
+  update: CommentsDocAccessFields_deletedAt_Update
+  delete: CommentsDocAccessFields_deletedAt_Delete
+}
+
+type CommentsDocAccessFields_deletedAt_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_deletedAt_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_deletedAt_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_deletedAt_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_deletedBy {
+  create: CommentsDocAccessFields_deletedBy_Create
+  read: CommentsDocAccessFields_deletedBy_Read
+  update: CommentsDocAccessFields_deletedBy_Update
+  delete: CommentsDocAccessFields_deletedBy_Delete
+}
+
+type CommentsDocAccessFields_deletedBy_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_deletedBy_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_deletedBy_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_deletedBy_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_updatedAt {
+  create: CommentsDocAccessFields_updatedAt_Create
+  read: CommentsDocAccessFields_updatedAt_Read
+  update: CommentsDocAccessFields_updatedAt_Update
+  delete: CommentsDocAccessFields_updatedAt_Delete
+}
+
+type CommentsDocAccessFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_createdAt {
+  create: CommentsDocAccessFields_createdAt_Create
+  read: CommentsDocAccessFields_createdAt_Read
+  update: CommentsDocAccessFields_createdAt_Update
+  delete: CommentsDocAccessFields_createdAt_Delete
+}
+
+type CommentsDocAccessFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type CommentsDocAccessFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type CommentsCreateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type CommentsReadDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type CommentsUpdateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type CommentsDeleteDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
 type PayloadLockedDocument {
   id: Int!
   document(draft: Boolean): PayloadLockedDocument_Document_Relationship
@@ -7227,9 +8497,12 @@ enum PayloadLockedDocument_Document_RelationTo {
   categories
   grant_mirror
   deferred_grants
+  reading_progress
+  bookmarks
+  comments
 }
 
-union PayloadLockedDocument_Document = User | Media | Book | Chapter | Post | Category | GrantMirror | DeferredGrant
+union PayloadLockedDocument_Document = User | Media | Book | Chapter | Post | Category | GrantMirror | DeferredGrant | ReadingProgress | Bookmark | Comment
 
 type PayloadLockedDocument_User_Relationship {
   relationTo: PayloadLockedDocument_User_RelationTo
@@ -7281,6 +8554,9 @@ enum PayloadLockedDocument_document_Relation_RelationTo {
   categories
   grant_mirror
   deferred_grants
+  reading_progress
+  bookmarks
+  comments
 }
 
 input PayloadLockedDocument_globalSlug_operator {
@@ -8060,6 +9336,9 @@ type Access {
   categories: categoriesAccess
   grant_mirror: grant_mirrorAccess
   deferred_grants: deferred_grantsAccess
+  reading_progress: reading_progressAccess
+  bookmarks: bookmarksAccess
+  comments: commentsAccess
   payload_locked_documents: payload_locked_documentsAccess
   payload_preferences: payload_preferencesAccess
   homepage: homepageAccess
@@ -9784,6 +11063,7 @@ type ChaptersFields {
   content: ChaptersFields_content
   password: ChaptersFields_password
   hasPassword: ChaptersFields_hasPassword
+  passwordVersion: ChaptersFields_passwordVersion
   createdBy: ChaptersFields_createdBy
   updatedAt: ChaptersFields_updatedAt
   createdAt: ChaptersFields_createdAt
@@ -10063,6 +11343,29 @@ type ChaptersFields_hasPassword_Update {
 }
 
 type ChaptersFields_hasPassword_Delete {
+  permission: Boolean!
+}
+
+type ChaptersFields_passwordVersion {
+  create: ChaptersFields_passwordVersion_Create
+  read: ChaptersFields_passwordVersion_Read
+  update: ChaptersFields_passwordVersion_Update
+  delete: ChaptersFields_passwordVersion_Delete
+}
+
+type ChaptersFields_passwordVersion_Create {
+  permission: Boolean!
+}
+
+type ChaptersFields_passwordVersion_Read {
+  permission: Boolean!
+}
+
+type ChaptersFields_passwordVersion_Update {
+  permission: Boolean!
+}
+
+type ChaptersFields_passwordVersion_Delete {
   permission: Boolean!
 }
 
@@ -11449,6 +12752,699 @@ type DeferredGrantsDeleteAccess {
   where: JSONObject
 }
 
+type reading_progressAccess {
+  fields: ReadingProgressFields
+  create: ReadingProgressCreateAccess
+  read: ReadingProgressReadAccess
+  update: ReadingProgressUpdateAccess
+  delete: ReadingProgressDeleteAccess
+}
+
+type ReadingProgressFields {
+  user: ReadingProgressFields_user
+  book: ReadingProgressFields_book
+  chapter: ReadingProgressFields_chapter
+  progress: ReadingProgressFields_progress
+  completedAt: ReadingProgressFields_completedAt
+  updatedAt: ReadingProgressFields_updatedAt
+  createdAt: ReadingProgressFields_createdAt
+}
+
+type ReadingProgressFields_user {
+  create: ReadingProgressFields_user_Create
+  read: ReadingProgressFields_user_Read
+  update: ReadingProgressFields_user_Update
+  delete: ReadingProgressFields_user_Delete
+}
+
+type ReadingProgressFields_user_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_user_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_user_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_user_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_book {
+  create: ReadingProgressFields_book_Create
+  read: ReadingProgressFields_book_Read
+  update: ReadingProgressFields_book_Update
+  delete: ReadingProgressFields_book_Delete
+}
+
+type ReadingProgressFields_book_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_book_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_book_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_book_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_chapter {
+  create: ReadingProgressFields_chapter_Create
+  read: ReadingProgressFields_chapter_Read
+  update: ReadingProgressFields_chapter_Update
+  delete: ReadingProgressFields_chapter_Delete
+}
+
+type ReadingProgressFields_chapter_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_chapter_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_chapter_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_chapter_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_progress {
+  create: ReadingProgressFields_progress_Create
+  read: ReadingProgressFields_progress_Read
+  update: ReadingProgressFields_progress_Update
+  delete: ReadingProgressFields_progress_Delete
+}
+
+type ReadingProgressFields_progress_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_progress_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_progress_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_progress_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_completedAt {
+  create: ReadingProgressFields_completedAt_Create
+  read: ReadingProgressFields_completedAt_Read
+  update: ReadingProgressFields_completedAt_Update
+  delete: ReadingProgressFields_completedAt_Delete
+}
+
+type ReadingProgressFields_completedAt_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_completedAt_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_completedAt_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_completedAt_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_updatedAt {
+  create: ReadingProgressFields_updatedAt_Create
+  read: ReadingProgressFields_updatedAt_Read
+  update: ReadingProgressFields_updatedAt_Update
+  delete: ReadingProgressFields_updatedAt_Delete
+}
+
+type ReadingProgressFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_createdAt {
+  create: ReadingProgressFields_createdAt_Create
+  read: ReadingProgressFields_createdAt_Read
+  update: ReadingProgressFields_createdAt_Update
+  delete: ReadingProgressFields_createdAt_Delete
+}
+
+type ReadingProgressFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type ReadingProgressFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type ReadingProgressCreateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type ReadingProgressReadAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type ReadingProgressUpdateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type ReadingProgressDeleteAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type bookmarksAccess {
+  fields: BookmarksFields
+  create: BookmarksCreateAccess
+  read: BookmarksReadAccess
+  update: BookmarksUpdateAccess
+  delete: BookmarksDeleteAccess
+}
+
+type BookmarksFields {
+  user: BookmarksFields_user
+  contentType: BookmarksFields_contentType
+  chapter: BookmarksFields_chapter
+  book: BookmarksFields_book
+  updatedAt: BookmarksFields_updatedAt
+  createdAt: BookmarksFields_createdAt
+}
+
+type BookmarksFields_user {
+  create: BookmarksFields_user_Create
+  read: BookmarksFields_user_Read
+  update: BookmarksFields_user_Update
+  delete: BookmarksFields_user_Delete
+}
+
+type BookmarksFields_user_Create {
+  permission: Boolean!
+}
+
+type BookmarksFields_user_Read {
+  permission: Boolean!
+}
+
+type BookmarksFields_user_Update {
+  permission: Boolean!
+}
+
+type BookmarksFields_user_Delete {
+  permission: Boolean!
+}
+
+type BookmarksFields_contentType {
+  create: BookmarksFields_contentType_Create
+  read: BookmarksFields_contentType_Read
+  update: BookmarksFields_contentType_Update
+  delete: BookmarksFields_contentType_Delete
+}
+
+type BookmarksFields_contentType_Create {
+  permission: Boolean!
+}
+
+type BookmarksFields_contentType_Read {
+  permission: Boolean!
+}
+
+type BookmarksFields_contentType_Update {
+  permission: Boolean!
+}
+
+type BookmarksFields_contentType_Delete {
+  permission: Boolean!
+}
+
+type BookmarksFields_chapter {
+  create: BookmarksFields_chapter_Create
+  read: BookmarksFields_chapter_Read
+  update: BookmarksFields_chapter_Update
+  delete: BookmarksFields_chapter_Delete
+}
+
+type BookmarksFields_chapter_Create {
+  permission: Boolean!
+}
+
+type BookmarksFields_chapter_Read {
+  permission: Boolean!
+}
+
+type BookmarksFields_chapter_Update {
+  permission: Boolean!
+}
+
+type BookmarksFields_chapter_Delete {
+  permission: Boolean!
+}
+
+type BookmarksFields_book {
+  create: BookmarksFields_book_Create
+  read: BookmarksFields_book_Read
+  update: BookmarksFields_book_Update
+  delete: BookmarksFields_book_Delete
+}
+
+type BookmarksFields_book_Create {
+  permission: Boolean!
+}
+
+type BookmarksFields_book_Read {
+  permission: Boolean!
+}
+
+type BookmarksFields_book_Update {
+  permission: Boolean!
+}
+
+type BookmarksFields_book_Delete {
+  permission: Boolean!
+}
+
+type BookmarksFields_updatedAt {
+  create: BookmarksFields_updatedAt_Create
+  read: BookmarksFields_updatedAt_Read
+  update: BookmarksFields_updatedAt_Update
+  delete: BookmarksFields_updatedAt_Delete
+}
+
+type BookmarksFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type BookmarksFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type BookmarksFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type BookmarksFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type BookmarksFields_createdAt {
+  create: BookmarksFields_createdAt_Create
+  read: BookmarksFields_createdAt_Read
+  update: BookmarksFields_createdAt_Update
+  delete: BookmarksFields_createdAt_Delete
+}
+
+type BookmarksFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type BookmarksFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type BookmarksFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type BookmarksFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type BookmarksCreateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type BookmarksReadAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type BookmarksUpdateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type BookmarksDeleteAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type commentsAccess {
+  fields: CommentsFields
+  create: CommentsCreateAccess
+  read: CommentsReadAccess
+  update: CommentsUpdateAccess
+  delete: CommentsDeleteAccess
+}
+
+type CommentsFields {
+  chapter: CommentsFields_chapter
+  post: CommentsFields_post
+  author: CommentsFields_author
+  content: CommentsFields_content
+  status: CommentsFields_status
+  parentComment: CommentsFields_parentComment
+  moderatedAt: CommentsFields_moderatedAt
+  moderatedBy: CommentsFields_moderatedBy
+  deletedAt: CommentsFields_deletedAt
+  deletedBy: CommentsFields_deletedBy
+  updatedAt: CommentsFields_updatedAt
+  createdAt: CommentsFields_createdAt
+}
+
+type CommentsFields_chapter {
+  create: CommentsFields_chapter_Create
+  read: CommentsFields_chapter_Read
+  update: CommentsFields_chapter_Update
+  delete: CommentsFields_chapter_Delete
+}
+
+type CommentsFields_chapter_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_chapter_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_chapter_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_chapter_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_post {
+  create: CommentsFields_post_Create
+  read: CommentsFields_post_Read
+  update: CommentsFields_post_Update
+  delete: CommentsFields_post_Delete
+}
+
+type CommentsFields_post_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_post_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_post_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_post_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_author {
+  create: CommentsFields_author_Create
+  read: CommentsFields_author_Read
+  update: CommentsFields_author_Update
+  delete: CommentsFields_author_Delete
+}
+
+type CommentsFields_author_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_author_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_author_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_author_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_content {
+  create: CommentsFields_content_Create
+  read: CommentsFields_content_Read
+  update: CommentsFields_content_Update
+  delete: CommentsFields_content_Delete
+}
+
+type CommentsFields_content_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_content_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_content_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_content_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_status {
+  create: CommentsFields_status_Create
+  read: CommentsFields_status_Read
+  update: CommentsFields_status_Update
+  delete: CommentsFields_status_Delete
+}
+
+type CommentsFields_status_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_status_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_status_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_status_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_parentComment {
+  create: CommentsFields_parentComment_Create
+  read: CommentsFields_parentComment_Read
+  update: CommentsFields_parentComment_Update
+  delete: CommentsFields_parentComment_Delete
+}
+
+type CommentsFields_parentComment_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_parentComment_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_parentComment_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_parentComment_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_moderatedAt {
+  create: CommentsFields_moderatedAt_Create
+  read: CommentsFields_moderatedAt_Read
+  update: CommentsFields_moderatedAt_Update
+  delete: CommentsFields_moderatedAt_Delete
+}
+
+type CommentsFields_moderatedAt_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_moderatedAt_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_moderatedAt_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_moderatedAt_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_moderatedBy {
+  create: CommentsFields_moderatedBy_Create
+  read: CommentsFields_moderatedBy_Read
+  update: CommentsFields_moderatedBy_Update
+  delete: CommentsFields_moderatedBy_Delete
+}
+
+type CommentsFields_moderatedBy_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_moderatedBy_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_moderatedBy_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_moderatedBy_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_deletedAt {
+  create: CommentsFields_deletedAt_Create
+  read: CommentsFields_deletedAt_Read
+  update: CommentsFields_deletedAt_Update
+  delete: CommentsFields_deletedAt_Delete
+}
+
+type CommentsFields_deletedAt_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_deletedAt_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_deletedAt_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_deletedAt_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_deletedBy {
+  create: CommentsFields_deletedBy_Create
+  read: CommentsFields_deletedBy_Read
+  update: CommentsFields_deletedBy_Update
+  delete: CommentsFields_deletedBy_Delete
+}
+
+type CommentsFields_deletedBy_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_deletedBy_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_deletedBy_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_deletedBy_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_updatedAt {
+  create: CommentsFields_updatedAt_Create
+  read: CommentsFields_updatedAt_Read
+  update: CommentsFields_updatedAt_Update
+  delete: CommentsFields_updatedAt_Delete
+}
+
+type CommentsFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type CommentsFields_createdAt {
+  create: CommentsFields_createdAt_Create
+  read: CommentsFields_createdAt_Read
+  update: CommentsFields_createdAt_Update
+  delete: CommentsFields_createdAt_Delete
+}
+
+type CommentsFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type CommentsFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type CommentsFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type CommentsFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type CommentsCreateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type CommentsReadAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type CommentsUpdateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type CommentsDeleteAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
 type payload_locked_documentsAccess {
   fields: PayloadLockedDocumentsFields
   create: PayloadLockedDocumentsCreateAccess
@@ -11995,6 +13991,120 @@ type SimilarPostsResult {
   totalDocs: Int
 }
 
+type PreviewTokenResult {
+  token: String!
+  slug: String!
+}
+
+type ReadingProgressResult {
+  records: [ReadingProgressRecord]
+}
+
+type ReadingProgressRecord {
+  chapterId: ID
+  progress: Float
+  completedAt: String
+  updatedAt: String
+}
+
+type BookmarksResult {
+  docs: [Bookmark]
+  totalDocs: Int
+}
+
+type CommentsResult {
+  docs: [PublicComment!]!
+  totalDocs: Int!
+  viewerCanComment: Boolean!
+}
+
+type PublicComment {
+  id: ID!
+  content: String!
+  status: String!
+  createdAt: String
+  updatedAt: String
+  parentCommentId: ID
+  chapterId: ID
+  postId: ID
+  isOwnPending: Boolean!
+  isDeleted: Boolean!
+  viewerCanEdit: Boolean!
+  viewerCanDelete: Boolean!
+  editWindowEndsAt: String
+  author: PublicCommentAuthor!
+}
+
+type PublicCommentAuthor {
+  id: ID!
+  fullName: String!
+  avatar: Media
+}
+
+type BookExportManifestResult {
+  filename: String!
+  pageSize: Int!
+  totalChapters: Int!
+  totalPages: Int!
+  book: BookExportManifestBook!
+  chapterIndex: [BookExportManifestChapterIndexEntry!]!
+}
+
+type BookExportManifestBook {
+  id: ID!
+  title: String!
+  slug: String!
+  author: String
+  description: String
+  language: String
+  publisher: String
+  publicationDate: String
+  isbn: String
+  epubVersion: String
+  updatedAt: String
+  cover: BookExportManifestCover
+}
+
+type BookExportManifestCover {
+  id: ID!
+  filename: String!
+  mimeType: String!
+  url: String!
+  optimizedUrl: String
+  alt: String!
+}
+
+type BookExportManifestChapterIndexEntry {
+  id: ID!
+  order: Int!
+  title: String!
+  slug: String!
+  chapterSourceKey: String
+}
+
+type BookExportChunkResult {
+  page: Int!
+  totalPages: Int!
+  chapters: [BookExportChunkChapter!]!
+  media: [BookExportChunkMedia!]!
+}
+
+type BookExportChunkChapter {
+  id: ID!
+  order: Int!
+  title: String!
+  content: JSON
+}
+
+type BookExportChunkMedia {
+  id: ID!
+  filename: String!
+  mimeType: String!
+  url: String!
+  optimizedUrl: String
+  alt: String!
+}
+
 type Mutation {
   createUser(data: mutationUserInput!, draft: Boolean): User
   updateUser(id: Int!, autosave: Boolean, data: mutationUserUpdateInput!, draft: Boolean, trash: Boolean): User
@@ -12032,6 +14142,18 @@ type Mutation {
   updateDeferredGrant(id: Int!, autosave: Boolean, data: mutationDeferredGrantUpdateInput!, draft: Boolean, trash: Boolean): DeferredGrant
   deleteDeferredGrant(id: Int!, trash: Boolean): DeferredGrant
   duplicateDeferredGrant(id: Int!, data: mutationDeferredGrantInput!): DeferredGrant
+  createReadingProgress(data: mutationReadingProgressInput!, draft: Boolean): ReadingProgress
+  updateReadingProgress(id: Int!, autosave: Boolean, data: mutationReadingProgressUpdateInput!, draft: Boolean, trash: Boolean): ReadingProgress
+  deleteReadingProgress(id: Int!, trash: Boolean): ReadingProgress
+  duplicateReadingProgress(id: Int!, data: mutationReadingProgressInput!): ReadingProgress
+  createBookmark(contentType: String!, chapterId: ID, bookId: ID): CreateBookmarkResult
+  updateBookmark(id: Int!, autosave: Boolean, data: mutationBookmarkUpdateInput!, draft: Boolean, trash: Boolean): Bookmark
+  deleteBookmark(id: ID!): DeleteBookmarkResult
+  duplicateBookmark(id: Int!, data: mutationBookmarkInput!): Bookmark
+  createComment(chapterId: ID, postId: ID, content: String!, parentCommentId: ID): CreateCommentResult
+  updateComment(commentId: ID!, content: String!): UpdateCommentResult
+  deleteComment(commentId: ID!): DeleteCommentResult
+  duplicateComment(id: Int!, data: mutationCommentInput!): Comment
   createPayloadLockedDocument(data: mutationPayloadLockedDocumentInput!, draft: Boolean): PayloadLockedDocument
   updatePayloadLockedDocument(id: Int!, autosave: Boolean, data: mutationPayloadLockedDocumentUpdateInput!, draft: Boolean, trash: Boolean): PayloadLockedDocument
   deletePayloadLockedDocument(id: Int!, trash: Boolean): PayloadLockedDocument
@@ -12041,6 +14163,10 @@ type Mutation {
   deletePayloadPreference(id: Int!, trash: Boolean): PayloadPreference
   duplicatePayloadPreference(id: Int!, data: mutationPayloadPreferenceInput!): PayloadPreference
   updateHomepage(data: mutationHomepageInput!, draft: Boolean): Homepage
+  unlockChapterPassword(chapterId: ID!, password: String!): UnlockChapterPasswordResult
+  saveReadingProgress(chapterId: ID!, bookId: ID!, progress: Float!): SaveReadingProgressResult
+  updateCommentStatus(commentId: ID!, status: String!): UpdateCommentStatusResult
+  generateEpub(bookId: ID!): GenerateEpubResult
 }
 
 input mutationUserInput {
@@ -12324,9 +14450,10 @@ input mutationChapterInput {
   importBatchId: String
   manualEditedAt: String
   chapterWordCount: Float
-  content: JSON!
+  content: JSON
   password: String
   hasPassword: Boolean
+  passwordVersion: Float
   createdBy: Int
   updatedAt: String
   createdAt: String
@@ -12351,6 +14478,7 @@ input mutationChapterUpdateInput {
   content: JSON
   password: String
   hasPassword: Boolean
+  passwordVersion: Float
   createdBy: Int
   updatedAt: String
   createdAt: String
@@ -12568,6 +14696,165 @@ enum DeferredGrantUpdate_type_MutationInput {
   revocation_tombstone
 }
 
+input mutationReadingProgressInput {
+  user: Int
+  book: Int
+  chapter: Int
+  progress: Float
+  completedAt: String
+  updatedAt: String
+  createdAt: String
+}
+
+input mutationReadingProgressUpdateInput {
+  user: Int
+  book: Int
+  chapter: Int
+  progress: Float
+  completedAt: String
+  updatedAt: String
+  createdAt: String
+}
+
+type CreateBookmarkResult {
+  bookmark: Bookmark
+  created: Boolean!
+}
+
+input mutationBookmarkUpdateInput {
+  user: Int
+  contentType: BookmarkUpdate_contentType_MutationInput
+  chapter: Int
+  book: Int
+  updatedAt: String
+  createdAt: String
+}
+
+enum BookmarkUpdate_contentType_MutationInput {
+  chapter
+  book
+}
+
+type DeleteBookmarkResult {
+  ok: Boolean!
+}
+
+input mutationBookmarkInput {
+  user: Int
+  contentType: Bookmark_contentType_MutationInput!
+  chapter: Int
+  book: Int
+  updatedAt: String
+  createdAt: String
+}
+
+enum Bookmark_contentType_MutationInput {
+  chapter
+  book
+}
+
+type CreateCommentResult {
+  comment: CreateComment_PublicComment!
+}
+
+type CreateComment_PublicComment {
+  id: ID!
+  content: String!
+  status: String!
+  createdAt: String
+  updatedAt: String
+  parentCommentId: ID
+  chapterId: ID
+  postId: ID
+  isOwnPending: Boolean!
+  isDeleted: Boolean!
+  viewerCanEdit: Boolean!
+  viewerCanDelete: Boolean!
+  editWindowEndsAt: String
+  author: CreateComment_PublicCommentAuthor!
+}
+
+type CreateComment_PublicCommentAuthor {
+  id: ID!
+  fullName: String!
+  avatar: Media
+}
+
+type UpdateCommentResult {
+  comment: UpdateComment_PublicComment!
+}
+
+type UpdateComment_PublicComment {
+  id: ID!
+  content: String!
+  status: String!
+  createdAt: String
+  updatedAt: String
+  parentCommentId: ID
+  chapterId: ID
+  postId: ID
+  isOwnPending: Boolean!
+  isDeleted: Boolean!
+  viewerCanEdit: Boolean!
+  viewerCanDelete: Boolean!
+  editWindowEndsAt: String
+  author: UpdateComment_PublicCommentAuthor!
+}
+
+type UpdateComment_PublicCommentAuthor {
+  id: ID!
+  fullName: String!
+  avatar: Media
+}
+
+type DeleteCommentResult {
+  comment: DeleteComment_PublicComment!
+}
+
+type DeleteComment_PublicComment {
+  id: ID!
+  content: String!
+  status: String!
+  createdAt: String
+  updatedAt: String
+  parentCommentId: ID
+  chapterId: ID
+  postId: ID
+  isOwnPending: Boolean!
+  isDeleted: Boolean!
+  viewerCanEdit: Boolean!
+  viewerCanDelete: Boolean!
+  editWindowEndsAt: String
+  author: DeleteComment_PublicCommentAuthor!
+}
+
+type DeleteComment_PublicCommentAuthor {
+  id: ID!
+  fullName: String!
+  avatar: Media
+}
+
+input mutationCommentInput {
+  chapter: Int
+  post: Int
+  author: Int
+  content: String!
+  status: Comment_status_MutationInput!
+  parentComment: Int
+  moderatedAt: String
+  moderatedBy: Int
+  deletedAt: String
+  deletedBy: Int
+  updatedAt: String
+  createdAt: String
+}
+
+enum Comment_status_MutationInput {
+  pending
+  approved
+  rejected
+}
+
 input mutationPayloadLockedDocumentInput {
   document: PayloadLockedDocument_DocumentRelationshipInput
   globalSlug: String
@@ -12590,6 +14877,9 @@ enum PayloadLockedDocument_DocumentRelationshipInputRelationTo {
   categories
   grant_mirror
   deferred_grants
+  reading_progress
+  bookmarks
+  comments
 }
 
 input PayloadLockedDocument_UserRelationshipInput {
@@ -12623,6 +14913,9 @@ enum PayloadLockedDocumentUpdate_DocumentRelationshipInputRelationTo {
   categories
   grant_mirror
   deferred_grants
+  reading_progress
+  bookmarks
+  comments
 }
 
 input PayloadLockedDocumentUpdate_UserRelationshipInput {
@@ -12681,4 +14974,48 @@ input mutationHomepage_MetaInput {
   title: String
   description: String
   image: Int
+}
+
+type UnlockChapterPasswordResult {
+  chapterId: ID!
+  expiresAt: String!
+  proof: String!
+}
+
+type SaveReadingProgressResult {
+  ok: Boolean!
+  progress: ReadingProgress
+}
+
+type UpdateCommentStatusResult {
+  comment: UpdateCommentStatus_PublicComment!
+}
+
+type UpdateCommentStatus_PublicComment {
+  id: ID!
+  content: String!
+  status: String!
+  createdAt: String
+  updatedAt: String
+  parentCommentId: ID
+  chapterId: ID
+  postId: ID
+  isOwnPending: Boolean!
+  isDeleted: Boolean!
+  viewerCanEdit: Boolean!
+  viewerCanDelete: Boolean!
+  editWindowEndsAt: String
+  author: UpdateCommentStatus_PublicCommentAuthor!
+}
+
+type UpdateCommentStatus_PublicCommentAuthor {
+  id: ID!
+  fullName: String!
+  avatar: Media
+}
+
+type GenerateEpubResult {
+  downloadUrl: String!
+  filename: String!
+  expiresAt: String!
 }

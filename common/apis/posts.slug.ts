@@ -1,77 +1,92 @@
 import type { PostSlugData, Post, SimilarPostsResult } from '../../types/cms';
 import { fetchAPI } from './base';
 
-interface PostSlugResponse {
+interface PostFetchOptions {
+  draftMode?: boolean;
+}
+
+interface PostDraftSlugResponse {
   Posts: {
     docs: Post[];
   };
-  SimilarPosts: SimilarPostsResult;
   Homepage: {
     header: string | null;
   } | null;
 }
 
-export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
-  const data = await fetchAPI<PostSlugResponse>(
+const POST_DETAIL_FIELDS = `
+  id
+  title
+  slug
+  content
+  excerpt
+  createdAt
+  updatedAt
+  _status
+  coverImage {
+    id
+    url
+    optimizedUrl
+    thumbnailURL
+    lowResUrl
+    alt
+    width
+    height
+  }
+  author {
+    id
+    fullName
+    avatar {
+      id
+      url
+      optimizedUrl
+      thumbnailURL
+      lowResUrl
+      alt
+    }
+  }
+  category {
+    id
+    name
+    slug
+  }
+  tags {
+    tag
+    id
+  }
+  meta {
+    title
+    description
+    image {
+      url
+      optimizedUrl
+      lowResUrl
+    }
+  }
+`;
+
+export async function getDataForPostSlug(
+  slug: string,
+  options: PostFetchOptions = {}
+): Promise<PostSlugData> {
+  const statusFilter = options.draftMode
+    ? '{ _status: { in: [published, draft] } }'
+    : '{ _status: { equals: published } }';
+
+  const data = await fetchAPI<PostDraftSlugResponse>(
     `#graphql
     query PostBySlug($slug: String!) {
       Posts(
         where: {
           AND: [
             { slug: { equals: $slug } }
-            { _status: { equals: published } }
+            ${statusFilter}
           ]
         }
         limit: 1
       ) {
         docs {
-          id
-          title
-          slug
-          content
-          excerpt
-          createdAt
-          updatedAt
-          coverImage {
-            id
-            url
-            optimizedUrl
-            thumbnailURL
-            lowResUrl
-            alt
-            width
-            height
-          }
-          author {
-            id
-            fullName
-            avatar {
-              id
-              url
-              optimizedUrl
-              thumbnailURL
-              lowResUrl
-              alt
-            }
-          }
-          category {
-            id
-            name
-            slug
-          }
-          tags {
-            tag
-            id
-          }
-          meta {
-            title
-            description
-            image {
-              url
-              optimizedUrl
-              lowResUrl
-            }
-          }
+          ${POST_DETAIL_FIELDS}
         }
       }
 
@@ -89,7 +104,6 @@ export async function getDataForPostSlug(slug: string): Promise<PostSlugData> {
 
   const post = data?.Posts?.docs?.[0] ?? null;
 
-  // If we have a post, fetch similar posts using its ID
   let morePosts: Post[] = [];
   if (post?.id) {
     const similarData = await fetchAPI<{ SimilarPosts: SimilarPostsResult }>(

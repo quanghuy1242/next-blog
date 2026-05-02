@@ -40,11 +40,23 @@ vi.mock('common/utils/meta-tags', () => ({
   generateMetaTags: () => ({}),
 }));
 
+vi.mock('components/shared/ssr-prefetch-link', () => ({
+  SSRPrefetchLink: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
+}));
+
+vi.mock('components/shared/comments/CommentsSection', () => ({
+  CommentsSection: () => <div data-testid="comments-section" />,
+}));
+
 vi.mock('next/router', () => ({
   useRouter: () => ({
     asPath: '/books/1~the-wild-robot-escapes/chapters/chapter-24',
     replace: vi.fn().mockResolvedValue(true),
   }),
+}));
+
+vi.mock('common/apis/reading-progress', () => ({
+  getReadingProgress: vi.fn().mockResolvedValue([]),
 }));
 
 function createBook(overrides: Partial<Book> = {}): Book {
@@ -125,6 +137,9 @@ describe('ChapterPage', () => {
         chapter={createChapter()}
         chapters={[createChapter()]}
         homepage={createHomepage()}
+        isDraftMode={false}
+        isAuthenticated={false}
+        readingProgress={[]}
       />
     );
 
@@ -138,6 +153,9 @@ describe('ChapterPage', () => {
         chapter={createChapter()}
         chapters={[createChapter()]}
         homepage={createHomepage()}
+        isDraftMode={false}
+        isAuthenticated={false}
+        readingProgress={[]}
       />
     );
 
@@ -151,6 +169,9 @@ describe('ChapterPage', () => {
         chapter={createChapter({ content: null, hasPassword: true })}
         chapters={[createChapter({ content: null, hasPassword: true })]}
         homepage={createHomepage()}
+        isDraftMode={false}
+        isAuthenticated={false}
+        readingProgress={[]}
       />
     );
 

@@ -6,6 +6,7 @@ import { PostHeader } from 'components/pages/posts_slugs/post-header';
 import { Posts } from 'components/shared/posts';
 import { SectionSeparator } from 'components/shared/section-separator';
 import { Text } from 'components/shared/text';
+import { CommentsSection } from 'components/shared/comments/CommentsSection';
 import { getDataForPostSlug } from 'common/apis/posts.slug';
 import { generatePostMetaTags } from 'common/utils/meta-tags';
 import { getCoverImageUrl } from 'common/utils/image';
@@ -20,9 +21,10 @@ interface PostPageProps {
   post: PostType | null;
   morePosts: PostType[];
   homepage: PostSlugData['homepage'];
+  isDraftMode: boolean;
 }
 
-export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
+export default function PostPage({ post, morePosts, homepage, isDraftMode }: PostPageProps) {
   const router = useRouter();
 
   if (!router.isFallback && !post?.slug) {
@@ -31,8 +33,6 @@ export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
 
   const header = homepage?.header || '';
 
-  // Optimize cover image for social media previews (Open Graph standard: 1200x630)
-  // Pass Media object to use optimizedUrl directly - CSS handles sizing
   const metaImageUrl = post?.coverImage
     ? getCoverImageUrl(post.coverImage)
     : '';
@@ -48,9 +48,10 @@ export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
       : post?.category?.name || '';
   const tags = normalizePostTags(post?.tags);
   const morePostList = Array.isArray(morePosts) ? morePosts : [];
+  const postId = post?.id;
 
   return (
-    <Layout header={header} className="flex flex-col items-center">
+    <Layout header={header} className="flex flex-col items-center" isDraftMode={isDraftMode}>
       <article className="flex flex-col items-center w-full">
         <Head>{renderMetaTags(metaTags)}</Head>
         <PostHeader
@@ -64,6 +65,11 @@ export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
           <PostContent content={post?.content} tags={tags} />
         </Container>
       </article>
+      {postId ? (
+        <Container>
+          <CommentsSection postId={String(postId)} />
+        </Container>
+      ) : null}
       <SectionSeparator />
       <Container>
         <div className="max-w-2xl mx-auto">
@@ -81,13 +87,14 @@ export default function PostPage({ post, morePosts, homepage }: PostPageProps) {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: [], // indicates that no page needs be created at build time
-    fallback: 'blocking', // indicates the type of fallback
+    paths: [],
+    fallback: 'blocking',
   };
 };
 
 export const getStaticProps: GetStaticProps<PostPageProps> = async ({
   params,
+  draftMode,
 }) => {
   const slugParam = Array.isArray(params?.slug)
     ? params?.slug[0]
@@ -99,14 +106,16 @@ export const getStaticProps: GetStaticProps<PostPageProps> = async ({
     };
   }
 
-  const data = await getDataForPostSlug(slugParam);
+  const isDraftMode = draftMode === true;
+  const data = await getDataForPostSlug(slugParam, { draftMode: isDraftMode });
 
   return {
     props: {
       post: data.post ?? null,
       morePosts: data.morePosts ?? [],
       homepage: data.homepage ?? null,
+      isDraftMode,
     },
-    revalidate: 60,
+    revalidate: isDraftMode ? false : 60,
   };
 };
