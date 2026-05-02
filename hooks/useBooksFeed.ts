@@ -26,6 +26,7 @@ export interface UseBooksFeedResult {
   error: string | null;
   loadMoreBooks: () => Promise<void>;
   retryLoadMore: () => Promise<void>;
+  refreshBooks: () => Promise<void>;
 }
 
 const LOAD_MORE_ERROR = 'Unable to load more books right now. Tap to retry.';
@@ -98,12 +99,52 @@ export function useBooksFeed({
     await loadMoreBooks();
   }, [loadMoreBooks]);
 
+  const refreshBooks = useCallback(async () => {
+    if (isFetching) {
+      return;
+    }
+
+    const visibleCount = Math.max(pageSize, booksState.books.length);
+    const params = new URLSearchParams({
+      limit: visibleCount.toString(),
+      offset: '0',
+    });
+
+    setIsFetching(true);
+    setError(null);
+
+    try {
+      const response = await fetchFn(`/api/books?${params.toString()}`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const payload = (await response.json()) as PaginatedBooksApiResponse;
+      const refreshedBooks = payload.books ?? [];
+
+      setBooksState((previous) => ({
+        books: refreshedBooks,
+        offset: Math.max(payload.nextOffset ?? refreshedBooks.length, refreshedBooks.length),
+        hasMore: payload.hasMore ?? previous.hasMore,
+      }));
+    } catch (refreshError) {
+      console.error('Failed to refresh books', refreshError);
+      setError(LOAD_MORE_ERROR);
+    } finally {
+      setIsFetching(false);
+    }
+  }, [booksState.books.length, fetchFn, isFetching, pageSize]);
+
   return {
     booksState,
     isFetching,
     error,
     loadMoreBooks,
     retryLoadMore,
+    refreshBooks,
   };
 }
 

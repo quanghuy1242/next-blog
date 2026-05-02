@@ -38,7 +38,7 @@ export default function BooksPage({
     description: 'Browse the bookshelf and continue reading chapter by chapter.',
   });
 
-  const { booksState, isFetching, error, loadMoreBooks, retryLoadMore } =
+  const { booksState, isFetching, error, loadMoreBooks, retryLoadMore, refreshBooks } =
     useBooksFeed({
       initialBooks,
       initialHasMore,
@@ -56,6 +56,32 @@ export default function BooksPage({
       void loadMoreBooks();
     }
   }, [booksState.hasMore, isIntersecting, loadMoreBooks]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    void refreshBooks();
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        void refreshBooks();
+      }
+    }
+
+    function handleWindowFocus() {
+      void refreshBooks();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [isAuthenticated, refreshBooks]);
 
   return (
     <Layout header={homepage?.header} className="flex flex-col items-center">

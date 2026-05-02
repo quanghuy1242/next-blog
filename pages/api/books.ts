@@ -22,6 +22,10 @@ export default async function handler(
   const sessionToken = getBetterAuthTokenFromRequest(req);
   const payloadCache = sessionToken ? AUTH_PAYLOAD_CACHE : ONE_HOUR_PAYLOAD_CACHE;
 
+  if (sessionToken) {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+  }
+
   try {
     const { books, hasMore } = await getPaginatedBooks({
       limit,

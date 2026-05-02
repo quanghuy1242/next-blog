@@ -72,7 +72,7 @@ describe('GET /api/books', () => {
       hasMore: false,
     });
 
-    await runHandler({
+    const { res } = await runHandler({
       method: 'GET',
       cookies: {
         [BETTER_AUTH_TOKEN_COOKIE]: 'token-123',
@@ -86,6 +86,8 @@ describe('GET /api/books', () => {
       authToken: 'token-123',
       cache: AUTH_PAYLOAD_CACHE,
     });
+
+    expect(res.getHeader('Cache-Control')).toBe('no-store, max-age=0');
   });
 
   test('returns server error when fetching books fails', async () => {

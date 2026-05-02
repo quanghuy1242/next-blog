@@ -119,7 +119,6 @@ async function attachWholeBookProgress(
         bookId,
         await getReadingProgress(String(bookId), {
           authToken: options.authToken,
-          cache: options.cache,
         }),
       ] as const)
     ),
