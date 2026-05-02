@@ -67,4 +67,17 @@ describe('ChapterList component', () => {
 
     expect(screen.getByText('Locked')).toBeInTheDocument();
   });
+
+  test('renders chapter progress as percentage text', () => {
+    render(
+      <ChapterList
+        bookId={1}
+        bookSlug="sample-book"
+        chapters={[createChapter({ id: 7, title: 'In progress' })]}
+        readingProgressByChapterId={{ 7: 42.4 }}
+      />
+    );
+
+    expect(screen.getByText('42%')).toBeInTheDocument();
+  });
 });

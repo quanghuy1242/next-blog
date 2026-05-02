@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -47,6 +47,7 @@ export default function ChapterPage({
   readingProgress,
 }: ChapterPageProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const chapterContentRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const shouldRenderChapterTitle =
     (book.origin as string) !== 'epub_imported' &&
@@ -91,6 +92,7 @@ export default function ChapterPage({
     chapterId: chapter.id,
     bookId: book.id,
     enabled: shouldTrackProgress,
+    targetRef: chapterContentRef,
     initialProgress: readingProgressByChapterId?.[chapter.id] ?? 0,
   });
 
@@ -187,12 +189,14 @@ export default function ChapterPage({
                   }}
                 />
               ) : (
-                <ChapterContent
-                  content={chapter.content}
-                  bookId={book.id}
-                  bookSlug={book.slug}
-                  chapters={chapters}
-                />
+                <div ref={chapterContentRef}>
+                  <ChapterContent
+                    content={chapter.content}
+                    bookId={book.id}
+                    bookSlug={book.slug}
+                    chapters={chapters}
+                  />
+                </div>
               )}
 
               {!isChapterLocked ? (

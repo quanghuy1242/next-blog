@@ -138,4 +138,18 @@ describe('ChapterToc component', () => {
     expect(lockedLink.querySelector('svg')).toBeInTheDocument();
     expect(screen.getByText('Locked')).toHaveClass('sr-only');
   });
+
+  test('renders chapter progress as percentage text', () => {
+    render(
+      <ChapterToc
+        chapters={[createChapter({ id: 9, title: 'Measured chapter' })]}
+        bookId={1}
+        bookSlug="sample-book"
+        currentChapterSlug="chapter-1"
+        readingProgressByChapterId={{ 9: 67.8 }}
+      />
+    );
+
+    expect(screen.getByText('68%')).toBeInTheDocument();
+  });
 });

@@ -1,9 +1,11 @@
+import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseReadingProgressOptions {
   chapterId: number;
   bookId: number;
   enabled: boolean;
+  targetRef: RefObject<HTMLElement | null>;
   initialProgress?: number;
 }
 
@@ -13,21 +15,31 @@ export function useReadingProgress({
   chapterId,
   bookId,
   enabled,
+  targetRef,
   initialProgress = 0,
 }: UseReadingProgressOptions) {
   const [currentProgress, setCurrentProgress] = useState(0);
   const lastSentProgress = useRef(Math.max(0, Math.min(initialProgress, 100)));
-  const throttleTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSentAt = useRef(0);
+  const hasTrackedScroll = useRef(false);
 
   useEffect(() => {
     const clampedInitialProgress = Math.max(0, Math.min(initialProgress, 100));
     lastSentProgress.current = clampedInitialProgress;
+    lastSentAt.current = 0;
+    hasTrackedScroll.current = false;
     setCurrentProgress(0);
   }, [bookId, chapterId, initialProgress]);
 
-  const sendProgress = useCallback((progress: number) => {
+  const sendProgress = useCallback((progress: number, force = false) => {
     if (progress <= lastSentProgress.current) return;
+
+    if (!force && Date.now() - lastSentAt.current < MIN_INTERVAL) {
+      return;
+    }
+
     lastSentProgress.current = progress;
+    lastSentAt.current = Date.now();
 
     fetch('/api/reading-progress', {
       method: 'POST',
@@ -39,17 +51,28 @@ export function useReadingProgress({
 
   const computeScrollPercentage = useCallback((): number => {
     if (typeof window === 'undefined') return 0;
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const scrollHeight = document.documentElement.scrollHeight;
-    const clientHeight = document.documentElement.clientHeight;
+    const target = targetRef.current;
+    if (!target) return 0;
 
-    if (scrollHeight <= clientHeight) return 100;
+    const viewportHeight =
+      window.innerHeight || document.documentElement.clientHeight || 0;
+    const rect = target.getBoundingClientRect();
+    const elementTop = rect.top + window.scrollY;
+    const elementHeight = Math.max(target.scrollHeight, rect.height);
 
-    return Math.min(
-      Math.max(Math.round((scrollTop / (scrollHeight - clientHeight)) * 100), 0),
-      100
-    );
-  }, []);
+    if (viewportHeight <= 0 || elementHeight <= 0) return 0;
+
+    const maxScrollableDistance = Math.max(elementHeight - viewportHeight, 0);
+
+    if (maxScrollableDistance === 0) {
+      return window.scrollY >= Math.max(elementTop - 8, 0) ? 100 : 0;
+    }
+
+    const progress =
+      ((window.scrollY - elementTop) / maxScrollableDistance) * 100;
+
+    return Math.min(Math.max(Math.round(progress), 0), 100);
+  }, [targetRef]);
 
   useEffect(() => {
     if (!enabled) {
@@ -57,32 +80,39 @@ export function useReadingProgress({
       return;
     }
 
-    function onScroll() {
+    function updateCurrentProgress() {
       const progress = computeScrollPercentage();
-
       setCurrentProgress(progress);
+      return progress;
+    }
 
-      if (throttleTimeout.current) return;
-
+    function onScroll() {
+      hasTrackedScroll.current = true;
+      const progress = updateCurrentProgress();
       sendProgress(progress);
+    }
 
-      throttleTimeout.current = setTimeout(() => {
-        throttleTimeout.current = null;
-      }, MIN_INTERVAL);
+    function onResize() {
+      updateCurrentProgress();
+    }
+
+    function flushProgress() {
+      if (!hasTrackedScroll.current) return;
+      const finalProgress = computeScrollPercentage();
+      setCurrentProgress(finalProgress);
+      sendProgress(finalProgress, true);
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    window.addEventListener('resize', onResize);
+    window.addEventListener('pagehide', flushProgress);
+    updateCurrentProgress();
 
     return () => {
       window.removeEventListener('scroll', onScroll);
-      if (throttleTimeout.current) {
-        clearTimeout(throttleTimeout.current);
-      }
-
-      const finalProgress = computeScrollPercentage();
-      setCurrentProgress(finalProgress);
-      sendProgress(finalProgress);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('pagehide', flushProgress);
+      flushProgress();
     };
   }, [enabled, computeScrollPercentage, sendProgress]);
 

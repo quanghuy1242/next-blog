@@ -8,11 +8,8 @@ export function ReadingProgressBar({ progress }: ReadingProgressBarProps) {
   if (clampedProgress <= 0) return null;
 
   return (
-    <div className="h-1 w-full bg-gray-200" role="progressbar" aria-valuenow={clampedProgress} aria-valuemin={0} aria-valuemax={100}>
-      <div
-        className="h-full bg-blue transition-[width] duration-300"
-        style={{ width: `${clampedProgress}%` }}
-      />
-    </div>
+    <p className="mb-6 text-sm font-medium tabular-nums text-gray-500">
+      Reading progress: {clampedProgress}%
+    </p>
   );
 }

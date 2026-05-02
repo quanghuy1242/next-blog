@@ -26,6 +26,26 @@ function formatDateTime(dateStr: string | null): string {
   }
 }
 
+function PendingCommentBadge() {
+  return (
+    <span
+      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-amber-300 bg-amber-50 text-amber-700"
+      title="Pending moderation"
+      aria-label="Pending moderation"
+    >
+      <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3 w-3">
+        <circle cx="10" cy="10" r="6.25" stroke="currentColor" strokeWidth="1.5" />
+        <path
+          d="M10 6.5v4.25M10 13.5h.01"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </svg>
+    </span>
+  );
+}
+
 export function CommentItem({
   comment,
   isSubmitting,
@@ -59,12 +79,6 @@ export function CommentItem({
   return (
     <div className="py-3">
       <div className="rounded border border-gray-200 bg-white px-4 py-3">
-        {comment.isOwnPending && comment.status === 'pending' ? (
-          <div className="mb-3 rounded border border-yellow-200 bg-yellow-50 px-3 py-2">
-            <p className="text-xs font-medium text-yellow-700">Awaiting moderation</p>
-          </div>
-        ) : null}
-
         {isEditing ? (
           <CommentComposer
             onSubmit={async (content) => {
@@ -83,6 +97,9 @@ export function CommentItem({
                   <span className="text-sm font-medium text-gray-900">
                     {comment.author?.fullName ?? 'Anonymous'}
                   </span>
+                  {comment.isOwnPending && comment.status === 'pending' ? (
+                    <PendingCommentBadge />
+                  ) : null}
                   <span className="text-xs text-gray-400">
                     {formatDateTime(comment.createdAt)}
                   </span>

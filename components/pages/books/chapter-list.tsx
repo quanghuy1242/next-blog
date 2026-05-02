@@ -11,6 +11,10 @@ interface ChapterListProps {
   readingProgressByChapterId?: Record<number, number>;
 }
 
+function formatProgress(progress: number): string {
+  return `${Math.min(Math.max(Math.round(progress), 0), 100)}%`;
+}
+
 export function ChapterList({ chapters, bookId, bookSlug, readingProgressByChapterId }: ChapterListProps) {
   if (!chapters.length) {
     return <p className="text-sm text-gray-500">No chapters are available yet.</p>;
@@ -31,11 +35,8 @@ export function ChapterList({ chapters, bookId, bookSlug, readingProgressByChapt
               </span>
               <span className="flex shrink-0 items-center gap-2">
                 {progress != null && progress > 0 ? (
-                  <span className="inline-flex h-2 w-12 overflow-hidden rounded-full bg-gray-200">
-                    <span
-                      className="h-full bg-blue"
-                      style={{ width: `${Math.min(progress, 100)}%` }}
-                    />
+                  <span className="text-xs font-semibold tabular-nums text-gray-500">
+                    {formatProgress(progress)}
                   </span>
                 ) : null}
                 {chapter.hasPassword ? <ChapterLockBadge className="ml-3" /> : null}

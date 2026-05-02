@@ -14,6 +14,10 @@ interface ChapterTocProps {
   readingProgressByChapterId?: Record<number, number>;
 }
 
+function formatProgress(progress: number): string {
+  return `${Math.min(Math.max(Math.round(progress), 0), 100)}%`;
+}
+
 export function ChapterToc({
   chapters,
   bookId,
@@ -41,11 +45,8 @@ export function ChapterToc({
               >
                 <span className="break-words relative -top-[2px]">{chapter.title}</span>
                 {progress != null && progress > 0 ? (
-                  <span className="inline-flex h-1.5 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200">
-                    <span
-                      className="h-full bg-blue"
-                      style={{ width: `${Math.min(progress, 100)}%` }}
-                    />
+                  <span className="shrink-0 text-[11px] font-semibold tabular-nums text-gray-400">
+                    {formatProgress(progress)}
                   </span>
                 ) : null}
                 {chapter.hasPassword ? <ChapterLockBadge compact className="ml-1 align-text-bottom" /> : null}
