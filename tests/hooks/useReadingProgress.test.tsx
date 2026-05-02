@@ -45,6 +45,7 @@ describe('useReadingProgress', () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
     } as Response);
+    window.localStorage.clear();
   });
 
   test('tracks progress from the chapter content element and does not save on mount', async () => {
@@ -125,5 +126,42 @@ describe('useReadingProgress', () => {
         body: JSON.stringify({ chapterId: 10, bookId: 20, progress: 100 }),
       })
     );
+  });
+
+  test('restores saved local reading position for the chapter', async () => {
+    const targetRef = createTargetRef(1600, 200);
+    const scrollToSpy = vi
+      .spyOn(window, 'scrollTo')
+      .mockImplementation((x: number | ScrollToOptions, y?: number) => {
+        if (typeof x === 'number') {
+          setScrollY(y ?? 0);
+          return;
+        }
+
+        setScrollY(typeof x.top === 'number' ? x.top : 0);
+      });
+
+    window.localStorage.setItem(
+      'reading-position:20:10',
+      JSON.stringify({ progress: 35, scrollY: 160 })
+    );
+
+    const { result } = renderHook(() =>
+      useReadingProgress({
+        chapterId: 10,
+        bookId: 20,
+        enabled: true,
+        targetRef,
+        initialProgress: 35,
+      })
+    );
+
+    await waitFor(() => {
+      expect(scrollToSpy).toHaveBeenCalled();
+      expect(result.current).toBe(35);
+      expect(window.scrollY).toBe(160);
+    });
+
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });

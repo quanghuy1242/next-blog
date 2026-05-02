@@ -5,6 +5,12 @@ import { AppWrapper } from 'context/state';
 import { useEffect, useRef } from 'react';
 import '../styles/index.css';
 
+declare global {
+  interface Window {
+    __historyScrollRestoredFor?: string;
+  }
+}
+
 interface ScrollPosition {
   x: number;
   y: number;
@@ -23,6 +29,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const restorePos = (url: string) => {
     const scrollPos = posRef.current[url];
     if (scrollPos) {
+      window.__historyScrollRestoredFor = url;
       window.scrollTo(scrollPos.x, scrollPos.y);
     }
   };
