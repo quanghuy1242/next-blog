@@ -39,13 +39,13 @@ export function CommentComposer({
         placeholder={placeholder}
         disabled={disabled || submitting}
         rows={3}
-        className="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+        className="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue disabled:opacity-50"
       />
       <div className="flex items-center gap-2">
         <button
           type="submit"
           disabled={!content.trim() || disabled || submitting}
-          className="rounded bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="rounded bg-blue px-4 py-1.5 text-sm font-medium text-white hover:bg-darkBlue disabled:opacity-50"
         >
           {submitting ? 'Posting...' : 'Post'}
         </button>

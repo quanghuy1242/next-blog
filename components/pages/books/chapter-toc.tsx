@@ -43,7 +43,7 @@ export function ChapterToc({
                 {progress != null && progress > 0 ? (
                   <span className="inline-flex h-1.5 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200">
                     <span
-                      className="h-full bg-blue-500"
+                      className="h-full bg-blue"
                       style={{ width: `${Math.min(progress, 100)}%` }}
                     />
                   </span>

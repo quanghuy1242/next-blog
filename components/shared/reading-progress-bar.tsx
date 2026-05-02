@@ -10,7 +10,7 @@ export function ReadingProgressBar({ progress }: ReadingProgressBarProps) {
   return (
     <div className="h-1 w-full bg-gray-200" role="progressbar" aria-valuenow={clampedProgress} aria-valuemin={0} aria-valuemax={100}>
       <div
-        className="h-full bg-blue-500 transition-[width] duration-300"
+        className="h-full bg-blue transition-[width] duration-300"
         style={{ width: `${clampedProgress}%` }}
       />
     </div>

@@ -1,3 +1,4 @@
+import cn from 'classnames';
 import { useBookmark } from 'hooks/useBookmark';
 
 interface BookmarkButtonProps {
@@ -32,7 +33,12 @@ function BookmarkButtonInner({
       type="button"
       onClick={toggle}
       disabled={isLoading || isMutating}
-      className="inline-flex items-center gap-1.5 rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:border-gray-400 disabled:opacity-50"
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm disabled:opacity-50',
+        isBookmarked
+          ? 'border-blue bg-blue text-white hover:bg-darkBlue'
+          : 'border-gray-300 text-gray-700 hover:border-gray-400'
+      )}
       aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
       aria-pressed={isBookmarked}
     >

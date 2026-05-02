@@ -33,7 +33,7 @@ export function ChapterList({ chapters, bookId, bookSlug, readingProgressByChapt
                 {progress != null && progress > 0 ? (
                   <span className="inline-flex h-2 w-12 overflow-hidden rounded-full bg-gray-200">
                     <span
-                      className="h-full bg-blue-500"
+                      className="h-full bg-blue"
                       style={{ width: `${Math.min(progress, 100)}%` }}
                     />
                   </span>

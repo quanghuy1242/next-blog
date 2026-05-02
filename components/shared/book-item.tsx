@@ -6,9 +6,10 @@ import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 
 interface BookItemProps {
   book: Book;
+  isBookmarked?: boolean;
 }
 
-export function BookItem({ book }: BookItemProps) {
+export function BookItem({ book, isBookmarked = false }: BookItemProps) {
   return (
     <article className="flex w-40 flex-none flex-col gap-2 sm:w-48">
       <BookCover
@@ -16,6 +17,7 @@ export function BookItem({ book }: BookItemProps) {
         title={book.title}
         href={buildBookHref(book.id, book.slug)}
         className="w-full"
+        isBookmarked={isBookmarked}
       />
 
       <h3 className="text-sm font-medium leading-snug sm:text-base">

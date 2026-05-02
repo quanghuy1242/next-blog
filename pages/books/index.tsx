@@ -1,7 +1,8 @@
 import React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import { getBookmarks } from 'common/apis/bookmarks';
 import { getDataForBooksPage } from 'common/apis/books';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
@@ -21,12 +22,16 @@ interface BooksPageProps {
   initialBooks: Book[];
   initialHasMore: boolean;
   homepage: Pick<Homepage, 'header'> | null;
+  initialBookmarkedBookIds: number[];
+  isAuthenticated: boolean;
 }
 
 export default function BooksPage({
   initialBooks,
   initialHasMore,
   homepage,
+  initialBookmarkedBookIds,
+  isAuthenticated,
 }: BooksPageProps) {
   const metaTags = generateMetaTags({
     title: 'Books',
@@ -39,6 +44,7 @@ export default function BooksPage({
       initialHasMore,
       pageSize: BOOKS_PAGE_SIZE,
     });
+  const [bookmarkedBookIds, setBookmarkedBookIds] = useState(initialBookmarkedBookIds);
 
   const { ref: loaderRef, isIntersecting } =
     useIntersectionObserver<HTMLDivElement>({
@@ -52,13 +58,57 @@ export default function BooksPage({
     }
   }, [booksState.hasMore, isIntersecting, loadMoreBooks]);
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadBookmarkedBooks() {
+      try {
+        const response = await fetch('/api/bookmarks?limit=100', {
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = await response.json();
+        const nextBookmarkedBookIds = Array.isArray(data?.docs)
+          ? data.docs
+              .filter((bookmark: { contentType?: string; book?: { id?: number } | null }) => {
+                return bookmark.contentType === 'book' && typeof bookmark.book?.id === 'number';
+              })
+              .map((bookmark: { book: { id: number } }) => bookmark.book.id)
+          : [];
+
+        if (!cancelled) {
+          setBookmarkedBookIds(nextBookmarkedBookIds);
+        }
+      } catch {
+        // Ignore non-critical bookmark refresh failures on the listing page.
+      }
+    }
+
+    void loadBookmarkedBooks();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
+
   return (
     <Layout header={homepage?.header} className="flex flex-col items-center">
       <Head>{renderMetaTags(metaTags)}</Head>
       <Container className="my-4 w-full md:px-20">
         <div className="mx-auto w-full md:w-2/3">
           <Text text="Books" />
-          <BooksGrid books={booksState.books} />
+          <BooksGrid
+            books={booksState.books}
+            bookmarkedBookIds={bookmarkedBookIds}
+          />
 
           {!isFetching && !error && booksState.books.length === 0 && (
             <p className="mt-6 text-center text-sm text-gray-500">No books found.</p>
@@ -105,12 +155,23 @@ export const getServerSideProps: GetServerSideProps<BooksPageProps> = async ({ r
     authToken: sessionToken,
     cache: payloadCache,
   });
+  const bookmarks = sessionToken
+    ? await getBookmarks({
+        authToken: sessionToken,
+        limit: 100,
+      }).catch(() => ({ docs: [], totalDocs: 0 }))
+    : { docs: [], totalDocs: 0 };
+  const initialBookmarkedBookIds = bookmarks.docs
+    .filter((bookmark) => bookmark.contentType === 'book' && bookmark.book != null)
+    .map((bookmark) => bookmark.book!.id);
 
   return {
     props: {
       initialBooks: data.books,
       initialHasMore: data.hasMore,
       homepage: data.homepage,
+      initialBookmarkedBookIds,
+      isAuthenticated: !!sessionToken,
     },
   };
 };
