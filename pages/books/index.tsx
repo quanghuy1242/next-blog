@@ -84,7 +84,11 @@ export default function BooksPage({
   }, [isAuthenticated, refreshBooks]);
 
   return (
-    <Layout header={homepage?.header} className="flex flex-col items-center">
+    <Layout
+      header={homepage?.header}
+      className="flex flex-col items-center"
+      isAuthenticated={isAuthenticated}
+    >
       <Head>{renderMetaTags(metaTags)}</Head>
       <Container className="my-4 w-full md:px-20">
         <div className="mx-auto w-full md:w-2/3">

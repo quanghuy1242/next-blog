@@ -61,7 +61,12 @@ export default function BookDetailPage({
   });
 
   return (
-    <Layout header={homepage?.header} className="flex flex-col items-center" isDraftMode={isDraftMode}>
+    <Layout
+      header={homepage?.header}
+      className="flex flex-col items-center"
+      isAuthenticated={isAuthenticated}
+      isDraftMode={isDraftMode}
+    >
       <Head>{renderMetaTags(metaTags)}</Head>
       <Container className="my-4 w-full md:px-20">
         <div className="mx-auto w-full md:w-2/3">

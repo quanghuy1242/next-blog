@@ -107,7 +107,12 @@ export default function ChapterPage({
   );
 
   return (
-    <Layout header={homepage?.header} className="flex flex-col items-center" isDraftMode={isDraftMode}>
+    <Layout
+      header={homepage?.header}
+      className="flex flex-col items-center"
+      isAuthenticated={isAuthenticated}
+      isDraftMode={isDraftMode}
+    >
       <Head>{renderMetaTags(metaTags)}</Head>
       <Container className="my-4 w-full md:px-20">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start lg:gap-10">

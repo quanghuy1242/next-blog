@@ -23,7 +23,11 @@ export default function ShelfPage({
 }: ShelfPageProps) {
   if (!isAuthenticated) {
     return (
-      <Layout header={homepage?.header} className="flex flex-col items-center">
+      <Layout
+        header={homepage?.header}
+        className="flex flex-col items-center"
+        isAuthenticated={isAuthenticated}
+      >
         <Container className="my-8">
           <h1 className="text-2xl font-bold text-gray-900">My Shelf</h1>
           <p className="mt-4 text-gray-600">Please sign in to view your bookmarks.</p>
@@ -35,7 +39,11 @@ export default function ShelfPage({
   const hasAny = bookBookmarks.length > 0 || chapterBookmarks.length > 0;
 
   return (
-    <Layout header={homepage?.header} className="flex flex-col items-center">
+    <Layout
+      header={homepage?.header}
+      className="flex flex-col items-center"
+      isAuthenticated={isAuthenticated}
+    >
       <Container className="my-8">
         <h1 className="text-2xl font-bold text-gray-900">My Shelf</h1>
         {!hasAny ? (

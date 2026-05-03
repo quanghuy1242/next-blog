@@ -8,17 +8,25 @@ interface LayoutProps {
   children: ReactNode;
   className?: string;
   header?: string | null;
+  isAuthenticated?: boolean;
   isDraftMode?: boolean;
   draftExitHref?: string;
 }
 
-export function Layout({ children, className, header, isDraftMode, draftExitHref }: LayoutProps) {
+export function Layout({
+  children,
+  className,
+  header,
+  isAuthenticated,
+  isDraftMode,
+  draftExitHref,
+}: LayoutProps) {
   return (
     <>
       <Metadata />
       <main>
         {isDraftMode ? <DraftBanner exitHref={draftExitHref} /> : null}
-        <Header text={header} />
+        <Header text={header} isAuthenticated={isAuthenticated} />
         <div className="mt-16" />
         <div className={cn(className)}>{children}</div>
       </main>

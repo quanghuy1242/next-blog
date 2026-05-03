@@ -59,16 +59,22 @@ const Option = ({ items = [] }: OptionProps) => {
 
 interface HeaderProps {
   text?: string | null;
+  isAuthenticated?: boolean;
 }
 
-export function Header({ text }: HeaderProps) {
+export function Header({ text, isAuthenticated = false }: HeaderProps) {
   const { header } = useAppContext();
   const router = useRouter();
   const returnTo = router.asPath || '/';
-  const authItems = [
-    { name: 'About me', href: '/about' },
-    { name: 'Sign in', href: `/auth/login?returnTo=${encodeURIComponent(returnTo)}` },
-  ];
+  const authItems = isAuthenticated
+    ? [
+        { name: 'About me', href: '/about' },
+        { name: 'Logout', href: `/auth/logout?returnTo=${encodeURIComponent(returnTo)}` },
+      ]
+    : [
+        { name: 'About me', href: '/about' },
+        { name: 'Sign in', href: `/auth/login?returnTo=${encodeURIComponent(returnTo)}` },
+      ];
 
   return (
     <div

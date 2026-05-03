@@ -36,4 +36,16 @@ describe('Header', () => {
       '/about'
     );
   });
+
+  test('renders the logout entry when the user is authenticated', () => {
+    render(<Header text="Blog" isAuthenticated />);
+
+    const logoutLink = screen.getByRole('link', { name: 'Logout' });
+
+    expect(logoutLink).toHaveAttribute(
+      'href',
+      '/auth/logout?returnTo=%2Fbooks'
+    );
+    expect(screen.queryByRole('link', { name: 'Sign in' })).not.toBeInTheDocument();
+  });
 });
