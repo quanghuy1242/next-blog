@@ -74,4 +74,15 @@ describe('Header', () => {
     );
     expect(screen.queryByRole('link', { name: 'Sign in' })).not.toBeInTheDocument();
   });
+
+  test('preserves the current auth UI when a later render has no server auth state', () => {
+    const { rerender } = render(<Header text="Blog" isAuthenticated />);
+
+    expect(screen.getByRole('link', { name: 'Logout' })).toBeInTheDocument();
+
+    rerender(<Header text="Blog" />);
+
+    expect(screen.getByRole('link', { name: 'Logout' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Sign in' })).not.toBeInTheDocument();
+  });
 });

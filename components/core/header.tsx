@@ -68,14 +68,16 @@ interface HeaderProps {
   isAuthenticated?: boolean;
 }
 
-export function Header({ text, isAuthenticated = false }: HeaderProps) {
+export function Header({ text, isAuthenticated }: HeaderProps) {
   const { header } = useAppContext();
   const router = useRouter();
-  const [authState, setAuthState] = useState(isAuthenticated);
+  const [authState, setAuthState] = useState(Boolean(isAuthenticated));
   const returnTo = router.asPath || '/';
 
   useEffect(() => {
-    setAuthState(isAuthenticated);
+    if (typeof isAuthenticated === 'boolean') {
+      setAuthState(isAuthenticated);
+    }
   }, [isAuthenticated]);
 
   useEffect(() => {
