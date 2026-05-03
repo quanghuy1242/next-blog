@@ -44,10 +44,13 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          AUTH_BASE_URL: ${{ secrets.AUTH_BASE_URL }}
+          BLOG_CLIENT_ID: ${{ secrets.BLOG_CLIENT_ID }}
+          BLOG_REDIRECT_URI: ${{ secrets.BLOG_REDIRECT_URI }}
           PAYLOAD_BASE_URL: ${{ secrets.PAYLOAD_BASE_URL }}
           PAYLOAD_API_KEY: ${{ secrets.PAYLOAD_API_KEY }}
         run: |
-          for var in CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_API_TOKEN PAYLOAD_BASE_URL PAYLOAD_API_KEY; do
+          for var in CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_API_TOKEN AUTH_BASE_URL BLOG_CLIENT_ID BLOG_REDIRECT_URI PAYLOAD_BASE_URL PAYLOAD_API_KEY; do
             if [ -z "${!var}" ]; then
               echo "::error::$var is missing"
               exit 1
@@ -66,8 +69,14 @@ jobs:
           command: deploy
           preCommands: pnpm exec opennextjs-cloudflare build
           secrets: |
+            AUTH_BASE_URL
+            BLOG_CLIENT_ID
+            BLOG_REDIRECT_URI
             PAYLOAD_BASE_URL
             PAYLOAD_API_KEY
         env:
+          AUTH_BASE_URL: ${{ secrets.AUTH_BASE_URL }}
+          BLOG_CLIENT_ID: ${{ secrets.BLOG_CLIENT_ID }}
+          BLOG_REDIRECT_URI: ${{ secrets.BLOG_REDIRECT_URI }}
           PAYLOAD_BASE_URL: ${{ secrets.PAYLOAD_BASE_URL }}
           PAYLOAD_API_KEY: ${{ secrets.PAYLOAD_API_KEY }}
