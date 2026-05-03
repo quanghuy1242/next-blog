@@ -1,11 +1,13 @@
 import cn from 'classnames';
 import { useAppContext } from 'context/state';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 interface NavigationItem {
   name: string;
   href: string;
+  hardNavigate?: boolean;
 }
 
 interface HeaderTitleProps {
@@ -29,7 +31,7 @@ const HeaderTitle = ({ text, link }: HeaderTitleProps) => {
   );
 };
 
-const OptionItem = ({ name, href }: NavigationItem) => {
+const OptionItem = ({ name, href, hardNavigate = false }: NavigationItem) => {
   return (
     <span
       className={cn(
@@ -38,7 +40,11 @@ const OptionItem = ({ name, href }: NavigationItem) => {
         'border-b-2 border-transparent hover:border-white'
       )}
     >
-      <Link href={href}>{name}</Link>
+      {hardNavigate ? (
+        <a href={href}>{name}</a>
+      ) : (
+        <Link href={href}>{name}</Link>
+      )}
     </span>
   );
 };
@@ -65,15 +71,80 @@ interface HeaderProps {
 export function Header({ text, isAuthenticated = false }: HeaderProps) {
   const { header } = useAppContext();
   const router = useRouter();
+  const [authState, setAuthState] = useState(isAuthenticated);
   const returnTo = router.asPath || '/';
-  const authItems = isAuthenticated
+
+  useEffect(() => {
+    setAuthState(isAuthenticated);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncAuthState() {
+      try {
+        const response = await fetch('/api/auth/session', {
+          credentials: 'same-origin',
+          cache: 'no-store',
+          headers: {
+            Accept: 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = (await response.json()) as { isAuthenticated?: boolean };
+
+        if (!cancelled && typeof data.isAuthenticated === 'boolean') {
+          setAuthState(data.isAuthenticated);
+        }
+      } catch {
+        // Keep the current UI state when the auth probe fails.
+      }
+    }
+
+    void syncAuthState();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void syncAuthState();
+      }
+    };
+
+    const handleWindowFocus = () => {
+      void syncAuthState();
+    };
+
+    router.events.on('routeChangeComplete', syncAuthState);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      cancelled = true;
+      router.events.off('routeChangeComplete', syncAuthState);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [router.events]);
+
+  const authItems = authState
     ? [
         { name: 'About me', href: '/about' },
-        { name: 'Logout', href: `/auth/logout?returnTo=${encodeURIComponent(returnTo)}` },
+        {
+          name: 'Logout',
+          href: `/auth/logout?returnTo=${encodeURIComponent(returnTo)}`,
+          hardNavigate: true,
+        },
       ]
     : [
         { name: 'About me', href: '/about' },
-        { name: 'Sign in', href: `/auth/login?returnTo=${encodeURIComponent(returnTo)}` },
+        {
+          name: 'Sign in',
+          href: `/auth/login?returnTo=${encodeURIComponent(returnTo)}`,
+          hardNavigate: true,
+        },
       ];
 
   return (

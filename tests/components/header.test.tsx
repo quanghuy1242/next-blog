@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { Header } from 'components/core/header';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 vi.mock('context/state', () => ({
   useAppContext: () => ({
@@ -14,10 +14,24 @@ vi.mock('context/state', () => ({
 vi.mock('next/router', () => ({
   useRouter: () => ({
     asPath: '/books',
+    events: {
+      on: vi.fn(),
+      off: vi.fn(),
+    },
   }),
 }));
 
 describe('Header', () => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ isAuthenticated: false }),
+      })
+    );
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -37,8 +51,20 @@ describe('Header', () => {
     );
   });
 
-  test('renders the logout entry when the user is authenticated', () => {
+  test('renders the logout entry when the user is authenticated', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ isAuthenticated: true }),
+      })
+    );
+
     render(<Header text="Blog" isAuthenticated />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Logout' })).toBeInTheDocument();
+    });
 
     const logoutLink = screen.getByRole('link', { name: 'Logout' });
 
