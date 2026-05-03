@@ -4,6 +4,7 @@ export const BLOG_AUTH_STATE_COOKIE = 'blogAuthState' as const;
 export const BLOG_AUTH_SCOPE = 'openid email profile' as const;
 export const BLOG_AUTH_COOKIE_MAX_AGE_SECONDS = 10 * 60;
 export const BLOG_TOKEN_COOKIE_MAX_AGE_SECONDS = 2 * 24 * 60 * 60;
+export const BLOG_AUTH_THEME = 'blog' as const;
 
 export interface BlogAuthStatePayload {
   createdAt: number;
@@ -175,6 +176,7 @@ export const buildAuthorizeUrl = (
   authorizeUrl.searchParams.set('state', payload.state);
   authorizeUrl.searchParams.set('code_challenge', createCodeChallenge(payload.verifier));
   authorizeUrl.searchParams.set('code_challenge_method', 'S256');
+  authorizeUrl.searchParams.set('theme', BLOG_AUTH_THEME);
 
   return authorizeUrl.toString();
 };

@@ -98,6 +98,7 @@ describe('blog auth routes', () => {
       'https://blog.example.com/auth/callback'
     );
     expect(url.searchParams.get('code_challenge_method')).toBe('S256');
+    expect(url.searchParams.get('theme')).toBe('blog');
 
     const setCookie = context.res.getHeader('Set-Cookie');
     expect(setCookie).toEqual(
