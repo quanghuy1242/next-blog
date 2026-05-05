@@ -60,7 +60,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       maxAgeSeconds,
       req,
       res,
-      token: tokenResponse.idToken,
+      token: tokenResponse.accessToken,
     });
   } catch {
     clearBlogAuthStateCookie(res);

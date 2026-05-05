@@ -141,8 +141,8 @@ describe('blog auth routes', () => {
     const setCookie = context.res.getHeader('Set-Cookie');
     expect(setCookie).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('betterAuthToken=id-token'),
-        expect.stringContaining('payload-token=id-token'),
+        expect.stringContaining('betterAuthToken=access-token'),
+        expect.stringContaining('payload-token=access-token'),
         expect.stringContaining(`${BLOG_AUTH_STATE_COOKIE}=`),
       ])
     );

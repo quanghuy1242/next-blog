@@ -182,9 +182,9 @@ export const buildAuthorizeUrl = (
 };
 
 export interface TokenExchangeSuccess {
-  accessToken: string | null;
+  accessToken: string;
   expiresIn: number | null;
-  idToken: string;
+  idToken: string | null;
 }
 
 export const exchangeAuthorizationCode = async ({
@@ -221,20 +221,20 @@ export const exchangeAuthorizationCode = async ({
     id_token?: unknown;
   };
 
-  if (typeof json.id_token !== 'string' || json.id_token.trim().length === 0) {
-    throw new Error('Token exchange did not return an id_token.');
+  if (typeof json.access_token !== 'string' || json.access_token.trim().length === 0) {
+    throw new Error('Token exchange did not return an access_token.');
   }
 
   return {
-    accessToken:
-      typeof json.access_token === 'string' && json.access_token.trim().length > 0
-        ? json.access_token
-        : null,
+    accessToken: json.access_token,
     expiresIn:
       typeof json.expires_in === 'number' && Number.isFinite(json.expires_in)
         ? Math.max(1, Math.floor(json.expires_in))
         : null,
-    idToken: json.id_token,
+    idToken:
+      typeof json.id_token === 'string' && json.id_token.trim().length > 0
+        ? json.id_token
+        : null,
   };
 };
 
