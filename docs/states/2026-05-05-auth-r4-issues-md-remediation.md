@@ -12,9 +12,11 @@
 > - `/home/quanghuy1242/pjs/payloadcms`
 > - `/home/quanghuy1242/pjs/next-blog`
 
-## 1. Restored Client Access Control
+## 1. Merged Comprehensive Access Control Into Authorization Spaces
 
-Restored `/admin/clients/[id]/access` in Auther. The page no longer redirects to Spaces and again renders the existing client `AccessControl` surface:
+The initial fix only restored `/admin/clients/[id]/access`, which was not the right final architecture. The corrected follow-up now embeds the existing comprehensive `AccessControl` surface inside `/admin/authorization-spaces/[id]/access` for every OAuth client linked to that space.
+
+The space access page now exposes the old full toolset for linked clients:
 
 - API key management
 - platform access list
@@ -22,7 +24,9 @@ Restored `/admin/clients/[id]/access` in Auther. The page no longer redirects to
 - scoped permissions for users, groups, and API keys
 - grant projection client options
 
-The previous change was too aggressive. Spaces are a new authorization-boundary concept, but they are not a replacement for every client access-control tool. The client detail tabs now include both `Access Control` and `Spaces`.
+The previous simplification was wrong: Spaces should be the operational entry point for access control, but that does not mean removing the mature client-scoped controls. The page now keeps those controls visible at the authorization-space boundary while still respecting that API keys are owned by OAuth clients.
+
+`/admin/clients/[id]/access` is now disabled as a duplicate UI. It redirects to the first linked authorization-space access page, or to the client Spaces page when the client has no linked spaces yet. The client detail Access Control tab was removed, and the client Spaces page now links each space directly to its authorization-space access-control page.
 
 ## 2. Fixed Authorization Space Access Crash
 
@@ -51,7 +55,7 @@ Saving the toggle updates both:
 
 The slow path from next-blog was through Payload's grant mirror live-check path calling Auther `check-permission/batch`.
 
-Payload now has a short token-scoped in-memory cache around the Auther batch check. The cache key hashes the session token, entity type, entity ids, and context. Default TTL is 15 seconds and can be disabled or tuned with `AUTHER_PERMISSION_CACHE_TTL_MS`.
+Payload now has a short token-scoped in-memory cache around the Auther batch check. This is the request path used when next-blog reads Payload content and Payload needs a live conditioned permission check from Auther. The cache key hashes the session token, entity type, entity ids, and context. Default TTL is 15 seconds and can be disabled or tuned with `AUTHER_PERMISSION_CACHE_TTL_MS`.
 
 ## 6. UI Component Cleanup
 
