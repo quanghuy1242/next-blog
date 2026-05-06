@@ -248,3 +248,42 @@ Verification:
 - `pnpm run lint` passed
 - `pnpm build` passed
 - focused permission/registration tests passed
+
+Follow-up correction:
+
+- moved `buildSpaceModelEditorJson` out of the `"use client"` component file into `model-editor-utils.ts`
+- this fixes the Next server/client boundary error when rendering `/admin/authorization-spaces/{spaceId}/access`
+- `pnpm run lint` passed
+- `pnpm build` passed
+
+---
+
+## Deploy Push Hotfix
+
+Applied after Vercel `pnpm run ci` hit:
+
+```text
+SQLITE_UNKNOWN: SQLite error: index registration_contexts_slug_unique already exists
+```
+
+Cause:
+
+- `registration_contexts.slug` was declared with Drizzle `.unique()`
+- the target DB already had `registration_contexts_slug_unique`
+- repeat `drizzle-kit push` can attempt to create that named unique index again after a partial/previous push
+
+Fix:
+
+- `drizzle.config.ts` now loads `.env.local` before `.env`
+- removed Drizzle-managed `.unique()` from `registration_contexts.slug`
+- removed the redundant non-unique `registration_contexts_slug_idx`
+- added `scripts/ensure-sqlite-indexes.ts`
+- changed `pnpm run db:push` to run Drizzle push and then idempotently run:
+  - `CREATE UNIQUE INDEX IF NOT EXISTS registration_contexts_slug_unique ON registration_contexts (slug)`
+- `pnpm run ci` now relies on the wrapped `db:push`
+
+Verification:
+
+- `pnpm run lint` passed
+- `pnpm run db:push` passed repeatedly
+- direct SQLite index check confirmed `registration_contexts_slug_unique` exists and is unique
