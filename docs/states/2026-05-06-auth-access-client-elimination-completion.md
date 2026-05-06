@@ -56,13 +56,16 @@ Code support is ready:
 
 - alias table/helper already exists
 - `scripts/migrate-space-model-identities.ts` handles dry-run and `--apply`
+- `scripts/migrate-legacy-oauth-client-full-access.ts` converts/deletes old `oauth_client/full_access` tuples
+- `scripts/migrate-legacy-oauth-client-platform-access.ts` converts old `oauth_client owner/admin/use` tuples
 - `scripts/seed-r2-payload-space.ts` no longer targets `client_<clientId>:<model>` names
 
 Operational requirement:
 
-- the data migration must be applied against the real target database during deployment
-- local execution was attempted but the local libSQL endpoint was not running at `127.0.0.1:8080`
-- this is not a code gap; it is the deployment step that mutates real data
+- the audit/migration scripts now load `.env.local` and `.env` before initializing DB modules
+- deployment execution applied one model identity rename
+- deployment execution deleted one unmappable old `oauth_client/full_access` API-key tuple
+- deployment execution converted one old `oauth_client/owner` user tuple into global `clients/admin`
 
 Required deployment command after DB connectivity is available:
 
@@ -70,6 +73,10 @@ Required deployment command after DB connectivity is available:
 pnpm exec tsx scripts/audit-authorization-space-access.ts
 pnpm exec tsx scripts/migrate-space-model-identities.ts
 pnpm exec tsx scripts/migrate-space-model-identities.ts --apply
+pnpm exec tsx scripts/migrate-legacy-oauth-client-full-access.ts
+pnpm exec tsx scripts/migrate-legacy-oauth-client-full-access.ts --apply
+pnpm exec tsx scripts/migrate-legacy-oauth-client-platform-access.ts
+pnpm exec tsx scripts/migrate-legacy-oauth-client-platform-access.ts --apply
 pnpm exec tsx scripts/audit-authorization-space-access.ts
 ```
 
@@ -119,6 +126,8 @@ Removed dead helpers:
 
 - `src/lib/auth/client-api-key-auth.ts`
 - `src/lib/auth/authorization-space-access-client.ts`
+- `scripts/migrate-legacy-oauth-client-full-access.ts` removed stale old client full-access data
+- `scripts/migrate-legacy-oauth-client-platform-access.ts` removed old client-id platform access data
 
 The remaining OAuth-client admin pages are for OAuth application/channel management, not auth-space access ownership.
 
@@ -194,6 +203,12 @@ pnpm build
 pnpm exec tsx --test tests/permission-service.full-access-fast-path.test.ts tests/registration-grants.metrics.test.ts
 pnpm exec tsx scripts/audit-authorization-space-access.ts
 pnpm exec tsx scripts/migrate-space-model-identities.ts
+pnpm exec tsx scripts/migrate-space-model-identities.ts --apply
+pnpm exec tsx scripts/migrate-legacy-oauth-client-full-access.ts
+pnpm exec tsx scripts/migrate-legacy-oauth-client-full-access.ts --apply
+pnpm exec tsx scripts/migrate-legacy-oauth-client-platform-access.ts
+pnpm exec tsx scripts/migrate-legacy-oauth-client-platform-access.ts --apply
+pnpm exec tsx scripts/audit-platform-registration-access.ts
 ```
 
 Results:
@@ -202,6 +217,34 @@ Results:
 - lint passed
 - production build passed
 - focused tests passed: 5/5
-- audit dry-run and migration dry-run could not run because local libSQL was not reachable at `127.0.0.1:8080`
+- model identity migration applied 1 candidate rename
+- legacy OAuth-client full-access cleanup deleted 1 stale API-key tuple
+- legacy OAuth-client platform access cleanup converted 1 `owner` tuple to global `clients/admin`
+- final authorization-space audit:
+  - `clientPrefixedModels: 0`
+  - `clientPrefixedTuples: 0`
+  - `nonSystemTuplesWithoutSpace: 0`
+- final platform-registration audit:
+  - `legacyOAuthClientAccessTuples: 0`
+  - `contextsWithClientId: 0`
+  - `requestsWithClientId: 0`
+  - `rulesWithClientId: 0`
 
-The blocked audit/migration commands are listed in the deployment sequence above and must be run where the database endpoint is available.
+The only remaining alias is intentional compatibility for the renamed model identity.
+
+---
+
+## Follow-Up Hotfix
+
+Applied after deployment validation:
+
+- fixed `Button asChild` so Radix `Slot` receives exactly one child; this resolves the minified React #143 error on `/admin/clients/{clientId}/spaces`
+- added a space-native data model editor to `/admin/authorization-spaces/{spaceId}/access`
+- added `updateSpaceAuthorizationModels` so visual/JSON model edits save canonical `space_<spaceId>:<model>` identities
+- model editor save supports create, update, one-to-one rename, delete-with-dependency-check, Lua syntax validation, tuple entity-type string updates, and alias creation for renamed models
+
+Verification:
+
+- `pnpm run lint` passed
+- `pnpm build` passed
+- focused permission/registration tests passed
