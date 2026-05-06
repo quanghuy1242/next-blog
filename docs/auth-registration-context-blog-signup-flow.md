@@ -248,17 +248,70 @@ These paths require header:
 x-internal-signup-secret: <INTERNAL_SIGNUP_SECRET>
 ```
 
-This means public blog signup cannot safely call Better Auth's sign-up endpoint directly. A browser must never receive `INTERNAL_SIGNUP_SECRET`.
+This means public signup cannot safely call Better Auth's sign-up endpoint directly. A browser must never receive `INTERNAL_SIGNUP_SECRET`.
 
-The correct shape is an Auther-owned server action or route:
+The corrected shape is not "remove the guard and let anyone call Better Auth signup." Keep the internal Better Auth endpoint protected, and add an Auther-owned public signup entrypoint that is controlled by UI-managed Onboarding Flow policy.
 
 ```text
-POST /sign-up/blog
-  validates invite/source token
-  queues or records signup intent
-  calls Better Auth signUpEmail server-side with INTERNAL_SIGNUP_SECRET
+POST /sign-up
+  validates a signed signup intent
+  resolves the enabled Onboarding Flow
+  verifies the trigger principal is allowed to start that flow
+  queues or records the grant plan
+  calls Better Auth signUpEmail server-side
   handles email verification and redirect state
 ```
+
+`INTERNAL_SIGNUP_SECRET` can remain an implementation detail between Auther's public signup route and Better Auth. It should not be the product control plane. Product control should live in admin UI records:
+
+```text
+Global Signup Policy:
+  public signup enabled/disabled
+  direct Auther signup enabled/disabled
+  allowed public entry kinds
+
+Authorization Space Onboarding Policy:
+  onboarding enabled/disabled for this space
+  allowed trigger clients / resource servers
+  allowed flow owners/managers
+
+Onboarding Flow:
+  enabled: true | false
+  allowed trigger principals
+  allowed redirect origins / redirect URLs
+  target authorization space
+  grant plan
+  signup mode: public_signed_intent | invite_only | disabled
+```
+
+This creates the two control levels needed for "only allow signup from the blog, not directly from Auther":
+
+```text
+Global level:
+  public signup is allowed only through approved Onboarding Flow entry kinds
+  direct Auther signup can stay disabled
+
+Authorization-space level:
+  the target space decides whether onboarding is enabled
+  the target space decides which clients/resource servers may trigger onboarding
+
+Flow level:
+  a specific flow chooses its allowed trigger principals and grant plan
+```
+
+The enforcement order should be default-deny:
+
+```text
+1. Global signup policy must allow this entry kind.
+2. The Onboarding Flow must exist and be enabled.
+3. The target authorization space must have onboarding enabled.
+4. The trigger principal must be allowed by the target space.
+5. The trigger principal must be allowed by the specific flow.
+6. Requested grants must be a subset of the flow grant plan.
+7. Return URL, email domain, and nonce/replay checks must pass.
+```
+
+If any layer rejects the request, signup does not proceed.
 
 ## 4. What Registration Context Is For
 
@@ -285,39 +338,39 @@ It should not answer:
 
 Those are different concepts.
 
-The target permission boundary should be the authorization space:
+The target permission boundary should be the authorization space. A blog commenter flow is only one configuration of the generic model:
 
 ```text
-Blog signup flow
-  trigger: blog OAuth client or invite token
-  target: blog/payload authorization space
-  grant/request: Book commenter, Comment author, Profile viewer, etc.
+Onboarding flow
+  trigger: selected OAuth client, selected resource server, or invite
+  target: selected authorization space
+  grant/request: selected model + relation + entity scope
 ```
 
-## 5. Blog Signup Target Flow
+## 5. Generic Signup Target Flow
 
 ### 5.1 Product Requirement
 
-When a user starts signup from the blog:
+When a user starts signup from any configured client/app:
 
-1. Blog sends the user to Auther.
-2. Auther can tell the signup was initiated by the blog.
+1. The client sends the user to Auther.
+2. Auther can tell which client or resource server initiated the signup.
 3. The user signs up or verifies email in Auther.
 4. Auther creates an Auther user.
-5. Auther gives or requests blog-specific permissions.
-6. User returns to the blog OAuth/login flow.
-7. Blog sees an authenticated user with the expected authorization-space grants.
+5. Auther applies the configured Onboarding Flow grant plan.
+6. User returns to the configured OAuth/login flow or return URL.
+7. The client/resource server sees an authenticated user with the expected authorization-space grants.
 
 ### 5.2 Recommended URL Shape
 
-For a public blog signup entry:
+For a public signup entry initiated by any allowed trigger principal:
 
 ```text
 https://auther.example.com/sign-up
-  ?flow=blog-commenter
+  ?flow=<onboarding-flow-slug>
   &token=<signed_signup_intent_or_invite>
-  &return_to=<encoded_blog_url_or_oauth_authorize_url>
-  &theme=blog
+  &return_to=<encoded_return_url_or_oauth_authorize_url>
+  &theme=<optional_theme>
 ```
 
 For a strict admin invite:
@@ -325,35 +378,35 @@ For a strict admin invite:
 ```text
 https://auther.example.com/sign-up
   ?invite=<one_time_invite_token>
-  &return_to=<encoded_blog_url_or_oauth_authorize_url>
-  &theme=blog
+  &return_to=<encoded_return_url_or_oauth_authorize_url>
+  &theme=<optional_theme>
 ```
 
 Do not rely on `allowedOrigins` alone. Origin and Referer headers are useful as defense-in-depth, but they are not a durable authorization proof for signup.
 
 ### 5.3 Signup Intent Token
 
-For self-serve blog signup, use a signed signup intent token instead of a reusable context slug.
+For self-serve signup, use a signed signup intent token instead of a reusable context slug.
 
 Token claims should include:
 
 ```json
 {
   "kind": "signup_intent",
-  "flow": "blog-commenter",
-  "triggerKind": "oauth_client",
-  "triggerClientId": "<blog-client-id>",
+  "flow": "<onboarding-flow-slug>",
+  "triggerKind": "oauth_client | resource_server",
+  "triggerId": "<allowed-client-or-resource-server-id>",
   "targetKind": "authorization_space",
-  "targetId": "<blog-auth-space-id>",
+  "targetId": "<authorization-space-id>",
   "requestedGrants": [
     {
-      "entityTypeId": "<book-model-id>",
+      "entityTypeId": "<model-id>",
       "entityId": "*",
-      "relation": "commenter"
+      "relation": "<relation>"
     }
   ],
   "email": null,
-  "returnTo": "https://blog.example.com/...",
+  "returnTo": "https://client.example.com/...",
   "nonce": "...",
   "expiresAt": 1778000000000
 }
@@ -364,15 +417,15 @@ The server must verify:
 - token signature
 - expiry
 - nonce/replay state if the token is one-time
-- `flow` maps to an enabled registration context
-- `triggerClientId` is allowed to trigger that context
+- `flow` maps to an enabled Onboarding Flow
+- `triggerId` is allowed by global policy, target-space policy, and the specific flow
 - `targetId` matches the context target authorization space
 - requested grants are a subset of the context grant policy
-- `returnTo` is allowed for the blog client
+- `returnTo` is allowed for the trigger principal and flow
 
 ### 5.4 Auto-Grant Variant
 
-Use this when blog signup should immediately allow a basic permission after email verification.
+Use this when public signup should immediately allow the configured permission after email verification.
 
 Flow:
 
@@ -452,7 +505,7 @@ Do not use `pending_registration_context_applications` for human approval. Its c
 
 ## 6. Required Auther Changes Before Blog Signup
 
-### 6.1 Add A Real Signup Page
+### 6.1 Add A Generic Signup Page
 
 Add a user-facing page:
 
@@ -466,7 +519,7 @@ It must handle:
 - `flow`
 - `token`
 - `return_to`
-- `theme=blog`
+- optional UI theme selected from flow/client configuration
 - already signed-in users
 - expired/consumed/invalid invite states
 - email-locked invite states
@@ -479,18 +532,24 @@ It should not expose `INTERNAL_SIGNUP_SECRET` to the browser.
 Add an Auther-owned action or route that:
 
 1. Validates the invite or signup intent token.
-2. Validates email restrictions.
-3. Queues grant application or creates approval request.
-4. Calls Better Auth signup internally with `INTERNAL_SIGNUP_SECRET`.
-5. Stores continuation state for post-verification redirect.
+2. Loads the Onboarding Flow by slug.
+3. Verifies the flow is enabled and public signup is allowed.
+4. Verifies the token trigger principal is allowed by global, space, and flow policy.
+5. Verifies the return URL is allowed for that trigger principal and flow.
+6. Validates email restrictions.
+7. Queues grant application or creates approval request.
+8. Calls Better Auth signup internally.
+9. Stores continuation state for post-verification redirect.
 
 The browser submits to this Auther route. This route calls Better Auth internally.
+
+The route should not hardcode blog, commenter, or any concrete client. It should execute the UI-managed Onboarding Flow definition.
 
 ### 6.3 Move Grant Timing If Email Verification Is Required
 
 Current grants apply on `user.create.after`, before verified email.
 
-For blog signup, choose one:
+For public signup, choose one:
 
 - Keep immediate apply only for trusted admin-created users.
 - Move public signup grant application to post-email-verification.
@@ -584,11 +643,12 @@ Current code still checks `context.clientId` and `oauth_client_metadata.allows_r
 Target behavior:
 
 - For OAuth-client-triggered signup, check `triggerClientId`.
-- The trigger client must be allowed to trigger signup contexts.
-- The trigger client must be linked to the target authorization space or explicitly granted `can_trigger_contexts`.
+- For resource-server-triggered signup, check the resource server/service principal.
+- The trigger principal must be allowed by global policy, target-space policy, and the specific flow.
+- The trigger principal must be linked to the target authorization space or explicitly granted `can_trigger_contexts` / onboarding trigger capability.
 - The grant target must be in the context target authorization space.
 
-The OAuth client is the caller/trigger, not the data-model owner.
+The OAuth client or resource server is the caller/trigger, not the data-model owner.
 
 ### 6.9 Store Return/OAuth Continuation State
 
@@ -680,36 +740,49 @@ AUTHER_API_KEY=<Auther space service-account key with authorization_space_id met
 - Existing users need special care: if `createIfNotExists()` finds an existing tuple, no new `grant.created` event is emitted. If Payload has no mirror row for that tuple, the flow must trigger reconciliation, list-object bootstrap, or a dedicated mirror repair path.
 - Payload should mirror all mirrorable resource grants for its configured authorization space, not only blog-signup-created grants. Today the mirrorable entity types are `book`, `chapter`, and `comment`.
 
-## 7. Blog Flow Recommendation
+## 7. Onboarding Flow Recommendation
 
-For this release, use one public blog onboarding flow.
+For this release, implement a generic Onboarding Flow engine and configure one public flow through the UI.
 
-### 7.1 Blog Commenter
-
-Use this when a public user signs up from the blog and should receive the first blog permission.
+The engine must not assume "blog" or "Payload". A new app should be onboarded by adding records in the UI:
 
 ```text
-flow slug: blog-commenter
-display name: Blog Commenter
-triggerKind: oauth_client
-triggerClientId: <blog oauth client id>
+new OAuth client or resource server
+linked authorization space
+space onboarding policy
+onboarding flow
+grant plan
+allowed redirects/origins/domains
+```
+
+No code changes should be needed to add a second client, a different authorization space, or a different resource server.
+
+### 7.1 Example First Configuration
+
+This is an admin configuration example, not hardcoded application behavior.
+
+```text
+flow slug: <admin-chosen slug, for example blog-commenter>
+display name: <admin-chosen display name>
+triggerKind: oauth_client | resource_server
+triggerId: <selected OAuth client or resource server id>
 targetKind: authorization_space
-targetId: <blog auth space id>
-entry: signed signup intent from the blog
+targetId: <selected authorization space id>
+entry: signed signup intent from an allowed trigger principal
 grant policy:
-  <blog model> commenter on "*"
+  <selected model> <selected relation> on <selected entity id or "*">
 apply mode: auto_after_email_verification
 ```
 
 Important prerequisite:
 
 ```text
-The blog authorization-space data model must define the commenter relation before this onboarding flow can be registered.
+The target authorization-space data model must define the relation before an admin can select it in the Onboarding Flow grant policy.
 ```
 
-The reviewed code suggests `commenter` is not currently present on the relevant model. That means the first implementation step is not the signup page; it is updating the blog auth-space model so `commenter` exists as a normal relation. After the relation exists, the onboarding flow can reference the model's stable `entityTypeId` and the `commenter` relation.
+The reviewed code suggests `commenter` is not currently present on the relevant blog model. That is not something to hardcode. It should be added through the authorization-space model editor UI like any other relation. After the relation exists, the Onboarding Flow UI can reference the model's stable `entityTypeId` and the selected relation.
 
-For the first release, do not add mixed auto/request grant modes. The current registration context `grants` shape is enough if the only target permission is auto-granted `commenter`.
+For the first release, do not add mixed auto/request grant modes. The current registration context `grants` shape is enough if the selected permissions are auto-granted after email verification.
 
 ### 7.2 Deferred Viewer/Admin Split
 
@@ -721,7 +794,7 @@ Future expansion can add:
 - a `member` or `profile_owner` relation for logged-in profile features
 - an admin promotion path through platform access or permission requests
 
-Do not add those relations just to make the first signup flow look more general. Start with the actual needed permission: `commenter`.
+Do not add those relations just to make the first signup flow look more general. Admins should create only the relations they need in the data model, then select them in the Onboarding Flow UI.
 
 ## 8. Edge Cases
 
@@ -939,38 +1012,95 @@ Implementation impact:
 - Blog and Payload OAuth clients remain login/client surfaces. They must not decide which grants Payload mirrors.
 - Legacy client-scoped webhook routing can remain only as migration compatibility.
 
+### 9.7 Decision G: Signup Control Plane
+
+Decision:
+
+```text
+Public signup is controlled by UI-managed global, authorization-space, and Onboarding Flow policy.
+It is not env-only config and not hardcoded blog logic.
+```
+
+Implementation impact:
+
+- Keep Better Auth's raw signup endpoint protected from direct public browser calls.
+- Add a generic Auther signup route/page that validates an Onboarding Flow and signed signup intent.
+- Add global UI for public signup entry modes, including whether direct Auther signup is allowed.
+- Add authorization-space UI for whether onboarding is enabled in that space.
+- Add authorization-space UI for which OAuth clients or resource servers may trigger onboarding for that space.
+- Add flow UI for which allowed trigger principals may use the specific flow.
+- Allow admins to select the target authorization space, model, relation, entity scope, email domains, allowed redirects, and theme in UI.
+- The first blog commenter setup is admin configuration, not code.
+
+Example policy outcome:
+
+```text
+Direct /sign-up without a valid flow intent: denied.
+Signup intent from blog client for the configured flow: allowed.
+Signup intent from another client in the same auth space: denied unless explicitly allowed.
+Signup intent from a new app: denied until an admin configures that app/space/flow in UI.
+```
+
 ## 10. Implementation Backlog
 
-### 10.1 First Release: Public Blog Commenter Signup
+### 10.1 Engineering Implementation: Generic Public Onboarding Signup
 
-This is the concrete first implementation path based on the recorded decisions.
+This is work for the codebase. It must implement a generic solution that can support blog now and other clients/spaces later.
 
-- Add `commenter` relation to the relevant blog authorization-space model.
 - Add real `/sign-up` page in Auther.
-- Add server-side signup action/route that can call Better Auth with `INTERNAL_SIGNUP_SECRET`.
+- Add generic server-side signup action/route that validates a signed signup intent and executes a UI-managed Onboarding Flow.
+- Keep Better Auth raw signup internally protected; do not expose `INTERNAL_SIGNUP_SECRET` to the browser.
+- Add global signup policy UI and persistence.
+- Add a global toggle for direct Auther signup.
+- Add global allowed entry modes: direct, public signed intent, invite.
+- Add authorization-space onboarding policy UI and persistence.
+- Add space-level allowed trigger principals: OAuth clients and resource servers linked to that space.
+- Add UI fields for Onboarding Flow signup mode: disabled, public signed intent, invite only.
+- Add UI selection for allowed trigger principals from the space-level allowlist.
+- Add UI selection for target authorization space, model, relation, and entity scope.
+- Add UI controls for allowed return URLs/origins, allowed email domains, and optional theme.
+- Add policy enforcement order: global policy, flow enabled, space onboarding enabled, trigger allowed by space, trigger allowed by flow, grant subset, redirect/domain/nonce checks.
 - Fix `applyContextGrants()` to include `authorizationSpaceId`.
 - Replace `findPlatformContexts()` usage with explicit target/trigger queries.
 - Remove blind `queuePlatformContextGrants()` from signup/invite verification paths.
 - Enforce `allowedDomains`.
 - Require non-default `INVITE_HMAC_SECRET` in production.
 - Make invite validation and grant application fail closed when the target authorization model or relation no longer exists.
-- Create `blog-commenter` signup flow targeted at the blog authorization space.
-- Add signed signup intent minting/verification for blog-initiated public signup.
-- Include flow slug, trigger client, target auth space, requested grant subset, return URL, nonce, and expiry.
+- Add signed signup intent minting/verification for public signup initiated by any allowed trigger principal.
+- Include flow slug, trigger principal, target auth space, requested grant subset, return URL, nonce, and expiry.
 - Store nonce/replay state if the token can grant access.
 - Store return/OAuth continuation state.
-- Add email verification completion handling that applies `commenter`.
+- Add email verification completion handling that applies the selected flow grants.
 - Add authorization-space-scoped webhook endpoint/subscription filtering in Auther.
-- Register/configure Payload's webhook endpoint as scoped to the blog/payload content authorization space.
-- Verify the `commenter` tuple emits or otherwise triggers Payload mirror propagation.
+- Register/configure Payload's webhook endpoint as scoped to the configured content authorization space.
+- Verify newly created flow tuples emit or otherwise trigger Payload mirror propagation.
 - Configure Payload's Auther webhook endpoint for authorization-space routing, not client-owned routing.
 - Update Payload's mirror parser if space-native webhook events use canonical entity names such as `space_<spaceId>:book`.
 - Add a deterministic mirror bootstrap for existing users when the tuple already exists and no new `grant.created` event is emitted.
-- Redirect verified users back to OAuth authorize or the blog return URL.
-- Handle existing users by applying `commenter` without creating a duplicate account.
+- Redirect verified users back to OAuth authorize or the configured return URL.
+- Handle existing users by applying the selected flow grants without creating a duplicate account.
 - Ensure a newly signed-up public user can only access `/admin/profile` in Auther unless promoted later.
+- Add tests for denied direct Auther signup when global direct signup is disabled.
+- Add tests for allowed signup from one client and denied signup from another client in the same authorization space.
+- Add tests proving a new client/space/flow can be configured through data/UI without code changes.
 
-### 10.2 Payload Mirror Verification
+### 10.2 Admin Setup Through UI: First Blog Flow
+
+This is not code-hardcoded work. It is the setup an admin performs after the generic implementation exists.
+
+- Open the blog/payload authorization-space model editor.
+- Add the `commenter` relation to the appropriate model if it does not exist.
+- Open the Onboarding Flow admin UI.
+- Create an enabled public signed-intent flow.
+- Select the blog OAuth client as an allowed trigger client.
+- Select the blog/payload content authorization space as the target.
+- Select the model and `commenter` relation from the model editor output.
+- Set entity scope to `*` if the first release grants commenter globally for that model.
+- Configure allowed return URLs/origins for the blog.
+- Configure allowed email domains if needed.
+- Configure the UI label/theme without hardcoding blog behavior in code.
+
+### 10.3 Payload Mirror Verification
 
 This is a first-release acceptance gate, not a later hardening task.
 
@@ -979,14 +1109,14 @@ This is a first-release acceptance gate, not a later hardening task.
 - Auther does not require a legacy `clientId` on the grant event for Payload delivery.
 - Payload webhook route accepts that event when `AUTHER_USE_SPACE_ROUTING=true`.
 - Payload rejects/skips events for other authorization spaces.
-- Payload mirrors direct user `commenter` grants into `grant-mirror`.
+- Payload mirrors direct user grants from the configured Onboarding Flow into `grant-mirror`.
 - Payload mirrors all supported resource-grant events for the configured authorization space, not just onboarding-created tuples.
 - If the Payload user does not exist yet, Payload writes `deferred-grants`.
 - When the user first logs into Payload/blog, the Payload user is created or linked and deferred grants are drained before access is checked.
 - Private-book or sharing checks read the mirrored grant successfully.
 - Reconciliation can repair a missed webhook without creating duplicate mirror rows.
 
-### 10.3 Future Approval Flow
+### 10.4 Future Approval Flow
 
 This is not part of first-release blog signup, but the decision is recorded for later.
 
@@ -999,7 +1129,7 @@ This is not part of first-release blog signup, but the decision is recorded for 
 - Add signup-source metadata only if needed.
 - Add approval action that creates authorization-space-scoped tuples and follows the same Payload mirror propagation requirements.
 
-### 10.4 Minimum User And Platform Promotion Backlog
+### 10.5 Minimum User And Platform Promotion Backlog
 
 For this release, public blog signup should create a normal minimum user. If that user signs into Auther directly, they should only see `/admin/profile`.
 
@@ -1032,7 +1162,7 @@ Auther already has platform access concepts, permission requests, permission rul
 Those should be used for later promotion flows, but they should not be mixed into the first public blog onboarding flow.
 ```
 
-### 10.5 Cleanup And Naming
+### 10.6 Cleanup And Naming
 
 These should happen alongside or after the first functional path:
 
