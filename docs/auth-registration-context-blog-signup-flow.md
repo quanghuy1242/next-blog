@@ -1172,7 +1172,80 @@ These should happen alongside or after the first functional path:
 - Replace `allowsRegistrationContexts` with auth-space/trigger permission checks.
 - Audit old invite URLs and invalidate if target semantics changed.
 
-## 11. Final Model
+## 11. Definition Of Done
+
+This epic is done only when the system supports generic, UI-managed public onboarding without hardcoded blog/Payload assumptions, and the first blog configuration works end to end.
+
+### 11.1 Policy And Control Plane
+
+- Better Auth raw signup endpoints are still protected from direct browser signup.
+- Direct Auther signup can be enabled or disabled from global signup policy UI.
+- Public signup through signed intent can be enabled or disabled from global signup policy UI.
+- Each authorization space has onboarding policy UI.
+- Each authorization space can enable/disable onboarding independently.
+- Each authorization space can define which OAuth clients or resource servers may trigger onboarding.
+- Each Onboarding Flow can enable/disable itself independently.
+- Each Onboarding Flow selects allowed trigger principals from the space-level allowlist.
+- Enforcement is default-deny if global policy, space policy, flow policy, trigger allowlist, grant subset, redirect, email-domain, or nonce validation fails.
+- A client in the same authorization space is denied unless explicitly allowed by both the space policy and flow policy.
+
+### 11.2 Generic Onboarding Engine
+
+- `/sign-up` is a generic Auther page, not blog-specific.
+- The signup action/route accepts a signed signup intent and resolves a UI-managed Onboarding Flow.
+- The signup action/route does not hardcode client IDs, authorization-space IDs, model names, relation names, or Payload-specific behavior.
+- Admin UI can configure flow slug, display name, signup mode, trigger principals, target authorization space, grant model, relation, entity scope, allowed redirects/origins, allowed email domains, and optional theme.
+- Adding a second app/client/resource server can be done through UI/data setup without code changes.
+- Existing users can use a valid onboarding flow without creating duplicate accounts.
+- Public grants are applied only after email verification.
+- Signup continuation state returns verified users to the configured OAuth/return URL.
+
+### 11.3 Grant Correctness
+
+- Onboarding grants create tuples with `authorizationSpaceId`.
+- Onboarding grants fail closed if the model is missing, relation is missing, model is outside the target space, or requested grant is outside the flow grant plan.
+- Blind `queuePlatformContextGrants()` behavior is removed from public signup.
+- `findPlatformContexts()` is no longer used as a proxy for all `clientId IS NULL` onboarding behavior.
+- Email domain restrictions are enforced when configured.
+- Invite-only behavior remains separate from public signed-intent behavior.
+
+### 11.4 Payload Mirror Projection
+
+- Auther grant webhooks can be scoped to `authorization_space`.
+- Payload's webhook endpoint is registered/configured for the content authorization space, not an OAuth client mirror scope.
+- `grant.created` includes `authorizationSpaceId`.
+- Payload accepts grant events only for its configured authorization space.
+- Payload skips grant events for other authorization spaces.
+- Payload mirrors supported resource grants for that space into `grant-mirror`.
+- Payload handles grants that arrive before the local Payload user exists through `deferred-grants`.
+- First login/link in Payload drains deferred grants before access checks depend on them.
+- Existing Auther tuple with missing Payload mirror can be repaired deterministically through reconcile/bootstrap.
+- Private book/sharing/comment access can read the mirrored grant successfully.
+
+### 11.5 First Blog Configuration
+
+- Admin can add the needed `commenter` relation through the authorization-space model editor UI.
+- Admin can create the first public signed-intent Onboarding Flow through UI.
+- Admin can select the blog OAuth client as an allowed trigger principal.
+- Admin can select the blog/payload content authorization space as target.
+- Admin can select the model, `commenter` relation, and entity scope through UI.
+- Direct Auther signup without a valid flow intent is denied.
+- Signup intent from the configured blog client is allowed.
+- Signup intent from an unapproved client in the same authorization space is denied.
+- Newly signed-up public users can access only `/admin/profile` in Auther unless later promoted.
+
+### 11.6 Verification
+
+- Automated tests cover global direct-signup denial.
+- Automated tests cover allowed client versus denied client in the same authorization space.
+- Automated tests cover invalid target space, invalid model, invalid relation, invalid redirect, invalid email domain, expired token, replayed token, and disabled flow.
+- Automated tests cover existing-user onboarding without duplicate user creation.
+- Automated tests cover grant creation after email verification.
+- Automated tests cover authorization-space-scoped webhook delivery.
+- Automated tests or integration checks cover Payload mirror creation, deferred grant drain, and reconcile repair.
+- Manual smoke test proves the first blog flow: blog initiates signup, Auther creates/verifies user, selected grant is applied, Payload mirrors the grant, and private/sharing access works.
+
+## 12. Final Model
 
 The concept should stay, but the meaning should be tightened:
 
