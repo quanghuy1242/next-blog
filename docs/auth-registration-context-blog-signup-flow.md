@@ -785,51 +785,199 @@ Before relying on admin-created users with contexts:
 - otherwise apply the context grants explicitly
 - keep tracking separate from grant application
 
-## 9. Decision Needed
+## 9. Decisions Before Implementation
 
-The core product decision is:
+The backlog below should not be read as "start anywhere". There are a few product decisions that must be made first because they change the schema, UI, and grant timing.
+
+### 9.1 Decision A: Auto-Grant Or Approval
+
+Question:
 
 ```text
-Should blog signup auto-grant access after email verification, or create a pending approval request?
+After a blog user verifies email, should Auther create access tuples immediately, or create an approval request first?
 ```
 
-Recommended split:
+Recommended answer:
 
-- `viewer`: auto-grant after email verification
-- `commenter`: either auto-grant for low-risk blog comments, or create permission request for moderation-sensitive comments
+```text
+viewer: auto-grant after email verification
+commenter: start with approval request unless the blog explicitly wants open comments
+```
 
-This avoids making every signup wait for approval while still protecting write permissions if needed.
+Why:
+
+- `viewer` is low risk and should not require manual admin work.
+- `commenter` creates write capability and may need moderation.
+- This lets signup feel normal while still protecting higher-risk permissions.
+
+Implementation impact:
+
+- If `commenter` is auto-granted, the existing registration context grant model can work after fixes.
+- If `commenter` requires approval, the current `grants` JSON is not enough because it only represents automatic grants. Add request-mode support.
+
+### 9.2 Decision B: Approval Storage
+
+Only needed if any signup permission requires approval.
+
+Question:
+
+```text
+Should signup approval use existing permission_requests or a dedicated signup_access_requests table?
+```
+
+Recommended answer:
+
+```text
+Use permission_requests first if it can represent the exact authorization-space target.
+Only add signup_access_requests if signup needs extra lifecycle state that permission_requests cannot hold cleanly.
+```
+
+Implementation impact:
+
+- Using `permission_requests` is smaller and keeps access approval in one queue.
+- A dedicated signup table is cleaner if the product needs invite metadata, onboarding state, reviewer notes, resend behavior, or multi-step approval.
+
+### 9.3 Decision C: Signup Token Type
+
+Question:
+
+```text
+Should the blog start signup with an admin invite token, a self-serve signed signup intent, or both?
+```
+
+Recommended answer:
+
+```text
+Support both, but implement self-serve signed signup intent for normal blog signup first.
+Keep admin invite for manually invited users.
+```
+
+Implementation impact:
+
+- Invite token means an admin created a one-time invitation.
+- Signup intent means the blog initiated an allowed flow for a public user.
+- Do not let a bare context slug grant permissions.
+
+### 9.4 Decision D: Baseline Platform Grants
+
+Question:
+
+```text
+Should every new user receive any global Auther/platform grant?
+```
+
+Recommended answer:
+
+```text
+No implicit baseline grants for blog signup unless a specific global baseline context is explicitly created.
+```
+
+Implementation impact:
+
+- Remove the current blind `queuePlatformContextGrants()` behavior from invite/signup flows.
+- If a global baseline is needed later, model it explicitly as `targetKind = platform`, `targetId = *`, and `triggerKind = platform`.
+
+### 9.5 Decision E: Naming
+
+Question:
+
+```text
+Should the product/UI continue saying registration context?
+```
+
+Recommended answer:
+
+```text
+Use "Signup Flow" or "Onboarding Flow" in UI/docs. Keep the table name for now if migration cost is not worth it.
+```
+
+Implementation impact:
+
+- This is mostly UI/domain language.
+- It does not need to block the first implementation unless UI copy is being rebuilt.
 
 ## 10. Implementation Backlog
 
-### P0: Correctness Before Public Signup
+### 10.1 Unblocked Now: Correctness Before Any Public Signup
+
+These are not product-choice dependent. Do them before exposing signup.
 
 - Add real `/sign-up` page in Auther.
 - Add server-side signup action/route that can call Better Auth with `INTERNAL_SIGNUP_SECRET`.
 - Fix `applyContextGrants()` to include `authorizationSpaceId`.
 - Replace `findPlatformContexts()` usage with explicit target/trigger queries.
-- Remove blind `queuePlatformContextGrants()` from invite verification, or restrict it to explicitly marked global baseline contexts.
+- Remove blind `queuePlatformContextGrants()` from invite verification.
 - Enforce `allowedDomains`.
 - Require non-default `INVITE_HMAC_SECRET` in production.
+- Make invite validation and grant application fail closed when the target authorization model or relation no longer exists.
 
-### P1: Blog Signup Flow
+### 10.2 Blocked By Decision A: Grant Timing And Mode
 
-- Create `blog-viewer` registration context targeted at the blog authorization space.
-- Create `blog-commenter` registration context targeted at the blog authorization space.
-- Add signed signup intent support for blog-initiated signup.
+If the answer is auto-grant:
+
+- Apply selected grants only after email verification.
+- Keep pending registration context applications as a deferred technical queue.
+- Mark invite consumed only after tuple creation succeeds.
+
+If the answer is approval request:
+
+- Create permission request after email verification.
+- Do not create the write-level access tuple until approval.
+- Mark invite consumed after request creation succeeds, or keep it reserved until approval depending on product expectation.
+
+Recommended implementation for blog:
+
+- Auto-grant `viewer` after email verification.
+- Create approval request for `commenter`.
+
+### 10.3 Blocked By Decision B: Approval Data Model
+
+If using `permission_requests`:
+
+- Confirm it supports `requestKind = authorization_space`.
+- Confirm it supports `targetKind = authorization_space`.
+- Confirm it stores `targetId = <blog auth space id>`.
+- Confirm it stores `targetEntityTypeId`, `targetEntityId`, and requested relation.
+- Add signup-source metadata if needed.
+
+If creating `signup_access_requests`:
+
+- Add table and repository.
+- Store `flowSlug`, `inviteId`, target grant plan, status, reviewer, decision reason, and expiry.
+- Add conversion from approved signup request to authorization-space-scoped tuples.
+
+### 10.4 Blocked By Decision C: Blog Entry Token
+
+If using self-serve signup intent:
+
+- Add signed signup intent minting/verification.
+- Include flow slug, trigger client, target auth space, requested grant subset, return URL, nonce, and expiry.
+- Store nonce/replay state if the token can grant or request access.
+
+If using only admin invite:
+
+- Keep `platform_invites`, but rename UI language away from "platform" where the invite targets an auth space.
+- Ensure invite context picker only lists contexts appropriate for the selected target.
+
+Recommended implementation for blog:
+
+- Implement self-serve signed signup intent first.
+- Keep admin invite as a separate manually invited flow.
+
+### 10.5 Blog Signup Flow Implementation
+
+After Decisions A-D are answered:
+
+- Create `blog-viewer` signup flow targeted at the blog authorization space.
+- Create `blog-commenter` signup flow targeted at the blog authorization space.
 - Store return/OAuth continuation state.
 - Add email verification completion handling that applies grants or creates requests.
 - Redirect verified users back to OAuth authorize or the blog return URL.
+- Handle existing users by applying/requesting access without creating a duplicate account.
 
-### P2: Approval Flow
+### 10.6 Cleanup And Naming
 
-- Decide whether to use `permission_requests` or a dedicated signup approval table.
-- Add request creation after email verification for request-mode grants.
-- Add admin review UI for signup-originated permission requests.
-- Add approval action that creates authorization-space-scoped tuples.
-- Add rejection and retry behavior.
-
-### P3: Cleanup And Naming
+These should happen after the functional path is clear:
 
 - Rename registration context in UI to "Signup Flow" or "Onboarding Flow".
 - Keep table name if migration cost is high, but update UI/domain language.
