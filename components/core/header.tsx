@@ -138,7 +138,7 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
 
   const authItems = authState
     ? [
-        { name: 'About me', href: '/about' },
+        // { name: 'About me', href: '/about' },
         {
           name: 'Logout',
           href: `/auth/logout?returnTo=${encodeURIComponent(returnTo)}`,
@@ -146,9 +146,9 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
         },
       ]
     : [
-        { name: 'About me', href: '/about' },
+        // { name: 'About me', href: '/about' },
         {
-          name: 'Create account',
+          name: 'Sign up',
           href: `/auth/signup?returnTo=${encodeURIComponent(returnTo)}&source=header`,
           hardNavigate: true,
         },

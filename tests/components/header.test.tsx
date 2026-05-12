@@ -39,7 +39,7 @@ describe('Header', () => {
   test('renders blog auth entries with the current return URL', () => {
     render(<Header text="Blog" />);
 
-    const signUpLink = screen.getByRole('link', { name: 'Create account' });
+    const signUpLink = screen.getByRole('link', { name: 'Sign up' });
     const signInLink = screen.getByRole('link', { name: 'Sign in' });
 
     expect(signUpLink).toHaveAttribute(

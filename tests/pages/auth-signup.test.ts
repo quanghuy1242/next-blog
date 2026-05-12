@@ -63,7 +63,11 @@ describe('blog signup route', () => {
     });
   });
 
-  test('/auth/signup falls back to login without exposing Auther errors', async () => {
+  test('/auth/signup renders unavailable state without exposing Auther errors', async () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -81,10 +85,14 @@ describe('blog signup route', () => {
     }));
 
     expect(result).toEqual({
-      redirect: {
-        destination: '/auth/login?returnTo=%2F&signup=unavailable',
-        permanent: false,
+      props: {
+        returnTo: '/',
+        unavailable: true,
       },
     });
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      '[blog-signup] Failed to create signup intent.',
+      expect.any(Error)
+    );
   });
 });
