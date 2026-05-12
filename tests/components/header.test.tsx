@@ -36,11 +36,16 @@ describe('Header', () => {
     vi.restoreAllMocks();
   });
 
-  test('renders the blog sign-in entry with the current return URL', () => {
+  test('renders blog auth entries with the current return URL', () => {
     render(<Header text="Blog" />);
 
+    const signUpLink = screen.getByRole('link', { name: 'Create account' });
     const signInLink = screen.getByRole('link', { name: 'Sign in' });
 
+    expect(signUpLink).toHaveAttribute(
+      'href',
+      '/auth/signup?returnTo=%2Fbooks&source=header'
+    );
     expect(signInLink).toHaveAttribute(
       'href',
       '/auth/login?returnTo=%2Fbooks'

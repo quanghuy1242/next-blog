@@ -6,8 +6,10 @@
 >
 > Scope:
 >
-> - Auther codebase: `/home/quanghuy1242/pjs/auther`
-> - Blog planning docs: `/home/quanghuy1242/pjs/next-blog/docs`
+> - Auther codebase: `~/pjs/auther`
+> - Blog planning docs: `~/pjs/next-blog/docs`
+> - Payloadcms codebase: `~/pjs/payloadcms`
+> - Blog codebase: `~/pjs/next-blog`
 >
 > Related docs:
 >
@@ -1324,13 +1326,15 @@ This is not code-hardcoded work. It is the setup an admin performs after the gen
 - Add the `commenter` relation to the appropriate model if it does not exist.
 - Open the Onboarding Flow admin UI.
 - Create an enabled public signed-intent flow.
-- Select the blog OAuth client as an allowed trigger client.
+- Select the blog OAuth client as an allowed trigger client, or select a dedicated server-only signup trigger client linked to the same authorization space if the browser OAuth client is public/PKCE and has no secret.
 - Select the blog/payload content authorization space as the target.
 - Select the model and `commenter` relation from the model editor output.
 - Set entity scope to `*` if the first release grants commenter globally for that model.
 - Configure allowed return URLs/origins for the blog.
 - Configure allowed email domains if needed.
 - Configure the UI label/theme without hardcoding blog behavior in code.
+- Configure the blog-side signup trigger values in `next-blog` server env: flow slug, target authorization-space id, trigger kind/id, trigger secret, and optional intent TTL.
+- The blog public entrypoint must mint a signed Auther signup intent from server-side code and redirect to `/sign-up?intent=...`; the browser must never receive the trigger secret.
 
 ### 11.3 Payload Mirror Verification
 
@@ -1351,6 +1355,8 @@ This is a first-release acceptance gate, not a later hardening task.
 ### 11.4 Future Approval Flow
 
 This is not part of first-release blog signup, but the decision is recorded for later.
+
+Status note: this is future backlog and does not block the first-release auto-grant signup DoD. Do not implement it until the product explicitly needs human approval for signup access.
 
 - Keep approval requests in `permission_requests`.
 - Keep approval request targets scoped to authorization spaces.
@@ -1379,6 +1385,8 @@ Target minimum-user behavior:
 - API key/client management is forbidden unless separately granted later
 
 Promotion path to add later:
+
+Status note: these promotion items are future platform-account features. They do not need to be done for first-release public blog signup, and they must stay separate from commenter onboarding.
 
 - Add a platform role or platform access grant for `platform_member` if a broader logged-in baseline is needed.
 - Add a platform admin promotion action that grants platform/admin relations intentionally.
@@ -1460,9 +1468,10 @@ This epic is done only when the system supports generic, UI-managed public onboa
 
 - Admin can add the needed `commenter` relation through the authorization-space model editor UI.
 - Admin can create the first public signed-intent Onboarding Flow through UI.
-- Admin can select the blog OAuth client as an allowed trigger principal.
+- Admin can select the blog OAuth client, or a dedicated server-only blog signup trigger client, as an allowed trigger principal.
 - Admin can select the blog/payload content authorization space as target.
 - Admin can select the model, `commenter` relation, and entity scope through UI.
+- Blog `/auth/signup` can mint an Auther signup intent from server-only trigger credentials and redirect the browser to Auther `/sign-up`.
 - Direct Auther signup without a valid flow intent is denied.
 - Signup intent from the configured blog client is allowed.
 - Signup intent from an unapproved client in the same authorization space is denied.

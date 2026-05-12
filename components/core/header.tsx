@@ -57,7 +57,12 @@ const Option = ({ items = [] }: OptionProps) => {
   return (
     <div className="flex gap-2">
       {items.map((item) => (
-        <OptionItem key={item.name} name={item.name} href={item.href} />
+        <OptionItem
+          key={item.name}
+          name={item.name}
+          href={item.href}
+          hardNavigate={item.hardNavigate}
+        />
       ))}
     </div>
   );
@@ -142,6 +147,11 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
       ]
     : [
         { name: 'About me', href: '/about' },
+        {
+          name: 'Create account',
+          href: `/auth/signup?returnTo=${encodeURIComponent(returnTo)}&source=header`,
+          hardNavigate: true,
+        },
         {
           name: 'Sign in',
           href: `/auth/login?returnTo=${encodeURIComponent(returnTo)}`,

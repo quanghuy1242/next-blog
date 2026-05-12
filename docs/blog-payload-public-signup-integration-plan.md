@@ -22,6 +22,15 @@
 > - `docs/auth-space-access-control-implementation-plan.md`
 > - `/home/quanghuy1242/pjs/payloadcms/docs/comment-improvements.md`
 
+> Implementation note, 2026-05-08:
+>
+> - `next-blog` signup intent initiation is partially implemented:
+>   - `common/utils/blog-signup.ts`
+>   - `pages/auth/signup.tsx`
+>   - header `Create account` entrypoint
+>   - focused route/helper/header tests
+> - Remaining work in this plan still includes comment-area CTAs, authenticated no-comment-access UI, Payload role/access hardening, and integrated end-to-end smoke.
+
 ## 1. Goal
 
 Add the product-facing blog and PayloadCMS integration layer that sits on top of the generic Auther public onboarding engine.
@@ -1751,4 +1760,3 @@ User can comment where allowed.
 User cannot use Payload admin.
 Admin/editor promotion stays a separate explicit staff flow.
 ```
-
