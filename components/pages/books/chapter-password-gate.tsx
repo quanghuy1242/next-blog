@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import cn from 'classnames';
+import { Button } from 'components/shared/ui/button';
+import { FieldError, getInputClassName } from 'components/shared/ui/form-control';
+import { CenteredPanel } from 'components/shared/ui/panel';
 
 interface ChapterPasswordGateProps {
   chapterId: number | string;
@@ -151,7 +153,7 @@ export function ChapterPasswordGate({
   };
 
   return (
-    <section className="mx-auto w-full max-w-xl rounded-2xl border border-slate-200 bg-white px-4 py-5 sm:px-6 sm:py-6">
+    <CenteredPanel>
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center">
           <PasswordIcon />
@@ -209,11 +211,10 @@ export function ChapterPasswordGate({
                   }
                 }}
                 placeholder="Enter password"
-                className={cn(
-                  'h-11 w-full rounded-xl border bg-white pl-9 pr-10 text-sm text-slate-900 outline-none transition',
-                  'placeholder:text-slate-400 focus:border-blue focus:ring-0',
-                  error ? 'border-red-300' : 'border-slate-200'
-                )}
+                className={getInputClassName({
+                  hasError: Boolean(error),
+                  className: 'h-11 rounded-xl pl-9 pr-10 text-slate-900 placeholder:text-slate-400',
+                })}
               />
 
               <button
@@ -228,28 +229,22 @@ export function ChapterPasswordGate({
             </div>
           </div>
 
-          {error ? (
-            <p className="text-sm text-red-600" role="alert">
-              {error}
-            </p>
-          ) : null}
+          <FieldError>{error}</FieldError>
 
-          <button
+          <Button
             type="submit"
             disabled={!canSubmit}
-            className={cn(
-              'inline-flex h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-semibold text-white transition-colors',
-              canSubmit ? 'bg-blue hover:bg-darkBlue' : 'cursor-not-allowed bg-blue/60'
-            )}
+            size="lg"
+            fullWidth
           >
             {isSubmitting ? 'Unlocking...' : 'Unlock and read'}
-          </button>
+          </Button>
         </form>
 
         <p className="mt-5 max-w-md border-t border-slate-100 pt-4 text-center text-sm leading-6 text-slate-500">
           If you do not have the password, contact the author or site owner for access.
         </p>
       </div>
-    </section>
+    </CenteredPanel>
   );
 }

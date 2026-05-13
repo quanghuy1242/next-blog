@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import { useBookmark } from 'hooks/useBookmark';
+import { Button } from 'components/shared/ui/button';
 
 interface BookmarkButtonProps {
   contentType: 'chapter' | 'book';
@@ -29,15 +30,15 @@ function BookmarkButtonInner({
   });
 
   return (
-    <button
+    <Button
       type="button"
       onClick={toggle}
       disabled={isLoading || isMutating}
+      variant={isBookmarked ? 'primary' : 'secondary'}
+      size="sm"
       className={cn(
-        'inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm disabled:opacity-50',
-        isBookmarked
-          ? 'border-blue bg-blue text-white hover:bg-darkBlue'
-          : 'border-gray-300 text-gray-700 hover:border-gray-400'
+        'gap-1.5',
+        isBookmarked ? 'border border-blue' : ''
       )}
       aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
       aria-pressed={isBookmarked}
@@ -57,6 +58,6 @@ function BookmarkButtonInner({
         />
       </svg>
       <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
-    </button>
+    </Button>
   );
 }

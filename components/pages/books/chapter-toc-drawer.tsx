@@ -1,6 +1,7 @@
 import React from 'react';
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { Button } from 'components/shared/ui/button';
 
 interface ChapterTocDrawerProps {
   isOpen: boolean;
@@ -64,13 +65,15 @@ export function ChapterTocDrawer({
         <div className="flex h-full min-h-0 flex-col">
           <div className="mb-3 flex flex-none items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-gray-900">Table of contents</h2>
-            <button
+            <Button
               type="button"
               onClick={onClose}
-              className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700"
+              variant="secondary"
+              size="sm"
+              className="px-2 py-1 text-xs"
             >
               Close
-            </button>
+            </Button>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
             {children}

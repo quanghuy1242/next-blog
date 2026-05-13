@@ -12,8 +12,8 @@ import { renderMetaTags } from 'components/core/metadata';
 import { BookHeader } from 'components/pages/books/book-header';
 import { ChapterList } from 'components/pages/books/chapter-list';
 import { BookmarkButton } from 'components/shared/bookmark-button';
-import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 import { Text } from 'components/shared/text';
+import { ButtonLink } from 'components/shared/ui/button';
 import type { Book, Chapter, Homepage } from 'types/cms';
 import { getReadingProgress } from 'common/apis/reading-progress';
 import type { ReadingProgressRecord } from 'types/cms';
@@ -88,12 +88,12 @@ export default function BookDetailPage({
                 </span>
               ) : null}
               {continueReadingChapterSlug ? (
-                <SSRPrefetchLink
+                <ButtonLink
                   href={`${buildBookHref(book.id, book.slug)}/chapters/${continueReadingChapterSlug}`}
-                  className="inline-flex items-center gap-2 rounded bg-blue px-4 py-2 text-sm font-medium text-white hover:bg-darkBlue"
+                  ssrPrefetch
                 >
                   Continue reading
-                </SSRPrefetchLink>
+                </ButtonLink>
               ) : null}
             </div>
           ) : null}

@@ -1,9 +1,11 @@
 import type { GetServerSideProps } from 'next';
-import Link from 'next/link';
 
-import { Header } from 'components/core/header';
 import { normalizeReturnTo } from 'common/utils/blog-auth';
 import { createBlogSignupIntent } from 'common/utils/blog-signup';
+import { Container } from 'components/core/container';
+import { Layout } from 'components/core/layout';
+import { ButtonLink } from 'components/shared/ui/button';
+import { CenteredPanel } from 'components/shared/ui/panel';
 
 interface BlogAuthSignupPageProps {
   returnTo: string;
@@ -19,37 +21,32 @@ export default function BlogAuthSignupPage({
   }
 
   return (
-    <>
-      <Header text="Blog" />
-      <main className="min-h-screen bg-white px-6 pb-20 pt-36 text-slate-900">
-        <section className="mx-auto flex max-w-xl flex-col gap-5">
+    <Layout header="Blog" className="flex flex-col items-center">
+      <Container className="my-4 w-full md:px-20">
+        <CenteredPanel>
           <p className="text-sm font-semibold uppercase tracking-wide text-blue">
             Account access
           </p>
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
             Sign up is not available
           </h1>
-          <p className="text-base leading-7 text-slate-600">
+          <p className="mt-2 text-sm leading-6 text-slate-600 sm:text-base sm:leading-7">
             The blog could not start the signup flow. Try again later, or sign in if
             you already have an account.
           </p>
-          <div className="flex flex-wrap gap-3 pt-1">
-            <Link
-              className="rounded bg-blue px-4 py-2 font-semibold text-white hover:bg-darkBlue"
+          <div className="mt-5 flex flex-wrap gap-3">
+            <ButtonLink
               href={`/auth/login?returnTo=${encodeURIComponent(returnTo)}`}
             >
               Sign in
-            </Link>
-            <Link
-              className="rounded border border-slate-300 px-4 py-2 font-semibold text-blue hover:border-blue"
-              href={returnTo}
-            >
+            </ButtonLink>
+            <ButtonLink variant="secondary" href={returnTo}>
               Back to blog
-            </Link>
+            </ButtonLink>
           </div>
-        </section>
-      </main>
-    </>
+        </CenteredPanel>
+      </Container>
+    </Layout>
   );
 }
 

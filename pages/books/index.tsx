@@ -11,6 +11,7 @@ import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
 import { BooksGrid } from 'components/shared/books-grid';
 import { Text } from 'components/shared/text';
+import { Button } from 'components/shared/ui/button';
 import { generateMetaTags } from 'common/utils/meta-tags';
 import { useBooksFeed } from 'hooks/useBooksFeed';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
@@ -114,15 +115,16 @@ export default function BooksPage({
           {error && (
             <div className="mt-4 flex flex-col items-center text-center">
               <p className="text-sm text-red-600">{error}</p>
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   void retryLoadMore();
                 }}
-                className="mt-2 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:border-gray-400 hover:text-gray-900"
+                variant="secondary"
+                className="mt-2"
               >
                 Try again
-              </button>
+              </Button>
             </div>
           )}
 

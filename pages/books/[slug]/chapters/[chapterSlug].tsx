@@ -24,6 +24,7 @@ import { BookmarkButton } from 'components/shared/bookmark-button';
 import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 import { CommentsSection } from 'components/shared/comments/CommentsSection';
 import { ReadingProgressBar } from 'components/shared/reading-progress-bar';
+import { Button } from 'components/shared/ui/button';
 import { useReadingProgress } from 'hooks/useReadingProgress';
 import type { Book, Chapter, Homepage, ReadingProgressRecord } from 'types/cms';
 
@@ -163,10 +164,11 @@ export default function ChapterPage({
                   ) : null}
                 </div>
                 <div className="flex shrink-0 items-center gap-2 self-start">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setIsTocOpen(true)}
-                    className="inline-flex items-center gap-2 rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 lg:hidden"
+                    variant="secondary"
+                    className="gap-2 px-3 lg:hidden"
                   >
                     <svg
                       aria-hidden="true"
@@ -185,7 +187,7 @@ export default function ChapterPage({
                       />
                     </svg>
                     <span>Table of contents</span>
-                  </button>
+                  </Button>
                   <BookmarkButton
                     contentType="chapter"
                     contentId={chapter.id}
