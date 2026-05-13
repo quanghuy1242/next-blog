@@ -37,10 +37,11 @@ export default function BlogAuthSignupPage({
           <div className="mt-5 flex flex-wrap gap-3">
             <ButtonLink
               href={`/auth/login?returnTo=${encodeURIComponent(returnTo)}`}
+              size="lg"
             >
               Sign in
             </ButtonLink>
-            <ButtonLink variant="secondary" href={returnTo}>
+            <ButtonLink variant="secondary" href={returnTo} size="lg">
               Back to blog
             </ButtonLink>
           </div>
