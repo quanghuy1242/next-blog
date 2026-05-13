@@ -1,39 +1,55 @@
 import cn from 'classnames';
 import { useBookmark } from 'hooks/useBookmark';
 import { Button } from 'components/shared/ui/button';
+import type { BookmarkRecord } from 'types/cms';
 
 interface BookmarkButtonProps {
   contentType: 'chapter' | 'book';
   contentId: number;
   isAuthenticated: boolean;
+  initialBookmark?: BookmarkRecord | null;
 }
 
-export function BookmarkButton({ contentType, contentId, isAuthenticated }: BookmarkButtonProps) {
+export function BookmarkButton({
+  contentType,
+  contentId,
+  isAuthenticated,
+  initialBookmark = null,
+}: BookmarkButtonProps) {
   if (!isAuthenticated) {
     return null;
   }
 
-  return <BookmarkButtonInner contentType={contentType} contentId={contentId} />;
+  return (
+    <BookmarkButtonInner
+      contentType={contentType}
+      contentId={contentId}
+      initialBookmark={initialBookmark}
+    />
+  );
 }
 
 function BookmarkButtonInner({
   contentType,
   contentId,
+  initialBookmark,
 }: {
   contentType: 'chapter' | 'book';
   contentId: number;
+  initialBookmark: BookmarkRecord | null;
 }) {
-  const { isBookmarked, isLoading, isMutating, toggle } = useBookmark({
+  const { isBookmarked, isMutating, toggle } = useBookmark({
     contentType,
     contentId,
     enabled: true,
+    initialBookmark,
   });
 
   return (
     <Button
       type="button"
       onClick={toggle}
-      disabled={isLoading || isMutating}
+      disabled={isMutating}
       variant={isBookmarked ? 'primary' : 'secondary'}
       size="lg"
       className={cn(

@@ -1,6 +1,7 @@
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { getBookBySlug, getBookDetailById } from 'common/apis/books';
+import { getBookmarks } from 'common/apis/bookmarks';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from 'common/apis/cache';
 import { getCoverImageUrl } from 'common/utils/image';
 import { generateMetaTags } from 'common/utils/meta-tags';
@@ -14,7 +15,7 @@ import { ChapterList } from 'components/pages/books/chapter-list';
 import { BookmarkButton } from 'components/shared/bookmark-button';
 import { Text } from 'components/shared/text';
 import { ButtonLink } from 'components/shared/ui/button';
-import type { Book, Chapter, Homepage } from 'types/cms';
+import type { Book, BookmarkRecord, Chapter, Homepage } from 'types/cms';
 import { getReadingProgress } from 'common/apis/reading-progress';
 import type { ReadingProgressRecord } from 'types/cms';
 import { calculateWholeBookProgress } from 'common/utils/reading-progress';
@@ -25,6 +26,7 @@ interface BookDetailPageProps {
   homepage: Pick<Homepage, 'header'> | null;
   readingProgress: ReadingProgressRecord[];
   continueReadingChapterSlug: string | null;
+  initialBookmark?: BookmarkRecord | null;
   isDraftMode: boolean;
   isAuthenticated: boolean;
 }
@@ -35,6 +37,7 @@ export default function BookDetailPage({
   homepage,
   readingProgress,
   continueReadingChapterSlug,
+  initialBookmark = null,
   isDraftMode,
   isAuthenticated,
 }: BookDetailPageProps) {
@@ -78,6 +81,7 @@ export default function BookDetailPage({
               contentType="book"
               contentId={book.id}
               isAuthenticated={isAuthenticated}
+              initialBookmark={initialBookmark}
             />
           </div>
           {isAuthenticated || continueReadingChapterSlug ? (
@@ -148,12 +152,25 @@ export const getServerSideProps: GetServerSideProps<
 
     let readingProgress: ReadingProgressRecord[] = [];
     let continueReadingChapterSlug: string | null = null;
+    let initialBookmark: BookmarkRecord | null = null;
 
     if (sessionToken) {
       try {
         readingProgress = await getReadingProgress(String(book.id), { authToken: sessionToken });
       } catch {
         readingProgress = [];
+      }
+
+      try {
+        const bookmarkResult = await getBookmarks({
+          authToken: sessionToken,
+          contentType: 'book',
+          contentId: String(book.id),
+          limit: 1,
+        });
+        initialBookmark = bookmarkResult.docs[0] ?? null;
+      } catch {
+        initialBookmark = null;
       }
 
       const chapterSlugs = new Map(chapters.map((c) => [c.id, c.slug]));
@@ -178,6 +195,7 @@ export const getServerSideProps: GetServerSideProps<
         homepage,
         readingProgress,
         continueReadingChapterSlug,
+        initialBookmark,
         isDraftMode,
         isAuthenticated: !!sessionToken,
       },

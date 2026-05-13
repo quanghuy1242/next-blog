@@ -13,6 +13,7 @@ import {
   getChapterPasswordProofCookieValueFromRequest,
 } from 'common/utils/chapter-password-proof';
 import { getReadingProgress } from 'common/apis/reading-progress';
+import { getBookmarks } from 'common/apis/bookmarks';
 import { Container } from 'components/core/container';
 import { Layout } from 'components/core/layout';
 import { renderMetaTags } from 'components/core/metadata';
@@ -26,7 +27,7 @@ import { ReadingProgressBar } from 'components/shared/reading-progress-bar';
 import { Button } from 'components/shared/ui/button';
 import { TextLink } from 'components/shared/ui/text-link';
 import { useReadingProgress } from 'hooks/useReadingProgress';
-import type { Book, Chapter, Homepage, ReadingProgressRecord } from 'types/cms';
+import type { Book, BookmarkRecord, Chapter, Homepage, ReadingProgressRecord } from 'types/cms';
 
 interface ChapterPageProps {
   book: Book;
@@ -36,6 +37,7 @@ interface ChapterPageProps {
   isDraftMode: boolean;
   isAuthenticated: boolean;
   readingProgress: ReadingProgressRecord[];
+  initialBookmark?: BookmarkRecord | null;
 }
 
 export default function ChapterPage({
@@ -46,6 +48,7 @@ export default function ChapterPage({
   isDraftMode,
   isAuthenticated,
   readingProgress,
+  initialBookmark = null,
 }: ChapterPageProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
   const chapterContentRef = useRef<HTMLDivElement | null>(null);
@@ -194,6 +197,7 @@ export default function ChapterPage({
                     contentType="chapter"
                     contentId={chapter.id}
                     isAuthenticated={isAuthenticated}
+                    initialBookmark={initialBookmark}
                   />
                 </div>
               </div>
@@ -318,11 +322,24 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
     }
 
     let readingProgress: ReadingProgressRecord[] = [];
+    let initialBookmark: BookmarkRecord | null = null;
     if (sessionToken) {
       try {
         readingProgress = await getReadingProgress(String(book.id), { authToken: sessionToken });
       } catch {
         readingProgress = [];
+      }
+
+      try {
+        const bookmarkResult = await getBookmarks({
+          authToken: sessionToken,
+          contentType: 'chapter',
+          contentId: String(chapter.id),
+          limit: 1,
+        });
+        initialBookmark = bookmarkResult.docs[0] ?? null;
+      } catch {
+        initialBookmark = null;
       }
     }
 
@@ -335,6 +352,7 @@ export const getServerSideProps: GetServerSideProps<ChapterPageProps> = async ({
         isDraftMode,
         isAuthenticated: !!sessionToken,
         readingProgress,
+        initialBookmark,
       },
     };
   }

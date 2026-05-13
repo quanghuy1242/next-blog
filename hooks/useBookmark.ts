@@ -5,6 +5,7 @@ interface UseBookmarkOptions {
   contentType: 'chapter' | 'book';
   contentId: number;
   enabled: boolean;
+  initialBookmark?: BookmarkRecord | null;
 }
 
 interface UseBookmarkState {
@@ -14,15 +15,26 @@ interface UseBookmarkState {
   isMutating: boolean;
 }
 
-export function useBookmark({ contentType, contentId, enabled }: UseBookmarkOptions): UseBookmarkState & {
+export function useBookmark({
+  contentType,
+  contentId,
+  enabled,
+  initialBookmark = null,
+}: UseBookmarkOptions): UseBookmarkState & {
   toggle: () => Promise<void>;
 } {
-  const [bookmark, setBookmark] = useState<BookmarkRecord | null>(null);
+  const [bookmark, setBookmark] = useState<BookmarkRecord | null>(initialBookmark);
   const [isLoading, setIsLoading] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
 
   useEffect(() => {
-    if (!enabled || !contentId) return;
+    setBookmark(initialBookmark);
+  }, [contentType, contentId, initialBookmark]);
+
+  useEffect(() => {
+    if (!enabled || !contentId) {
+      return;
+    }
 
     let cancelled = false;
 
