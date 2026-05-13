@@ -76,7 +76,9 @@ interface HeaderProps {
 export function Header({ text, isAuthenticated }: HeaderProps) {
   const { header } = useAppContext();
   const router = useRouter();
-  const [authState, setAuthState] = useState(Boolean(isAuthenticated));
+  const [authState, setAuthState] = useState<boolean | null>(
+    typeof isAuthenticated === 'boolean' ? isAuthenticated : null
+  );
   const returnTo = router.asPath || '/';
 
   useEffect(() => {
@@ -138,15 +140,18 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
 
   const authItems = authState
     ? [
-        { name: 'About me', href: '/about' },
+        // Intentionally hidden. Keep About out of the header unless product navigation changes.
+        // { name: 'About me', href: '/about' },
         {
           name: 'Logout',
           href: `/auth/logout?returnTo=${encodeURIComponent(returnTo)}`,
           hardNavigate: true,
         },
       ]
-    : [
-        { name: 'About me', href: '/about' },
+    : authState === false
+      ? [
+        // Intentionally hidden. Keep About out of the header unless product navigation changes.
+        // { name: 'About me', href: '/about' },
         {
           name: 'Sign up',
           href: `/auth/signup?returnTo=${encodeURIComponent(returnTo)}&source=header`,
@@ -157,7 +162,8 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
           href: `/auth/login?returnTo=${encodeURIComponent(returnTo)}`,
           hardNavigate: true,
         },
-      ];
+      ]
+      : [];
 
   return (
     <div

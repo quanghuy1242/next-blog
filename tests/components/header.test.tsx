@@ -36,10 +36,13 @@ describe('Header', () => {
     vi.restoreAllMocks();
   });
 
-  test('renders blog auth entries with the current return URL', () => {
+  test('renders blog auth entries with the current return URL', async () => {
     render(<Header text="Blog" />);
 
-    const signUpLink = screen.getByRole('link', { name: 'Sign up' });
+    expect(screen.queryByRole('link', { name: 'Sign up' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Sign in' })).not.toBeInTheDocument();
+
+    const signUpLink = await screen.findByRole('link', { name: 'Sign up' });
     const signInLink = screen.getByRole('link', { name: 'Sign in' });
 
     expect(signUpLink).toHaveAttribute(
@@ -50,10 +53,7 @@ describe('Header', () => {
       'href',
       '/auth/login?returnTo=%2Fbooks'
     );
-    expect(screen.getByRole('link', { name: 'About me' })).toHaveAttribute(
-      'href',
-      '/about'
-    );
+    expect(screen.queryByRole('link', { name: 'About me' })).not.toBeInTheDocument();
   });
 
   test('renders the logout entry when the user is authenticated', async () => {
