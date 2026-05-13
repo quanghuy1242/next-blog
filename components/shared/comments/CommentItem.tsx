@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { PublicComment } from 'types/cms';
 import { CommentComposer } from './CommentComposer';
+import { TextActionButton } from 'components/shared/ui/button';
 
 interface CommentItemProps {
   comment: PublicComment;
@@ -111,64 +112,55 @@ export function CommentItem({
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               {showReply ? (
-                <button
-                  type="button"
+                <TextActionButton
                   onClick={() => {
                     setIsReplying((value) => !value);
                     setIsConfirmingDelete(false);
                     setIsEditing(false);
                   }}
-                  className="text-xs text-gray-500 hover:text-gray-700"
                 >
                   {isReplying ? 'Cancel reply' : 'Reply'}
-                </button>
+                </TextActionButton>
               ) : null}
               {showEdit ? (
-                <button
-                  type="button"
+                <TextActionButton
                   onClick={() => {
                     setIsEditing(true);
                     setIsReplying(false);
                     setIsConfirmingDelete(false);
                   }}
-                  className="text-xs text-gray-500 hover:text-gray-700"
                 >
                   Edit
-                </button>
+                </TextActionButton>
               ) : null}
               {showDelete ? (
                 isConfirmingDelete ? (
                   <>
-                    <button
-                      type="button"
+                    <TextActionButton
+                      variant="danger"
                       onClick={async () => {
                         await onDelete(comment.id);
                         setIsConfirmingDelete(false);
                       }}
-                      className="text-xs text-red-600 hover:text-red-800"
                     >
                       Confirm delete
-                    </button>
-                    <button
-                      type="button"
+                    </TextActionButton>
+                    <TextActionButton
                       onClick={() => setIsConfirmingDelete(false)}
-                      className="text-xs text-gray-500 hover:text-gray-700"
                     >
                       Cancel
-                    </button>
+                    </TextActionButton>
                   </>
                 ) : (
-                  <button
-                    type="button"
+                  <TextActionButton
                     onClick={() => {
                       setIsConfirmingDelete(true);
                       setIsReplying(false);
                       setIsEditing(false);
                     }}
-                    className="text-xs text-gray-500 hover:text-gray-700"
                   >
                     Delete
-                  </button>
+                  </TextActionButton>
                 )
               ) : null}
             </div>

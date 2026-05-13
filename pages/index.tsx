@@ -12,6 +12,7 @@ import { BOOKS_CTA_MEDIA, BooksCtaCard } from 'components/shared/books-cta-card'
 import { Posts } from 'components/shared/posts';
 import { Text } from 'components/shared/text';
 import { Button } from 'components/shared/ui/button';
+import { LoadingSpinner } from 'components/shared/ui/loading-spinner';
 import { generateHomepageMetaTags } from 'common/utils/meta-tags';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
@@ -142,7 +143,7 @@ export default function Index({
             <div ref={loaderRef} className="h-1 w-full" aria-hidden />
             {isFetching && (
               <div className="my-6 flex justify-center">
-                <span className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
+                <LoadingSpinner />
               </div>
             )}
             {error && (

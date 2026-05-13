@@ -90,6 +90,7 @@ export default function BookDetailPage({
               {continueReadingChapterSlug ? (
                 <ButtonLink
                   href={`${buildBookHref(book.id, book.slug)}/chapters/${continueReadingChapterSlug}`}
+                  size="lg"
                   ssrPrefetch
                 >
                   Continue reading

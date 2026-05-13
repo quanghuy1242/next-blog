@@ -1,11 +1,11 @@
 import React from 'react';
 import type { GetServerSideProps } from 'next';
-import Link from 'next/link';
 import { getBookmarks } from 'common/apis/bookmarks';
 import { getBetterAuthTokenFromRequest } from 'common/utils/auth';
 import { Layout } from 'components/core/layout';
 import { Container } from 'components/core/container';
 import { buildBookHref, buildChapterHref } from 'common/utils/book-route';
+import { TextLink } from 'components/shared/ui/text-link';
 import type { BookmarkRecord } from 'types/cms';
 
 interface ShelfPageProps {
@@ -59,12 +59,9 @@ export default function ShelfPage({
                     if (!book) return null;
                     return (
                       <li key={bm.id}>
-                        <Link
-                          href={buildBookHref(book.id, book.slug)}
-                          className="text-blue hover:underline"
-                        >
+                        <TextLink href={buildBookHref(book.id, book.slug)}>
                           {book.title}
-                        </Link>
+                        </TextLink>
                       </li>
                     );
                   })}
@@ -82,13 +79,10 @@ export default function ShelfPage({
                     return (
                       <li key={bm.id}>
                         {book ? (
-                          <Link
-                            href={buildChapterHref(book.id, book.slug, chapter.slug)}
-                            className="text-blue hover:underline"
-                          >
+                          <TextLink href={buildChapterHref(book.id, book.slug, chapter.slug)}>
                             {chapter.title}{' '}
                             <span className="text-gray-500">in {book.title}</span>
-                          </Link>
+                          </TextLink>
                         ) : (
                           <span>{chapter.title}</span>
                         )}

@@ -21,10 +21,10 @@ import { ChapterPasswordGate } from 'components/pages/books/chapter-password-gat
 import { ChapterToc } from 'components/pages/books/chapter-toc';
 import { ChapterTocDrawer } from 'components/pages/books/chapter-toc-drawer';
 import { BookmarkButton } from 'components/shared/bookmark-button';
-import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 import { CommentsSection } from 'components/shared/comments/CommentsSection';
 import { ReadingProgressBar } from 'components/shared/reading-progress-bar';
 import { Button } from 'components/shared/ui/button';
+import { TextLink } from 'components/shared/ui/text-link';
 import { useReadingProgress } from 'hooks/useReadingProgress';
 import type { Book, Chapter, Homepage, ReadingProgressRecord } from 'types/cms';
 
@@ -138,20 +138,22 @@ export default function ChapterPage({
                   <nav aria-label="Breadcrumb" className="mb-2">
                     <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-gray-500 sm:text-sm">
                       <li>
-                        <SSRPrefetchLink href="/books" className="font-medium text-blue hover:underline">
+                        <TextLink href="/books" medium ssrPrefetch>
                           Books
-                        </SSRPrefetchLink>
+                        </TextLink>
                       </li>
                       <li aria-hidden="true" className="text-gray-400">
                         &gt;
                       </li>
                       <li className="min-w-0">
-                        <SSRPrefetchLink
+                        <TextLink
                           href={buildBookHref(book.id, book.slug)}
-                          className="font-medium break-words text-blue hover:underline"
+                          className="break-words"
+                          medium
+                          ssrPrefetch
                         >
                           {book.title}
-                        </SSRPrefetchLink>
+                        </TextLink>
                       </li>
                       <li aria-hidden="true" className="text-gray-400">
                         &gt;
@@ -225,22 +227,22 @@ export default function ChapterPage({
               <div className="mt-8 flex items-center justify-between gap-4 border-t border-gray-200 pt-4 text-sm">
                 <div>
                   {previousChapter ? (
-                    <SSRPrefetchLink
+                    <TextLink
                       href={buildChapterHref(book.id, book.slug, previousChapter.slug)}
-                      className="text-blue hover:underline"
+                      ssrPrefetch
                     >
                       Previous: {previousChapter.title}
-                    </SSRPrefetchLink>
+                    </TextLink>
                   ) : null}
                 </div>
                 <div className="text-right">
                   {nextChapter ? (
-                    <SSRPrefetchLink
+                    <TextLink
                       href={buildChapterHref(book.id, book.slug, nextChapter.slug)}
-                      className="text-blue hover:underline"
+                      ssrPrefetch
                     >
                       Next: {nextChapter.title}
-                    </SSRPrefetchLink>
+                    </TextLink>
                   ) : null}
                 </div>
               </div>

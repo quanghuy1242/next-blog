@@ -35,7 +35,7 @@ function BookmarkButtonInner({
       onClick={toggle}
       disabled={isLoading || isMutating}
       variant={isBookmarked ? 'primary' : 'secondary'}
-      size="sm"
+      size="lg"
       className={cn(
         'gap-1.5',
         isBookmarked ? 'border border-blue' : ''

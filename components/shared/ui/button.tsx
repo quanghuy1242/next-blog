@@ -9,6 +9,7 @@ import { SSRPrefetchLink } from 'components/shared/ssr-prefetch-link';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
+export type TextActionVariant = 'neutral' | 'danger';
 
 interface ButtonClassNameOptions {
   variant?: ButtonVariant;
@@ -112,5 +113,31 @@ export function ButtonLink({
     <Link href={href} className={composedClassName} {...props}>
       {children}
     </Link>
+  );
+}
+
+interface TextActionButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: TextActionVariant;
+}
+
+export function TextActionButton({
+  variant = 'neutral',
+  className,
+  type = 'button',
+  ...props
+}: TextActionButtonProps) {
+  return (
+    <button
+      type={type}
+      className={cn(
+        'text-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60',
+        variant === 'danger'
+          ? 'text-red-600 hover:text-red-800'
+          : 'text-gray-500 hover:text-gray-700',
+        className
+      )}
+      {...props}
+    />
   );
 }

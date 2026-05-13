@@ -12,6 +12,7 @@ import { renderMetaTags } from 'components/core/metadata';
 import { BooksGrid } from 'components/shared/books-grid';
 import { Text } from 'components/shared/text';
 import { Button } from 'components/shared/ui/button';
+import { LoadingSpinner } from 'components/shared/ui/loading-spinner';
 import { generateMetaTags } from 'common/utils/meta-tags';
 import { useBooksFeed } from 'hooks/useBooksFeed';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
@@ -108,7 +109,7 @@ export default function BooksPage({
 
           {isFetching && (
             <div className="my-6 flex justify-center">
-              <span className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
+              <LoadingSpinner />
             </div>
           )}
 
