@@ -153,24 +153,34 @@ describe('ScrollRestoration', () => {
     });
   });
 
-  test('restores from popstate even before App Router rerenders the route hook', async () => {
+  test('waits for first-visit page height before restoring', async () => {
     navigationState.pathname = '/posts/example';
     window.history.replaceState({}, '', '/posts/example');
     window.sessionStorage.setItem(
       'scroll-pos:/',
-      JSON.stringify({ x: 0, y: 880 })
+      JSON.stringify({ x: 0, y: 1200 })
     );
-    render(<ScrollRestoration />);
+    setDocumentHeight(900);
+    const { rerender } = render(<ScrollRestoration />);
 
     act(() => {
-      setScrollPosition(0, 30);
+      setScrollPosition(0, 20);
       window.history.pushState({}, '', '/');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
 
+    navigationState.pathname = '/';
+    rerender(<ScrollRestoration />);
+
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+    expect(window.scrollY).toBe(20);
+
+    act(() => {
+      setDocumentHeight(2400);
+    });
+
     await waitFor(() => {
-      expect(window.scrollY).toBe(880);
-      expect(window.__historyScrollRestoredFor).toBe('/');
+      expect(window.scrollY).toBe(1200);
     });
   });
 });

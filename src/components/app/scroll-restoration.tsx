@@ -25,7 +25,6 @@ export function ScrollRestoration() {
   const suspendedSaveUrlRef = useRef<string | null>(null);
   const saveFrameRef = useRef<number | null>(null);
   const cancelRestoreRef = useRef<(() => void) | null>(null);
-  const restoreFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -139,17 +138,7 @@ export function ScrollRestoration() {
       const leavingRoute = currentUrlRef.current;
       savePosition(leavingRoute);
       suspendedSaveUrlRef.current = leavingRoute;
-      const restoreUrl = getWindowUrl();
-      pendingRestoreUrlRef.current = restoreUrl;
-
-      if (restoreFrameRef.current !== null) {
-        window.cancelAnimationFrame(restoreFrameRef.current);
-      }
-
-      restoreFrameRef.current = window.requestAnimationFrame(() => {
-        restoreFrameRef.current = null;
-        restoreSavedPosition(restoreUrl, cancelRestoreRef);
-      });
+      pendingRestoreUrlRef.current = getWindowUrl();
     };
 
     if ('scrollRestoration' in window.history) {
@@ -170,11 +159,6 @@ export function ScrollRestoration() {
       if (saveFrameRef.current !== null) {
         window.cancelAnimationFrame(saveFrameRef.current);
         saveFrameRef.current = null;
-      }
-
-      if (restoreFrameRef.current !== null) {
-        window.cancelAnimationFrame(restoreFrameRef.current);
-        restoreFrameRef.current = null;
       }
 
       cancelRestoreRef.current?.();
@@ -280,8 +264,8 @@ function restoreWhenReady(url: string, x: number, y: number) {
   let restoreFrames = 0;
   let frameId: number | null = null;
   let cancelled = false;
-  const maxAttempts = 90;
-  const minRestoreFrames = 12;
+  const maxAttempts = 600;
+  const minRestoreFrames = 30;
 
   const cancel = () => {
     cancelled = true;
