@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { getHomeFeedPage } from '@/lib/home/posts-feed';
+import { getHomeFeedPage } from '@/lib/payload/home-feed';
 import { json, methodNotAllowed } from '@/lib/server/http';
 import { normalizeLimit, normalizeOffset } from '@/lib/utils/number';
 import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';

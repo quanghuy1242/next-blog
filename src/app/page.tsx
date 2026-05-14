@@ -1,7 +1,7 @@
 import { cache } from 'react';
 
-import { getHomeFeedPage } from '@/lib/home/posts-feed';
 import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
+import { getHomeFeedPage } from '@/lib/payload/home-feed';
 import { getHomePageShell } from '@/lib/payload/index';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';

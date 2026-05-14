@@ -10,10 +10,18 @@ import type {
   CommentsResult,
   ReadingProgressRecord,
 } from '@/types/cms';
-import { fetchAPI, fetchAPIWithAuthToken } from '@/lib/payload/base';
 import { getBookBySlug } from '@/lib/payload/books';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE, type PayloadCacheSettings } from '@/lib/payload/cache';
 import { getChapterByBookAndSlug } from '@/lib/payload/chapters';
+import {
+  fetchAuthenticatedBookPagePayload,
+  fetchAuthenticatedChapterPageSupplementalPayload,
+  fetchChapterPageBasePayload,
+  fetchPublicBookPagePayload,
+  fetchPublicChapterCommentsPayload,
+  type PayloadBookPageRequestOptions,
+  type PayloadChapterPageRequestOptions,
+} from '@/lib/payload/book-pages';
 import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
 import {
   buildBookHref,
@@ -25,118 +33,6 @@ import {
   getChapterProofFromAppRequest,
 } from '@/lib/server/app-request';
 
-const BOOK_STATUS_PUBLISHED = '{ _status: { equals: published } }';
-const CHAPTER_STATUS_PUBLISHED = '{ _status: { equals: published } }';
-
-const BOOK_DETAIL_FIELDS = `
-  id
-  title
-  author
-  slug
-  totalWordCount
-  cover {
-    url
-    optimizedUrl
-    lowResUrl
-  }
-`;
-
-const CHAPTER_PAGE_FIELDS = `
-  id
-  title
-  slug
-  order
-  hasPassword
-  chapterWordCount
-`;
-
-const CHAPTER_READER_DETAIL_FIELDS = `
-  id
-  title
-  slug
-  hasPassword
-  content
-  book {
-    ... on Book {
-      id
-      title
-      slug
-      origin
-      sourceType
-      cover {
-        url
-        optimizedUrl
-      }
-    }
-  }
-`;
-
-const CHAPTER_READER_LIST_FIELDS = `
-  ${CHAPTER_PAGE_FIELDS}
-  chapterSourceKey
-`;
-
-const READING_PROGRESS_FIELDS = `
-  chapterId
-  progress
-  completedAt
-  updatedAt
-`;
-
-const BOOKMARK_RECORD_FIELDS = `
-  id
-  contentType
-  chapter(draft: true) {
-    ... on Chapter {
-      id
-      title
-      slug
-      book(draft: true) {
-        ... on Book {
-          id
-          title
-          slug
-        }
-      }
-    }
-  }
-  book(draft: true) {
-    ... on Book {
-      id
-      title
-      slug
-    }
-  }
-`;
-
-const COMMENT_FIELDS = `
-  id
-  content
-  status
-  createdAt
-  updatedAt
-  parentCommentId
-  chapterId
-  postId
-  isOwnPending
-  isDeleted
-  viewerCanEdit
-  viewerCanDelete
-  editWindowEndsAt
-  author {
-    id
-    fullName
-    avatar {
-      id
-      url
-      thumbnailURL
-      optimizedUrl
-      lowResUrl
-      alt
-    }
-  }
-`;
-
 interface PageRequestContext {
   sessionToken: string | null;
   isDraftMode: boolean;
@@ -145,47 +41,6 @@ interface PageRequestContext {
 
 interface ChapterPageRequestContext extends PageRequestContext {
   chapterPasswordProof: string | null;
-}
-
-interface BookPageBaseResponse {
-  Books: {
-    docs: Book[];
-  };
-  Chapters: {
-    docs: Chapter[];
-  };
-}
-
-interface BookPageAuthenticatedResponse extends BookPageBaseResponse {
-  readingProgress: {
-    records: ReadingProgressRecord[];
-  } | null;
-  Bookmarks: {
-    docs: BookmarkRecord[];
-  } | null;
-}
-
-interface ChapterPageBaseResponse {
-  ChapterMatch: {
-    docs: Chapter[];
-  };
-  ChaptersByBook: {
-    docs: Chapter[];
-  };
-}
-
-interface ChapterPageSupplementalResponse {
-  readingProgress: {
-    records: ReadingProgressRecord[];
-  } | null;
-  Bookmarks: {
-    docs: BookmarkRecord[];
-  } | null;
-  comments: CommentsResult | null;
-}
-
-interface ChapterCommentsResponse {
-  comments: CommentsResult | null;
 }
 
 export interface BookPageData {
@@ -219,10 +74,22 @@ export async function getBookPageData(slugParam: string): Promise<BookPageData> 
     await redirectLegacyBookSlug(parsedBookRoute.bookSlug, requestContext);
   }
 
-  const { book, chapters, bookmark, readingProgress } =
-    requestContext.sessionToken
-      ? await fetchAuthenticatedBookPageData(parsedBookRoute.bookId!, requestContext)
-      : await fetchPublicBookPageData(parsedBookRoute.bookId!, requestContext);
+  const authenticatedPayload = requestContext.sessionToken
+    ? await fetchAuthenticatedBookPagePayload(
+        parsedBookRoute.bookId!,
+        toPayloadOptions(requestContext)
+      )
+    : null;
+  const publicPayload = authenticatedPayload
+    ? null
+    : await fetchPublicBookPagePayload(
+        parsedBookRoute.bookId!,
+        toPayloadOptions(requestContext)
+      );
+  const book = authenticatedPayload?.book ?? publicPayload?.book ?? null;
+  const chapters = authenticatedPayload?.chapters ?? publicPayload?.chapters ?? [];
+  const bookmark = authenticatedPayload?.bookmark ?? null;
+  const readingProgress = authenticatedPayload?.readingProgress ?? [];
 
   if (!book || book.slug !== parsedBookRoute.bookSlug) {
     notFound();
@@ -333,205 +200,16 @@ async function getChapterPageRequestContext(): Promise<ChapterPageRequestContext
   };
 }
 
-async function fetchAuthenticatedBookPageData(
-  bookId: number,
-  requestContext: PageRequestContext
-) {
-  const fetcher = selectPayloadFetcher(requestContext);
-  const statusFilter = buildBookStatusFilter(requestContext.isDraftMode);
-
-  const data = await fetcher<BookPageAuthenticatedResponse>(
-    `#graphql
-      query BookPageAuthenticated(
-        $bookId: Int!
-        $bookRelationId: JSON!
-        $readingProgressBookId: ID!
-        $bookmarkWhere: Bookmark_where
-      ) {
-        Books(
-          where: {
-            AND: [
-              { id: { equals: $bookId } }
-              ${statusFilter}
-            ]
-          }
-          limit: 1
-        ) {
-          docs {
-            ${BOOK_DETAIL_FIELDS}
-          }
-        }
-
-        Chapters(
-          where: {
-            AND: [
-              { book: { equals: $bookRelationId } }
-              ${buildChapterStatusFilter(requestContext.isDraftMode)}
-            ]
-          }
-          sort: "order"
-          limit: 200
-        ) {
-          docs {
-            ${CHAPTER_PAGE_FIELDS}
-          }
-        }
-
-        readingProgress(bookId: $readingProgressBookId) {
-          records {
-            ${READING_PROGRESS_FIELDS}
-          }
-        }
-
-        Bookmarks(where: $bookmarkWhere, limit: 1) {
-          docs {
-            ${BOOKMARK_RECORD_FIELDS}
-          }
-        }
-      }
-    `,
-    {
-      variables: {
-        bookId,
-        bookRelationId: bookId,
-        readingProgressBookId: String(bookId),
-        bookmarkWhere: {
-          and: [
-            { contentType: { equals: 'book' } },
-            { book: { equals: String(bookId) } },
-          ],
-        },
-      },
-      authToken: requestContext.sessionToken,
-      cache: requestContext.payloadCache,
-    }
-  );
-
-  return {
-    book: data?.Books?.docs?.[0] ?? null,
-    chapters: sortChaptersForPage(data?.Chapters?.docs ?? []),
-    bookmark: data?.Bookmarks?.docs?.[0] ?? null,
-    readingProgress: data?.readingProgress?.records ?? [],
-  };
-}
-
-async function fetchPublicBookPageData(
-  bookId: number,
-  requestContext: PageRequestContext
-) {
-  const fetcher = selectPayloadFetcher(requestContext);
-
-  const data = await fetcher<BookPageBaseResponse>(
-    `#graphql
-      query BookPagePublic($bookId: Int!, $bookRelationId: JSON!) {
-        Books(
-          where: {
-            AND: [
-              { id: { equals: $bookId } }
-              ${buildBookStatusFilter(requestContext.isDraftMode)}
-            ]
-          }
-          limit: 1
-        ) {
-          docs {
-            ${BOOK_DETAIL_FIELDS}
-          }
-        }
-
-        Chapters(
-          where: {
-            AND: [
-              { book: { equals: $bookRelationId } }
-              ${buildChapterStatusFilter(requestContext.isDraftMode)}
-            ]
-          }
-          sort: "order"
-          limit: 200
-        ) {
-          docs {
-            ${CHAPTER_PAGE_FIELDS}
-          }
-        }
-      }
-    `,
-    {
-      variables: {
-        bookId,
-        bookRelationId: bookId,
-      },
-      authToken: requestContext.sessionToken,
-      cache: requestContext.payloadCache,
-    }
-  );
-
-  return {
-    book: data?.Books?.docs?.[0] ?? null,
-    chapters: sortChaptersForPage(data?.Chapters?.docs ?? []),
-    bookmark: null,
-    readingProgress: [],
-  };
-}
-
 async function fetchChapterPageBaseData(
   bookId: number,
   chapterSlug: string,
   requestContext: ChapterPageRequestContext
 ) {
-  const fetcher = selectPayloadFetcher(requestContext);
-
-  const data = await fetcher<ChapterPageBaseResponse>(
-    `#graphql
-      query ChapterPageBase($bookRelationId: JSON!, $chapterSlug: String!) {
-        ChapterMatch: Chapters(
-          where: {
-            AND: [
-              { book: { equals: $bookRelationId } }
-              { slug: { equals: $chapterSlug } }
-              ${buildChapterStatusFilter(requestContext.isDraftMode)}
-            ]
-          }
-          limit: 1
-        ) {
-          docs {
-            ${CHAPTER_READER_DETAIL_FIELDS}
-          }
-        }
-
-        ChaptersByBook: Chapters(
-          where: {
-            AND: [
-              { book: { equals: $bookRelationId } }
-              ${buildChapterStatusFilter(requestContext.isDraftMode)}
-            ]
-          }
-          sort: "order"
-          limit: 200
-        ) {
-          docs {
-            ${CHAPTER_READER_LIST_FIELDS}
-          }
-        }
-      }
-    `,
-    {
-      variables: {
-        bookRelationId: bookId,
-        chapterSlug: chapterSlug.trim(),
-      },
-      authToken: requestContext.sessionToken,
-      cache: requestContext.payloadCache,
-      requestHeaders: buildChapterProofHeaders(requestContext.chapterPasswordProof),
-    }
+  return fetchChapterPageBasePayload(
+    bookId,
+    chapterSlug,
+    toPayloadChapterOptions(requestContext)
   );
-
-  const chapter = data?.ChapterMatch?.docs?.[0] ?? null;
-  const book = chapter?.book && typeof chapter.book === 'object' ? (chapter.book as Book) : null;
-
-  return {
-    book,
-    chapter,
-    chapters: sortChaptersForPage(data?.ChaptersByBook?.docs ?? []),
-  };
 }
 
 async function fetchChapterPageSupplementalData(
@@ -544,58 +222,14 @@ async function fetchChapterPageSupplementalData(
   }
 ) {
   if (options.includeViewerData) {
-    const data = await fetchAPIWithAuthToken<ChapterPageSupplementalResponse>(
-      `#graphql
-        query ChapterPageSupplemental(
-          $readingProgressBookId: ID!
-          $bookmarkWhere: Bookmark_where
-          $commentsChapterId: ID
-        ) {
-          readingProgress(bookId: $readingProgressBookId) {
-            records {
-              ${READING_PROGRESS_FIELDS}
-            }
-          }
-
-          Bookmarks(where: $bookmarkWhere, limit: 1) {
-            docs {
-              ${BOOKMARK_RECORD_FIELDS}
-            }
-          }
-
-          comments(chapterId: $commentsChapterId) {
-            docs {
-              ${COMMENT_FIELDS}
-            }
-            totalDocs
-            viewerCanComment
-          }
-        }
-      `,
+    return fetchAuthenticatedChapterPageSupplementalPayload(
+      bookId,
+      chapterId,
       {
-        variables: {
-          readingProgressBookId: String(bookId),
-          bookmarkWhere: {
-            and: [
-              { contentType: { equals: 'chapter' } },
-              { chapter: { equals: String(chapterId) } },
-            ],
-          },
-          commentsChapterId: options.includeComments ? String(chapterId) : undefined,
-        },
-        authToken: requestContext.sessionToken!,
-        cache: requestContext.payloadCache,
-        requestHeaders: buildChapterProofHeaders(requestContext.chapterPasswordProof),
+        ...toPayloadChapterOptions(requestContext),
+        includeComments: options.includeComments,
       }
     );
-
-    return {
-      comments: options.includeComments
-        ? (data?.comments ?? emptyCommentsResult())
-        : null,
-      bookmark: data?.Bookmarks?.docs?.[0] ?? null,
-      readingProgress: data?.readingProgress?.records ?? [],
-    };
   }
 
   if (!options.includeComments) {
@@ -606,29 +240,11 @@ async function fetchChapterPageSupplementalData(
     };
   }
 
-  const data = await fetchAPIWithAuthToken<ChapterCommentsResponse>(
-    `#graphql
-      query ChapterPageComments($commentsChapterId: ID!) {
-        comments(chapterId: $commentsChapterId) {
-          docs {
-            ${COMMENT_FIELDS}
-          }
-          totalDocs
-          viewerCanComment
-        }
-      }
-    `,
-    {
-      variables: {
-        commentsChapterId: String(chapterId),
-      },
-      requestHeaders: buildChapterProofHeaders(requestContext.chapterPasswordProof),
-      cache: requestContext.payloadCache,
-    }
-  );
-
   return {
-    comments: data?.comments ?? emptyCommentsResult(),
+    comments: await fetchPublicChapterCommentsPayload(
+      chapterId,
+      toPayloadChapterOptions(requestContext)
+    ),
     bookmark: null,
     readingProgress: [],
   };
@@ -686,42 +302,6 @@ async function redirectLegacyChapterRoute(
   );
 }
 
-function selectPayloadFetcher(
-  requestContext: PageRequestContext | ChapterPageRequestContext
-) {
-  if (requestContext.isDraftMode) {
-    return fetchAPI as typeof fetchAPIWithAuthToken;
-  }
-
-  return fetchAPIWithAuthToken;
-}
-
-function buildBookStatusFilter(draft: boolean): string {
-  if (draft) {
-    return '{ _status: { in: [published, draft] } }';
-  }
-
-  return BOOK_STATUS_PUBLISHED;
-}
-
-function buildChapterStatusFilter(draft: boolean): string {
-  if (draft) {
-    return '{ _status: { in: [published, draft] } }';
-  }
-
-  return CHAPTER_STATUS_PUBLISHED;
-}
-
-function buildChapterProofHeaders(chapterPasswordProof: string | null) {
-  if (!chapterPasswordProof) {
-    return undefined;
-  }
-
-  return {
-    'x-chapter-password-proof': chapterPasswordProof,
-  };
-}
-
 function buildReadingProgressByChapterId(records: ReadingProgressRecord[]) {
   if (!records.length) {
     return undefined;
@@ -759,20 +339,21 @@ function getContinueReadingChapterSlug(
   return null;
 }
 
-function sortChaptersForPage(chapters: Chapter[]): Chapter[] {
-  return [...chapters].sort((first, second) => {
-    if (first.order !== second.order) {
-      return first.order - second.order;
-    }
-
-    return first.id - second.id;
-  });
+function toPayloadOptions(requestContext: PageRequestContext): PayloadBookPageRequestOptions {
+  return {
+    authToken: requestContext.sessionToken,
+    cache: requestContext.payloadCache,
+    draftMode: requestContext.isDraftMode,
+  };
 }
 
-function emptyCommentsResult(): CommentsResult {
+function toPayloadChapterOptions(
+  requestContext: ChapterPageRequestContext
+): PayloadChapterPageRequestOptions {
   return {
-    docs: [],
-    totalDocs: 0,
-    viewerCanComment: false,
+    authToken: requestContext.sessionToken,
+    cache: requestContext.payloadCache,
+    draftMode: requestContext.isDraftMode,
+    chapterPasswordProof: requestContext.chapterPasswordProof,
   };
 }

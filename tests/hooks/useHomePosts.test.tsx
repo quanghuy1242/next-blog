@@ -3,11 +3,11 @@ import { useHomePosts, type HomePostsState } from '@/hooks/useHomePosts';
 import {
   readHomeFeedSnapshot,
   writeHomeFeedSnapshot,
-} from '@/lib/home/home-feed-snapshot';
+} from '@/lib/browser/home-feed-snapshot';
 import type { Post } from '@/types/cms';
 import { vi } from 'vitest';
 
-vi.mock('@/lib/home/home-feed-snapshot', () => ({
+vi.mock('@/lib/browser/home-feed-snapshot', () => ({
   buildHomeFeedSnapshotKey: vi.fn((category: string | null, tags: string[]) =>
     JSON.stringify({ category, tags })
   ),

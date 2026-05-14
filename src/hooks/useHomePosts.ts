@@ -5,7 +5,7 @@ import {
   readHomeFeedSnapshot,
   writeHomeFeedSnapshot,
   type HomeFeedStateSnapshot,
-} from '@/lib/home/home-feed-snapshot';
+} from '@/lib/browser/home-feed-snapshot';
 import { areStringArraysEqual } from '@/lib/utils/query';
 
 interface UseHomePostsParams {
