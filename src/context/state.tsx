@@ -1,17 +1,19 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useMemo, useReducer } from 'react';
 import type { Post } from '@/types/cms';
 import {
   changeHeader,
   getChangeStateFuncs,
+  setAuthState,
   setHomePosts,
   type ChangeStates,
 } from './actions';
 
 export interface State {
   header: string;
+  authState: boolean | null;
   homePosts: HomePostsState | null;
 }
 
@@ -25,13 +27,15 @@ export interface HomePostsState {
 
 export type Action =
   | { type: typeof changeHeader; value: string }
-  | { type: typeof setHomePosts; value: HomePostsState | null };
+  | { type: typeof setHomePosts; value: HomePostsState | null }
+  | { type: typeof setAuthState; value: boolean | null };
 
 const AppContext = createContext<(State & ChangeStates) | undefined>(undefined);
 
 function init(): State {
   return {
     header: 'Birdless Sky',
+    authState: null,
     homePosts: null,
   };
 }
@@ -39,10 +43,17 @@ function init(): State {
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case changeHeader: {
-      return { ...state, header: action.value };
+      return state.header === action.value
+        ? state
+        : { ...state, header: action.value };
     }
     case setHomePosts: {
       return { ...state, homePosts: action.value };
+    }
+    case setAuthState: {
+      return state.authState === action.value
+        ? state
+        : { ...state, authState: action.value };
     }
     default: {
       // const _exhaustiveCheck: never = action;
@@ -57,9 +68,14 @@ interface AppWrapperProps {
 
 export function AppWrapper({ children }: AppWrapperProps) {
   const [state, dispatch] = useReducer(reducer, init());
+  const actions = useMemo(() => getChangeStateFuncs(dispatch), [dispatch]);
+  const value = useMemo(
+    () => ({ ...state, ...actions }),
+    [actions, state]
+  );
 
   return (
-    <AppContext.Provider value={{ ...state, ...getChangeStateFuncs(dispatch) }}>
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   );

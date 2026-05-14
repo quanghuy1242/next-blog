@@ -1238,9 +1238,10 @@ Tests:
   - Keep authenticated and proof-scoped content private.
 - Add on-demand revalidation endpoints if Payload can call webhooks after content changes.
 - Replace client comment/bookmark fetches with Server Actions only if it improves UX without breaking API consumers.
-- Add Playwright E2E tests for real browser scroll restoration and reader progress.
+- Add Playwright E2E tests for real browser scroll restoration and reader progress. (skipped)
+- Promote persistent shared shell/header into App Router layout boundary and remove null Suspense flicker. (done)
 - Consider Partial Prerendering only after OpenNext Cloudflare behavior is validated for this app's dynamic holes.
-- Revisit `next build --webpack` and Turbopack after the router migration is stable.
+- Revisit `next build --webpack` and Turbopack after the router migration is stable. (skipped)
 - Add typed routes after all paths live in `src/app/`.
 
 ## 12. Test And Verification Plan

@@ -3,8 +3,8 @@
 import cn from 'classnames';
 import { useAppContext } from '@/context/state';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface NavigationItem {
   name: string;
@@ -76,23 +76,38 @@ interface HeaderProps {
 }
 
 export function Header({ text, isAuthenticated }: HeaderProps) {
-  const { header } = useAppContext();
+  const {
+    authState: contextAuthState,
+    header,
+    setAuthState: setContextAuthState,
+  } = useAppContext();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [authState, setAuthState] = useState<boolean | null>(
-    typeof isAuthenticated === 'boolean' ? isAuthenticated : null
+    typeof isAuthenticated === 'boolean' ? isAuthenticated : contextAuthState
   );
-  const returnTo = useMemo(() => {
-    const search = searchParams?.toString();
-
-    return `${pathname || '/'}${search ? `?${search}` : ''}`;
-  }, [pathname, searchParams]);
+  const [returnTo, setReturnTo] = useState(pathname || '/');
 
   useEffect(() => {
     if (typeof isAuthenticated === 'boolean') {
       setAuthState(isAuthenticated);
+      setContextAuthState(isAuthenticated);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, setContextAuthState]);
+
+  useEffect(() => {
+    if (typeof isAuthenticated !== 'boolean' && contextAuthState !== null) {
+      setAuthState(contextAuthState);
+    }
+  }, [contextAuthState, isAuthenticated]);
+
+  useEffect(() => {
+    if (window.location.pathname === pathname) {
+      setReturnTo(`${window.location.pathname}${window.location.search}`);
+      return;
+    }
+
+    setReturnTo(pathname || '/');
+  }, [pathname]);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,6 +130,7 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
 
         if (!cancelled && typeof data.isAuthenticated === 'boolean') {
           setAuthState(data.isAuthenticated);
+          setContextAuthState(data.isAuthenticated);
         }
       } catch {
         // Keep the current UI state when the auth probe fails.
@@ -141,7 +157,7 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleWindowFocus);
     };
-  }, [pathname, searchParams]);
+  }, [pathname, setContextAuthState]);
 
   const authItems = authState
     ? [

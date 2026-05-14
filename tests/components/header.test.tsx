@@ -4,9 +4,11 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 vi.mock('@/context/state', () => ({
   useAppContext: () => ({
+    authState: null,
     changeHeader: vi.fn(),
     header: 'Birdless Sky',
     homePosts: null,
+    setAuthState: vi.fn(),
     setHomePosts: vi.fn(),
   }),
 }));
