@@ -6,6 +6,7 @@ interface CommentsSectionProps {
   postId?: string;
   viewerCanComment?: boolean;
   initialData?: CommentsResult | null;
+  refreshOnMount?: boolean;
 }
 
 export function CommentsSection({
@@ -13,6 +14,7 @@ export function CommentsSection({
   postId,
   viewerCanComment: initialViewerCanComment,
   initialData,
+  refreshOnMount,
 }: CommentsSectionProps) {
   return (
     <CommentsSectionClient
@@ -20,6 +22,7 @@ export function CommentsSection({
       postId={postId}
       viewerCanComment={initialViewerCanComment}
       initialData={initialData}
+      refreshOnMount={refreshOnMount}
     />
   );
 }

@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
+import { cache } from 'react';
 
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
@@ -111,8 +112,10 @@ async function loadBookPageData(slugParam: string) {
   redirect(buildBookHref(accessibleResult.book.id, accessibleResult.book.slug));
 }
 
+const getCachedBookPageData = cache(loadBookPageData);
+
 export async function generateMetadata({ params }: BookPageProps) {
-  const { book } = await loadBookPageData((await params).slug);
+  const { book } = await getCachedBookPageData((await params).slug);
 
   return buildMetadata({
     title: book.title,
@@ -123,7 +126,7 @@ export async function generateMetadata({ params }: BookPageProps) {
 }
 
 export default async function BookPage({ params }: BookPageProps) {
-  const data = await loadBookPageData((await params).slug);
+  const data = await getCachedBookPageData((await params).slug);
   const readingProgressByChapterId =
     data.readingProgress.length > 0
       ? Object.fromEntries(

@@ -1,9 +1,16 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
-import type { Book, BookmarkRecord, Chapter, Homepage, ReadingProgressRecord } from '@/types/cms';
+import type {
+  Book,
+  BookmarkRecord,
+  Chapter,
+  CommentsResult,
+  Homepage,
+  ReadingProgressRecord,
+} from '@/types/cms';
 import { buildBookHref, buildChapterHref } from '@/lib/routes/book-route';
 import { useReadingProgress } from '@/hooks/useReadingProgress';
 import { Container } from '@/components/core/container';
@@ -25,6 +32,7 @@ interface ChapterReaderClientProps {
   isDraftMode: boolean;
   isAuthenticated: boolean;
   readingProgress: ReadingProgressRecord[];
+  initialComments?: CommentsResult | null;
   initialBookmark?: BookmarkRecord | null;
 }
 
@@ -34,13 +42,12 @@ export function ChapterReaderClient({
   chapters,
   isAuthenticated,
   readingProgress,
+  initialComments = null,
   initialBookmark = null,
 }: ChapterReaderClientProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
   const chapterContentRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const shouldRenderChapterTitle =
     (book.origin as string) !== 'epub_imported' &&
     (book.sourceType as string) !== 'epub_upload';
@@ -169,8 +176,7 @@ export function ChapterReaderClient({
               <ChapterPasswordGate
                 chapterId={chapter.id}
                 onUnlocked={async () => {
-                  const search = searchParams?.toString();
-                  const currentUrl = `${pathname || ''}${search ? `?${search}` : ''}`;
+                  const currentUrl = `${window.location.pathname}${window.location.search}`;
                   router.replace(currentUrl || window.location.pathname);
                   router.refresh();
                 }}
@@ -187,7 +193,11 @@ export function ChapterReaderClient({
             )}
 
             {!isChapterLocked ? (
-              <CommentsSection chapterId={String(chapter.id)} />
+              <CommentsSection
+                chapterId={String(chapter.id)}
+                initialData={initialComments}
+                refreshOnMount={false}
+              />
             ) : null}
 
             <div className="mt-8 flex items-center justify-between gap-4 border-t border-gray-200 pt-4 text-sm">

@@ -10,6 +10,7 @@ interface CommentsSectionClientProps {
   postId?: string;
   viewerCanComment?: boolean;
   initialData?: CommentsResult | null;
+  refreshOnMount?: boolean;
 }
 
 export function CommentsSectionClient({
@@ -17,6 +18,7 @@ export function CommentsSectionClient({
   postId,
   viewerCanComment: initialViewerCanComment,
   initialData,
+  refreshOnMount = true,
 }: CommentsSectionClientProps) {
   const {
     data,
@@ -30,6 +32,8 @@ export function CommentsSectionClient({
     chapterId,
     postId,
     enabled: true,
+    initialData,
+    refreshOnMount,
   });
 
   const comments = data?.docs ?? initialData?.docs ?? [];

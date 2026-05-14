@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import { getDataForAbout } from '@/lib/payload/author';
 import { getCoverImageUrl } from '@/lib/utils/image';
 import { buildMetadata } from '@/lib/utils/next-metadata';
@@ -7,8 +9,10 @@ import { LexicalRenderer } from '@/components/shared/lexical-renderer';
 
 export const revalidate = 3600;
 
+const getAboutPageData = cache(getDataForAbout);
+
 export async function generateMetadata() {
-  const data = await getDataForAbout();
+  const data = await getAboutPageData();
 
   return buildMetadata({
     title: `About ${data.author?.fullName || 'Author'}`,
@@ -18,7 +22,7 @@ export async function generateMetadata() {
 }
 
 export default async function AboutPage() {
-  const data = await getDataForAbout();
+  const data = await getAboutPageData();
 
   return (
     <Layout header={data.homepage?.header} className="flex flex-col items-center">

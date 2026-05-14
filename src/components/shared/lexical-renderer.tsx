@@ -17,7 +17,7 @@ import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical
 import type {
   SerializedUploadNode,
 } from '@payloadcms/richtext-lexical';
-import { ResponsiveImage } from './responsive-image';
+import { ResponsiveImageMarkup } from './responsive-image-markup';
 import { SSRPrefetchLink } from '@/components/shared/ssr-prefetch-link';
 import {
   resolveEpubHref,
@@ -90,7 +90,7 @@ const CustomUploadComponent: React.FC<{
     };
 
     return (
-      <ResponsiveImage
+      <ResponsiveImageMarkup
         src={mediaObject}
         alt={alt || ''}
         width={width || null}

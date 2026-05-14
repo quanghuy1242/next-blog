@@ -1,10 +1,12 @@
 import { draftMode } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
+import { cache } from 'react';
 
 import { Layout } from '@/components/core/layout';
 import { ChapterReaderClient } from '@/components/pages/books/chapter-reader-client';
 import { getChapterPageMetadata } from '@/lib/metadata/chapter-page';
 import { getBookmarks } from '@/lib/payload/bookmarks';
+import { getComments } from '@/lib/payload/comments';
 import { getBookBySlug } from '@/lib/payload/books';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
 import { getChapterByBookAndSlug, getChapterPageByBookId } from '@/lib/payload/chapters';
@@ -45,6 +47,13 @@ async function loadChapterPageData(bookSlug: string, chapterSlug: string) {
 
     let readingProgress: ReadingProgressRecord[] = [];
     let initialBookmark: BookmarkRecord | null = null;
+    const isChapterLocked = chapter.hasPassword === true && chapter.content == null;
+    const initialComments = isChapterLocked
+      ? null
+      : await getComments(
+          { chapterId: String(chapter.id) },
+          { authToken: sessionToken, chapterPasswordProof }
+        ).catch(() => null);
 
     if (sessionToken) {
       try {
@@ -71,6 +80,7 @@ async function loadChapterPageData(bookSlug: string, chapterSlug: string) {
       chapter,
       chapters,
       homepage,
+      initialComments,
       initialBookmark,
       isAuthenticated: Boolean(sessionToken),
       isDraftMode,
@@ -102,16 +112,18 @@ async function loadChapterPageData(bookSlug: string, chapterSlug: string) {
   redirect(buildChapterHref(accessibleResult.book.id, accessibleResult.book.slug, chapterData.chapter.slug));
 }
 
+const getCachedChapterPageData = cache(loadChapterPageData);
+
 export async function generateMetadata({ params }: ChapterPageProps) {
   const resolvedParams = await params;
-  const data = await loadChapterPageData(resolvedParams.slug, resolvedParams.chapterSlug);
+  const data = await getCachedChapterPageData(resolvedParams.slug, resolvedParams.chapterSlug);
 
   return getChapterPageMetadata(data.book, data.chapter);
 }
 
 export default async function ChapterPage({ params }: ChapterPageProps) {
   const resolvedParams = await params;
-  const data = await loadChapterPageData(resolvedParams.slug, resolvedParams.chapterSlug);
+  const data = await getCachedChapterPageData(resolvedParams.slug, resolvedParams.chapterSlug);
 
   return (
     <Layout

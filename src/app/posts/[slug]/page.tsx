@@ -1,7 +1,9 @@
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 
 import { getDataForPostSlug } from '@/lib/payload/posts.slug';
+import { getComments } from '@/lib/payload/comments';
 import { getCoverImageUrl } from '@/lib/utils/image';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { normalizePostTags } from '@/lib/utils/tags';
@@ -20,10 +22,18 @@ interface PostPageProps {
   params: Promise<{ slug: string }>;
 }
 
+const getPostPageData = cache((slug: string, isDraftMode: boolean) =>
+  getDataForPostSlug(slug, { draftMode: isDraftMode })
+);
+
+const getPublicPostComments = cache((postId: number) =>
+  getComments({ postId: String(postId) }).catch(() => null)
+);
+
 export async function generateMetadata({ params }: PostPageProps) {
   const { slug } = await params;
   const preview = await draftMode();
-  const data = await getDataForPostSlug(slug, { draftMode: preview.isEnabled });
+  const data = await getPostPageData(slug, preview.isEnabled);
 
   return buildMetadata({
     title: data.post?.meta?.title || data.post?.title,
@@ -36,7 +46,7 @@ export async function generateMetadata({ params }: PostPageProps) {
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
   const preview = await draftMode();
-  const data = await getDataForPostSlug(slug, { draftMode: preview.isEnabled });
+  const data = await getPostPageData(slug, preview.isEnabled);
 
   if (!data.post?.slug) {
     notFound();
@@ -45,6 +55,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const categoryName =
     typeof data.post.category === 'string' ? data.post.category : data.post.category?.name || '';
   const tags = normalizePostTags(data.post.tags);
+  const initialComments = await getPublicPostComments(data.post.id);
 
   return (
     <Layout
@@ -66,7 +77,10 @@ export default async function PostPage({ params }: PostPageProps) {
       </article>
       <Container>
         <div className="mx-auto max-w-3xl">
-          <CommentsSection postId={String(data.post.id)} />
+          <CommentsSection
+            postId={String(data.post.id)}
+            initialData={initialComments}
+          />
         </div>
       </Container>
       <SectionSeparator />

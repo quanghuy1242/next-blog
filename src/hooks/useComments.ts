@@ -5,6 +5,8 @@ interface UseCommentsOptions {
   chapterId?: string;
   postId?: string;
   enabled?: boolean;
+  initialData?: CommentsResult | null;
+  refreshOnMount?: boolean;
 }
 
 interface UseCommentsState {
@@ -14,9 +16,15 @@ interface UseCommentsState {
   isSubmitting: boolean;
 }
 
-export function useComments({ chapterId, postId, enabled = true }: UseCommentsOptions) {
+export function useComments({
+  chapterId,
+  postId,
+  enabled = true,
+  initialData = null,
+  refreshOnMount = true,
+}: UseCommentsOptions) {
   const [state, setState] = useState<UseCommentsState>({
-    data: null,
+    data: initialData,
     loading: false,
     error: null,
     isSubmitting: false,
@@ -46,8 +54,12 @@ export function useComments({ chapterId, postId, enabled = true }: UseCommentsOp
   }, [chapterId, postId, enabled]);
 
   useEffect(() => {
+    if (!refreshOnMount && initialData) {
+      return;
+    }
+
     reload();
-  }, [reload]);
+  }, [initialData, refreshOnMount, reload]);
 
   const createComment = useCallback(async (
     input: { content: string; parentCommentId?: string }

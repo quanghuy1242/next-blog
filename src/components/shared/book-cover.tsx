@@ -1,7 +1,7 @@
 import React from 'react';
 import cn from 'classnames';
 import type { Media } from '@/types/cms';
-import { ResponsiveImage } from './responsive-image';
+import { ResponsiveImageMarkup } from './responsive-image-markup';
 import { SSRPrefetchLink } from '@/components/shared/ssr-prefetch-link';
 
 const BOOK_COVER_WIDTH = 1026;
@@ -33,7 +33,7 @@ export function BookCover({
   } as const;
 
   const cover = media ? (
-    <ResponsiveImage
+    <ResponsiveImageMarkup
       src={media}
       alt={`Cover image for ${title}`}
       width={BOOK_COVER_WIDTH}

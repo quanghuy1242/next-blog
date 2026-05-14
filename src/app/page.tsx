@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import { getCategoryIdBySlug } from '@/lib/payload/categories';
 import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
 import { getDataForHome } from '@/lib/payload/index';
@@ -15,6 +17,14 @@ interface HomePageProps {
 async function loadHomePageData(searchParams: Record<string, string | string[] | undefined>) {
   const initialCategory = normalizeQueryParam(searchParams.category);
   const initialTags = normalizeQueryParamList(searchParams.tag);
+  return loadHomePageDataForFilters(initialCategory, initialTags.join('\u0000'));
+}
+
+const loadHomePageDataForFilters = cache(async (
+  initialCategory: string | null,
+  initialTagsKey: string
+) => {
+  const initialTags = initialTagsKey ? initialTagsKey.split('\u0000') : [];
   const tags = initialTags.length ? initialTags : null;
   let categoryId: number | null = null;
 
@@ -40,7 +50,7 @@ async function loadHomePageData(searchParams: Record<string, string | string[] |
     initialPosts: categoryIsValid ? data.allPosts ?? [] : [],
     initialTags,
   };
-}
+});
 
 export async function generateMetadata({ searchParams }: HomePageProps) {
   const data = await loadHomePageData(await searchParams);
