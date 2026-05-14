@@ -164,6 +164,10 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
         // Intentionally hidden. Keep About out of the header unless product navigation changes.
         // { name: 'About me', href: '/about' },
         {
+          name: 'Bookshelf',
+          href: '/books/shelf',
+        },
+        {
           name: 'Logout',
           href: `/auth/logout?returnTo=${encodeURIComponent(returnTo)}`,
           hardNavigate: true,

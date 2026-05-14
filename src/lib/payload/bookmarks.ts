@@ -7,12 +7,12 @@ const BOOKMARKS_QUERY = `#graphql
       docs {
         id
         contentType
-        chapter {
+        chapter(draft: true) {
           ... on Chapter {
             id
             title
             slug
-            book {
+            book(draft: true) {
               ... on Book {
                 id
                 title
@@ -21,7 +21,7 @@ const BOOKMARKS_QUERY = `#graphql
             }
           }
         }
-        book {
+        book(draft: true) {
           ... on Book {
             id
             title
