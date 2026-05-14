@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactCompiler: true,
+  typedRoutes: true,
   images: {
     // Using unoptimized since R2 handles all image transformations
     unoptimized: true,

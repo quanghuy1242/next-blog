@@ -1242,7 +1242,7 @@ Tests:
 - Promote persistent shared shell/header into App Router layout boundary and remove null Suspense flicker. (done)
 - Consider Partial Prerendering only after OpenNext Cloudflare behavior is validated for this app's dynamic holes.
 - Revisit `next build --webpack` and Turbopack after the router migration is stable. (skipped)
-- Add typed routes after all paths live in `src/app/`.
+- Add typed routes after all paths live in `src/app/`. (done)
 
 ## 12. Test And Verification Plan
 
