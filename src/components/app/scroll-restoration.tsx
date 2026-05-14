@@ -43,18 +43,15 @@ export function ScrollRestoration() {
         const raw = window.sessionStorage.getItem(getStorageKey(url));
 
         if (!raw) {
-          return false;
+          return null;
         }
 
         const parsed = JSON.parse(raw) as { x?: unknown; y?: unknown };
         const x = typeof parsed.x === 'number' ? parsed.x : 0;
         const y = typeof parsed.y === 'number' ? parsed.y : 0;
-
-        window.__historyScrollRestoredFor = url;
-        window.scrollTo(x, y);
-        return true;
+        return { x, y };
       } catch {
-        return false;
+        return null;
       }
     };
 
@@ -129,12 +126,11 @@ export function ScrollRestoration() {
 
     if (shouldRestoreRef.current) {
       shouldRestoreRef.current = false;
+      const savedPosition = restorePosition(currentUrl);
 
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          restorePosition(currentUrl);
-        });
-      });
+      if (savedPosition) {
+        restoreWhenReady(currentUrl, savedPosition.x, savedPosition.y);
+      }
     }
 
     previousUrlRef.current = currentUrl;
@@ -161,4 +157,33 @@ function buildUrl(
 
 function getStorageKey(url: string) {
   return `${STORAGE_KEY_PREFIX}${url}`;
+}
+
+function restoreWhenReady(url: string, x: number, y: number) {
+  let attempts = 0;
+  const maxAttempts = 60;
+
+  const tryRestore = () => {
+    attempts += 1;
+
+    const scrollHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight
+    );
+    const viewportHeight = window.innerHeight;
+    const maxScrollableY = Math.max(scrollHeight - viewportHeight, 0);
+    const targetY = Math.min(Math.max(y, 0), maxScrollableY);
+
+    if (maxScrollableY >= y || attempts >= maxAttempts) {
+      window.__historyScrollRestoredFor = url;
+      window.scrollTo(x, targetY);
+      return;
+    }
+
+    window.requestAnimationFrame(tryRestore);
+  };
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(tryRestore);
+  });
 }
