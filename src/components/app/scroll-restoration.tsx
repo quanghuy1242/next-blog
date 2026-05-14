@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 declare global {
@@ -20,8 +20,8 @@ export function ScrollRestoration() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentUrl = buildUrl(pathname, searchParams);
+  const [restoreTargetUrl, setRestoreTargetUrl] = useState<string | null>(null);
   const currentUrlRef = useRef(currentUrl);
-  const pendingRestoreUrlRef = useRef<string | null>(null);
   const suspendedSaveUrlRef = useRef<string | null>(null);
   const saveFrameRef = useRef<number | null>(null);
   const cancelRestoreRef = useRef<(() => void) | null>(null);
@@ -45,12 +45,11 @@ export function ScrollRestoration() {
       window.__historyScrollRestoredFor = undefined;
     }
 
-    if (pendingRestoreUrlRef.current === currentUrl) {
-      pendingRestoreUrlRef.current = null;
-
+    if (restoreTargetUrl === currentUrl) {
+      setRestoreTargetUrl(null);
       restoreSavedPosition(currentUrl, cancelRestoreRef);
     }
-  }, [currentUrl]);
+  }, [currentUrl, restoreTargetUrl]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -135,10 +134,15 @@ export function ScrollRestoration() {
     };
 
     const handlePopState = () => {
+      const restoreUrl = getWindowUrl();
       const leavingRoute = currentUrlRef.current;
-      savePosition(leavingRoute);
-      suspendedSaveUrlRef.current = leavingRoute;
-      pendingRestoreUrlRef.current = getWindowUrl();
+
+      if (leavingRoute !== restoreUrl) {
+        savePosition(leavingRoute);
+        suspendedSaveUrlRef.current = leavingRoute;
+      }
+
+      setRestoreTargetUrl(restoreUrl);
     };
 
     if ('scrollRestoration' in window.history) {

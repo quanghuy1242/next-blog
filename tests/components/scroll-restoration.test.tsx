@@ -183,4 +183,27 @@ describe('ScrollRestoration', () => {
       expect(window.scrollY).toBe(1200);
     });
   });
+
+  test('restores when the route hook updates before popstate is handled', async () => {
+    navigationState.pathname = '/posts/example';
+    window.history.replaceState({}, '', '/posts/example');
+    window.sessionStorage.setItem(
+      'scroll-pos:/',
+      JSON.stringify({ x: 0, y: 900 })
+    );
+    const { rerender } = render(<ScrollRestoration />);
+
+    navigationState.pathname = '/';
+    rerender(<ScrollRestoration />);
+
+    act(() => {
+      setScrollPosition(0, 20);
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+
+    await waitFor(() => {
+      expect(window.scrollY).toBe(900);
+    });
+  });
 });
