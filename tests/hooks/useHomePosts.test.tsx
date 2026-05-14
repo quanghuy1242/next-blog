@@ -1,8 +1,19 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useHomePosts } from '@/hooks/useHomePosts';
+import { useHomePosts, type HomePostsState } from '@/hooks/useHomePosts';
+import {
+  readHomeFeedSnapshot,
+  writeHomeFeedSnapshot,
+} from '@/lib/home/home-feed-snapshot';
 import type { Post } from '@/types/cms';
-import type { HomePostsState } from '@/context/state';
 import { vi } from 'vitest';
+
+vi.mock('@/lib/home/home-feed-snapshot', () => ({
+  buildHomeFeedSnapshotKey: vi.fn((category: string | null, tags: string[]) =>
+    JSON.stringify({ category, tags })
+  ),
+  readHomeFeedSnapshot: vi.fn(),
+  writeHomeFeedSnapshot: vi.fn(),
+}));
 
 function createPost(slug: string): Post {
   return {
@@ -37,13 +48,18 @@ describe('useHomePosts', () => {
   const initialPosts = [createPost('initial')];
   const pageSize = 5;
 
-  test('hydrates from context when filters match', async () => {
-    const contextState = createState({ category: 'story', tags: [] });
-    const setHomePosts = vi.fn();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(readHomeFeedSnapshot).mockReturnValue(null);
+  });
+
+  test('hydrates from snapshot when filters match', async () => {
+    const snapshotState = createState({ category: 'story', tags: [] });
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ posts: [] }),
     });
+    vi.mocked(readHomeFeedSnapshot).mockReturnValue(snapshotState);
 
     const { result } = renderHook(() =>
       useHomePosts({
@@ -52,14 +68,12 @@ describe('useHomePosts', () => {
         activeCategory: 'story',
         activeTags: [],
         routerReady: true,
-        homePosts: contextState,
-        setHomePosts,
         fetchImplementation: fetchMock as unknown as typeof fetch,
       })
     );
 
     await waitFor(() => {
-      expect(result.current.postsState).toBe(contextState);
+      expect(result.current.postsState).toBe(snapshotState);
     });
 
     expect(fetchMock).not.toHaveBeenCalled();
@@ -67,7 +81,6 @@ describe('useHomePosts', () => {
   });
 
   test('resets to initial posts when no filters active', async () => {
-    const setHomePosts = vi.fn();
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ posts: [] }),
@@ -80,8 +93,6 @@ describe('useHomePosts', () => {
         activeCategory: null,
         activeTags: [],
         routerReady: true,
-        homePosts: null,
-        setHomePosts,
         fetchImplementation: fetchMock as unknown as typeof fetch,
       })
     );
@@ -95,7 +106,6 @@ describe('useHomePosts', () => {
   });
 
   test('initial state respects provided filters metadata', () => {
-    const setHomePosts = vi.fn();
     const fetchMock = vi.fn();
 
     const { result } = renderHook(() =>
@@ -108,8 +118,6 @@ describe('useHomePosts', () => {
         initialTags: ['tech'],
         initialHasMore: false,
         routerReady: false,
-        homePosts: null,
-        setHomePosts,
         fetchImplementation: fetchMock as unknown as typeof fetch,
       })
     );
@@ -120,7 +128,6 @@ describe('useHomePosts', () => {
   });
 
   test('fetches posts when filters change', async () => {
-    const setHomePosts = vi.fn();
     const responseData = {
       posts: [createPost('filtered')],
       hasMore: false,
@@ -138,8 +145,6 @@ describe('useHomePosts', () => {
         activeCategory: 'story',
         activeTags: ['tech'],
         routerReady: true,
-        homePosts: null,
-        setHomePosts,
         fetchImplementation: fetchMock as unknown as typeof fetch,
       })
     );
@@ -152,7 +157,7 @@ describe('useHomePosts', () => {
       expect.stringContaining('category=story')
     );
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('tag=tech'));
-    expect(setHomePosts).toHaveBeenCalledWith({
+    expect(writeHomeFeedSnapshot).toHaveBeenCalledWith({
       posts: responseData.posts,
       offset: responseData.nextOffset,
       hasMore: responseData.hasMore,
@@ -162,14 +167,13 @@ describe('useHomePosts', () => {
   });
 
   test('appends posts when loadMorePosts is called', async () => {
-    const existingState = createState({
+    const snapshotState = createState({
       posts: [createPost('initial')],
       offset: 1,
       hasMore: true,
       category: 'story',
       tags: ['tech'],
     });
-    const setHomePosts = vi.fn();
     const responseData = {
       posts: [createPost('next')],
       hasMore: false,
@@ -178,6 +182,7 @@ describe('useHomePosts', () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValue({ ok: true, json: async () => responseData });
+    vi.mocked(readHomeFeedSnapshot).mockReturnValue(snapshotState);
 
     const { result } = renderHook(() =>
       useHomePosts({
@@ -186,8 +191,6 @@ describe('useHomePosts', () => {
         activeCategory: 'story',
         activeTags: ['tech'],
         routerReady: true,
-        homePosts: existingState,
-        setHomePosts,
         fetchImplementation: fetchMock as unknown as typeof fetch,
       })
     );
@@ -211,7 +214,6 @@ describe('useHomePosts', () => {
   });
 
   test('exposes error when fetch fails', async () => {
-    const setHomePosts = vi.fn();
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
       status: 500,
@@ -223,8 +225,6 @@ describe('useHomePosts', () => {
       activeCategory: 'story',
       activeTags: [],
       routerReady: false,
-      homePosts: null,
-      setHomePosts,
       fetchImplementation: fetchMock as unknown as typeof fetch,
     };
 

@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { useAppContext } from '@/context/state';
 import { useHomePosts } from '@/hooks/useHomePosts';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';
@@ -37,7 +36,6 @@ export function HomePageClient({
   initialCategory,
   initialTags,
 }: HomePageClientProps) {
-  const { homePosts, setHomePosts } = useAppContext();
   const searchParams = useSearchParams();
   const activeCategory = normalizeQueryParam(searchParams?.get('category') ?? undefined);
   const activeTags = normalizeQueryParamList(searchParams?.getAll('tag') ?? undefined);
@@ -57,8 +55,6 @@ export function HomePageClient({
     activeCategory,
     activeTags,
     routerReady: true,
-    homePosts,
-    setHomePosts,
   });
   const { ref: loaderRef, isIntersecting } = useIntersectionObserver<HTMLDivElement>({
     rootMargin: '200px 0px',

@@ -1,6 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import type { Post } from '@/types/cms';
-import type { HomePostsState } from '@/context/state';
+import {
+  buildHomeFeedSnapshotKey,
+  readHomeFeedSnapshot,
+  writeHomeFeedSnapshot,
+  type HomeFeedStateSnapshot,
+} from '@/lib/home/home-feed-snapshot';
 import { areStringArraysEqual } from '@/lib/utils/query';
 
 interface UseHomePostsParams {
@@ -12,8 +17,6 @@ interface UseHomePostsParams {
   initialCategory?: string | null;
   initialTags?: string[];
   routerReady: boolean;
-  homePosts: HomePostsState | null;
-  setHomePosts: (value: HomePostsState | null) => void;
   fetchImplementation?: typeof fetch;
 }
 
@@ -32,6 +35,8 @@ interface PaginatedPostsApiResponse {
   nextOffset?: number;
 }
 
+export type HomePostsState = HomeFeedStateSnapshot;
+
 const FILTER_FETCH_ERROR =
   'Unable to load posts for this filter. Tap to retry.';
 const LOAD_MORE_ERROR = 'Unable to load more posts right now. Tap to retry.';
@@ -45,8 +50,6 @@ export function useHomePosts({
   initialCategory,
   initialTags,
   routerReady,
-  homePosts,
-  setHomePosts,
   fetchImplementation,
 }: UseHomePostsParams): UseHomePostsResult {
   const fetchFn = fetchImplementation ?? globalThis.fetch;
@@ -81,39 +84,56 @@ export function useHomePosts({
   );
 
   const [postsState, setPostsState] = useState<HomePostsState>(
-    () => homePosts ?? initialState
+    () => initialState
   );
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resolvedSnapshotKey, setResolvedSnapshotKey] = useState<string | null>(null);
 
   const hasActiveFilters = Boolean(activeCategory || activeTags.length);
-  const hasHydratedFromContext = useRef(false);
+  const snapshotKey = useMemo(
+    () => buildHomeFeedSnapshotKey(activeCategory, activeTags),
+    [activeCategory, activeTags]
+  );
 
-  useEffect(() => {
-    if (!routerReady || hasHydratedFromContext.current) {
+  useLayoutEffect(() => {
+    if (!routerReady || resolvedSnapshotKey === snapshotKey) {
       return;
     }
 
-    if (homePosts && filtersMatch(homePosts, activeCategory, activeTags)) {
-      setPostsState(homePosts);
+    const snapshot = readHomeFeedSnapshot(activeCategory, activeTags);
+
+    if (snapshot && filtersMatch(snapshot, activeCategory, activeTags)) {
+      setPostsState(snapshot);
+    } else {
+      setPostsState(initialState);
     }
 
-    hasHydratedFromContext.current = true;
-  }, [routerReady, homePosts, activeCategory, activeTags]);
+    setResolvedSnapshotKey(snapshotKey);
+  }, [
+    routerReady,
+    activeCategory,
+    activeTags,
+    initialState,
+    resolvedSnapshotKey,
+    snapshotKey,
+  ]);
 
   useEffect(() => {
-    if (!hasHydratedFromContext.current) {
+    if (resolvedSnapshotKey !== snapshotKey) {
       return;
     }
 
-    if (postsState !== homePosts) {
-      setHomePosts(postsState);
-    }
-  }, [postsState, homePosts, setHomePosts]);
+    writeHomeFeedSnapshot(postsState);
+  }, [postsState, resolvedSnapshotKey, snapshotKey]);
 
   const fetchPostsForFilters = useCallback(
     async (force = false) => {
       if (!routerReady) {
+        return;
+      }
+
+      if (resolvedSnapshotKey !== snapshotKey) {
         return;
       }
 
@@ -177,7 +197,9 @@ export function useHomePosts({
       initialState,
       pageSize,
       postsState,
+      resolvedSnapshotKey,
       routerReady,
+      snapshotKey,
     ]
   );
 

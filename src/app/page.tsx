@@ -1,8 +1,8 @@
 import { cache } from 'react';
 
-import { getCategoryIdBySlug } from '@/lib/payload/categories';
+import { getHomeFeedPage } from '@/lib/home/posts-feed';
 import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
-import { getDataForHome } from '@/lib/payload/index';
+import { getHomePageShell } from '@/lib/payload/index';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';
 import { Layout } from '@/components/core/layout';
@@ -25,30 +25,25 @@ const loadHomePageDataForFilters = cache(async (
   initialTagsKey: string
 ) => {
   const initialTags = initialTagsKey ? initialTagsKey.split('\u0000') : [];
-  const tags = initialTags.length ? initialTags : null;
-  let categoryId: number | null = null;
-
-  if (initialCategory) {
-    categoryId = await getCategoryIdBySlug(initialCategory, {
+  const [shell, feedPage] = await Promise.all([
+    getHomePageShell({
       cache: ONE_HOUR_PAYLOAD_CACHE,
-    });
-  }
-
-  const { data, hasMore } = await getDataForHome({
-    limit: POSTS_PAGE_SIZE,
-    categoryId: categoryId ? String(categoryId) : null,
-    tags,
-    cache: ONE_HOUR_PAYLOAD_CACHE,
-  });
-  const categoryIsValid = !initialCategory || Boolean(categoryId);
+    }),
+    getHomeFeedPage({
+      limit: POSTS_PAGE_SIZE,
+      category: initialCategory,
+      tags: initialTags,
+      cache: ONE_HOUR_PAYLOAD_CACHE,
+    }),
+  ]);
 
   return {
-    allCategories: data.allCategories ?? [],
-    homepage: data.homepage ?? null,
-    initialCategory,
-    initialHasMore: categoryIsValid ? hasMore : false,
-    initialPosts: categoryIsValid ? data.allPosts ?? [] : [],
-    initialTags,
+    allCategories: shell.allCategories,
+    homepage: shell.homepage,
+    initialCategory: feedPage.category,
+    initialHasMore: feedPage.hasMore,
+    initialPosts: feedPage.posts,
+    initialTags: feedPage.tags,
   };
 });
 

@@ -177,6 +177,12 @@ export interface HomePageData {
   author: Author | null;
 }
 
+export interface HomePageShellData {
+  allCategories: Category[];
+  homepage: Homepage | null;
+  author: Author | null;
+}
+
 export interface AboutPageData {
   author: Author | null;
   homepage: Pick<Homepage, 'header'> | null;

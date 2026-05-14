@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
 
-import { getCategoryIdBySlug } from '@/lib/payload/categories';
-import { getPaginatedPosts } from '@/lib/payload/posts';
+import { getHomeFeedPage } from '@/lib/home/posts-feed';
 import { json, methodNotAllowed } from '@/lib/server/http';
 import { normalizeLimit, normalizeOffset } from '@/lib/utils/number';
+import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';
 
 const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 50;
@@ -11,31 +11,21 @@ const MAX_LIMIT = 50;
 export async function GET(request: NextRequest) {
   const limit = normalizeLimit(request.nextUrl.searchParams.get('limit'), DEFAULT_LIMIT, MAX_LIMIT);
   const offset = normalizeOffset(request.nextUrl.searchParams.get('offset'));
-  const categorySlug = request.nextUrl.searchParams.get('category')?.trim() || null;
-  const tag = request.nextUrl.searchParams.get('tag')?.trim() || null;
+  const category = normalizeQueryParam(request.nextUrl.searchParams.get('category') ?? undefined);
+  const tags = normalizeQueryParamList(request.nextUrl.searchParams.getAll('tag'));
 
   try {
-    const categoryIdNum = categorySlug ? await getCategoryIdBySlug(categorySlug) : null;
-
-    if (categorySlug && !categoryIdNum) {
-      return json({
-        posts: [],
-        hasMore: false,
-        nextOffset: offset,
-      });
-    }
-
-    const { posts, hasMore } = await getPaginatedPosts({
+    const feedPage = await getHomeFeedPage({
       limit,
-      skip: offset,
-      categoryId: categoryIdNum ? String(categoryIdNum) : null,
-      tags: tag ? [tag] : null,
+      offset,
+      category,
+      tags,
     });
 
     return json({
-      posts,
-      hasMore,
-      nextOffset: offset + posts.length,
+      posts: feedPage.posts,
+      hasMore: feedPage.hasMore,
+      nextOffset: feedPage.nextOffset,
     });
   } catch (error) {
     console.error('Failed to fetch paginated posts', error);

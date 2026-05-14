@@ -1,6 +1,6 @@
 import { cache } from 'react';
 
-import { getDataForHome } from '@/lib/payload/index';
+import { getHomePageShell } from '@/lib/payload/index';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
@@ -8,10 +8,10 @@ import { NotYetImplemented } from '@/components/core/not-yet-implemented';
 
 export const revalidate = 60;
 
-const getCategoriesPageData = cache(getDataForHome);
+const getCategoriesPageData = cache(getHomePageShell);
 
 export async function generateMetadata() {
-  const { data } = await getCategoriesPageData();
+  const data = await getCategoriesPageData();
 
   return buildMetadata({
     title: data.homepage?.meta?.title || 'Categories',
