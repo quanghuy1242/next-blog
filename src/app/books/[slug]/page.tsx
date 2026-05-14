@@ -8,7 +8,7 @@ import { BookmarkButton } from '@/components/shared/bookmark-button';
 import { Text } from '@/components/shared/text';
 import { ButtonLink } from '@/components/shared/ui/button';
 import { buildBookHref } from '@/lib/routes/book-route';
-import { getBookPageData } from '@/lib/server/books/page-data';
+import { getBookPageData, getBookPageMetadataData } from '@/lib/server/books/page-data';
 import { getCoverImageUrl } from '@/lib/utils/image';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 
@@ -16,10 +16,13 @@ interface BookPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = 'force-dynamic';
+
 const getCachedBookPageData = cache(getBookPageData);
+const getCachedBookPageMetadataData = cache(getBookPageMetadataData);
 
 export async function generateMetadata({ params }: BookPageProps) {
-  const { book } = await getCachedBookPageData((await params).slug);
+  const { book } = await getCachedBookPageMetadataData((await params).slug);
 
   return buildMetadata({
     title: book.title,

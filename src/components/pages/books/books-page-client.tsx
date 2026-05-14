@@ -46,8 +46,6 @@ export function BooksPageClient({
       return;
     }
 
-    void refreshBooks();
-
     function handleVisibilityChange() {
       if (document.visibilityState === 'visible') {
         void refreshBooks();

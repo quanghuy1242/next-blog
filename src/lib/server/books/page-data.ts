@@ -67,6 +67,27 @@ export interface ChapterPageData {
   readingProgress: ReadingProgressRecord[];
 }
 
+export async function getBookPageMetadataData(slugParam: string): Promise<{ book: Book }> {
+  const requestContext = await getPageRequestContext();
+  const parsedBookRoute = parseBookRouteSegment(slugParam);
+
+  if (!parsedBookRoute.bookId) {
+    await redirectLegacyBookSlug(parsedBookRoute.bookSlug, requestContext);
+  }
+
+  const basePayload = await fetchPublicBookPagePayload(
+    parsedBookRoute.bookId!,
+    toPayloadOptions(requestContext)
+  );
+  const book = basePayload.book;
+
+  if (!book || book.slug !== parsedBookRoute.bookSlug) {
+    notFound();
+  }
+
+  return { book };
+}
+
 export async function getBookPageData(slugParam: string): Promise<BookPageData> {
   const requestContext = await getPageRequestContext();
   const parsedBookRoute = parseBookRouteSegment(slugParam);
@@ -115,6 +136,30 @@ export async function getBookPageData(slugParam: string): Promise<BookPageData> 
     readingProgressByChapterId,
     wholeBookProgress,
   };
+}
+
+export async function getChapterPageMetadataData(
+  bookSlugParam: string,
+  chapterSlug: string
+): Promise<{ book: Book; chapter: Chapter }> {
+  const requestContext = await getChapterPageRequestContext();
+  const parsedBookRoute = parseBookRouteSegment(bookSlugParam);
+
+  if (!parsedBookRoute.bookId) {
+    await redirectLegacyChapterRoute(parsedBookRoute.bookSlug, chapterSlug, requestContext);
+  }
+
+  const { book, chapter } = await fetchChapterPageBaseData(
+    parsedBookRoute.bookId!,
+    chapterSlug,
+    requestContext
+  );
+
+  if (!book || !chapter || book.slug !== parsedBookRoute.bookSlug) {
+    notFound();
+  }
+
+  return { book, chapter };
 }
 
 export async function getChapterPageData(

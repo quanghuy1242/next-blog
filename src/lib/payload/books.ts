@@ -108,7 +108,6 @@ async function attachWholeBookProgress(
   const [chaptersByBookId, progressEntries] = await Promise.all([
     getChapterProgressMetadataByBookIds(bookIds, {
       authToken: options.authToken,
-      cache: options.cache,
       draftMode: options.draftMode,
     }),
     Promise.all(
