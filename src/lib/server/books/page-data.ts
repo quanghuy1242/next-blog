@@ -14,8 +14,8 @@ import { getBookBySlug } from '@/lib/payload/books';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE, type PayloadCacheSettings } from '@/lib/payload/cache';
 import { getChapterByBookAndSlug } from '@/lib/payload/chapters';
 import {
-  fetchAuthenticatedBookPagePayload,
   fetchAuthenticatedChapterPageSupplementalPayload,
+  fetchBookPageViewerPayload,
   fetchChapterPageBasePayload,
   fetchPublicBookPagePayload,
   fetchPublicChapterCommentsPayload,
@@ -75,22 +75,22 @@ export async function getBookPageData(slugParam: string): Promise<BookPageData> 
     await redirectLegacyBookSlug(parsedBookRoute.bookSlug, requestContext);
   }
 
-  const authenticatedPayload = requestContext.sessionToken
-    ? await fetchAuthenticatedBookPagePayload(
-        parsedBookRoute.bookId!,
-        toPayloadOptions(requestContext)
-      )
-    : null;
-  const publicPayload = authenticatedPayload
-    ? null
-    : await fetchPublicBookPagePayload(
-        parsedBookRoute.bookId!,
-        toPayloadOptions(requestContext)
-      );
-  const book = authenticatedPayload?.book ?? publicPayload?.book ?? null;
-  const chapters = authenticatedPayload?.chapters ?? publicPayload?.chapters ?? [];
-  const bookmark = authenticatedPayload?.bookmark ?? null;
-  const readingProgress = authenticatedPayload?.readingProgress ?? [];
+  const [basePayload, viewerPayload] = await Promise.all([
+    fetchPublicBookPagePayload(
+      parsedBookRoute.bookId!,
+      toPayloadOptions(requestContext)
+    ),
+    requestContext.sessionToken
+      ? fetchBookPageViewerPayload(
+          parsedBookRoute.bookId!,
+          toLivePayloadOptions(requestContext)
+        )
+      : null,
+  ]);
+  const book = basePayload.book;
+  const chapters = basePayload.chapters;
+  const bookmark = viewerPayload?.bookmark ?? null;
+  const readingProgress = viewerPayload?.readingProgress ?? [];
 
   if (!book || book.slug !== parsedBookRoute.bookSlug) {
     notFound();
@@ -228,6 +228,7 @@ async function fetchChapterPageSupplementalData(
       chapterId,
       {
         ...toPayloadChapterOptions(requestContext),
+        cache: undefined,
         includeComments: options.includeComments,
       }
     );
@@ -319,6 +320,13 @@ function toPayloadOptions(requestContext: PageRequestContext): PayloadBookPageRe
   return {
     authToken: requestContext.sessionToken,
     cache: requestContext.payloadCache,
+    draftMode: requestContext.isDraftMode,
+  };
+}
+
+function toLivePayloadOptions(requestContext: PageRequestContext): PayloadBookPageRequestOptions {
+  return {
+    authToken: requestContext.sessionToken,
     draftMode: requestContext.isDraftMode,
   };
 }

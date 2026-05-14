@@ -140,7 +140,7 @@ interface BookPageBaseResponse {
   };
 }
 
-interface BookPageAuthenticatedResponse extends BookPageBaseResponse {
+interface BookPageViewerResponse {
   readingProgress: {
     records: ReadingProgressRecord[];
   } | null;
@@ -172,49 +172,16 @@ interface ChapterCommentsResponse {
   comments: CommentsResult | null;
 }
 
-export async function fetchAuthenticatedBookPagePayload(
+export async function fetchBookPageViewerPayload(
   bookId: number,
   options: PayloadBookPageRequestOptions
 ) {
-  const fetcher = selectPayloadFetcher(options);
-
-  const data = await fetcher<BookPageAuthenticatedResponse>(
+  const data = await fetchAPIWithAuthToken<BookPageViewerResponse>(
     `#graphql
-      query BookPageAuthenticated(
-        $bookId: Int!
-        $bookRelationId: JSON!
+      query BookPageViewer(
         $readingProgressBookId: ID!
         $bookmarkWhere: Bookmark_where
       ) {
-        Books(
-          where: {
-            AND: [
-              { id: { equals: $bookId } }
-              ${buildBookStatusFilter(options.draftMode)}
-            ]
-          }
-          limit: 1
-        ) {
-          docs {
-            ${BOOK_DETAIL_FIELDS}
-          }
-        }
-
-        Chapters(
-          where: {
-            AND: [
-              { book: { equals: $bookRelationId } }
-              ${buildChapterStatusFilter(options.draftMode)}
-            ]
-          }
-          sort: "order"
-          limit: 200
-        ) {
-          docs {
-            ${CHAPTER_PAGE_FIELDS}
-          }
-        }
-
         readingProgress(bookId: $readingProgressBookId) {
           records {
             ${READING_PROGRESS_FIELDS}
@@ -230,8 +197,6 @@ export async function fetchAuthenticatedBookPagePayload(
     `,
     {
       variables: {
-        bookId,
-        bookRelationId: bookId,
         readingProgressBookId: String(bookId),
         bookmarkWhere: {
           AND: [
@@ -240,14 +205,11 @@ export async function fetchAuthenticatedBookPagePayload(
           ],
         },
       },
-      authToken: options.authToken,
-      cache: options.cache,
+      authToken: options.authToken!,
     }
   );
 
   return {
-    book: data?.Books?.docs?.[0] ?? null,
-    chapters: sortChaptersForPage(data?.Chapters?.docs ?? []),
     bookmark: data?.Bookmarks?.docs?.[0] ?? null,
     readingProgress: data?.readingProgress?.records ?? [],
   };
@@ -417,7 +379,6 @@ export async function fetchAuthenticatedChapterPageSupplementalPayload(
         commentsChapterId: options.includeComments ? String(chapterId) : undefined,
       },
       authToken: options.authToken!,
-      cache: options.cache,
       requestHeaders: buildChapterProofHeaders(options.chapterPasswordProof),
     }
   );

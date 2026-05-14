@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type {
@@ -10,6 +10,7 @@ import type {
   CommentsResult,
   ReadingProgressRecord,
 } from '@/types/cms';
+import { readReadingProgressByChapterId } from '@/lib/browser/reading-position';
 import { buildBookHref, buildChapterHref } from '@/lib/routes/book-route';
 import { useReadingProgress } from '@/hooks/useReadingProgress';
 import { Container } from '@/components/core/container';
@@ -44,6 +45,7 @@ export function ChapterReaderClient({
   initialBookmark = null,
 }: ChapterReaderClientProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const [localProgressByChapterId, setLocalProgressByChapterId] = useState<Record<number, number>>({});
   const chapterContentRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const shouldRenderChapterTitle =
@@ -61,6 +63,9 @@ export function ChapterReaderClient({
         : undefined,
     [readingProgress]
   );
+  useEffect(() => {
+    setLocalProgressByChapterId(readReadingProgressByChapterId(book.id, chapters));
+  }, [book.id, chapters]);
   const { previousChapter, nextChapter } = useMemo(() => {
     const currentIndex = chapters.findIndex((candidate) => candidate.slug === chapter.slug);
 
@@ -81,11 +86,26 @@ export function ChapterReaderClient({
   const chapterProgressForDisplay = useMemo(
     () => ({
       ...(readingProgressByChapterId ?? {}),
+      ...Object.fromEntries(
+        Object.entries(localProgressByChapterId).map(([chapterId, localProgress]) => [
+          chapterId,
+          Math.max(
+            readingProgressByChapterId?.[Number(chapterId)] ?? 0,
+            localProgress
+          ),
+        ])
+      ),
       [chapter.id]: shouldTrackProgress
         ? currentReadingProgress
         : (readingProgressByChapterId?.[chapter.id] ?? 0),
     }),
-    [chapter.id, currentReadingProgress, readingProgressByChapterId, shouldTrackProgress]
+    [
+      chapter.id,
+      currentReadingProgress,
+      localProgressByChapterId,
+      readingProgressByChapterId,
+      shouldTrackProgress,
+    ]
   );
 
   return (

@@ -1,5 +1,9 @@
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  readReadingPosition,
+  writeReadingPosition,
+} from '@/lib/browser/reading-position';
 
 declare global {
   interface Window {
@@ -18,11 +22,6 @@ interface UseReadingProgressOptions {
 const MIN_INTERVAL = 5000;
 const COMPLETION_THRESHOLD = 95;
 
-interface StoredReadingPosition {
-  progress: number;
-  scrollY: number;
-}
-
 export function useReadingProgress({
   chapterId,
   bookId,
@@ -38,8 +37,6 @@ export function useReadingProgress({
   const hasRestoredPosition = useRef(false);
   const isRestoringPosition = useRef(false);
 
-  const storageKey = `reading-position:${bookId}:${chapterId}`;
-
   useEffect(() => {
     lastSentProgress.current = clampedInitialProgress;
     lastSentAt.current = 0;
@@ -49,53 +46,21 @@ export function useReadingProgress({
     setCurrentProgress(clampedInitialProgress);
   }, [bookId, chapterId, clampedInitialProgress]);
 
-  const readStoredPosition = useCallback((): StoredReadingPosition | null => {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-
-    try {
-      const rawValue = window.localStorage.getItem(storageKey);
-      if (!rawValue) {
-        return null;
-      }
-
-      const parsedValue = JSON.parse(rawValue) as Partial<StoredReadingPosition>;
-      const progress =
-        typeof parsedValue.progress === 'number' ? parsedValue.progress : NaN;
-      const scrollY =
-        typeof parsedValue.scrollY === 'number' ? parsedValue.scrollY : NaN;
-
-      if (!Number.isFinite(progress) || !Number.isFinite(scrollY)) {
-        return null;
-      }
-
-      return {
-        progress: Math.min(Math.max(progress, 0), 100),
-        scrollY: Math.max(scrollY, 0),
-      };
-    } catch {
-      return null;
-    }
-  }, [storageKey]);
+  const readStoredPosition = useCallback(
+    () => readReadingPosition(bookId, chapterId),
+    [bookId, chapterId]
+  );
 
   const persistReadingPosition = useCallback((progress: number) => {
     if (typeof window === 'undefined') {
       return;
     }
 
-    try {
-      window.localStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          progress: Math.min(Math.max(progress, 0), 100),
-          scrollY: Math.max(window.scrollY, 0),
-        } satisfies StoredReadingPosition)
-      );
-    } catch {
-      // Ignore storage failures.
-    }
-  }, [storageKey]);
+    writeReadingPosition(bookId, chapterId, {
+      progress,
+      scrollY: Math.max(window.scrollY, 0),
+    });
+  }, [bookId, chapterId]);
 
   const sendProgress = useCallback((progress: number, force = false) => {
     if (progress <= lastSentProgress.current) return;
@@ -107,10 +72,20 @@ export function useReadingProgress({
     lastSentProgress.current = progress;
     lastSentAt.current = Date.now();
 
+    const body = JSON.stringify({ chapterId, bookId, progress });
+
+    if (force && typeof navigator !== 'undefined' && navigator.sendBeacon) {
+      const blob = new Blob([body], { type: 'application/json' });
+
+      if (navigator.sendBeacon('/api/reading-progress', blob)) {
+        return;
+      }
+    }
+
     fetch('/api/reading-progress', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chapterId, bookId, progress }),
+      body,
       keepalive: true,
     }).catch(() => {});
   }, [chapterId, bookId]);
