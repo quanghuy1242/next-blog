@@ -9,61 +9,62 @@ declare global {
   }
 }
 
-interface ScrollPosition {
-  x: number;
-  y: number;
-}
-
-type ScrollMap = Record<string, ScrollPosition>;
+const STORAGE_KEY_PREFIX = 'scroll-pos:';
 
 export function ScrollRestoration() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const positionsRef = useRef<ScrollMap>({});
-  const previousUrlRef = useRef<string | null>(null);
   const shouldRestoreRef = useRef(false);
-  const lastSavedUrlRef = useRef<string | null>(null);
+  const previousUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
     }
 
-    if (!('scrollRestoration' in window.history)) {
-      return;
-    }
-
-    window.history.scrollRestoration = 'manual';
-
     const currentUrl = buildUrl(pathname, searchParams);
-    const savePos = (url: string) => {
-      positionsRef.current[url] = {
-        x: window.scrollX,
-        y: window.scrollY,
-      };
-      lastSavedUrlRef.current = url;
+
+    const savePosition = (url: string) => {
+      try {
+        window.sessionStorage.setItem(
+          getStorageKey(url),
+          JSON.stringify({
+            x: window.scrollX,
+            y: window.scrollY,
+          })
+        );
+      } catch {
+        // Best effort only.
+      }
     };
 
-    if (shouldRestoreRef.current) {
-      shouldRestoreRef.current = false;
-      const saved = positionsRef.current[currentUrl];
+    const restorePosition = (url: string) => {
+      try {
+        const raw = window.sessionStorage.getItem(getStorageKey(url));
 
-      if (saved) {
-        window.__historyScrollRestoredFor = currentUrl;
-        window.scrollTo(saved.x, saved.y);
-      }
-    } else if (previousUrlRef.current === null) {
-      const saved = positionsRef.current[currentUrl];
+        if (!raw) {
+          return false;
+        }
 
-      if (saved) {
-        window.__historyScrollRestoredFor = currentUrl;
-        window.scrollTo(saved.x, saved.y);
+        const parsed = JSON.parse(raw) as { x?: unknown; y?: unknown };
+        const x = typeof parsed.x === 'number' ? parsed.x : 0;
+        const y = typeof parsed.y === 'number' ? parsed.y : 0;
+
+        window.__historyScrollRestoredFor = url;
+        window.scrollTo(x, y);
+        return true;
+      } catch {
+        return false;
       }
-    }
+    };
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      savePos(currentUrl);
+      savePosition(currentUrl);
       delete event.returnValue;
+    };
+
+    const handlePageHide = () => {
+      savePosition(currentUrl);
     };
 
     const handleDocumentClick = (event: MouseEvent) => {
@@ -90,14 +91,8 @@ export function ScrollRestoration() {
 
       if (
         anchor.hasAttribute('download') ||
-        (anchor.getAttribute('target') &&
-          anchor.getAttribute('target') !== '_self')
+        (anchor.target && anchor.target !== '_self')
       ) {
-        return;
-      }
-
-      const href = anchor.getAttribute('href');
-      if (!href || href.startsWith('#')) {
         return;
       }
 
@@ -113,41 +108,42 @@ export function ScrollRestoration() {
         return;
       }
 
-      const nextPath = `${nextUrl.pathname}${nextUrl.search}`;
-      if (nextPath === currentUrl) {
+      const nextRoute = `${nextUrl.pathname}${nextUrl.search}`;
+      if (nextRoute === currentUrl) {
         return;
       }
 
-      savePos(currentUrl);
+      savePosition(currentUrl);
     };
 
     const handlePopState = () => {
-      if (previousUrlRef.current) {
-        savePos(previousUrlRef.current);
-      }
-
+      savePosition(previousUrlRef.current ?? currentUrl);
       shouldRestoreRef.current = true;
     };
 
+    window.history.scrollRestoration = 'manual';
     window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('click', handleDocumentClick, true);
+    window.addEventListener('pagehide', handlePageHide);
     window.addEventListener('popstate', handlePopState);
+    document.addEventListener('click', handleDocumentClick, true);
 
-    if (
-      previousUrlRef.current &&
-      previousUrlRef.current !== currentUrl &&
-      lastSavedUrlRef.current !== previousUrlRef.current
-    ) {
-      savePos(previousUrlRef.current);
+    if (shouldRestoreRef.current) {
+      shouldRestoreRef.current = false;
+
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          restorePosition(currentUrl);
+        });
+      });
     }
 
     previousUrlRef.current = currentUrl;
-    lastSavedUrlRef.current = null;
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('click', handleDocumentClick, true);
+      window.removeEventListener('pagehide', handlePageHide);
       window.removeEventListener('popstate', handlePopState);
+      document.removeEventListener('click', handleDocumentClick, true);
     };
   }, [pathname, searchParams]);
 
@@ -161,4 +157,8 @@ function buildUrl(
   const search = searchParams?.toString();
 
   return `${pathname || '/'}${search ? `?${search}` : ''}`;
+}
+
+function getStorageKey(url: string) {
+  return `${STORAGE_KEY_PREFIX}${url}`;
 }
