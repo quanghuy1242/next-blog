@@ -3,7 +3,6 @@ import type {
   BookSlugData,
   BooksPageData,
   Chapter,
-  Homepage,
   PaginatedResponse,
 } from '@/types/cms';
 import { fetchAPI, fetchAPIWithAuthToken } from './base';
@@ -33,14 +32,12 @@ interface BooksResponse {
 
 interface BooksPageResponse {
   Books: PaginatedResponse<Book>;
-  Homepage: Pick<Homepage, 'header'> | null;
 }
 
 interface BookBySlugResponse {
   Books: {
     docs: Book[];
   };
-  Homepage: Pick<Homepage, 'header'> | null;
 }
 
 interface BookDetailByIdResponse {
@@ -50,7 +47,6 @@ interface BookDetailByIdResponse {
   Chapters: {
     docs: Chapter[];
   };
-  Homepage: Pick<Homepage, 'header'> | null;
 }
 
 interface BookFetchOptions {
@@ -263,10 +259,6 @@ export async function getDataForBooksPage(
           page
           limit
         }
-
-        Homepage {
-          header
-        }
       }
     `,
     {
@@ -286,20 +278,18 @@ export async function getDataForBooksPage(
   return {
     books,
     hasMore: data?.Books?.hasNextPage ?? false,
-    homepage: data?.Homepage ?? null,
   };
 }
 
 export async function getBookBySlug(
   slug: string,
   options: BookFetchOptions = {}
-): Promise<{ book: Book | null; homepage: Pick<Homepage, 'header'> | null }> {
+): Promise<{ book: Book | null }> {
   const trimmedSlug = slug.trim();
 
   if (!trimmedSlug) {
     return {
       book: null,
-      homepage: null,
     };
   }
 
@@ -322,10 +312,6 @@ export async function getBookBySlug(
             ${BOOK_LOOKUP_FIELDS}
           }
         }
-
-        Homepage {
-          header
-        }
       }
     `,
     {
@@ -347,7 +333,6 @@ export async function getBookBySlug(
 
   return {
     book: data?.Books?.docs?.[0] ?? null,
-    homepage: data?.Homepage ?? null,
   };
 }
 
@@ -355,13 +340,12 @@ export async function getBookDetailBySlug(
   slug: string,
   options: BookFetchOptions = {}
 ): Promise<BookSlugData> {
-  const { book, homepage } = await getBookBySlug(slug, options);
+  const { book } = await getBookBySlug(slug, options);
 
   if (!book) {
     return {
       book: null,
       chapters: [],
-      homepage,
     };
   }
 
@@ -370,7 +354,6 @@ export async function getBookDetailBySlug(
   return {
     book,
     chapters,
-    homepage,
   };
 }
 
@@ -382,7 +365,6 @@ export async function getBookDetailById(
     return {
       book: null,
       chapters: [],
-      homepage: null,
     };
   }
 
@@ -428,10 +410,6 @@ export async function getBookDetailById(
             chapterWordCount
           }
         }
-
-        Homepage {
-          header
-        }
       }
     `,
     {
@@ -448,6 +426,5 @@ export async function getBookDetailById(
   return {
     book: data?.Books?.docs?.[0] ?? null,
     chapters: sortChapters(data?.Chapters?.docs ?? []),
-    homepage: data?.Homepage ?? null,
   };
 }

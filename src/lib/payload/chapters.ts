@@ -1,4 +1,4 @@
-import type { Book, Chapter, ChapterSlugData, Homepage } from '@/types/cms';
+import type { Book, Chapter, ChapterSlugData } from '@/types/cms';
 import { fetchAPI, fetchAPIWithAuthToken } from './base';
 import {
   buildChapterPasswordProofCacheKey,
@@ -23,7 +23,6 @@ interface ChapterDetailResponse {
   Chapters: {
     docs: Chapter[];
   };
-  Homepage: Pick<Homepage, 'header'> | null;
 }
 
 interface ChapterReaderResponse {
@@ -42,7 +41,6 @@ interface ChapterPageByBookIdResponse {
   ChaptersByBook: {
     docs: Chapter[];
   };
-  Homepage: Pick<Homepage, 'header'> | null;
 }
 
 interface ChaptersProgressMetadataResponse {
@@ -254,13 +252,12 @@ export async function getChapterProgressMetadataByBookIds(
 export async function getChapterBySlug(
   chapterSlug: string,
   options: ChapterFetchOptions = {}
-): Promise<{ chapter: Chapter | null; homepage: Pick<Homepage, 'header'> | null }> {
+): Promise<{ chapter: Chapter | null }> {
   const trimmedSlug = chapterSlug.trim();
 
   if (!trimmedSlug) {
     return {
       chapter: null,
-      homepage: null,
     };
   }
 
@@ -282,10 +279,6 @@ export async function getChapterBySlug(
           docs {
             ${CHAPTER_DETAIL_FIELDS}
           }
-        }
-
-        Homepage {
-          header
         }
       }
     `,
@@ -311,7 +304,6 @@ export async function getChapterBySlug(
 
   return {
     chapter: data?.Chapters?.docs?.[0] ?? null,
-    homepage: data?.Homepage ?? null,
   };
 }
 
@@ -402,7 +394,6 @@ export async function getChapterPageByBookId(
       book: null,
       chapter: null,
       chapters: [],
-      homepage: null,
     };
   }
 
@@ -441,10 +432,6 @@ export async function getChapterPageByBookId(
             ${CHAPTER_PAGE_LIST_FIELDS}
           }
         }
-
-        Homepage {
-          header
-        }
       }
     `,
     {
@@ -473,7 +460,6 @@ export async function getChapterPageByBookId(
     book,
     chapter,
     chapters: sortChapters(data?.ChaptersByBook?.docs ?? []),
-    homepage: data?.Homepage ?? null,
   };
 }
 

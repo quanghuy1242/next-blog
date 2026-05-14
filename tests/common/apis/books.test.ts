@@ -16,7 +16,6 @@ describe('@/lib/payload/books', () => {
   test('short-circuits when the book slug is blank', async () => {
     await expect(getBookBySlug('   ')).resolves.toEqual({
       book: null,
-      homepage: null,
     });
 
     expect(mockedFetchAPIWithAuthToken).not.toHaveBeenCalled();
@@ -35,7 +34,6 @@ describe('@/lib/payload/books', () => {
             },
           ],
         },
-        Homepage: { header: 'Books' },
       } as never)
       .mockResolvedValueOnce({
         Chapters: {
@@ -65,7 +63,6 @@ describe('@/lib/payload/books', () => {
     const result = await getBookDetailBySlug('sample-book');
 
     expect(result.book?.slug).toBe('sample-book');
-    expect(result.homepage).toEqual({ header: 'Books' });
     expect(result.chapters.map((chapter) => chapter.slug)).toEqual([
       'first-chapter',
       'second-chapter',
@@ -78,7 +75,6 @@ describe('@/lib/payload/books', () => {
       Books: {
         docs: [],
       },
-      Homepage: null,
     } as never);
 
     await getBookBySlug('missing-book');
@@ -123,13 +119,11 @@ describe('@/lib/payload/books', () => {
           },
         ],
       },
-      Homepage: { header: 'Books' },
     } as never);
 
     const result = await getBookDetailById(42);
 
     expect(result.book?.slug).toBe('sample-book');
-    expect(result.homepage).toEqual({ header: 'Books' });
     expect(result.chapters.map((chapter) => chapter.slug)).toEqual([
       'first-chapter',
       'second-chapter',

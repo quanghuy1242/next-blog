@@ -37,13 +37,12 @@ describe('@/lib/payload/chapters', () => {
   test('short-circuits when the chapter slug is blank', async () => {
     await expect(getChapterBySlug('')).resolves.toEqual({
       chapter: null,
-      homepage: null,
     });
 
     expect(mockedFetchAPIWithAuthToken).not.toHaveBeenCalled();
   });
 
-  test('loads the chapter and homepage in one request', async () => {
+  test('loads the chapter in one request', async () => {
     mockedFetchAPIWithAuthToken.mockResolvedValueOnce({
       Chapters: {
         docs: [
@@ -58,13 +57,11 @@ describe('@/lib/payload/chapters', () => {
           },
         ],
       },
-      Homepage: { header: 'Books' },
     } as never);
 
     const result = await getChapterBySlug('chapter-seven');
 
     expect(result.chapter?.slug).toBe('chapter-seven');
-    expect(result.homepage).toEqual({ header: 'Books' });
     expect(mockedFetchAPIWithAuthToken).toHaveBeenCalledTimes(1);
   });
 
@@ -73,7 +70,6 @@ describe('@/lib/payload/chapters', () => {
       Chapters: {
         docs: [],
       },
-      Homepage: null,
     } as never);
 
     await getChapterBySlug('missing-chapter');
@@ -126,7 +122,6 @@ describe('@/lib/payload/chapters', () => {
           },
         ],
       },
-      Homepage: { header: 'Books' },
     } as never);
 
     const result = await getChapterPageByBookId(42, 'chapter-seven');
@@ -137,7 +132,6 @@ describe('@/lib/payload/chapters', () => {
       'chapter-seven',
       'chapter-eight',
     ]);
-    expect(result.homepage).toEqual({ header: 'Books' });
     expect(mockedFetchAPIWithAuthToken).toHaveBeenCalledTimes(1);
   });
 
@@ -149,7 +143,6 @@ describe('@/lib/payload/chapters', () => {
       ChaptersByBook: {
         docs: [],
       },
-      Homepage: null,
     } as never);
 
     await getChapterPageByBookId(42, 'missing-chapter');
@@ -172,7 +165,6 @@ describe('@/lib/payload/chapters', () => {
       Chapters: {
         docs: [],
       },
-      Homepage: null,
     } as never);
 
     const proof = createChapterPasswordProof({

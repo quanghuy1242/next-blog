@@ -16,9 +16,6 @@ interface PostDraftSlugResponse {
   Posts: {
     docs: Post[];
   };
-  Homepage: {
-    header: string | null;
-  } | null;
 }
 
 const POST_DETAIL_FIELDS = `
@@ -82,7 +79,6 @@ export async function getDataForPostSlug(
     return {
       post: null,
       morePosts: [],
-      homepage: null,
     };
   }
 
@@ -106,10 +102,6 @@ export async function getDataForPostSlug(
         docs {
           ${POST_DETAIL_FIELDS}
         }
-      }
-
-      Homepage {
-        header
       }
     }
     `,
@@ -199,6 +191,5 @@ export async function getDataForPostSlug(
   return {
     post,
     morePosts,
-    homepage: data?.Homepage ?? null,
   };
 }

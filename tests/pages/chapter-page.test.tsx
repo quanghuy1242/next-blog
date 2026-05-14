@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { ChapterReaderClient } from '@/components/pages/books/chapter-reader-client';
-import type { Book, Chapter, Homepage } from '@/types/cms';
+import type { Book, Chapter } from '@/types/cms';
 
 vi.mock('@/components/core/container', () => ({
   Container: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -121,10 +121,6 @@ function createChapter(overrides: Partial<Chapter> = {}): Chapter {
   };
 }
 
-function createHomepage(): Pick<Homepage, 'header'> {
-  return { header: 'Dark Blue Pattern' };
-}
-
 describe('ChapterPage', () => {
   test('renders the chapter title for manually created books', () => {
     render(
@@ -132,7 +128,6 @@ describe('ChapterPage', () => {
         book={createBook({ origin: 'manual' })}
         chapter={createChapter()}
         chapters={[createChapter()]}
-        homepage={createHomepage()}
         isDraftMode={false}
         isAuthenticated={false}
         readingProgress={[]}
@@ -148,7 +143,6 @@ describe('ChapterPage', () => {
         book={createBook({ origin: 'epub_imported' as never, sourceType: 'epub_upload' as never })}
         chapter={createChapter()}
         chapters={[createChapter()]}
-        homepage={createHomepage()}
         isDraftMode={false}
         isAuthenticated={false}
         readingProgress={[]}
@@ -164,7 +158,6 @@ describe('ChapterPage', () => {
         book={createBook({ origin: 'manual' })}
         chapter={createChapter({ content: null, hasPassword: true })}
         chapters={[createChapter({ content: null, hasPassword: true })]}
-        homepage={createHomepage()}
         isDraftMode={false}
         isAuthenticated={false}
         readingProgress={[]}

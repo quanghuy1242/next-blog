@@ -185,32 +185,27 @@ export interface HomePageShellData {
 
 export interface AboutPageData {
   author: Author | null;
-  homepage: Pick<Homepage, 'header'> | null;
 }
 
 export interface PostSlugData {
   post: Post | null;
   morePosts: Post[];
-  homepage: Pick<Homepage, 'header'> | null;
 }
 
 export interface BooksPageData {
   books: Book[];
-  homepage: Pick<Homepage, 'header'> | null;
   hasMore: boolean;
 }
 
 export interface BookSlugData {
   book: Book | null;
   chapters: Chapter[];
-  homepage: Pick<Homepage, 'header'> | null;
 }
 
 export interface ChapterSlugData {
   book: Book | null;
   chapter: Chapter | null;
   chapters: Chapter[];
-  homepage: Pick<Homepage, 'header'> | null;
 }
 
 // Meta Tags Generation (replacement for react-datocms renderMetaTags)

@@ -8,7 +8,6 @@ import type {
   BookmarkRecord,
   Chapter,
   CommentsResult,
-  Homepage,
   ReadingProgressRecord,
 } from '@/types/cms';
 import { buildBookHref, buildChapterHref } from '@/lib/routes/book-route';
@@ -28,7 +27,6 @@ interface ChapterReaderClientProps {
   book: Book;
   chapter: Chapter;
   chapters: Chapter[];
-  homepage: Pick<Homepage, 'header'> | null;
   isDraftMode: boolean;
   isAuthenticated: boolean;
   readingProgress: ReadingProgressRecord[];

@@ -1,11 +1,10 @@
-import type { AboutPageData, Author, Homepage } from '@/types/cms';
+import type { AboutPageData, Author } from '@/types/cms';
 import { fetchAPI } from './base';
 
 const AUTHOR_ID = 1; // quanghuy1242
 
 interface AboutPageResponse {
   User: Author | null;
-  Homepage: Pick<Homepage, 'header'> | null;
 }
 
 export async function getDataForAbout(): Promise<AboutPageData> {
@@ -27,10 +26,6 @@ export async function getDataForAbout(): Promise<AboutPageData> {
         }
         bio
       }
-
-      Homepage {
-        header
-      }
     }
     `,
     {
@@ -42,7 +37,6 @@ export async function getDataForAbout(): Promise<AboutPageData> {
 
   return {
     author: data?.User ?? null,
-    homepage: data?.Homepage ?? null,
   };
 }
 
