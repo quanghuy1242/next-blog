@@ -152,4 +152,25 @@ describe('ScrollRestoration', () => {
       expect(window.__historyScrollRestoredFor).toBe('/');
     });
   });
+
+  test('restores from popstate even before App Router rerenders the route hook', async () => {
+    navigationState.pathname = '/posts/example';
+    window.history.replaceState({}, '', '/posts/example');
+    window.sessionStorage.setItem(
+      'scroll-pos:/',
+      JSON.stringify({ x: 0, y: 880 })
+    );
+    render(<ScrollRestoration />);
+
+    act(() => {
+      setScrollPosition(0, 30);
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+
+    await waitFor(() => {
+      expect(window.scrollY).toBe(880);
+      expect(window.__historyScrollRestoredFor).toBe('/');
+    });
+  });
 });

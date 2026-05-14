@@ -25,6 +25,7 @@ export function ScrollRestoration() {
   const suspendedSaveUrlRef = useRef<string | null>(null);
   const saveFrameRef = useRef<number | null>(null);
   const cancelRestoreRef = useRef<(() => void) | null>(null);
+  const restoreFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -48,17 +49,7 @@ export function ScrollRestoration() {
     if (pendingRestoreUrlRef.current === currentUrl) {
       pendingRestoreUrlRef.current = null;
 
-      const savedPosition = restorePosition(currentUrl);
-
-      if (savedPosition) {
-        window.__historyScrollRestoredFor = currentUrl;
-        cancelRestoreRef.current?.();
-        cancelRestoreRef.current = restoreWhenReady(
-          currentUrl,
-          savedPosition.x,
-          savedPosition.y
-        );
-      }
+      restoreSavedPosition(currentUrl, cancelRestoreRef);
     }
   }, [currentUrl]);
 
@@ -148,7 +139,17 @@ export function ScrollRestoration() {
       const leavingRoute = currentUrlRef.current;
       savePosition(leavingRoute);
       suspendedSaveUrlRef.current = leavingRoute;
-      pendingRestoreUrlRef.current = getWindowUrl();
+      const restoreUrl = getWindowUrl();
+      pendingRestoreUrlRef.current = restoreUrl;
+
+      if (restoreFrameRef.current !== null) {
+        window.cancelAnimationFrame(restoreFrameRef.current);
+      }
+
+      restoreFrameRef.current = window.requestAnimationFrame(() => {
+        restoreFrameRef.current = null;
+        restoreSavedPosition(restoreUrl, cancelRestoreRef);
+      });
     };
 
     if ('scrollRestoration' in window.history) {
@@ -169,6 +170,11 @@ export function ScrollRestoration() {
       if (saveFrameRef.current !== null) {
         window.cancelAnimationFrame(saveFrameRef.current);
         saveFrameRef.current = null;
+      }
+
+      if (restoreFrameRef.current !== null) {
+        window.cancelAnimationFrame(restoreFrameRef.current);
+        restoreFrameRef.current = null;
       }
 
       cancelRestoreRef.current?.();
@@ -238,6 +244,25 @@ function restorePosition(url: string): ScrollPosition | null {
   } catch {
     return null;
   }
+}
+
+function restoreSavedPosition(
+  url: string,
+  cancelRestoreRef: { current: (() => void) | null }
+) {
+  const savedPosition = restorePosition(url);
+
+  if (!savedPosition) {
+    return;
+  }
+
+  window.__historyScrollRestoredFor = url;
+  cancelRestoreRef.current?.();
+  cancelRestoreRef.current = restoreWhenReady(
+    url,
+    savedPosition.x,
+    savedPosition.y
+  );
 }
 
 function findAnchor(target: EventTarget | null): HTMLAnchorElement | null {
