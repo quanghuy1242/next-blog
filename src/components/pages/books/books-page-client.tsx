@@ -14,7 +14,6 @@ import { LoadingSpinner } from '@/components/shared/ui/loading-spinner';
 interface BooksPageClientProps {
   initialBooks: Book[];
   initialHasMore: boolean;
-  initialBookmarkedBookIds: number[];
   isAuthenticated: boolean;
 }
 
@@ -23,7 +22,6 @@ const BOOKS_PAGE_SIZE = 6;
 export function BooksPageClient({
   initialBooks,
   initialHasMore,
-  initialBookmarkedBookIds,
   isAuthenticated,
 }: BooksPageClientProps) {
   const { booksState, isFetching, error, loadMoreBooks, retryLoadMore, refreshBooks } =
@@ -75,7 +73,6 @@ export function BooksPageClient({
         <Text text="Books" />
         <BooksGrid
           books={booksState.books}
-          bookmarkedBookIds={initialBookmarkedBookIds}
           isAuthenticated={isAuthenticated}
         />
 

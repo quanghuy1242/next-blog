@@ -1,6 +1,5 @@
 import { Layout } from '@/components/core/layout';
 import { BooksPageClient } from '@/components/pages/books/books-page-client';
-import { getBookmarks } from '@/lib/payload/bookmarks';
 import { getDataForBooksPage } from '@/lib/payload/books';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
 import { getAuthTokenFromAppRequest } from '@/lib/server/app-request';
@@ -23,15 +22,6 @@ export default async function BooksPage() {
     authToken: sessionToken,
     cache: payloadCache,
   });
-  const bookmarks = sessionToken
-    ? await getBookmarks({
-        authToken: sessionToken,
-        limit: 100,
-      }).catch(() => ({ docs: [], totalDocs: 0 }))
-    : { docs: [], totalDocs: 0 };
-  const initialBookmarkedBookIds = bookmarks.docs
-    .filter((bookmark) => bookmark.contentType === 'book' && bookmark.book != null)
-    .map((bookmark) => bookmark.book!.id);
 
   return (
     <Layout
@@ -42,7 +32,6 @@ export default async function BooksPage() {
       <BooksPageClient
         initialBooks={data.books}
         initialHasMore={data.hasMore}
-        initialBookmarkedBookIds={initialBookmarkedBookIds}
         isAuthenticated={Boolean(sessionToken)}
       />
     </Layout>

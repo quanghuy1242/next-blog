@@ -65,10 +65,12 @@ export default async function BooksShelfPage() {
             {visibleBookBookmarks.length > 0 ? (
               <section>
                 <BooksGrid
-                  books={visibleBookBookmarks.map((bm) => bm.book).filter(Boolean) as Book[]}
-                  bookmarkedBookIds={visibleBookBookmarks
-                    .map((bm) => bm.book?.id)
-                    .filter((id): id is number => typeof id === 'number')}
+                  books={(visibleBookBookmarks.map((bm) => bm.book).filter(Boolean) as Book[]).map(
+                    (book) => ({
+                      ...book,
+                      isBookmarked: true,
+                    })
+                  )}
                   isAuthenticated
                 />
               </section>

@@ -7,6 +7,7 @@ import type {
   PaginatedResponse,
 } from '@/types/cms';
 import { fetchAPI, fetchAPIWithAuthToken } from './base';
+import { getBookmarks } from './bookmarks';
 import {
   buildBookCacheTags,
   buildBookDetailCacheTags,
@@ -136,6 +137,34 @@ async function attachWholeBookProgress(
   }));
 }
 
+async function attachBookmarkState(
+  books: Book[],
+  options: BookFetchOptions
+): Promise<Book[]> {
+  if (!options.authToken || books.length === 0) {
+    return books.map((book) => ({
+      ...book,
+      isBookmarked: false,
+    }));
+  }
+
+  const bookmarks = await getBookmarks({
+    authToken: options.authToken,
+    limit: 100,
+  }).catch(() => ({ docs: [], totalDocs: 0 }));
+
+  const bookmarkedBookIds = new Set(
+    bookmarks.docs
+      .filter((bookmark) => bookmark.contentType === 'book' && bookmark.book != null)
+      .map((bookmark) => bookmark.book!.id)
+  );
+
+  return books.map((book) => ({
+    ...book,
+    isBookmarked: bookmarkedBookIds.has(book.id),
+  }));
+}
+
 const BOOK_STATUS_PUBLISHED = '{ _status: { equals: published } }';
 
 function buildBookStatusFilter(draftMode?: boolean): string {
@@ -205,7 +234,8 @@ export async function getPaginatedBooks(
     }
   );
 
-  const books = await attachWholeBookProgress(data?.Books?.docs ?? [], options);
+  const booksWithProgress = await attachWholeBookProgress(data?.Books?.docs ?? [], options);
+  const books = await attachBookmarkState(booksWithProgress, options);
 
   return {
     books,
@@ -250,7 +280,8 @@ export async function getDataForBooksPage(
     }
   );
 
-  const books = await attachWholeBookProgress(data?.Books?.docs ?? [], options);
+  const booksWithProgress = await attachWholeBookProgress(data?.Books?.docs ?? [], options);
+  const books = await attachBookmarkState(booksWithProgress, options);
 
   return {
     books,
