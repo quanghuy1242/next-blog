@@ -144,7 +144,7 @@ export function ChapterReaderClient({
                 <nav aria-label="Breadcrumb" className="mb-2">
                   <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-gray-500 sm:text-sm">
                     <li>
-                      <TextLink href="/books" medium ssrPrefetch>
+                      <TextLink href="/books" medium>
                         Books
                       </TextLink>
                     </li>
@@ -157,7 +157,6 @@ export function ChapterReaderClient({
                         className="break-words"
                         medium
                         prefetch={false}
-                        ssrPrefetch
                       >
                         {book.title}
                       </TextLink>
@@ -237,7 +236,6 @@ export function ChapterReaderClient({
                   <TextLink
                     href={buildChapterHref(book.id, book.slug, previousChapter.slug)}
                     prefetch={false}
-                    ssrPrefetch
                   >
                     Previous: {previousChapter.title}
                   </TextLink>
@@ -248,7 +246,6 @@ export function ChapterReaderClient({
                   <TextLink
                     href={buildChapterHref(book.id, book.slug, nextChapter.slug)}
                     prefetch={false}
-                    ssrPrefetch
                   >
                     Next: {nextChapter.title}
                   </TextLink>

@@ -32,10 +32,6 @@ vi.mock('@/lib/utils/image', () => ({
   getCoverImageUrl: () => 'https://example.com/cover.jpg',
 }));
 
-vi.mock('@/components/shared/ssr-prefetch-link', () => ({
-  SSRPrefetchLink: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
-}));
-
 vi.mock('@/components/shared/comments/CommentsSection', () => ({
   CommentsSection: () => <div data-testid="comments-section" />,
 }));

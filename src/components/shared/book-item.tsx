@@ -1,8 +1,8 @@
 import React from 'react';
+import Link from 'next/link';
 import type { Book } from '@/types/cms';
 import { buildBookHref } from '@/lib/routes/book-route';
 import { BookCover } from './book-cover';
-import { SSRPrefetchLink } from '@/components/shared/ssr-prefetch-link';
 
 interface BookItemProps {
   book: Book;
@@ -27,9 +27,9 @@ export function BookItem({
       />
 
       <h3 className="text-sm font-medium leading-snug sm:text-base">
-        <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} prefetch={false} className="hover:underline">
+        <Link href={buildBookHref(book.id, book.slug)} prefetch={false} className="hover:underline">
           {book.title}
-        </SSRPrefetchLink>
+        </Link>
       </h3>
 
       {book.author && <p className="text-xs text-gray-700">{book.author}</p>}

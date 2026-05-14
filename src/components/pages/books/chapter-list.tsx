@@ -1,7 +1,7 @@
 import React from 'react';
+import Link from 'next/link';
 import type { Chapter } from '@/types/cms';
 import { buildChapterHref } from '@/lib/routes/book-route';
-import { SSRPrefetchLink } from '@/components/shared/ssr-prefetch-link';
 import { ChapterLockBadge } from './chapter-lock-badge';
 
 interface ChapterListProps {
@@ -26,7 +26,7 @@ export function ChapterList({ chapters, bookId, bookSlug, readingProgressByChapt
         const progress = readingProgressByChapterId?.[chapter.id];
         return (
           <li key={`${chapter.slug}-${chapter.order}`}>
-            <SSRPrefetchLink
+            <Link
               href={buildChapterHref(bookId, bookSlug, chapter.slug)}
               prefetch={false}
               className="flex items-center justify-between rounded border border-gray-200 px-3 py-2 hover:border-gray-300"
@@ -42,7 +42,7 @@ export function ChapterList({ chapters, bookId, bookSlug, readingProgressByChapt
                 ) : null}
                 {chapter.hasPassword ? <ChapterLockBadge className="ml-3" /> : null}
               </span>
-            </SSRPrefetchLink>
+            </Link>
           </li>
         );
       })}

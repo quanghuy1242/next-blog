@@ -1,8 +1,8 @@
 import React from 'react';
+import Link from 'next/link';
 import cn from 'classnames';
 import type { Chapter } from '@/types/cms';
 import { buildChapterHref } from '@/lib/routes/book-route';
-import { SSRPrefetchLink } from '@/components/shared/ssr-prefetch-link';
 import { ChapterLockBadge } from './chapter-lock-badge';
 
 interface ChapterTocProps {
@@ -33,7 +33,7 @@ export function ChapterToc({
           const progress = readingProgressByChapterId?.[chapter.id];
           return (
             <li key={`${chapter.slug}-${chapter.order}`}>
-              <SSRPrefetchLink
+              <Link
                 href={buildChapterHref(bookId, bookSlug, chapter.slug)}
                 prefetch={false}
                 onClick={onNavigate}
@@ -51,7 +51,7 @@ export function ChapterToc({
                   </span>
                 ) : null}
                 {chapter.hasPassword ? <ChapterLockBadge compact className="ml-1 align-text-bottom" /> : null}
-              </SSRPrefetchLink>
+              </Link>
             </li>
           );
         })}

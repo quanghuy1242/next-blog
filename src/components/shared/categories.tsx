@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { LinkProps } from 'next/link';
 import type { Category as CategoryData } from '@/types/cms';
-import { SSRPrefetchLink } from '@/components/shared/ssr-prefetch-link';
 
 export interface CategoryCardProps {
   name: string;
@@ -15,7 +14,7 @@ export interface CategoryCardProps {
   className?: string;
   alwaysShowDescription?: boolean;
   simpleImage?: boolean;
-  ssrPrefetch?: boolean;
+  prefetch?: LinkProps['prefetch'];
 }
 
 export function CategoryCard({
@@ -26,7 +25,7 @@ export function CategoryCard({
   className,
   alwaysShowDescription = false,
   simpleImage = false,
-  ssrPrefetch = false,
+  prefetch,
 }: CategoryCardProps) {
   const [show, setShow] = useState(false);
   const descriptionText = description ?? '';
@@ -81,16 +80,8 @@ export function CategoryCard({
     onBlur: () => setShow(false),
   };
 
-  if (ssrPrefetch && typeof href === 'string') {
-    return (
-      <SSRPrefetchLink href={href} {...commonProps}>
-        {cardContent}
-      </SSRPrefetchLink>
-    );
-  }
-
   return (
-    <Link href={href} {...commonProps}>
+    <Link href={href} prefetch={prefetch} {...commonProps}>
       {cardContent}
     </Link>
   );

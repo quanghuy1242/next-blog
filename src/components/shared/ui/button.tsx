@@ -6,7 +6,6 @@ import type {
 import Link from 'next/link';
 import type { LinkProps } from 'next/link';
 import cn from 'classnames';
-import { SSRPrefetchLink } from '@/components/shared/ssr-prefetch-link';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -73,7 +72,6 @@ interface ButtonLinkProps
   size?: ButtonSize;
   fullWidth?: boolean;
   hardNavigate?: boolean;
-  ssrPrefetch?: boolean;
   prefetch?: LinkProps['prefetch'];
 }
 
@@ -84,7 +82,6 @@ export function ButtonLink({
   size = 'md',
   fullWidth = false,
   hardNavigate = false,
-  ssrPrefetch = false,
   prefetch,
   className,
   ...props
@@ -101,14 +98,6 @@ export function ButtonLink({
       <a href={href} className={composedClassName} {...props}>
         {children}
       </a>
-    );
-  }
-
-  if (ssrPrefetch) {
-    return (
-      <SSRPrefetchLink href={href} prefetch={prefetch} className={composedClassName} {...props}>
-        {children}
-      </SSRPrefetchLink>
     );
   }
 
