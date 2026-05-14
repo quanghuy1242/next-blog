@@ -12,6 +12,7 @@
 >
 > - Local source code under `pages/`, `components/`, `common/`, `hooks/`, `context/`, `tests/`, `next.config.mjs`, `open-next.config.ts`, `wrangler.jsonc`, and `.github/workflows/deploy-cloudflare.yml`
 > - Next.js App Router migration guide: <https://nextjs.org/docs/app/guides/migrating/app-router-migration>
+> - Next.js `src` folder convention: <https://nextjs.org/docs/app/api-reference/file-conventions/src-folder>
 > - Next.js Route Handlers reference: <https://nextjs.org/docs/app/api-reference/file-conventions/route>
 > - Next.js caching guide: <https://nextjs.org/docs/app/getting-started/caching>
 > - Next.js caching without Cache Components guide: <https://nextjs.org/docs/app/guides/caching-without-cache-components>
@@ -32,6 +33,7 @@
 > - The code is the source of truth; existing docs may lag implementation.
 > - The migration must preserve every current public route, auth route, API route, cookie contract, cache behavior, and user-facing flow before Pages Router code is removed.
 > - Deployment remains Cloudflare Workers through `@opennextjs/cloudflare`, not Vercel.
+> - Application code should end up under `src/`; root-level `docs/`, `public/`, config files, infrastructure, and tests can remain outside `src/`.
 > - No PayloadCMS, Auther, or database schema migration is in first-release scope unless a route contract forces a small adapter change.
 
 ## Table Of Contents
@@ -45,6 +47,7 @@
   - [3.4 Auth, Draft, And Cookie Model](#34-auth-draft-and-cookie-model)
   - [3.5 Client State And Navigation Model](#35-client-state-and-navigation-model)
   - [3.6 Test Coverage](#36-test-coverage)
+  - [3.7 Source Layout](#37-source-layout)
 - [4. Target Model](#4-target-model)
 - [5. Architecture Decisions](#5-architecture-decisions)
   - [5.1 Migrate Incrementally With Coexisting Routers](#51-migrate-incrementally-with-coexisting-routers)
@@ -52,9 +55,10 @@
   - [5.3 Keep Route Handlers As The Browser Mutation Boundary](#53-keep-route-handlers-as-the-browser-mutation-boundary)
   - [5.4 Defer Cache Components Until After Parity](#54-defer-cache-components-until-after-parity)
   - [5.5 Replace Pages Data Warmup With App Router Prefetching](#55-replace-pages-data-warmup-with-app-router-prefetching)
+  - [5.6 Move Application Code Under `src`](#56-move-application-code-under-src)
 - [6. Implementation Strategy](#6-implementation-strategy)
 - [7. Detailed Implementation Plan](#7-detailed-implementation-plan)
-  - [7.1 Foundation](#71-foundation)
+  - [7.1 Source Tree And App Foundation](#71-source-tree-and-app-foundation)
   - [7.2 Route Handlers](#72-route-handlers)
   - [7.3 Public Static And ISR Routes](#73-public-static-and-isr-routes)
   - [7.4 Homepage](#74-homepage)
@@ -77,6 +81,7 @@ Move `next-blog` from Pages Router to App Router while keeping 100% functional p
 - All public URLs continue to resolve.
 - All OAuth, signup, logout, draft preview, comments, bookmarks, reading progress, chapter unlock, and infinite-scroll APIs keep the same browser-visible contracts.
 - PayloadCMS GraphQL integration and Cloudflare cache behavior remain intact.
+- Application source becomes organized under `src/`, with routes in `src/app`, reusable UI in `src/components`, and non-UI logic in `src/lib`.
 - App Router improvements are used where they reduce complexity or improve performance without changing behavior.
 
 Non-goals for the first release:
@@ -92,12 +97,13 @@ Non-goals for the first release:
 The migration is feasible and worth doing, but it is not a mechanical rename. The repo already runs modern dependencies (`next@16.2.4`, React 19, TypeScript 6, OpenNext Cloudflare 1.19) and does not need a framework-version upgrade first. The hard parts are architectural:
 
 - The current app depends on Pages Router-only APIs: `getServerSideProps`, `getStaticProps`, `getStaticPaths`, `next/head`, `next/router`, `_app.tsx`, `_document.tsx`, and `NextApiRequest`/`NextApiResponse`.
+- The current source tree is split across root-level `pages/`, `components/`, `common/`, `hooks/`, `context/`, `types/`, and `styles/`. A source-root migration is feasible, but it must respect Next's `src` folder precedence rules.
 - Several Pages Router pages are fully client-capable today because every component under `pages/` is effectively allowed to use hooks. App Router defaults to Server Components, so hook-heavy surfaces must be split into server loaders plus explicit client components.
 - `common/utils/route-prefetch.ts` is explicitly coupled to `/_next/data/{buildId}.json` and Next Pages Router internals. It should be retired or rewritten, not carried forward unchanged.
 - Authenticated book routes and reader routes read cookies and return user-specific data. These should remain dynamic routes at first. Their public content can be optimized later by isolating private UI behind Suspense or private cache scopes.
 - The route handlers are straightforward to port because their current logic is already isolated in `common/apis/*` and `common/utils/*`; the main change is adapting request, response, cookies, redirects, and body parsing to Web APIs.
 
-Recommendation: do a phased, route-by-route migration with both routers present until each route reaches parity. Next's migration guide explicitly supports moving data fetching into Server Components and updating routing hooks to `next/navigation`; it also documents that `app` and `pages` can be migrated incrementally. Route Handlers use standard Web `Request` and `Response` APIs, and OpenNext Cloudflare supports deploying Next apps to Cloudflare Workers with the Node.js runtime, which matches this app's existing `node:crypto`, `Buffer`, and server-side utility usage.
+Recommendation: first move existing application code into `src/` without behavior changes, then do a phased route-by-route App Router migration with `src/pages` and `src/app` coexisting until each route reaches parity. Next's migration guide supports moving data fetching into Server Components and updating routing hooks to `next/navigation`; it also documents incremental `app` and `pages` migration. Route Handlers use standard Web `Request` and `Response` APIs, and OpenNext Cloudflare supports deploying Next apps to Cloudflare Workers with the Node.js runtime, which matches this app's existing `node:crypto`, `Buffer`, and server-side utility usage.
 
 ## 3. Current-State Findings
 
@@ -163,7 +169,7 @@ Current API routes:
 
 Migration implication:
 
-- UI and API routes can be migrated independently, but each path must exist in only one router at a time. Use route parity branches and delete the corresponding `pages/*` file when introducing the final `app/*` route.
+- UI and API routes can be migrated independently after the source-root move, but each path must exist in only one router at a time. Use route parity branches and delete the corresponding `src/pages/*` file when introducing the final `src/app/*` route.
 - Auth and API routes are good early candidates because they have strong tests and limited UI coupling.
 
 ### 3.3 Data And Cache Model
@@ -198,7 +204,7 @@ Current behavior:
 
 Migration implication:
 
-- Preserve `common/apis/*` as server-only data access modules in the first release.
+- Preserve the moved `src/lib/payload/*` modules as server-only data access modules in the first release.
 - Keep `readThroughCloudflareCache` for Cloudflare parity. App Router caching can wrap or replace it later after production metrics prove parity.
 - Server Components can call these helpers directly. Browser components should continue to call route handlers for pagination, comments, bookmarks, and reading progress.
 
@@ -232,7 +238,7 @@ Migration implication:
 
 - Do not call existing `auth-cookies.ts` response helpers directly from App Route Handlers because they are typed around Node `ServerResponse`. Add Web-response equivalents or replace them with `NextResponse.cookies`.
 - Server Components should read auth through a new helper that adapts `await cookies()` and `await headers()` into the existing `getBetterAuthTokenFromRequest` shape.
-- Draft routes should move to `app/api/draft/route.ts` and `app/api/draft-exit/route.ts` using App Router `draftMode()` from `next/headers`.
+- Draft routes should move to `src/app/api/draft/route.ts` and `src/app/api/draft-exit/route.ts` using App Router `draftMode()` from `next/headers`.
 
 ### 3.5 Client State And Navigation Model
 
@@ -264,7 +270,7 @@ Current behavior:
 
 Migration implication:
 
-- Add `app/layout.tsx` and a client `components/app/app-providers.tsx` that contains `AppWrapper`, analytics, and scroll restoration.
+- Add `src/app/layout.tsx` and a client provider under `src/app/providers.tsx` or `src/components/app/app-providers.tsx` that contains `AppWrapper`, analytics, and scroll restoration.
 - Replace `next/router` usage with `next/navigation` hooks in client components:
   - `usePathname()` and `useSearchParams()` for return URLs and query filters.
   - `useRouter().replace()` for chapter unlock refresh behavior.
@@ -296,38 +302,129 @@ Current test gaps for migration:
 - There is no browser end-to-end test covering OAuth redirect stubs, chapter unlock, draft preview, or full reader progress.
 - There is no App Router RSC test harness yet.
 
+### 3.7 Source Layout
+
+Observed current application-code directories:
+
+- `pages/`: Pages Router UI routes, API routes, auth redirects, `_app.tsx`, and `_document.tsx`.
+- `components/`: core layout, page-specific components, shared UI, comments, rich text, images, and route prefetch link wrapper.
+- `common/`: Payload GraphQL clients, cache helpers, constants, analytics, auth, preview, book-route helpers, image helpers, and reading utilities.
+- `hooks/`: browser hooks for home posts, books feed, comments, bookmarks, intersection, pointer proximity, and reading progress.
+- `context/`: global app context for header and home post state.
+- `types/`: CMS data contracts.
+- `styles/`: global CSS.
+
+Observed root-level non-application directories and files:
+
+- `docs/`, `public/`, `tests/`, `infrastructure/`, `.github/`, `package.json`, `next.config.mjs`, `open-next.config.ts`, `wrangler.jsonc`, `tsconfig.json`, `vitest.config.ts`, and lint/build config.
+
+Current problems:
+
+- Runtime application code is scattered across multiple root-level folders, so routing code, UI code, server data access, browser hooks, and types are visually peers with docs, infrastructure, config, and tests.
+- `common/` is too broad. It mixes Payload data access, Cloudflare cache, auth, analytics, constants, and UI-facing utilities.
+- Existing imports use root aliases such as `common/apis/books`, `components/core/layout`, `hooks/useBooksFeed`, `context/state`, and `types/cms`. A source-root move must update both production code and tests.
+- Next's `src` folder convention means root `pages/` or root `app/` takes precedence over `src/pages` or `src/app`. To use `src/app` reliably, the migration must not leave a root `pages/` tree in place.
+
+Migration implication:
+
+- Add a behavior-preserving source-root refactor before App Router route takeover:
+  - move `pages/` to `src/pages/`;
+  - move reusable UI to `src/components/`;
+  - move `common/` into clearer `src/lib/` subdomains;
+  - move `hooks/`, `context/`, `types/`, and `styles/` under `src/`;
+  - update import aliases and tests.
+- Keep root-level `docs/`, `public/`, `tests/`, deployment config, and package/build config outside `src/`.
+- After the source-root refactor, introduce `src/app/` beside `src/pages/` for incremental App Router migration.
+
 ## 4. Target Model
 
-Target route tree:
+Target source tree:
 
 ```text
-app/
-  layout.tsx
-  providers.tsx
-  page.tsx
-  about/page.tsx
-  categories/page.tsx
-  posts/[slug]/page.tsx
-  books/page.tsx
-  books/[slug]/page.tsx
-  books/[slug]/chapters/[chapterSlug]/page.tsx
-  shelf/page.tsx
-  auth/login/route.ts
-  auth/callback/route.ts
-  auth/logout/route.ts
-  auth/signup/page.tsx
-  api/auth/session/route.ts
-  api/posts/route.ts
-  api/books/route.ts
-  api/comments/route.ts
-  api/comments/[commentId]/route.ts
-  api/bookmarks/route.ts
-  api/bookmarks/[bookmarkId]/route.ts
-  api/reading-progress/route.ts
-  api/chapters/unlock/route.ts
-  api/draft/route.ts
-  api/draft-exit/route.ts
+src/
+  app/
+    layout.tsx
+    providers.tsx
+    page.tsx
+    about/page.tsx
+    categories/page.tsx
+    posts/[slug]/page.tsx
+    books/page.tsx
+    books/[slug]/page.tsx
+    books/[slug]/chapters/[chapterSlug]/page.tsx
+    shelf/page.tsx
+    auth/login/route.ts
+    auth/callback/route.ts
+    auth/logout/route.ts
+    auth/signup/page.tsx
+    api/auth/session/route.ts
+    api/posts/route.ts
+    api/books/route.ts
+    api/comments/route.ts
+    api/comments/[commentId]/route.ts
+    api/bookmarks/route.ts
+    api/bookmarks/[bookmarkId]/route.ts
+    api/reading-progress/route.ts
+    api/chapters/unlock/route.ts
+    api/draft/route.ts
+    api/draft-exit/route.ts
+  components/
+    app/
+    core/
+    pages/
+    shared/
+  context/
+  hooks/
+  lib/
+    analytics/
+    auth/
+    constants/
+    payload/
+    preview/
+    reading/
+    routes/
+    server/
+    utils/
+  styles/
+  types/
 ```
+
+Transition-only tree while App Router migration is in progress:
+
+```text
+src/
+  pages/
+    ...
+  app/
+    ...
+```
+
+`src/pages/` exists only during migration. It should be deleted when every route and API endpoint has moved to `src/app/`.
+
+Recommended move map:
+
+| Current path | Target path | Notes |
+| --- | --- | --- |
+| `pages/` | `src/pages/` then deleted route by route | Required before `src/app` can be used reliably. |
+| `components/` | `src/components/` | Keep current `core`, `pages`, `shared` grouping initially. |
+| `common/apis/` | `src/lib/payload/` | Payload GraphQL and Cloudflare cache access. |
+| `common/utils/auth*.ts`, `common/utils/blog-*.ts` | `src/lib/auth/` | OAuth, signup, cookie, and token helpers. |
+| `common/utils/preview.ts` | `src/lib/preview/preview.ts` | Draft preview token helpers. |
+| `common/utils/book-route.ts`, `common/utils/route-prefetch.ts` | `src/lib/routes/` | `route-prefetch.ts` is deleted after App Router link migration. |
+| `common/utils/reading-progress.ts` | `src/lib/reading/reading-progress.ts` | Server/client-neutral reading math. |
+| `common/constants*` | `src/lib/constants/` | Preserve existing exported names. |
+| `common/gtag.ts` | `src/lib/analytics/gtag.ts` | Used only by client analytics. |
+| Other `common/utils/*` | `src/lib/utils/` | Date, image, number, query, tags, EPUB resolver, etc. |
+| `hooks/` | `src/hooks/` | Client hooks; each hook file remains explicit about browser-only assumptions. |
+| `context/` | `src/context/` | App provider state. |
+| `types/` | `src/types/` | CMS contracts. |
+| `styles/` | `src/styles/` | `src/app/layout.tsx` imports `src/styles/index.css`. |
+
+Target import convention:
+
+- Prefer `@/components/...`, `@/hooks/...`, `@/context/...`, `@/types/...`, and `@/lib/...`.
+- Avoid reintroducing broad aliases like `common/*`.
+- During the source-root PR, update `tsconfig.json` and `vitest.config.ts` aliases together so production and tests resolve the same paths.
 
 Target component ownership:
 
@@ -342,24 +439,24 @@ Target component ownership:
   - Header auth polling.
   - Comments, bookmarks, reading progress, chapter drawer, password gate callback, route analytics, and scroll restoration.
 - Shared server libraries:
-  - `common/apis/*` remain server data modules.
-  - Add `server/request-context.ts` or similar for App Router cookie/header adapters.
+  - `src/lib/payload/*` remain server data modules.
+  - Add `src/lib/server/request-context.ts` or similar for App Router cookie/header adapters.
 - Shared route-handler utilities:
-  - Add `server/http.ts` or `app/api/_utils.ts` for method guards, JSON parsing, no-store headers, and cookie serialization.
+  - Add `src/lib/server/http.ts` or `src/app/api/_utils.ts` for method guards, JSON parsing, no-store headers, and cookie serialization.
 
 Target data flow:
 
 ```text
 Server Component page
   -> reads cookies/searchParams/params/draftMode
-  -> calls common/apis/*
+  -> calls src/lib/payload/*
   -> passes serializable props to client island
   -> renders shared presentational components
 
 Client component
-  -> calls app/api route handlers for mutation and incremental pagination
+  -> calls src/app/api route handlers for mutation and incremental pagination
   -> route handler validates method/body/auth
-  -> calls common/apis/*
+  -> calls src/lib/payload/*
   -> returns same JSON shape used today
 ```
 
@@ -367,11 +464,11 @@ Client component
 
 ### 5.1 Migrate Incrementally With Coexisting Routers
 
-Decision: migrate one route family at a time and delete the corresponding `pages/*` file only when the `app/*` implementation is ready.
+Decision: after the source-root move, migrate one route family at a time and delete the corresponding `src/pages/*` file only when the `src/app/*` implementation is ready.
 
 Why:
 
-- Next's official migration guide is built around creating `app/`, adding a root layout, moving pages one by one, moving data fetching into Server Components, and updating routing hooks.
+- Next's official migration guide is built around creating `app`, adding a root layout, moving pages one by one, moving data fetching into Server Components, and updating routing hooks.
 - The app has high-value behavior with good existing tests; route families can be validated independently.
 
 Rejected option: big-bang migration of all pages and APIs in one PR.
@@ -449,63 +546,113 @@ First-release behavior:
 - Keep the `ssrPrefetch` prop temporarily as a no-op compatibility prop on shared buttons and links to avoid broad UI churn.
 - Delete `route-prefetch.ts` and its tests only when no Pages route depends on it.
 
+### 5.6 Move Application Code Under `src`
+
+Decision: make the source-root refactor the first migration phase. Move the current Pages Router app from root-level folders into `src/`, then add `src/app/` for the App Router work.
+
+Why:
+
+- The desired end state is cleaner architecture, not only a router change.
+- Next's `src` folder convention supports application code under `src`, but root-level `pages/` or `app/` takes precedence. Moving `pages/` to `src/pages/` first avoids a confusing state where `src/app/` is ignored or route resolution differs from expectations.
+- A behavior-preserving source move is easier to review before Server Component, Route Handler, auth, and cache semantics change.
+- Using `@/lib`, `@/components`, `@/hooks`, `@/context`, and `@/types` makes ownership clearer than the current broad `common`, root `components`, and root `hooks` layout.
+
+Rejected option: create root `app/` for incremental migration, then move everything into `src/` at the end.
+
+Reason rejected:
+
+- It would solve routing first but leave the code scattered during the largest implementation phase.
+- It creates another large move-only PR after the behavior migration, increasing merge conflict risk.
+
+Rejected option: move only `app/` to `src/app` and leave `components/`, `common/`, `hooks/`, `context/`, and `types/` at root.
+
+Reason rejected:
+
+- It only partially addresses the architecture problem. The project would still mix application code with docs, public assets, tests, deployment config, and package config at the repo root.
+
 ## 6. Implementation Strategy
 
 Sequence:
 
-1. Add App Router foundation while Pages Router still runs.
-2. Add adapter utilities for App Router request cookies, response cookies, redirects, no-store JSON, and route params.
-3. Port `/api/*` route handlers with tests.
-4. Port auth redirect routes.
-5. Port simple public pages (`/about`, `/categories`, `/posts/[slug]`).
-6. Port homepage and its query/filter behavior.
-7. Port book and chapter routes.
-8. Port shelf.
-9. Replace navigation, analytics, scroll restoration, and prefetch behavior.
-10. Remove remaining `pages/` files, Pages Router tests, Pages Router-only dependencies, and obsolete warmup utilities.
+1. Move application source into `src/` without behavior changes:
+   - `pages/` to `src/pages/`;
+   - `components/` to `src/components/`;
+   - `common/` to `src/lib/` subdomains;
+   - `hooks/`, `context/`, `types/`, and `styles/` to matching `src/*` folders.
+2. Update aliases and imports to the `@/...` convention.
+3. Add App Router foundation in `src/app/` while `src/pages/` still runs.
+4. Add adapter utilities for App Router request cookies, response cookies, redirects, no-store JSON, and route params.
+5. Port `/api/*` route handlers with tests.
+6. Port auth redirect routes.
+7. Port simple public pages (`/about`, `/categories`, `/posts/[slug]`).
+8. Port homepage and its query/filter behavior.
+9. Port book and chapter routes.
+10. Port shelf.
+11. Replace navigation, analytics, scroll restoration, and prefetch behavior.
+12. Remove remaining `src/pages/` files, Pages Router tests, Pages Router-only dependencies, and obsolete warmup utilities.
 
 Compatibility bridge:
 
-- Keep `common/apis/*`, `common/utils/*`, `hooks/*`, and presentational components in place during migration.
+- Keep behavior stable during the source-root refactor; it should be a move/import-rewrite PR, not a behavior PR.
+- Keep `src/lib/payload/*`, `src/lib/auth/*`, `src/hooks/*`, and presentational components available during migration.
 - Create client wrappers instead of rewriting shared components immediately.
 - Keep `/api/*` JSON response shapes unchanged so hooks can be migrated independently from server routes.
 
 Rollback:
 
-- Before deleting a `pages/*` route, keep the old file available on the branch until the new route passes tests.
-- If a migrated route fails in production, revert that route-family commit and restore its `pages/*` file.
+- Before deleting a `src/pages/*` route, keep the old file available on the branch until the new route passes tests.
+- If a migrated route fails in production, revert that route-family commit and restore its `src/pages/*` file.
 - Avoid schema or external service changes in the first release so rollback is code-only.
 
 ## 7. Detailed Implementation Plan
 
-### 7.1 Foundation
+### 7.1 Source Tree And App Foundation
 
 Current problem:
 
+- Application code is scattered across root-level `pages/`, `components/`, `common/`, `hooks/`, `context/`, `types/`, and `styles/`.
+- The desired end state needs `src/app`, but the current root `pages/` tree should be moved first so `src/app` and `src/pages` can coexist during migration.
 - `_app.tsx` and `_document.tsx` own global styles, context, analytics script injection, pageview tracking, and manual scroll restoration.
-- App Router needs root `app/layout.tsx`, metadata/script APIs, and explicit client providers.
+- App Router needs `src/app/layout.tsx`, metadata/script APIs, and explicit client providers.
 
 Target behavior:
 
-- `app/layout.tsx` imports `styles/index.css`, sets `<html lang="en">`, renders GA script through `next/script`, and wraps children in a client provider.
+- All runtime application code lives under `src/`.
+- Existing Pages Router behavior first runs from `src/pages/` with updated imports.
+- App Router routes are introduced under `src/app/`.
+- `src/app/layout.tsx` imports `src/styles/index.css`, sets `<html lang="en">`, renders GA script through `next/script`, and wraps children in a client provider.
 - A client provider preserves `AppWrapper`, pageview tracking, and manual scroll restoration.
 
 Implementation tasks:
 
-- [ ] Create `app/layout.tsx`.
-- [ ] Create `app/providers.tsx` with `'use client'`.
+- [ ] Move `pages/` to `src/pages/`.
+- [ ] Move `components/` to `src/components/`.
+- [ ] Move `hooks/` to `src/hooks/`.
+- [ ] Move `context/` to `src/context/`.
+- [ ] Move `types/` to `src/types/`.
+- [ ] Move `styles/` to `src/styles/`.
+- [ ] Move `common/apis/` to `src/lib/payload/`.
+- [ ] Split `common/utils/` into `src/lib/auth/`, `src/lib/preview/`, `src/lib/routes/`, `src/lib/reading/`, and `src/lib/utils/`.
+- [ ] Move `common/constants*` to `src/lib/constants/`.
+- [ ] Move `common/gtag.ts` to `src/lib/analytics/gtag.ts`.
+- [ ] Update `tsconfig.json` paths to prefer `@/* -> ./src/*`.
+- [ ] Update `vitest.config.ts` aliases to match production imports.
+- [ ] Rewrite production and test imports from `common/*`, `components/*`, `hooks/*`, `context/*`, and `types/*` to `@/lib/*`, `@/components/*`, `@/hooks/*`, `@/context/*`, and `@/types/*`.
+- [ ] Create `src/app/layout.tsx`.
+- [ ] Create `src/app/providers.tsx` with `'use client'`.
 - [ ] Move the `_app.tsx` scroll restoration logic into a client component that uses `usePathname()` and `useSearchParams()` instead of `router.events`.
-- [ ] Move GA script injection from `_document.tsx` to `next/script` in `app/layout.tsx`.
-- [ ] Keep `context/state.tsx` as a client-only provider.
+- [ ] Move GA script injection from `_document.tsx` to `next/script` in `src/app/layout.tsx`.
+- [ ] Keep `src/context/state.tsx` as a client-only provider.
 - [ ] Mark hook-using components with `'use client'` where needed:
-  - `components/core/header.tsx`
-  - `components/shared/ssr-prefetch-link.tsx` or replacement
-  - `components/shared/bookmark-button.tsx`
-  - `components/shared/comments/CommentsSection.tsx`
+  - `src/components/core/header.tsx`
+  - `src/components/shared/ssr-prefetch-link.tsx` or replacement
+  - `src/components/shared/bookmark-button.tsx`
+  - `src/components/shared/comments/CommentsSection.tsx`
   - hook-driven page clients for homepage, books, and chapter reader
 
 Tests:
 
+- After the source-root move, run the full test suite before adding App Router behavior.
 - Add `tests/app/providers.test.tsx` or component tests for analytics and scroll restoration if logic is extractable.
 - Update `tests/components/header.test.tsx` to mock `next/navigation` instead of `next/router`.
 
@@ -522,7 +669,7 @@ Target behavior:
 
 Implementation tasks:
 
-- [ ] Add `app/api/_utils/http.ts`:
+- [ ] Add `src/app/api/_utils/http.ts` or `src/lib/server/http.ts`:
   - `json(data, init?)`
   - `methodNotAllowed(methods)`
   - `noStoreHeaders()`
@@ -530,8 +677,8 @@ Implementation tasks:
   - `getSearchParam(request.nextUrl, key)`
   - `getAuthTokenFromNextRequest(request)`
   - `getChapterProofFromNextRequest(request)`
-- [ ] Port `/api/posts` to `app/api/posts/route.ts`.
-- [ ] Port `/api/books` to `app/api/books/route.ts`.
+- [ ] Port `/api/posts` to `src/app/api/posts/route.ts`.
+- [ ] Port `/api/books` to `src/app/api/books/route.ts`.
 - [ ] Port `/api/comments` and `/api/comments/[commentId]`.
 - [ ] Port `/api/bookmarks` and `/api/bookmarks/[bookmarkId]`.
 - [ ] Port `/api/reading-progress`.
@@ -559,15 +706,15 @@ Target behavior:
 
 Implementation tasks:
 
-- [ ] Create `app/about/page.tsx`:
+- [ ] Create `src/app/about/page.tsx`:
   - `export const revalidate = 3600`.
   - Call `getDataForAbout()`.
   - Use `generateMetadata` with `generateMetaTags` logic translated to Next metadata shape.
-- [ ] Create `app/categories/page.tsx`:
+- [ ] Create `src/app/categories/page.tsx`:
   - `export const revalidate = 60`.
   - Call `getDataForHome()`.
   - Preserve `NotYetImplemented`.
-- [ ] Create `app/posts/[slug]/page.tsx`:
+- [ ] Create `src/app/posts/[slug]/page.tsx`:
   - Do not generate static params initially; preserve blocking-on-first-request behavior.
   - Call `getDataForPostSlug(slug, { draftMode: isEnabled })`.
   - Use `notFound()` when no post.
@@ -589,13 +736,13 @@ Current problem:
 
 Target behavior:
 
-- `app/page.tsx` is a Server Component that receives `searchParams`, fetches the initial filtered posts, and renders a client `HomePageClient`.
+- `src/app/page.tsx` is a Server Component that receives `searchParams`, fetches the initial filtered posts, and renders a client `HomePageClient`.
 - `HomePageClient` owns `useHomePosts`, intersection observer, retry UI, and context synchronization.
 
 Implementation tasks:
 
-- [ ] Create `app/page.tsx`.
-- [ ] Create `components/pages/index/home-page-client.tsx` with `'use client'`.
+- [ ] Create `src/app/page.tsx`.
+- [ ] Create `src/components/pages/index/home-page-client.tsx` with `'use client'`.
 - [ ] Replace `router.query` and `router.isReady` with server-normalized `initialCategory` and `initialTags`; if client-side filter changes are still needed, use `useSearchParams()`.
 - [ ] Keep `POSTS_PAGE_SIZE = 5`.
 - [ ] Keep `/api/posts` contract for load more and filtered reload.
@@ -621,21 +768,21 @@ Target behavior:
 
 Implementation tasks:
 
-- [ ] Add `server/app-request.ts`:
+- [ ] Add `src/lib/server/app-request.ts`:
   - `getAuthTokenFromAppRequest()`
   - `getChapterProofFromAppRequest()`
   - adapter object compatible with `getBetterAuthTokenFromRequest`.
-- [ ] Create `app/books/page.tsx`:
+- [ ] Create `src/app/books/page.tsx`:
   - Read auth token from cookies.
   - Call `getDataForBooksPage(6, { authToken, cache })`.
   - Fetch initial bookmarks if authenticated.
   - Render `BooksPageClient`.
-- [ ] Create `app/books/[slug]/page.tsx`:
+- [ ] Create `src/app/books/[slug]/page.tsx`:
   - Parse route segment with `parseBookRouteSegment`.
   - If legacy slug-only, call `getBookBySlug` and `redirect(buildBookHref(...))`.
   - If canonical `id~slug`, call `getBookDetailById`.
   - Preserve reading progress, initial bookmark, continue-reading selection, draft mode, and `notFound` conditions.
-- [ ] Create `app/books/[slug]/chapters/[chapterSlug]/page.tsx`:
+- [ ] Create `src/app/books/[slug]/chapters/[chapterSlug]/page.tsx`:
   - Preserve canonical redirect behavior.
   - Preserve `chapterPasswordProof` logic for anonymous non-draft users.
   - Preserve auth/proof cache selection.
@@ -660,14 +807,14 @@ Current problem:
 Target behavior:
 
 - Redirect-only auth routes become route handlers:
-  - `app/auth/login/route.ts`
-  - `app/auth/callback/route.ts`
-  - `app/auth/logout/route.ts`
+  - `src/app/auth/login/route.ts`
+  - `src/app/auth/callback/route.ts`
+  - `src/app/auth/logout/route.ts`
 - Signup can be either a route handler plus fallback page or a dynamic page. Prefer a page for preserving the fallback UI.
 
 Implementation tasks:
 
-- [ ] Add `common/utils/app-auth-cookies.ts` or route-handler cookie helpers using `NextResponse`.
+- [ ] Add `src/lib/auth/app-auth-cookies.ts` or route-handler cookie helpers using `NextResponse`.
 - [ ] Port `/auth/login`:
   - Normalize `returnTo`.
   - Set `blogAuthState`.
@@ -710,16 +857,16 @@ Implementation tasks:
 - [ ] Refactor `Header`:
   - Replace `useRouter` with `usePathname()` and `useSearchParams()`.
   - Replace `router.events.on('routeChangeComplete')` with an effect keyed by current URL.
-- [ ] Add `components/app/analytics.tsx`:
+- [ ] Add `src/components/app/analytics.tsx`:
   - Client component that calls `gtag.pageview(url)` on URL changes.
-- [ ] Add `components/app/scroll-restoration.tsx`:
+- [ ] Add `src/components/app/scroll-restoration.tsx`:
   - Port current scroll map logic using URL changes and `popstate` where possible.
   - Preserve `window.__historyScrollRestoredFor` semantics for `useReadingProgress`.
 - [ ] Replace `SSRPrefetchLink` implementation:
   - Keep component name and `ssrPrefetch` callers for compatibility.
   - Remove `route-prefetch` scheduler calls for App Router routes.
   - Use standard `Link` prefetch behavior unless a route-specific performance issue appears.
-- [ ] Delete `common/utils/route-prefetch.ts` after all callers are migrated away from Pages Router and tests are replaced.
+- [ ] Delete `src/lib/routes/route-prefetch.ts` after all callers are migrated away from Pages Router and tests are replaced.
 
 Tests:
 
@@ -744,7 +891,7 @@ Implementation tasks:
 
 - [ ] Add test helpers for `NextRequest` construction.
 - [ ] Add test helpers for asserting `Response` JSON, status, headers, and cookies.
-- [ ] Migrate direct imports from `pages/*` to extracted client components or route loaders.
+- [ ] Migrate direct imports from `src/pages/*` to extracted client components or route loaders.
 - [ ] Add Playwright or equivalent E2E smoke tests:
   - Homepage renders and loads more posts.
   - Post detail renders comments section.
@@ -767,25 +914,28 @@ pnpm exec opennextjs-cloudflare build
 Recommended PR sequence:
 
 1. Foundation PR:
-   - Add `app/layout.tsx`, providers, request adapters, response helpers, and metadata helpers.
+   - Move runtime code into `src/`, including `src/pages`, `src/components`, `src/lib`, `src/hooks`, `src/context`, `src/types`, and `src/styles`.
+   - Update import aliases and run full behavior-preserving verification.
+2. App foundation PR:
+   - Add `src/app/layout.tsx`, providers, request adapters, response helpers, and metadata helpers.
    - No route takeover yet.
-2. API route-handler PR:
+3. API route-handler PR:
    - Port `/api/*` endpoints and tests.
-   - Delete corresponding `pages/api/*` files route by route.
-3. Auth route PR:
+   - Delete corresponding `src/pages/api/*` files route by route.
+4. Auth route PR:
    - Port `/auth/login`, `/auth/callback`, `/auth/logout`, `/auth/signup`.
    - Validate cookie domain behavior in local and deployed environments.
-4. Static/public content PR:
+5. Static/public content PR:
    - Port `/about`, `/categories`, `/posts/[slug]`.
    - Validate metadata and draft preview.
-5. Homepage PR:
+6. Homepage PR:
    - Port `/`, preserve filters and infinite scroll.
-6. Books PR:
+7. Books PR:
    - Port `/books`, `/books/[slug]`, `/shelf`.
-7. Chapter reader PR:
+8. Chapter reader PR:
    - Port chapter route, password unlock, reader progress, TOC, comments, and canonical redirects.
-8. Cleanup PR:
-   - Remove `pages/`, `_app.tsx`, `_document.tsx`, `next/head`, `next/router`, Pages API types, route-prefetch scheduler, and obsolete tests.
+9. Cleanup PR:
+   - Remove `src/pages/`, `_app.tsx`, `_document.tsx`, `next/head`, `next/router`, Pages API types, route-prefetch scheduler, and obsolete tests.
 
 Deployment rollout:
 
@@ -802,7 +952,9 @@ Rollback:
 
 ## 9. Edge Cases And Failure Modes
 
-- Route collision: if `pages/foo.tsx` and `app/foo/page.tsx` coexist for the same URL, builds or routing can fail. Delete old route files in the same commit that introduces the final App route.
+- Route collision: if `src/pages/foo.tsx` and `src/app/foo/page.tsx` coexist for the same URL, builds or routing can fail. Delete old route files in the same commit that introduces the final App route.
+- `src` precedence confusion: root `pages/` or root `app/` can take precedence over `src/pages` or `src/app`. The first source-root PR must remove root `pages/` after moving it to `src/pages/`, and later work should not create a root `app/`.
+- Import rewrite drift: production and test aliases can diverge if `tsconfig.json` and `vitest.config.ts` are not updated together. Treat alias updates as part of the source-root PR.
 - Cookie domain drift: Web cookie helpers must preserve `AUTH_SHARED_COOKIE_DOMAIN` and derived domain behavior from `auth-cookies.ts`.
 - Auth cache leakage: never cache authenticated GraphQL responses without the existing auth subject partitioning or an equivalent private cache boundary.
 - Draft leakage: draft mode must disable public cache use and include draft content only when `draftMode().isEnabled` is true.
@@ -817,41 +969,58 @@ Rollback:
 
 ## 10. Implementation Backlog
 
-### R1-A. App Foundation
+### R1-A. Source Root And App Foundation
 
 Scope:
 
-- `app/layout.tsx`
-- `app/providers.tsx`
-- `components/app/analytics.tsx`
-- `components/app/scroll-restoration.tsx`
-- `components/core/header.tsx`
+- `src/pages/`
+- `src/app/layout.tsx`
+- `src/app/providers.tsx`
+- `src/components/`
+- `src/components/app/analytics.tsx`
+- `src/components/app/scroll-restoration.tsx`
+- `src/components/core/header.tsx`
+- `src/lib/`
+- `src/hooks/`
+- `src/context/`
+- `src/types/`
+- `src/styles/`
+- `tsconfig.json`
+- `vitest.config.ts`
 
 Tasks:
 
+- [ ] Move existing runtime code under `src/` with no behavior changes.
+- [ ] Move root `pages/` to `src/pages/` before creating `src/app/`.
+- [ ] Split `common/` into `src/lib/payload`, `src/lib/auth`, `src/lib/constants`, `src/lib/analytics`, `src/lib/preview`, `src/lib/reading`, `src/lib/routes`, and `src/lib/utils`.
+- [ ] Replace broad root imports with `@/...` imports.
+- [ ] Update TypeScript and Vitest aliases.
 - [ ] Add App Router root layout and provider wrapper.
-- [ ] Move global CSS import to `app/layout.tsx`.
+- [ ] Move global CSS import to `src/app/layout.tsx`.
 - [ ] Move GA scripts to `next/script`.
 - [ ] Replace router event analytics with pathname/search-param tracking.
 - [ ] Replace Header `next/router` usage with `next/navigation`.
 
 Acceptance criteria:
 
+- Current Pages Router app still works from `src/pages/` before any route takeover.
 - App Router can render a temporary test page with the same header and context defaults.
 - No existing Pages route behavior changes before route takeover.
+- `rg -n "from 'common/|from 'components/|from 'hooks/|from 'context/|from 'types/" src tests` returns no unresolved old-style imports, except intentional compatibility shims if the implementation chooses to add them temporarily.
 
 Tests:
 
 - `pnpm lint`
+- `pnpm test`
 - `pnpm test -- tests/components/header.test.tsx`
 
 ### R1-B. App Request And Response Adapters
 
 Scope:
 
-- `server/app-request.ts`
-- `app/api/_utils/http.ts`
-- `common/utils/app-auth-cookies.ts`
+- `src/lib/server/app-request.ts`
+- `src/lib/server/http.ts` or `src/app/api/_utils/http.ts`
+- `src/lib/auth/app-auth-cookies.ts`
 
 Tasks:
 
@@ -872,8 +1041,8 @@ Tests:
 
 Scope:
 
-- `app/api/**/*/route.ts`
-- `pages/api/**` deletion as each route migrates
+- `src/app/api/**/*/route.ts`
+- `src/pages/api/**` deletion as each route migrates
 - `tests/api/*.test.ts`
 
 Tasks:
@@ -898,11 +1067,11 @@ Tests:
 
 Scope:
 
-- `app/auth/login/route.ts`
-- `app/auth/callback/route.ts`
-- `app/auth/logout/route.ts`
-- `app/auth/signup/page.tsx`
-- `pages/auth/**` deletion
+- `src/app/auth/login/route.ts`
+- `src/app/auth/callback/route.ts`
+- `src/app/auth/logout/route.ts`
+- `src/app/auth/signup/page.tsx`
+- `src/pages/auth/**` deletion
 - `tests/pages/auth-routes.test.ts`
 - `tests/pages/auth-signup.test.ts`
 
@@ -927,11 +1096,11 @@ Tests:
 
 Scope:
 
-- `app/about/page.tsx`
-- `app/categories/page.tsx`
-- `app/posts/[slug]/page.tsx`
+- `src/app/about/page.tsx`
+- `src/app/categories/page.tsx`
+- `src/app/posts/[slug]/page.tsx`
 - metadata helpers
-- `pages/about.tsx`, `pages/categories.tsx`, `pages/posts/[slug].tsx` deletion
+- `src/pages/about.tsx`, `src/pages/categories.tsx`, `src/pages/posts/[slug].tsx` deletion
 
 Tasks:
 
@@ -955,9 +1124,9 @@ Tests:
 
 Scope:
 
-- `app/page.tsx`
-- `components/pages/index/home-page-client.tsx`
-- `pages/index.tsx` deletion
+- `src/app/page.tsx`
+- `src/components/pages/index/home-page-client.tsx`
+- `src/pages/index.tsx` deletion
 
 Tasks:
 
@@ -980,12 +1149,12 @@ Tests:
 
 Scope:
 
-- `app/books/page.tsx`
-- `app/books/[slug]/page.tsx`
-- `app/books/[slug]/chapters/[chapterSlug]/page.tsx`
-- `app/shelf/page.tsx`
+- `src/app/books/page.tsx`
+- `src/app/books/[slug]/page.tsx`
+- `src/app/books/[slug]/chapters/[chapterSlug]/page.tsx`
+- `src/app/shelf/page.tsx`
 - extracted client components
-- corresponding `pages/books/**` and `pages/shelf.tsx` deletion
+- corresponding `src/pages/books/**` and `src/pages/shelf.tsx` deletion
 
 Tasks:
 
@@ -1011,8 +1180,8 @@ Tests:
 
 Scope:
 
-- `components/shared/ssr-prefetch-link.tsx`
-- `common/utils/route-prefetch.ts`
+- `src/components/shared/ssr-prefetch-link.tsx`
+- `src/lib/routes/route-prefetch.ts`
 - `tests/components/ssr-prefetch-link.test.tsx`
 - `tests/common/utils/route-prefetch.test.ts`
 
@@ -1030,20 +1199,20 @@ Acceptance criteria:
 Tests:
 
 - `pnpm test -- tests/components/ssr-prefetch-link.test.tsx`
-- `rg -n "route-prefetch|_next/data|next/dist/shared/lib/router" common components hooks pages app tests`
+- `rg -n "route-prefetch|_next/data|next/dist/shared/lib/router" src tests`
 
 ### R1-I. Final Cleanup
 
 Scope:
 
-- `pages/`
+- `src/pages/`
 - Pages-router imports across repo
 - tests
 - docs
 
 Tasks:
 
-- [ ] Remove `pages/_app.tsx`, `pages/_document.tsx`, and remaining `pages/` files.
+- [ ] Remove `src/pages/_app.tsx`, `src/pages/_document.tsx`, and remaining `src/pages/` files.
 - [ ] Remove `next/head`, `next/router`, `next/app`, `next/document`, `GetServerSideProps`, `GetStaticProps`, `GetStaticPaths`, `NextApiRequest`, and `NextApiResponse` imports from production code.
 - [ ] Update README route architecture if desired after migration.
 - [ ] Run full verification suite and OpenNext build.
@@ -1051,6 +1220,7 @@ Tasks:
 Acceptance criteria:
 
 - `rg` finds no Pages Router-only production imports.
+- Runtime application code lives under `src/`; root contains only docs, public assets, tests, config, deployment, package, and infrastructure files.
 - Full build and tests pass.
 
 Tests:
@@ -1071,7 +1241,7 @@ Tests:
 - Add Playwright E2E tests for real browser scroll restoration and reader progress.
 - Consider Partial Prerendering only after OpenNext Cloudflare behavior is validated for this app's dynamic holes.
 - Revisit `next build --webpack` and Turbopack after the router migration is stable.
-- Add typed routes after all paths live in `app/`.
+- Add typed routes after all paths live in `src/app/`.
 
 ## 12. Test And Verification Plan
 
@@ -1130,9 +1300,12 @@ Manual smoke:
 
 ## 13. Definition Of Done
 
-- All current routes and API endpoints exist under `app/`.
-- No production code remains in `pages/`.
+- All current routes and API endpoints exist under `src/app/`.
+- No production code remains in `src/pages/` or root-level `pages/`.
+- Runtime application code is organized under `src/`, with route code in `src/app`, reusable UI in `src/components`, and non-UI logic in `src/lib`.
+- Root-level application folders such as `components/`, `common/`, `hooks/`, `context/`, `types/`, and `styles/` are removed after their contents move to `src/`.
 - No production imports remain from `next/router`, `next/head`, `next/app`, `next/document`, or Next API route types.
+- Production and test imports use the new `@/...` alias convention.
 - Auth cookies, signup intent, draft mode, chapter proof cookies, bookmarks, comments, reading progress, and pagination keep their existing browser-visible contracts.
 - Metadata parity is verified for home, posts, books, chapters, about, and categories.
 - Full test suite passes.
@@ -1143,4 +1316,4 @@ Manual smoke:
 
 ## 14. Final Model
 
-The target system is an App Router blog deployed on Cloudflare Workers through OpenNext. Server Components own initial PayloadCMS reads and metadata. Client components own the interactive feed, reader, comments, bookmarks, auth polling, analytics, and scroll behavior. Route Handlers keep the current `/api/*` and `/auth/*` browser contracts stable. The existing Cloudflare GraphQL cache remains in place for first-release parity, with Cache Components and on-demand revalidation reserved for a later performance-focused pass.
+The target system is an App Router blog deployed on Cloudflare Workers through OpenNext, with application code collected under `src/`. `src/app` owns routes and route handlers, `src/components` owns UI, and `src/lib` owns PayloadCMS access, auth, cache, preview, analytics, and reusable utilities. Server Components own initial PayloadCMS reads and metadata. Client components own the interactive feed, reader, comments, bookmarks, auth polling, analytics, and scroll behavior. Route Handlers keep the current `/api/*` and `/auth/*` browser contracts stable. The existing Cloudflare GraphQL cache remains in place for first-release parity, with Cache Components and on-demand revalidation reserved for a later performance-focused pass.
