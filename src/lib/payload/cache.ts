@@ -6,8 +6,12 @@ const AUTH_STALE_TTL_SECONDS = 5 * 60 * 60;
 const CACHE_KEY_PARAM = '__payload_cache_key';
 const CACHE_NAMESPACE = 'payload-graphql';
 export const BOOKS_LIST_CACHE_TAG = 'books:list' as const;
+export const POSTS_LIST_CACHE_TAG = 'posts:list' as const;
 const BOOK_CACHE_TAG_PREFIX = 'book:';
 const BOOK_SLUG_CACHE_TAG_PREFIX = 'book:slug:';
+const POST_CACHE_TAG_PREFIX = 'post:';
+const POST_SLUG_CACHE_TAG_PREFIX = 'post:slug:';
+const SIMILAR_POSTS_CACHE_TAG_PREFIX = 'similar-posts:post:';
 const CHAPTER_CACHE_TAG_PREFIX = 'chapter:';
 const CHAPTER_SLUG_CACHE_TAG_PREFIX = 'chapter:slug:';
 const CHAPTERS_BY_BOOK_CACHE_TAG_PREFIX = 'chapters:book:';
@@ -86,18 +90,37 @@ export function buildBooksListCacheTags(): string[] {
   return [BOOKS_LIST_CACHE_TAG];
 }
 
+export function buildPostsListCacheTags(): string[] {
+  return [POSTS_LIST_CACHE_TAG];
+}
+
 export function buildBookCacheTags(bookId: unknown): string[] {
   return normalizeCacheTags([buildScopedCacheTag(BOOK_CACHE_TAG_PREFIX, bookId)]);
+}
+
+export function buildPostCacheTags(postId: unknown): string[] {
+  return normalizeCacheTags([buildScopedCacheTag(POST_CACHE_TAG_PREFIX, postId)]);
 }
 
 export function buildBookSlugCacheTags(bookSlug: unknown): string[] {
   return normalizeCacheTags([buildScopedCacheTag(BOOK_SLUG_CACHE_TAG_PREFIX, bookSlug)]);
 }
 
+export function buildPostSlugCacheTags(postSlug: unknown): string[] {
+  return normalizeCacheTags([buildScopedCacheTag(POST_SLUG_CACHE_TAG_PREFIX, postSlug)]);
+}
+
 export function buildBookDetailCacheTags(bookId: unknown): string[] {
   return normalizeCacheTags([
     buildScopedCacheTag(BOOK_CACHE_TAG_PREFIX, bookId),
     buildScopedCacheTag(CHAPTERS_BY_BOOK_CACHE_TAG_PREFIX, bookId),
+  ]);
+}
+
+export function buildPostDetailCacheTags(postId: unknown): string[] {
+  return normalizeCacheTags([
+    buildScopedCacheTag(POST_CACHE_TAG_PREFIX, postId),
+    buildScopedCacheTag(SIMILAR_POSTS_CACHE_TAG_PREFIX, postId),
   ]);
 }
 
@@ -129,6 +152,12 @@ export function buildChapterPageLookupCacheTags(
 
 export function buildChapterSlugCacheTags(chapterSlug: unknown): string[] {
   return normalizeCacheTags([buildScopedCacheTag(CHAPTER_SLUG_CACHE_TAG_PREFIX, chapterSlug)]);
+}
+
+export function buildSimilarPostsCacheTags(postId: unknown): string[] {
+  return normalizeCacheTags([
+    buildScopedCacheTag(SIMILAR_POSTS_CACHE_TAG_PREFIX, postId),
+  ]);
 }
 
 export const ONE_HOUR_PAYLOAD_CACHE: PayloadCacheSettings = Object.freeze({

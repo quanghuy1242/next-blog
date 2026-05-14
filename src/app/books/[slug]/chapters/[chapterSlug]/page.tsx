@@ -2,10 +2,8 @@ import { draftMode } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
 import { Layout } from '@/components/core/layout';
-import {
-  ChapterReaderClient,
-  getChapterPageMetadata,
-} from '@/components/pages/books/chapter-reader-client';
+import { ChapterReaderClient } from '@/components/pages/books/chapter-reader-client';
+import { getChapterPageMetadata } from '@/lib/metadata/chapter-page';
 import { getBookmarks } from '@/lib/payload/bookmarks';
 import { getBookBySlug } from '@/lib/payload/books';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';

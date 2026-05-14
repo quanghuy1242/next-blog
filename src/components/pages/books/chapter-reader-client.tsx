@@ -5,8 +5,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import type { Book, BookmarkRecord, Chapter, Homepage, ReadingProgressRecord } from '@/types/cms';
 import { buildBookHref, buildChapterHref } from '@/lib/routes/book-route';
-import { getCoverImageUrl } from '@/lib/utils/image';
-import { buildMetadata } from '@/lib/utils/next-metadata';
 import { useReadingProgress } from '@/hooks/useReadingProgress';
 import { Container } from '@/components/core/container';
 import { ChapterContent } from '@/components/pages/books/chapter-content';
@@ -28,15 +26,6 @@ interface ChapterReaderClientProps {
   isAuthenticated: boolean;
   readingProgress: ReadingProgressRecord[];
   initialBookmark?: BookmarkRecord | null;
-}
-
-export function getChapterPageMetadata(book: Book, chapter: Chapter) {
-  return buildMetadata({
-    title: `${chapter.title} | ${book.title}`,
-    description: `Read ${chapter.title} from ${book.title}.`,
-    image: book.cover ? getCoverImageUrl(book.cover) : null,
-    type: 'article',
-  });
 }
 
 export function ChapterReaderClient({

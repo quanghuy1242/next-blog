@@ -1,5 +1,12 @@
 import type { Post, PostSlugData, SimilarPostsResult } from '@/types/cms';
 import { fetchAPI } from './base';
+import {
+  buildPostDetailCacheTags,
+  buildPostSlugCacheTags,
+  buildSimilarPostsCacheTags,
+  normalizeCacheTags,
+  ONE_HOUR_PAYLOAD_CACHE,
+} from './cache';
 
 interface PostFetchOptions {
   draftMode?: boolean;
@@ -69,6 +76,17 @@ export async function getDataForPostSlug(
   slug: string,
   options: PostFetchOptions = {}
 ): Promise<PostSlugData> {
+  const trimmedSlug = slug.trim();
+
+  if (!trimmedSlug) {
+    return {
+      post: null,
+      morePosts: [],
+      homepage: null,
+    };
+  }
+
+  const payloadCache = options.draftMode ? undefined : ONE_HOUR_PAYLOAD_CACHE;
   const statusFilter = options.draftMode
     ? '{ _status: { in: [published, draft] } }'
     : '{ _status: { equals: published } }';
@@ -97,7 +115,17 @@ export async function getDataForPostSlug(
     `,
     {
       variables: {
-        slug,
+        slug: trimmedSlug,
+      },
+      cache: payloadCache,
+      cacheKeySuffix: { route: 'post-by-slug', slug: trimmedSlug },
+      getCacheTags: (data) => {
+        const post = data?.Posts?.docs?.[0] ?? null;
+
+        return normalizeCacheTags([
+          ...buildPostSlugCacheTags(trimmedSlug),
+          ...buildPostDetailCacheTags(post?.id),
+        ]);
       },
     }
   );
@@ -156,6 +184,13 @@ export async function getDataForPostSlug(
         variables: {
           postId: post.id,
         },
+        cache: payloadCache,
+        cacheKeySuffix: { route: 'similar-posts', postId: post.id },
+        getCacheTags: () =>
+          normalizeCacheTags([
+            ...buildPostDetailCacheTags(post.id),
+            ...buildSimilarPostsCacheTags(post.id),
+          ]),
       }
     );
     morePosts = similarData?.SimilarPosts?.docs ?? [];
