@@ -212,7 +212,6 @@ export function useReadingProgress({
       const finalProgress = computeScrollPercentage();
       persistReadingPosition(finalProgress);
 
-      if (!hasTrackedScroll.current) return;
       setCurrentProgress(finalProgress);
       sendProgress(finalProgress, true);
     }
@@ -247,8 +246,10 @@ export function useReadingProgress({
       hasRestoredPosition.current = true;
 
       const storedPosition = readStoredPosition();
+      const shouldUseStoredPosition =
+        storedPosition != null && storedPosition.progress >= clampedInitialProgress;
       const targetScrollY =
-        storedPosition?.scrollY ??
+        (shouldUseStoredPosition ? storedPosition.scrollY : null) ??
         (clampedInitialProgress > 0
           ? computeScrollTargetForProgress(clampedInitialProgress)
           : null);
@@ -270,12 +271,14 @@ export function useReadingProgress({
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
     window.addEventListener('pagehide', flushProgress);
+    document.addEventListener('click', flushProgress, true);
     restoreReadingPosition();
 
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pagehide', flushProgress);
+      document.removeEventListener('click', flushProgress, true);
       flushProgress();
     };
   }, [

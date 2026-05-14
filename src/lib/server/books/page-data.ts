@@ -28,6 +28,7 @@ import {
   buildChapterHref,
   parseBookRouteSegment,
 } from '@/lib/routes/book-route';
+import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
 import {
   getAuthTokenFromAppRequest,
   getChapterProofFromAppRequest,
@@ -312,31 +313,6 @@ function buildReadingProgressByChapterId(records: ReadingProgressRecord[]) {
       .filter((record) => record.chapterId != null && record.progress != null)
       .map((record) => [Number(record.chapterId!), record.progress!])
   );
-}
-
-function getContinueReadingChapterSlug(
-  chapters: Chapter[],
-  readingProgress: ReadingProgressRecord[]
-): string | null {
-  if (!readingProgress.length || !chapters.length) {
-    return null;
-  }
-
-  const chapterSlugs = new Map(chapters.map((chapter) => [chapter.id, chapter.slug]));
-  const incompleteProgress = readingProgress
-    .filter((record) => record.chapterId != null && record.progress != null && record.progress < 95)
-    .sort((first, second) => (second.updatedAt ?? '').localeCompare(first.updatedAt ?? ''));
-
-  for (const record of incompleteProgress) {
-    const chapterId = Number(record.chapterId);
-    const slug = chapterSlugs.get(chapterId);
-
-    if (slug) {
-      return slug;
-    }
-  }
-
-  return null;
 }
 
 function toPayloadOptions(requestContext: PageRequestContext): PayloadBookPageRequestOptions {
