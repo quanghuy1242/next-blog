@@ -11,57 +11,91 @@ declare global {
 
 const STORAGE_KEY_PREFIX = 'scroll-pos:';
 
+interface ScrollPosition {
+  x: number;
+  y: number;
+}
+
 export function ScrollRestoration() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const shouldRestoreRef = useRef(false);
-  const previousUrlRef = useRef<string | null>(null);
+  const currentUrl = buildUrl(pathname, searchParams);
+  const currentUrlRef = useRef(currentUrl);
+  const pendingRestoreUrlRef = useRef<string | null>(null);
+  const suspendedSaveUrlRef = useRef<string | null>(null);
+  const saveFrameRef = useRef<number | null>(null);
+  const cancelRestoreRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
     }
 
-    const currentUrl = buildUrl(pathname, searchParams);
+    const previousUrl = currentUrlRef.current;
+    currentUrlRef.current = currentUrl;
 
-    const savePosition = (url: string) => {
-      try {
-        window.sessionStorage.setItem(
-          getStorageKey(url),
-          JSON.stringify({
-            x: window.scrollX,
-            y: window.scrollY,
-          })
+    if (
+      suspendedSaveUrlRef.current &&
+      suspendedSaveUrlRef.current !== currentUrl
+    ) {
+      suspendedSaveUrlRef.current = null;
+    }
+
+    if (previousUrl !== currentUrl) {
+      window.__historyScrollRestoredFor = undefined;
+    }
+
+    if (pendingRestoreUrlRef.current === currentUrl) {
+      pendingRestoreUrlRef.current = null;
+
+      const savedPosition = restorePosition(currentUrl);
+
+      if (savedPosition) {
+        window.__historyScrollRestoredFor = currentUrl;
+        cancelRestoreRef.current?.();
+        cancelRestoreRef.current = restoreWhenReady(
+          currentUrl,
+          savedPosition.x,
+          savedPosition.y
         );
-      } catch {
-        // Best effort only.
       }
-    };
+    }
+  }, [currentUrl]);
 
-    const restorePosition = (url: string) => {
-      try {
-        const raw = window.sessionStorage.getItem(getStorageKey(url));
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
 
-        if (!raw) {
-          return null;
-        }
+    const previousScrollRestoration =
+      'scrollRestoration' in window.history
+        ? window.history.scrollRestoration
+        : null;
 
-        const parsed = JSON.parse(raw) as { x?: unknown; y?: unknown };
-        const x = typeof parsed.x === 'number' ? parsed.x : 0;
-        const y = typeof parsed.y === 'number' ? parsed.y : 0;
-        return { x, y };
-      } catch {
-        return null;
+    const saveCurrentPosition = (force = false) => {
+      if (
+        !force &&
+        suspendedSaveUrlRef.current === currentUrlRef.current
+      ) {
+        return;
       }
+
+      savePosition(currentUrlRef.current);
     };
 
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      savePosition(currentUrl);
-      delete event.returnValue;
+    const flushCurrentPosition = () => {
+      saveCurrentPosition(true);
     };
 
-    const handlePageHide = () => {
-      savePosition(currentUrl);
+    const scheduleSaveCurrentPosition = () => {
+      if (saveFrameRef.current !== null) {
+        return;
+      }
+
+      saveFrameRef.current = window.requestAnimationFrame(() => {
+        saveFrameRef.current = null;
+        saveCurrentPosition();
+      });
     };
 
     const handleDocumentClick = (event: MouseEvent) => {
@@ -76,12 +110,7 @@ export function ScrollRestoration() {
         return;
       }
 
-      const target = event.target;
-      if (!(target instanceof Node)) {
-        return;
-      }
-
-      const anchor = target.parentElement?.closest('a[href]') as HTMLAnchorElement | null;
+      const anchor = findAnchor(event.target);
       if (!anchor) {
         return;
       }
@@ -106,42 +135,59 @@ export function ScrollRestoration() {
       }
 
       const nextRoute = `${nextUrl.pathname}${nextUrl.search}`;
-      if (nextRoute === currentUrl) {
+      if (nextRoute === currentUrlRef.current) {
         return;
       }
 
-      savePosition(currentUrl);
+      const currentRoute = currentUrlRef.current;
+      savePosition(currentRoute);
+      suspendedSaveUrlRef.current = currentRoute;
     };
 
     const handlePopState = () => {
-      savePosition(previousUrlRef.current ?? currentUrl);
-      shouldRestoreRef.current = true;
+      const leavingRoute = currentUrlRef.current;
+      savePosition(leavingRoute);
+      suspendedSaveUrlRef.current = leavingRoute;
+      pendingRestoreUrlRef.current = getWindowUrl();
     };
 
-    window.history.scrollRestoration = 'manual';
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('pagehide', handlePageHide);
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    window.addEventListener('scroll', scheduleSaveCurrentPosition, {
+      passive: true,
+    });
+    window.addEventListener('pagehide', flushCurrentPosition);
+    document.addEventListener('visibilitychange', flushCurrentPosition);
     window.addEventListener('popstate', handlePopState);
     document.addEventListener('click', handleDocumentClick, true);
 
-    if (shouldRestoreRef.current) {
-      shouldRestoreRef.current = false;
-      const savedPosition = restorePosition(currentUrl);
-
-      if (savedPosition) {
-        restoreWhenReady(currentUrl, savedPosition.x, savedPosition.y);
-      }
-    }
-
-    previousUrlRef.current = currentUrl;
-
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('pagehide', handlePageHide);
+      flushCurrentPosition();
+
+      if (saveFrameRef.current !== null) {
+        window.cancelAnimationFrame(saveFrameRef.current);
+        saveFrameRef.current = null;
+      }
+
+      cancelRestoreRef.current?.();
+      cancelRestoreRef.current = null;
+
+      if (
+        previousScrollRestoration &&
+        'scrollRestoration' in window.history
+      ) {
+        window.history.scrollRestoration = previousScrollRestoration;
+      }
+
+      window.removeEventListener('scroll', scheduleSaveCurrentPosition);
+      window.removeEventListener('pagehide', flushCurrentPosition);
+      document.removeEventListener('visibilitychange', flushCurrentPosition);
       window.removeEventListener('popstate', handlePopState);
       document.removeEventListener('click', handleDocumentClick, true);
     };
-  }, [pathname, searchParams]);
+  }, []);
 
   return null;
 }
@@ -159,11 +205,77 @@ function getStorageKey(url: string) {
   return `${STORAGE_KEY_PREFIX}${url}`;
 }
 
+function getWindowUrl() {
+  return `${window.location.pathname}${window.location.search}`;
+}
+
+function savePosition(url: string) {
+  try {
+    window.sessionStorage.setItem(
+      getStorageKey(url),
+      JSON.stringify({
+        x: window.scrollX,
+        y: window.scrollY,
+      } satisfies ScrollPosition)
+    );
+  } catch {
+    // Best effort only.
+  }
+}
+
+function restorePosition(url: string): ScrollPosition | null {
+  try {
+    const raw = window.sessionStorage.getItem(getStorageKey(url));
+
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw) as { x?: unknown; y?: unknown };
+    const x = typeof parsed.x === 'number' ? parsed.x : 0;
+    const y = typeof parsed.y === 'number' ? parsed.y : 0;
+    return { x, y };
+  } catch {
+    return null;
+  }
+}
+
+function findAnchor(target: EventTarget | null): HTMLAnchorElement | null {
+  if (!(target instanceof Node)) {
+    return null;
+  }
+
+  const element = target instanceof Element ? target : target.parentElement;
+
+  return element?.closest<HTMLAnchorElement>('a[href]') ?? null;
+}
+
 function restoreWhenReady(url: string, x: number, y: number) {
   let attempts = 0;
-  const maxAttempts = 60;
+  let restoreFrames = 0;
+  let frameId: number | null = null;
+  let cancelled = false;
+  const maxAttempts = 90;
+  const minRestoreFrames = 12;
+
+  const cancel = () => {
+    cancelled = true;
+
+    if (frameId !== null) {
+      window.cancelAnimationFrame(frameId);
+      frameId = null;
+    }
+
+    removeUserCancelListeners(cancel);
+  };
+
+  addUserCancelListeners(cancel);
 
   const tryRestore = () => {
+    if (cancelled) {
+      return;
+    }
+
     attempts += 1;
 
     const scrollHeight = Math.max(
@@ -173,17 +285,37 @@ function restoreWhenReady(url: string, x: number, y: number) {
     const viewportHeight = window.innerHeight;
     const maxScrollableY = Math.max(scrollHeight - viewportHeight, 0);
     const targetY = Math.min(Math.max(y, 0), maxScrollableY);
+    const hasEnoughHeight = maxScrollableY >= y;
 
-    if (maxScrollableY >= y || attempts >= maxAttempts) {
+    if (hasEnoughHeight || attempts >= maxAttempts) {
+      restoreFrames += 1;
       window.__historyScrollRestoredFor = url;
       window.scrollTo(x, targetY);
-      return;
+
+      if (restoreFrames >= minRestoreFrames || attempts >= maxAttempts) {
+        cancel();
+        return;
+      }
     }
 
-    window.requestAnimationFrame(tryRestore);
+    frameId = window.requestAnimationFrame(tryRestore);
   };
 
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(tryRestore);
+  frameId = window.requestAnimationFrame(() => {
+    frameId = window.requestAnimationFrame(tryRestore);
   });
+
+  return cancel;
+}
+
+function addUserCancelListeners(cancel: () => void) {
+  window.addEventListener('wheel', cancel, { passive: true });
+  window.addEventListener('touchstart', cancel, { passive: true });
+  window.addEventListener('keydown', cancel);
+}
+
+function removeUserCancelListeners(cancel: () => void) {
+  window.removeEventListener('wheel', cancel);
+  window.removeEventListener('touchstart', cancel);
+  window.removeEventListener('keydown', cancel);
 }
