@@ -1,11 +1,13 @@
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
+import { BooksGrid } from '@/components/shared/books-grid';
+import { Text } from '@/components/shared/text';
 import { TextLink } from '@/components/shared/ui/text-link';
 import { getBookmarks } from '@/lib/payload/bookmarks';
-import { buildBookHref, buildChapterHref } from '@/lib/routes/book-route';
+import { buildChapterHref } from '@/lib/routes/book-route';
 import { getAuthTokenFromAppRequest } from '@/lib/server/app-request';
 import { buildMetadata } from '@/lib/utils/next-metadata';
-import type { BookmarkRecord } from '@/types/cms';
+import type { Book, BookmarkRecord } from '@/types/cms';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,9 +24,11 @@ export default async function BooksShelfPage() {
   if (!sessionToken) {
     return (
       <Layout className="flex flex-col items-center" isAuthenticated={false}>
-        <Container className="my-8">
-          <h1 className="text-2xl font-bold text-gray-900">Bookshelf</h1>
+        <Container className="my-4 w-full md:px-20">
+          <div className="mx-auto w-full md:w-2/3">
+            <Text text="Bookshelf" />
           <p className="mt-4 text-gray-600">Please sign in to view your bookmarks.</p>
+          </div>
         </Container>
       </Layout>
     );
@@ -51,32 +55,28 @@ export default async function BooksShelfPage() {
 
   return (
     <Layout className="flex flex-col items-center" isAuthenticated>
-      <Container className="my-8">
-        <h1 className="text-2xl font-bold text-gray-900">Bookshelf</h1>
+      <Container className="my-4 w-full md:px-20">
+        <div className="mx-auto w-full md:w-2/3">
+          <Text text="Bookshelf" />
         {!hasAny ? (
           <p className="mt-4 text-gray-600">No bookmarks yet.</p>
         ) : (
-          <div className="mt-6 space-y-8">
+            <div className="mt-4 space-y-8">
             {visibleBookBookmarks.length > 0 ? (
               <section>
-                <h2 className="mb-3 text-lg font-semibold text-gray-800">Books</h2>
-                <ul className="space-y-2">
-                  {visibleBookBookmarks.map((bm) => {
-                    const book = bm.book;
-
-                    return book ? (
-                      <li key={bm.id}>
-                        <TextLink href={buildBookHref(book.id, book.slug)}>{book.title}</TextLink>
-                      </li>
-                    ) : null;
-                  })}
-                </ul>
+                <BooksGrid
+                  books={visibleBookBookmarks.map((bm) => bm.book).filter(Boolean) as Book[]}
+                  bookmarkedBookIds={visibleBookBookmarks
+                    .map((bm) => bm.book?.id)
+                    .filter((id): id is number => typeof id === 'number')}
+                  isAuthenticated
+                />
               </section>
             ) : null}
             {visibleChapterBookmarks.length > 0 ? (
               <section>
-                <h2 className="mb-3 text-lg font-semibold text-gray-800">Chapters</h2>
-                <ul className="space-y-2">
+                <Text text="Chapters" />
+                <ul className="mt-3 space-y-2">
                   {visibleChapterBookmarks.map((bm) => {
                     const chapter = bm.chapter;
                     const book = chapter?.book;
@@ -98,6 +98,7 @@ export default async function BooksShelfPage() {
             ) : null}
           </div>
         )}
+        </div>
       </Container>
     </Layout>
   );

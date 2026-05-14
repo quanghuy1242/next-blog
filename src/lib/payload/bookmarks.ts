@@ -2,8 +2,8 @@ import type { BookmarksResult } from '@/types/cms';
 import { fetchAPIWithAuthToken } from './base';
 
 const BOOKMARKS_QUERY = `#graphql
-  query Bookmarks($contentType: String, $contentId: ID, $limit: Int, $page: Int) {
-    bookmarks(contentType: $contentType, contentId: $contentId, limit: $limit, page: $page) {
+  query Bookmarks($where: Bookmark_where, $limit: Int, $page: Int) {
+    Bookmarks(where: $where, limit: $limit, page: $page, sort: "-createdAt") {
       docs {
         id
         contentType
@@ -17,6 +17,20 @@ const BOOKMARKS_QUERY = `#graphql
                 id
                 title
                 slug
+                author
+                cover {
+                  id
+                  url
+                  optimizedUrl
+                  lowResUrl
+                  alt
+                  width
+                  height
+                }
+                origin
+                sourceType
+                syncStatus
+                importStatus
               }
             }
           }
@@ -26,6 +40,20 @@ const BOOKMARKS_QUERY = `#graphql
             id
             title
             slug
+            author
+            cover {
+              id
+              url
+              optimizedUrl
+              lowResUrl
+              alt
+              width
+              height
+            }
+            origin
+            sourceType
+            syncStatus
+            importStatus
           }
         }
       }
@@ -61,7 +89,7 @@ const DELETE_BOOKMARK_MUTATION = `#graphql
 `;
 
 interface BookmarksResponse {
-  bookmarks: BookmarksResult | null;
+  Bookmarks: BookmarksResult | null;
 }
 
 interface CreateBookmarkResponse {
@@ -95,8 +123,7 @@ export async function getBookmarks(options?: {
     BOOKMARKS_QUERY,
     {
       variables: {
-        contentType: options.contentType,
-        contentId: options.contentId,
+        where: buildBookmarksWhere(options.contentType, options.contentId),
         limit: options.limit,
         page: options.page,
       },
@@ -104,7 +131,7 @@ export async function getBookmarks(options?: {
     }
   );
 
-  return data?.bookmarks ?? { docs: [], totalDocs: 0 };
+  return data?.Bookmarks ?? { docs: [], totalDocs: 0 };
 }
 
 export async function createBookmark(
@@ -142,4 +169,30 @@ export async function deleteBookmark(
   );
 
   return { ok: data?.deleteBookmark?.ok ?? false };
+}
+
+function buildBookmarksWhere(contentType?: string, contentId?: string) {
+  if (!contentType || !contentId) {
+    return undefined;
+  }
+
+  if (contentType === 'chapter') {
+    return {
+      and: [
+        { contentType: { equals: 'chapter' } },
+        { chapter: { equals: contentId } },
+      ],
+    };
+  }
+
+  if (contentType === 'book') {
+    return {
+      and: [
+        { contentType: { equals: 'book' } },
+        { book: { equals: contentId } },
+      ],
+    };
+  }
+
+  return undefined;
 }
