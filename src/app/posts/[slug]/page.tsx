@@ -7,6 +7,7 @@ import { getComments } from '@/lib/payload/comments';
 import { getCoverImageUrl } from '@/lib/utils/image';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { normalizePostTags } from '@/lib/utils/tags';
+import { getAuthTokenFromAppRequest } from '@/lib/server/app-request';
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
 import { PostContent } from '@/components/pages/posts_slugs/post-content';
@@ -26,10 +27,6 @@ const getPostPageData = cache((slug: string, isDraftMode: boolean) =>
   getDataForPostSlug(slug, { draftMode: isDraftMode })
 );
 
-const getPublicPostComments = cache((postId: number) =>
-  getComments({ postId: String(postId) }).catch(() => null)
-);
-
 export async function generateMetadata({ params }: PostPageProps) {
   const { slug } = await params;
   const preview = await draftMode();
@@ -46,6 +43,7 @@ export async function generateMetadata({ params }: PostPageProps) {
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
   const preview = await draftMode();
+  const sessionToken = await getAuthTokenFromAppRequest();
   const data = await getPostPageData(slug, preview.isEnabled);
 
   if (!data.post?.slug) {
@@ -55,13 +53,17 @@ export default async function PostPage({ params }: PostPageProps) {
   const categoryName =
     typeof data.post.category === 'string' ? data.post.category : data.post.category?.name || '';
   const tags = normalizePostTags(data.post.tags);
-  const initialComments = await getPublicPostComments(data.post.id);
+  const initialComments = await getComments(
+    { postId: String(data.post.id) },
+    { authToken: sessionToken }
+  ).catch(() => null);
 
   return (
     <Layout
       header={data.homepage?.header || ''}
       className="flex flex-col items-center"
       isDraftMode={preview.isEnabled}
+      isAuthenticated={Boolean(sessionToken)}
     >
       <article className="flex w-full flex-col items-center">
         <PostHeader
@@ -80,6 +82,7 @@ export default async function PostPage({ params }: PostPageProps) {
           <CommentsSection
             postId={String(data.post.id)}
             initialData={initialComments}
+            refreshOnMount={false}
           />
         </div>
       </Container>
