@@ -20,7 +20,7 @@ import {
   getChaptersByBookId,
   sortChapters,
 } from './chapters';
-import { getReadingProgress } from './reading-progress';
+import { getReadingProgressByBookIds } from './reading-progress';
 import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
 
 const AUTHOR_ID = 1; // quanghuy1242
@@ -108,25 +108,19 @@ async function attachWholeBookProgress(
   const [chaptersByBookId, progressEntries] = await Promise.all([
     getChapterProgressMetadataByBookIds(bookIds, {
       authToken: options.authToken,
+      cache: options.cache,
       draftMode: options.draftMode,
     }),
-    Promise.all(
-      bookIds.map(async (bookId) => [
-        bookId,
-        await getReadingProgress(String(bookId), {
-          authToken: options.authToken,
-        }),
-      ] as const)
-    ),
+    getReadingProgressByBookIds(bookIds, {
+      authToken: options.authToken,
+    }),
   ]);
-
-  const readingProgressByBookId = new Map(progressEntries);
 
   return books.map((book) => ({
     ...book,
     readingProgressPct: calculateWholeBookProgress({
       chapters: chaptersByBookId[book.id] ?? [],
-      records: readingProgressByBookId.get(book.id) ?? [],
+      records: progressEntries.get(book.id) ?? [],
       totalWordCount: book.totalWordCount,
     }),
   }));
