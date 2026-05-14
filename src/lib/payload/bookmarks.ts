@@ -178,7 +178,7 @@ function buildBookmarksWhere(contentType?: string, contentId?: string) {
 
   if (contentType === 'chapter') {
     return {
-      and: [
+      AND: [
         { contentType: { equals: 'chapter' } },
         { chapter: { equals: contentId } },
       ],
@@ -187,7 +187,7 @@ function buildBookmarksWhere(contentType?: string, contentId?: string) {
 
   if (contentType === 'book') {
     return {
-      and: [
+      AND: [
         { contentType: { equals: 'book' } },
         { book: { equals: contentId } },
       ],

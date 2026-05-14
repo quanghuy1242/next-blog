@@ -234,7 +234,7 @@ export async function fetchAuthenticatedBookPagePayload(
         bookRelationId: bookId,
         readingProgressBookId: String(bookId),
         bookmarkWhere: {
-          and: [
+          AND: [
             { contentType: { equals: 'book' } },
             { book: { equals: String(bookId) } },
           ],
@@ -409,7 +409,7 @@ export async function fetchAuthenticatedChapterPageSupplementalPayload(
       variables: {
         readingProgressBookId: String(bookId),
         bookmarkWhere: {
-          and: [
+          AND: [
             { contentType: { equals: 'chapter' } },
             { chapter: { equals: String(chapterId) } },
           ],
