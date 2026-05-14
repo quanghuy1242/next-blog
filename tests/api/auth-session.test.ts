@@ -1,41 +1,30 @@
-import handler from 'pages/api/auth/session';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { createMocks } from 'node-mocks-http';
+import { NextRequest } from 'next/server';
 import { describe, expect, test } from 'vitest';
 
-import { BETTER_AUTH_TOKEN_COOKIE } from 'common/utils/auth';
+import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/auth/auth';
+import { GET } from '@/app/api/auth/session/route';
 
-function runHandler(req: Parameters<typeof createMocks>[0]) {
-  const { req: request, res: response } = createMocks(req);
-
-  handler(
-    request as unknown as NextApiRequest,
-    response as unknown as NextApiResponse
+async function runHandler(cookieHeader?: string) {
+  return GET(
+    new NextRequest('http://localhost/api/auth/session', {
+      headers: cookieHeader ? { cookie: cookieHeader } : undefined,
+    })
   );
-
-  return { req: request, res: response };
 }
 
 describe('auth session API route', () => {
-  test('returns signed-out state when no auth cookie is present', () => {
-    const { res } = runHandler({
-      method: 'GET',
-    });
+  test('returns signed-out state when no auth cookie is present', async () => {
+    const response = await runHandler();
 
-    expect(res.statusCode).toBe(200);
-    expect(res.getHeader('Cache-Control')).toBe('no-store, max-age=0');
-    expect(res._getJSONData()).toEqual({ isAuthenticated: false });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Cache-Control')).toBe('no-store, max-age=0');
+    await expect(response.json()).resolves.toEqual({ isAuthenticated: false });
   });
 
-  test('returns signed-in state when an auth cookie is present', () => {
-    const { res } = runHandler({
-      method: 'GET',
-      cookies: {
-        [BETTER_AUTH_TOKEN_COOKIE]: 'reader-token',
-      },
-    });
+  test('returns signed-in state when an auth cookie is present', async () => {
+    const response = await runHandler(`${BETTER_AUTH_TOKEN_COOKIE}=reader-token`);
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({ isAuthenticated: true });
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ isAuthenticated: true });
   });
 });

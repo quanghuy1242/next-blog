@@ -4,7 +4,7 @@ import {
   PAYLOAD_BETTER_AUTH_TOKEN_COOKIE,
   getAuthCacheSubjectFromToken,
   getBetterAuthTokenFromRequest,
-} from 'common/utils/auth';
+} from '@/lib/auth/auth';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 afterEach(() => {

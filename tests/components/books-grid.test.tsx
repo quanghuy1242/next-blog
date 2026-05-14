@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BooksGrid } from 'components/shared/books-grid';
-import type { Book } from 'types/cms';
+import { BooksGrid } from '@/components/shared/books-grid';
+import type { Book } from '@/types/cms';
 
 function createBook(title: string, slug: string): Book {
   return {

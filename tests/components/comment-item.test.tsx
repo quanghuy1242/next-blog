@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { CommentItem } from 'components/shared/comments/CommentItem';
-import type { PublicComment } from 'types/cms';
+import { CommentItem } from '@/components/shared/comments/CommentItem';
+import type { PublicComment } from '@/types/cms';
 
 function createComment(overrides: Partial<PublicComment> = {}): PublicComment {
   return {

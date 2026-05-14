@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BookCard } from 'components/shared/book-card';
-import type { Book } from 'types/cms';
+import { BookCard } from '@/components/shared/book-card';
+import type { Book } from '@/types/cms';
 
 function createBook(overrides: Partial<Book> = {}): Book {
   return {

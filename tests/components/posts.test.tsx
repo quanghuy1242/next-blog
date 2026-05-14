@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Posts } from 'components/shared/posts';
-import type { Post } from 'types/cms';
+import { Posts } from '@/components/shared/posts';
+import type { Post } from '@/types/cms';
 
 function createPost(overrides: Partial<Post> = {}): Post {
   return {

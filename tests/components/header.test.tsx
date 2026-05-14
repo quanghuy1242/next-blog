@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { Header } from 'components/core/header';
+import { Header } from '@/components/core/header';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-vi.mock('context/state', () => ({
+vi.mock('@/context/state', () => ({
   useAppContext: () => ({
     changeHeader: vi.fn(),
     header: 'Birdless Sky',
@@ -11,13 +11,10 @@ vi.mock('context/state', () => ({
   }),
 }));
 
-vi.mock('next/router', () => ({
-  useRouter: () => ({
-    asPath: '/books',
-    events: {
-      on: vi.fn(),
-      off: vi.fn(),
-    },
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/books',
+  useSearchParams: () => ({
+    toString: () => '',
   }),
 }));
 

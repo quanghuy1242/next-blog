@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatDate, isValidDateString } from 'common/utils/date';
+import { formatDate, isValidDateString } from '@/lib/utils/date';
 
 describe('formatDate', () => {
   it('formats ISO date string', () => {

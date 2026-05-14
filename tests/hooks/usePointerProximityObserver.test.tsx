@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { usePointerProximityObserver } from 'hooks/usePointerProximityObserver';
+import { usePointerProximityObserver } from '@/hooks/usePointerProximityObserver';
 
 function Probe() {
   const ref = React.useRef<HTMLDivElement>(null);

@@ -1,61 +1,57 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import ChapterPage from 'pages/books/[slug]/chapters/[chapterSlug]';
-import type { Book, Chapter, Homepage } from 'types/cms';
+import { ChapterReaderClient } from '@/components/pages/books/chapter-reader-client';
+import type { Book, Chapter, Homepage } from '@/types/cms';
 
-vi.mock('components/core/container', () => ({
+vi.mock('@/components/core/container', () => ({
   Container: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('components/core/layout', () => ({
+vi.mock('@/components/core/layout', () => ({
   Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('components/core/metadata', () => ({
-  renderMetaTags: () => null,
-}));
-
-vi.mock('components/pages/books/chapter-content', () => ({
+vi.mock('@/components/pages/books/chapter-content', () => ({
   ChapterContent: () => <h1>CHƯƠNG 24</h1>,
 }));
 
-vi.mock('components/pages/books/chapter-password-gate', () => ({
+vi.mock('@/components/pages/books/chapter-password-gate', () => ({
   ChapterPasswordGate: () => <div>Chapter password gate</div>,
 }));
 
-vi.mock('components/pages/books/chapter-toc', () => ({
+vi.mock('@/components/pages/books/chapter-toc', () => ({
   ChapterToc: () => <nav aria-label="Chapter table of contents" />, 
 }));
 
-vi.mock('components/pages/books/chapter-toc-drawer', () => ({
+vi.mock('@/components/pages/books/chapter-toc-drawer', () => ({
   ChapterTocDrawer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('common/utils/image', () => ({
+vi.mock('@/lib/utils/image', () => ({
   getCoverImageUrl: () => 'https://example.com/cover.jpg',
 }));
 
-vi.mock('common/utils/meta-tags', () => ({
-  generateMetaTags: () => ({}),
-}));
-
-vi.mock('components/shared/ssr-prefetch-link', () => ({
+vi.mock('@/components/shared/ssr-prefetch-link', () => ({
   SSRPrefetchLink: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
 }));
 
-vi.mock('components/shared/comments/CommentsSection', () => ({
+vi.mock('@/components/shared/comments/CommentsSection', () => ({
   CommentsSection: () => <div data-testid="comments-section" />,
 }));
 
-vi.mock('next/router', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    asPath: '/books/1~the-wild-robot-escapes/chapters/chapter-24',
-    replace: vi.fn().mockResolvedValue(true),
+    replace: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  usePathname: () => '/books/1~the-wild-robot-escapes/chapters/chapter-24',
+  useSearchParams: () => ({
+    toString: () => '',
   }),
 }));
 
-vi.mock('common/apis/reading-progress', () => ({
+vi.mock('@/lib/payload/reading-progress', () => ({
   getReadingProgress: vi.fn().mockResolvedValue([]),
 }));
 
@@ -132,7 +128,7 @@ function createHomepage(): Pick<Homepage, 'header'> {
 describe('ChapterPage', () => {
   test('renders the chapter title for manually created books', () => {
     render(
-      <ChapterPage
+      <ChapterReaderClient
         book={createBook({ origin: 'manual' })}
         chapter={createChapter()}
         chapters={[createChapter()]}
@@ -148,7 +144,7 @@ describe('ChapterPage', () => {
 
   test('hides the page chapter title for epub-imported books', () => {
     render(
-      <ChapterPage
+      <ChapterReaderClient
         book={createBook({ origin: 'epub_imported' as never, sourceType: 'epub_upload' as never })}
         chapter={createChapter()}
         chapters={[createChapter()]}
@@ -164,7 +160,7 @@ describe('ChapterPage', () => {
 
   test('renders the chapter password gate when locked content is unavailable', () => {
     render(
-      <ChapterPage
+      <ChapterReaderClient
         book={createBook({ origin: 'manual' })}
         chapter={createChapter({ content: null, hasPassword: true })}
         chapters={[createChapter({ content: null, hasPassword: true })]}

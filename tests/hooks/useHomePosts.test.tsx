@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useHomePosts } from 'hooks/useHomePosts';
-import type { Post } from 'types/cms';
-import type { HomePostsState } from 'context/state';
+import { useHomePosts } from '@/hooks/useHomePosts';
+import type { Post } from '@/types/cms';
+import type { HomePostsState } from '@/context/state';
 import { vi } from 'vitest';
 
 function createPost(slug: string): Post {

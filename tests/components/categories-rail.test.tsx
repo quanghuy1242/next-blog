@@ -1,25 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { vi } from 'vitest';
-import { CategoriesRail } from 'components/shared/categories-rail';
-import type { Category, Media } from 'types/cms';
-
-const defaultRouteWarmupPolicyState = {
-  allowHoverWarmup: true,
-  allowPointerWarmup: true,
-  allowViewportWarmup: true,
-  disableWarmup: false,
-  pauseSpeculativeWarmup: false,
-};
-
-vi.mock('common/utils/route-prefetch', () => ({
-  cancelRouteWarmup: vi.fn(),
-  claimRouteWarmup: vi.fn(),
-  getRouteWarmupPolicyState: vi.fn(() => defaultRouteWarmupPolicyState),
-  pauseSpeculativeRouteWarmupsUntilUserActivity: vi.fn(),
-  requestRouteWarmup: vi.fn(),
-  subscribeRouteWarmupPolicy: vi.fn(() => () => {}),
-}));
+import { CategoriesRail } from '@/components/shared/categories-rail';
+import type { Category, Media } from '@/types/cms';
 
 function createCategory(overrides: Partial<Category> = {}): Category {
   const image: Media = {

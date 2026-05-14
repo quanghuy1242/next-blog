@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { calculateWholeBookProgress } from 'common/utils/reading-progress';
-import type { ReadingProgressRecord } from 'types/cms';
+import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
+import type { ReadingProgressRecord } from '@/types/cms';
 
 function createRecord(
   chapterId: string,

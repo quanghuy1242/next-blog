@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { LexicalRenderer } from 'components/shared/lexical-renderer';
+import { LexicalRenderer } from '@/components/shared/lexical-renderer';
 
 vi.mock('@payloadcms/richtext-lexical/react', () => ({
   RichText: ({ converters }: { converters: any }) => {

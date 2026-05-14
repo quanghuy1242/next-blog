@@ -1,0 +1,55 @@
+'use client';
+
+import cn from 'classnames';
+
+import { useBookmark } from '@/hooks/useBookmark';
+import { Button } from '@/components/shared/ui/button';
+import type { BookmarkRecord } from '@/types/cms';
+
+interface BookmarkButtonClientProps {
+  contentType: 'chapter' | 'book';
+  contentId: number;
+  initialBookmark: BookmarkRecord | null;
+}
+
+export function BookmarkButtonClient({
+  contentType,
+  contentId,
+  initialBookmark,
+}: BookmarkButtonClientProps) {
+  const { isBookmarked, isMutating, toggle } = useBookmark({
+    contentType,
+    contentId,
+    enabled: true,
+    initialBookmark,
+  });
+
+  return (
+    <Button
+      type="button"
+      onClick={toggle}
+      disabled={isMutating}
+      variant={isBookmarked ? 'primary' : 'secondary'}
+      size="lg"
+      className={cn('gap-1.5', isBookmarked ? 'border border-blue' : '')}
+      aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
+      aria-pressed={isBookmarked}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill={isBookmarked ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth={2}
+        className="h-4 w-4"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+        />
+      </svg>
+      <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+    </Button>
+  );
+}

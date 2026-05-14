@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Categories } from 'components/shared/categories';
-import type { Category } from 'types/cms';
+import { Categories } from '@/components/shared/categories';
+import type { Category } from '@/types/cms';
 
 function createCategory(overrides: Partial<Category> = {}): Category {
   return {

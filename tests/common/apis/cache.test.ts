@@ -10,7 +10,7 @@ import {
   buildChapterSlugCacheTags,
   buildChaptersByBookCacheTags,
   normalizeCacheTags,
-} from '../../../common/apis/cache';
+} from '@/lib/payload/cache';
 
 describe('cache tags', () => {
   it('normalizes and deduplicates tags', () => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Banner } from 'components/pages/index/banner';
-import type { Media } from 'types/cms';
+import { Banner } from '@/components/pages/index/banner';
+import type { Media } from '@/types/cms';
 
 describe('Banner component', () => {
   test('renders header and subheader', () => {

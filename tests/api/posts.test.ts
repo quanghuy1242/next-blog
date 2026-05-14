@@ -1,16 +1,15 @@
-import handler from 'pages/api/posts';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { createMocks } from 'node-mocks-http';
+import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { getCategoryIdBySlug } from 'common/apis/categories';
-import { getPaginatedPosts } from 'common/apis/posts';
-import type { Post } from 'types/cms';
+import { getCategoryIdBySlug } from '@/lib/payload/categories';
+import { getPaginatedPosts } from '@/lib/payload/posts';
+import type { Post } from '@/types/cms';
+import { GET, POST } from '@/app/api/posts/route';
 
-vi.mock('common/apis/categories', () => ({
+vi.mock('@/lib/payload/categories', () => ({
   getCategoryIdBySlug: vi.fn(),
 }));
 
-vi.mock('common/apis/posts', () => ({
+vi.mock('@/lib/payload/posts', () => ({
   getPaginatedPosts: vi.fn(),
 }));
 
@@ -35,15 +34,10 @@ function createPost(overrides: Partial<Post> = {}): Post {
   };
 }
 
-function runHandler(
-  req: Parameters<typeof createMocks>[0],
-  res?: Parameters<typeof createMocks>[1]
-) {
-  const { req: request, res: response } = createMocks(req, res);
-  return handler(
-    request as unknown as NextApiRequest,
-    response as unknown as NextApiResponse
-  ).then(() => ({ req: request, res: response }));
+async function runGet(query?: Record<string, string>) {
+  const url = new URL('http://localhost/api/posts');
+  Object.entries(query ?? {}).forEach(([key, value]) => url.searchParams.set(key, value));
+  return GET(new NextRequest(url));
 }
 
 describe('GET /api/posts', () => {
@@ -52,11 +46,11 @@ describe('GET /api/posts', () => {
   });
 
   test('rejects non-GET methods', async () => {
-    const { res } = await runHandler({ method: 'POST' });
+    const response = POST();
 
-    expect(res.statusCode).toBe(405);
-    expect(res.getHeader('Allow')).toBe('GET');
-    expect(res._getJSONData()).toEqual({ error: 'Method Not Allowed' });
+    expect(response.status).toBe(405);
+    expect(response.headers.get('Allow')).toBe('GET');
+    await expect(response.json()).resolves.toEqual({ error: 'Method Not Allowed' });
   });
 
   test('normalizes query params and returns paginated posts', async () => {
@@ -66,12 +60,9 @@ describe('GET /api/posts', () => {
       hasMore: true,
     });
 
-    const { res } = await runHandler({
-      method: 'GET',
-      query: {
+    const response = await runGet({
         limit: '100',
         offset: '-5',
-      },
     });
 
     expect(mockedGetPaginatedPosts).toHaveBeenCalledWith({
@@ -81,8 +72,8 @@ describe('GET /api/posts', () => {
       tags: null,
     });
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
       posts: [createPost()],
       hasMore: true,
       nextOffset: 0 + 1,
@@ -92,16 +83,11 @@ describe('GET /api/posts', () => {
   test('short-circuits when category slug cannot be resolved', async () => {
     mockedGetCategoryIdBySlug.mockResolvedValue(null);
 
-    const { res } = await runHandler({
-      method: 'GET',
-      query: {
-        category: 'unknown',
-      },
-    });
+    const response = await runGet({ category: 'unknown' });
 
     expect(mockedGetPaginatedPosts).not.toHaveBeenCalled();
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
       posts: [],
       hasMore: false,
       nextOffset: 0,
@@ -112,11 +98,9 @@ describe('GET /api/posts', () => {
     mockedGetCategoryIdBySlug.mockResolvedValue(1);
     mockedGetPaginatedPosts.mockRejectedValue(new Error('Network error'));
 
-    const { res } = await runHandler({
-      method: 'GET',
-    });
+    const response = await runGet();
 
-    expect(res.statusCode).toBe(500);
-    expect(res._getJSONData()).toEqual({ error: 'Failed to load posts' });
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({ error: 'Failed to load posts' });
   });
 });

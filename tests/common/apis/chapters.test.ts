@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { fetchAPIWithAuthToken } from 'common/apis/base';
-import { getChapterBySlug, getChapterPageByBookId } from 'common/apis/chapters';
+import { fetchAPIWithAuthToken } from '@/lib/payload/base';
+import { getChapterBySlug, getChapterPageByBookId } from '@/lib/payload/chapters';
 
-vi.mock('common/apis/base', () => ({
+vi.mock('@/lib/payload/base', () => ({
   fetchAPIWithAuthToken: vi.fn(),
 }));
 
@@ -29,7 +29,7 @@ function createChapterPasswordProof({
   return `v1.${payload}.signature`;
 }
 
-describe('common/apis/chapters', () => {
+describe('@/lib/payload/chapters', () => {
   afterEach(() => {
     vi.resetAllMocks();
   });

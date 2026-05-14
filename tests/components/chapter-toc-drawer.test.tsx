@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { ChapterTocDrawer } from 'components/pages/books/chapter-toc-drawer';
+import { ChapterTocDrawer } from '@/components/pages/books/chapter-toc-drawer';
 
 describe('ChapterTocDrawer component', () => {
   test('does not render when closed', () => {

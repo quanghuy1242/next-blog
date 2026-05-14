@@ -4,7 +4,7 @@ import {
   buildPreviewTokenForTests,
   validatePreviewToken,
   type PreviewPayload,
-} from 'common/utils/preview';
+} from '@/lib/preview/preview';
 
 function createPreviewPayload(overrides: Partial<PreviewPayload> = {}): PreviewPayload {
   return {

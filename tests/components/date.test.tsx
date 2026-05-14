@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { Date } from 'components/shared/date';
+import { Date } from '@/components/shared/date';
 
 describe('Date component', () => {
   it('renders formatted date', () => {

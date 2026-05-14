@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { renderHook } from '@testing-library/react';
-import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock IntersectionObserver

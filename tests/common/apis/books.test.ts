@@ -1,14 +1,14 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { fetchAPIWithAuthToken } from 'common/apis/base';
-import { getBookBySlug, getBookDetailById, getBookDetailBySlug } from 'common/apis/books';
+import { fetchAPIWithAuthToken } from '@/lib/payload/base';
+import { getBookBySlug, getBookDetailById, getBookDetailBySlug } from '@/lib/payload/books';
 
-vi.mock('common/apis/base', () => ({
+vi.mock('@/lib/payload/base', () => ({
   fetchAPIWithAuthToken: vi.fn(),
 }));
 
 const mockedFetchAPIWithAuthToken = vi.mocked(fetchAPIWithAuthToken);
 
-describe('common/apis/books', () => {
+describe('@/lib/payload/books', () => {
   afterEach(() => {
     vi.resetAllMocks();
   });

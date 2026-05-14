@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { ChapterList } from 'components/pages/books/chapter-list';
-import type { Chapter } from 'types/cms';
+import { ChapterList } from '@/components/pages/books/chapter-list';
+import type { Chapter } from '@/types/cms';
 
 function createChapter(overrides: Partial<Chapter> = {}): Chapter {
   const defaultContent = {

@@ -1,6 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { CHAPTER_PASSWORD_PROOF_COOKIE } from 'common/utils/chapter-password-proof';
+import { CHAPTER_PASSWORD_PROOF_COOKIE } from '@/lib/server/chapter-password-proof';
 
 function createChapterPasswordProof({
   chapterId,
@@ -21,32 +21,6 @@ function createChapterPasswordProof({
     .toString('base64url');
 
   return `v1.${payload}.signature-${chapterId}`;
-}
-
-function createResponseMock() {
-  const headers = new Map<string, string>();
-
-  const response = {
-    jsonBody: null as unknown,
-    statusCode: 200,
-    getHeader(name: string) {
-      return headers.get(name.toLowerCase()) ?? null;
-    },
-    json(body: unknown) {
-      this.jsonBody = body;
-      return this;
-    },
-    setHeader(name: string, value: string) {
-      headers.set(name.toLowerCase(), value);
-      return this;
-    },
-    status(code: number) {
-      this.statusCode = code;
-      return this;
-    },
-  };
-
-  return response as typeof response & NextApiResponse;
 }
 
 describe('chapter unlock API route', () => {
@@ -92,24 +66,23 @@ describe('chapter unlock API route', () => {
     vi.stubGlobal('fetch', fetchMock);
     vi.stubEnv('PAYLOAD_BASE_URL', 'https://payload.example.com');
     vi.stubEnv('PAYLOAD_API_KEY', 'payload-api-key');
-    const { default: handler } = await import('pages/api/chapters/unlock');
+    const { POST } = await import('@/app/api/chapters/unlock/route');
+    const response = await POST(
+      new NextRequest('http://localhost/api/chapters/unlock', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          cookie: `${CHAPTER_PASSWORD_PROOF_COOKIE}=${encodeURIComponent(oldProof)}`,
+        },
+        body: JSON.stringify({
+          chapterId: '7',
+          password: 'open-sesame',
+        }),
+      })
+    );
 
-    const req = {
-      body: {
-        chapterId: '7',
-        password: 'open-sesame',
-      },
-      cookies: {
-        [CHAPTER_PASSWORD_PROOF_COOKIE]: oldProof,
-      },
-      method: 'POST',
-    } as unknown as NextApiRequest;
-    const res = createResponseMock();
-
-    await handler(req, res);
-
-    expect(res.statusCode).toBe(200);
-    expect(res.jsonBody).toEqual({
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
       chapterId: '7',
       expiresAt: '2026-04-27T14:16:30.043Z',
       proof: newProof,
@@ -124,9 +97,9 @@ describe('chapter unlock API route', () => {
       })
     );
 
-    const setCookieHeader = res.getHeader('Set-Cookie');
+    const setCookieHeader = response.headers.get('set-cookie');
     expect(setCookieHeader).toContain('HttpOnly');
-    expect(setCookieHeader).toContain('SameSite=Lax');
+    expect(setCookieHeader).toContain('SameSite=lax');
     expect(decodeURIComponent(String(setCookieHeader))).toContain(newProof);
     expect(decodeURIComponent(String(setCookieHeader))).not.toContain(oldProof);
   });

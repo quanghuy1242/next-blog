@@ -1,11 +1,10 @@
-import handler from 'pages/api/bookmarks';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { createMocks } from 'node-mocks-http';
+import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { createBookmark, getBookmarks } from 'common/apis/bookmarks';
-import { BETTER_AUTH_TOKEN_COOKIE } from 'common/utils/auth';
+import { createBookmark, getBookmarks } from '@/lib/payload/bookmarks';
+import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/auth/auth';
+import { GET, POST } from '@/app/api/bookmarks/route';
 
-vi.mock('common/apis/bookmarks', () => ({
+vi.mock('@/lib/payload/bookmarks', () => ({
   createBookmark: vi.fn(),
   getBookmarks: vi.fn(),
 }));
@@ -13,16 +12,29 @@ vi.mock('common/apis/bookmarks', () => ({
 const mockedGetBookmarks = vi.mocked(getBookmarks);
 const mockedCreateBookmark = vi.mocked(createBookmark);
 
-function runHandler(
-  req: Parameters<typeof createMocks>[0],
-  res?: Parameters<typeof createMocks>[1]
-) {
-  const { req: request, res: response } = createMocks(req, res);
+async function runGet({
+  cookie,
+  query,
+}: {
+  cookie?: string;
+  query?: Record<string, string>;
+}) {
+  const url = new URL('http://localhost/api/bookmarks');
+  Object.entries(query ?? {}).forEach(([key, value]) => url.searchParams.set(key, value));
+  return GET(new NextRequest(url, { headers: cookie ? { cookie } : undefined }));
+}
 
-  return handler(
-    request as unknown as NextApiRequest,
-    response as unknown as NextApiResponse
-  ).then(() => ({ req: request, res: response }));
+async function runPost(body: Record<string, unknown>, cookie?: string) {
+  return POST(
+    new NextRequest('http://localhost/api/bookmarks', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        ...(cookie ? { cookie } : {}),
+      },
+      body: JSON.stringify(body),
+    })
+  );
 }
 
 describe('bookmarks API route', () => {
@@ -31,29 +43,24 @@ describe('bookmarks API route', () => {
   });
 
   test('returns an empty bookmark list for anonymous GET requests', async () => {
-    const { res } = await runHandler({
-      method: 'GET',
-    });
+    const response = await runGet({});
 
     expect(mockedGetBookmarks).not.toHaveBeenCalled();
-    expect(res.statusCode).toBe(200);
-    expect(res.getHeader('Cache-Control')).toBe('no-store, max-age=0');
-    expect(res._getJSONData()).toEqual({ docs: [], totalDocs: 0 });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Cache-Control')).toBe('no-store, max-age=0');
+    await expect(response.json()).resolves.toEqual({ docs: [], totalDocs: 0 });
   });
 
   test('rejects partial bookmark lookup filters', async () => {
-    const { res } = await runHandler({
-      method: 'GET',
-      cookies: {
-        [BETTER_AUTH_TOKEN_COOKIE]: 'reader-token',
-      },
+    const response = await runGet({
+      cookie: `${BETTER_AUTH_TOKEN_COOKIE}=reader-token`,
       query: {
         contentType: 'book',
       },
     });
 
-    expect(res.statusCode).toBe(400);
-    expect(res._getJSONData()).toEqual({
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
       error: 'contentType and contentId must be provided together.',
     });
   });
@@ -64,21 +71,18 @@ describe('bookmarks API route', () => {
       bookmarkId: 1,
     });
 
-    const { res } = await runHandler({
-      method: 'POST',
-      cookies: {
-        [BETTER_AUTH_TOKEN_COOKIE]: 'reader-token',
-      },
-      body: {
+    const response = await runPost(
+      {
         contentType: 'book',
         bookId: '7',
         chapterId: '11',
       },
-    });
+      `${BETTER_AUTH_TOKEN_COOKIE}=reader-token`
+    );
 
     expect(mockedCreateBookmark).not.toHaveBeenCalled();
-    expect(res.statusCode).toBe(400);
-    expect(res._getJSONData()).toEqual({
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
       error: 'chapterId is not allowed for book bookmarks.',
     });
   });

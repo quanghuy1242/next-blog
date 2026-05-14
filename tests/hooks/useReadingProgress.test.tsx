@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { useReadingProgress } from 'hooks/useReadingProgress';
+import { useReadingProgress } from '@/hooks/useReadingProgress';
 
 function setScrollY(value: number) {
   Object.defineProperty(window, 'scrollY', {

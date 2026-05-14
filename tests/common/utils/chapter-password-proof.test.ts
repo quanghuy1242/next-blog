@@ -4,7 +4,7 @@ import {
   getChapterPasswordProofCookieValueFromRequest,
   normalizeChapterPasswordProofCookieValue,
   updateChapterPasswordProofCookieValue,
-} from 'common/utils/chapter-password-proof';
+} from '@/lib/server/chapter-password-proof';
 
 function createChapterPasswordProof({
   chapterId,

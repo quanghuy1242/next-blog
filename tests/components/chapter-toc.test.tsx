@@ -1,32 +1,17 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { ChapterToc } from 'components/pages/books/chapter-toc';
-import type { Chapter } from 'types/cms';
-import { requestRouteWarmup } from 'common/utils/route-prefetch';
-
-const defaultRouteWarmupPolicyState = {
-  allowHoverWarmup: true,
-  allowPointerWarmup: true,
-  allowViewportWarmup: true,
-  disableWarmup: false,
-  pauseSpeculativeWarmup: false,
-};
-
-vi.mock('common/utils/route-prefetch', () => ({
-  cancelRouteWarmup: vi.fn(),
-  claimRouteWarmup: vi.fn(),
-  getRouteWarmupPolicyState: vi.fn(() => defaultRouteWarmupPolicyState),
-  pauseSpeculativeRouteWarmupsUntilUserActivity: vi.fn(),
-  requestRouteWarmup: vi.fn(),
-  subscribeRouteWarmupPolicy: vi.fn(() => () => {}),
-}));
+import { describe, expect, test, vi } from 'vitest';
+import { ChapterToc } from '@/components/pages/books/chapter-toc';
+import type { Chapter } from '@/types/cms';
 
 vi.mock('next/link', () => ({
   default: React.forwardRef<
     HTMLAnchorElement,
-    React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
-  >(function MockLink({ href, children, ...rest }, ref) {
+    React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+      href: string;
+      onNavigate?: (event: { preventDefault: () => void }) => void;
+    }
+  >(function MockLink({ href, children, onNavigate, ...rest }, ref) {
     return (
       <a
         ref={ref}
@@ -34,6 +19,14 @@ vi.mock('next/link', () => ({
         {...rest}
         onClick={(event) => {
           rest.onClick?.(event);
+          if (event.defaultPrevented) {
+            return;
+          }
+          onNavigate?.({
+            preventDefault: () => {
+              event.preventDefault();
+            },
+          });
           event.preventDefault();
         }}
       >
@@ -42,8 +35,6 @@ vi.mock('next/link', () => ({
     );
   }),
 }));
-
-const mockedRequestRouteWarmup = vi.mocked(requestRouteWarmup);
 
 function createChapter(overrides: Partial<Chapter> = {}): Chapter {
   const defaultContent = {
@@ -77,10 +68,6 @@ function createChapter(overrides: Partial<Chapter> = {}): Chapter {
 }
 
 describe('ChapterToc component', () => {
-  beforeEach(() => {
-    mockedRequestRouteWarmup.mockReset();
-  });
-
   test('highlights current chapter with inline sidebar styling', () => {
     const chapters = [
       createChapter({ slug: 'ch-1', title: 'One', order: 1 }),

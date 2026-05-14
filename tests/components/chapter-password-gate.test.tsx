@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { ChapterPasswordGate } from 'components/pages/books/chapter-password-gate';
+import { ChapterPasswordGate } from '@/components/pages/books/chapter-password-gate';
 
 afterEach(() => {
   vi.unstubAllGlobals();

@@ -1,33 +1,39 @@
-import handler from 'pages/api/comments';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { createMocks } from 'node-mocks-http';
+import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { createComment, getComments } from 'common/apis/comments';
-import { COMMENT_MAX_LENGTH } from 'common/constants/comments';
-import { BETTER_AUTH_TOKEN_COOKIE } from 'common/utils/auth';
+import { createComment, getComments } from '@/lib/payload/comments';
+import { COMMENT_MAX_LENGTH } from '@/lib/constants/comments';
+import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/auth/auth';
+import { GET, POST } from '@/app/api/comments/route';
 
-vi.mock('common/apis/comments', () => ({
+vi.mock('@/lib/payload/comments', () => ({
   createComment: vi.fn(),
   getComments: vi.fn(),
 }));
 
-vi.mock('common/utils/chapter-password-proof', () => ({
+vi.mock('@/lib/server/chapter-password-proof', () => ({
   getChapterPasswordProofCookieValueFromRequest: vi.fn(() => 'chapter-proof-123'),
 }));
 
 const mockedGetComments = vi.mocked(getComments);
 const mockedCreateComment = vi.mocked(createComment);
 
-function runHandler(
-  req: Parameters<typeof createMocks>[0],
-  res?: Parameters<typeof createMocks>[1]
-) {
-  const { req: request, res: response } = createMocks(req, res);
+async function runGet(query: Record<string, string>) {
+  const url = new URL('http://localhost/api/comments');
+  Object.entries(query).forEach(([key, value]) => url.searchParams.set(key, value));
+  return GET(new NextRequest(url));
+}
 
-  return handler(
-    request as unknown as NextApiRequest,
-    response as unknown as NextApiResponse
-  ).then(() => ({ req: request, res: response }));
+async function runPost(body: Record<string, unknown>, cookie?: string) {
+  return POST(
+    new NextRequest('http://localhost/api/comments', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        ...(cookie ? { cookie } : {}),
+      },
+      body: JSON.stringify(body),
+    })
+  );
 }
 
 describe('comments API route', () => {
@@ -36,16 +42,10 @@ describe('comments API route', () => {
   });
 
   test('rejects GET requests that provide both chapterId and postId', async () => {
-    const { res } = await runHandler({
-      method: 'GET',
-      query: {
-        chapterId: '10',
-        postId: '22',
-      },
-    });
+    const response = await runGet({ chapterId: '10', postId: '22' });
 
-    expect(res.statusCode).toBe(400);
-    expect(res._getJSONData()).toEqual({
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
       error: 'Provide exactly one of chapterId or postId.',
     });
   });
@@ -57,35 +57,27 @@ describe('comments API route', () => {
       viewerCanComment: false,
     });
 
-    const { res } = await runHandler({
-      method: 'GET',
-      query: {
-        chapterId: '10',
-      },
-    });
+    const response = await runGet({ chapterId: '10' });
 
     expect(mockedGetComments).toHaveBeenCalledWith(
       { chapterId: '10', postId: undefined },
       { authToken: null, chapterPasswordProof: 'chapter-proof-123' }
     );
-    expect(res.statusCode).toBe(200);
-    expect(res.getHeader('Cache-Control')).toBe('no-store, max-age=0');
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Cache-Control')).toBe('no-store, max-age=0');
   });
 
   test('forwards auth token and chapter proof when creating chapter comments', async () => {
     mockedCreateComment.mockResolvedValue(null);
 
-    const { res } = await runHandler({
-      method: 'POST',
-      body: {
+    const response = await runPost(
+      {
         chapterId: '10',
         content: 'New comment',
         parentCommentId: '5',
       },
-      cookies: {
-        [BETTER_AUTH_TOKEN_COOKIE]: 'reader-token',
-      },
-    });
+      `${BETTER_AUTH_TOKEN_COOKIE}=reader-token`
+    );
 
     expect(mockedCreateComment).toHaveBeenCalledWith(
       {
@@ -99,24 +91,21 @@ describe('comments API route', () => {
         chapterPasswordProof: 'chapter-proof-123',
       }
     );
-    expect(res.statusCode).toBe(200);
+    expect(response.status).toBe(200);
   });
 
   test('rejects comments longer than the configured limit', async () => {
-    const { res } = await runHandler({
-      method: 'POST',
-      body: {
+    const response = await runPost(
+      {
         postId: '22',
         content: 'x'.repeat(COMMENT_MAX_LENGTH + 1),
       },
-      cookies: {
-        [BETTER_AUTH_TOKEN_COOKIE]: 'reader-token',
-      },
-    });
+      `${BETTER_AUTH_TOKEN_COOKIE}=reader-token`
+    );
 
     expect(mockedCreateComment).not.toHaveBeenCalled();
-    expect(res.statusCode).toBe(400);
-    expect(res._getJSONData()).toEqual({
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
       error: `content must be at most ${COMMENT_MAX_LENGTH} characters.`,
     });
   });
