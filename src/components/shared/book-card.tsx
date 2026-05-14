@@ -11,7 +11,7 @@ interface BookCardProps {
 export function BookCard({ book }: BookCardProps) {
   return (
     <article className="flex flex-col gap-2">
-      <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} className="block">
+      <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} prefetch={false} className="block">
         {book.cover ? (
           <CoverImage media={book.cover} title={book.title} className="mb-0" />
         ) : (
@@ -20,7 +20,7 @@ export function BookCard({ book }: BookCardProps) {
       </SSRPrefetchLink>
 
       <h3 className="text-2xl leading-snug">
-        <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} className="hover:underline">
+        <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} prefetch={false} className="hover:underline">
           {book.title}
         </SSRPrefetchLink>
       </h3>

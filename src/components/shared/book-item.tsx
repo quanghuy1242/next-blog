@@ -27,7 +27,7 @@ export function BookItem({
       />
 
       <h3 className="text-sm font-medium leading-snug sm:text-base">
-        <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} className="hover:underline">
+        <SSRPrefetchLink href={buildBookHref(book.id, book.slug)} prefetch={false} className="hover:underline">
           {book.title}
         </SSRPrefetchLink>
       </h3>

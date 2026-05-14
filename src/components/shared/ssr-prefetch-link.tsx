@@ -1,10 +1,12 @@
 import Link from 'next/link';
+import type { LinkProps } from 'next/link';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
 
 interface SSRPrefetchLinkProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   href: string;
   children: ReactNode;
+  prefetch?: LinkProps['prefetch'];
 }
 
 /**
@@ -22,10 +24,11 @@ interface SSRPrefetchLinkProps
 export function SSRPrefetchLink({
   href,
   children,
+  prefetch = true,
   ...rest
 }: SSRPrefetchLinkProps) {
   return (
-    <Link href={href} prefetch {...rest}>
+    <Link href={href} prefetch={prefetch} {...rest}>
       {children}
     </Link>
   );

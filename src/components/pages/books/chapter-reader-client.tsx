@@ -10,7 +10,10 @@ import type {
   CommentsResult,
   ReadingProgressRecord,
 } from '@/types/cms';
-import { readReadingProgressByChapterId } from '@/lib/browser/reading-position';
+import {
+  READING_POSITION_CHANGE_EVENT,
+  readReadingProgressByChapterId,
+} from '@/lib/browser/reading-position';
 import { buildBookHref, buildChapterHref } from '@/lib/routes/book-route';
 import { useReadingProgress } from '@/hooks/useReadingProgress';
 import { Container } from '@/components/core/container';
@@ -64,8 +67,17 @@ export function ChapterReaderClient({
     [readingProgress]
   );
   useEffect(() => {
-    setLocalProgressByChapterId(readReadingProgressByChapterId(book.id, chapters));
-  }, [book.id, chapters]);
+    function syncLocalProgress() {
+      setLocalProgressByChapterId(readReadingProgressByChapterId(book.id, chapters));
+    }
+
+    syncLocalProgress();
+    window.addEventListener(READING_POSITION_CHANGE_EVENT, syncLocalProgress);
+
+    return () => {
+      window.removeEventListener(READING_POSITION_CHANGE_EVENT, syncLocalProgress);
+    };
+  }, [book.id, chapter.id, chapters]);
   const { previousChapter, nextChapter } = useMemo(() => {
     const currentIndex = chapters.findIndex((candidate) => candidate.slug === chapter.slug);
 
@@ -144,6 +156,7 @@ export function ChapterReaderClient({
                         href={buildBookHref(book.id, book.slug)}
                         className="break-words"
                         medium
+                        prefetch={false}
                         ssrPrefetch
                       >
                         {book.title}
@@ -223,6 +236,7 @@ export function ChapterReaderClient({
                 {previousChapter ? (
                   <TextLink
                     href={buildChapterHref(book.id, book.slug, previousChapter.slug)}
+                    prefetch={false}
                     ssrPrefetch
                   >
                     Previous: {previousChapter.title}
@@ -231,7 +245,11 @@ export function ChapterReaderClient({
               </div>
               <div className="text-right">
                 {nextChapter ? (
-                  <TextLink href={buildChapterHref(book.id, book.slug, nextChapter.slug)} ssrPrefetch>
+                  <TextLink
+                    href={buildChapterHref(book.id, book.slug, nextChapter.slug)}
+                    prefetch={false}
+                    ssrPrefetch
+                  >
                     Next: {nextChapter.title}
                   </TextLink>
                 ) : null}

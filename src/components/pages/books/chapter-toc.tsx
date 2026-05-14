@@ -35,6 +35,7 @@ export function ChapterToc({
             <li key={`${chapter.slug}-${chapter.order}`}>
               <SSRPrefetchLink
                 href={buildChapterHref(bookId, bookSlug, chapter.slug)}
+                prefetch={false}
                 onClick={onNavigate}
                 className={cn(
                   'flex items-center gap-2 text-sm text-gray-700 hover:underline',

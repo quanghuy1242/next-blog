@@ -4,6 +4,7 @@ import type {
   ReactNode,
 } from 'react';
 import Link from 'next/link';
+import type { LinkProps } from 'next/link';
 import cn from 'classnames';
 import { SSRPrefetchLink } from '@/components/shared/ssr-prefetch-link';
 
@@ -73,6 +74,7 @@ interface ButtonLinkProps
   fullWidth?: boolean;
   hardNavigate?: boolean;
   ssrPrefetch?: boolean;
+  prefetch?: LinkProps['prefetch'];
 }
 
 export function ButtonLink({
@@ -83,6 +85,7 @@ export function ButtonLink({
   fullWidth = false,
   hardNavigate = false,
   ssrPrefetch = false,
+  prefetch,
   className,
   ...props
 }: ButtonLinkProps) {
@@ -103,14 +106,14 @@ export function ButtonLink({
 
   if (ssrPrefetch) {
     return (
-      <SSRPrefetchLink href={href} className={composedClassName} {...props}>
+      <SSRPrefetchLink href={href} prefetch={prefetch} className={composedClassName} {...props}>
         {children}
       </SSRPrefetchLink>
     );
   }
 
   return (
-    <Link href={href} className={composedClassName} {...props}>
+    <Link href={href} prefetch={prefetch} className={composedClassName} {...props}>
       {children}
     </Link>
   );

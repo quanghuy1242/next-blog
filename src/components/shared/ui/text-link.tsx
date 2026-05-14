@@ -22,6 +22,7 @@ interface TextLinkProps
   children: ReactNode;
   medium?: boolean;
   ssrPrefetch?: boolean;
+  prefetch?: LinkProps['prefetch'];
 }
 
 export function TextLink({
@@ -29,6 +30,7 @@ export function TextLink({
   children,
   medium = false,
   ssrPrefetch = false,
+  prefetch,
   className,
   ...props
 }: TextLinkProps) {
@@ -36,14 +38,14 @@ export function TextLink({
 
   if (ssrPrefetch && typeof href === 'string') {
     return (
-      <SSRPrefetchLink href={href} className={composedClassName} {...props}>
+      <SSRPrefetchLink href={href} prefetch={prefetch} className={composedClassName} {...props}>
         {children}
       </SSRPrefetchLink>
     );
   }
 
   return (
-    <Link href={href} className={composedClassName} {...props}>
+    <Link href={href} prefetch={prefetch} className={composedClassName} {...props}>
       {children}
     </Link>
   );

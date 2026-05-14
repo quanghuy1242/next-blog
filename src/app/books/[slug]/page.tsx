@@ -61,6 +61,7 @@ export default async function BookPage({ params }: BookPageProps) {
                 <ButtonLink
                   href={`${buildBookHref(data.book.id, data.book.slug)}/chapters/${data.continueReadingChapterSlug}`}
                   size="lg"
+                  prefetch={false}
                   ssrPrefetch
                 >
                   Continue reading

@@ -87,7 +87,7 @@ export function BookCover({
   }
 
   return (
-    <SSRPrefetchLink href={href} className="block">
+    <SSRPrefetchLink href={href} prefetch={false} className="block">
       {coverWithIndicator}
     </SSRPrefetchLink>
   );

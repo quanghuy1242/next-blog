@@ -1,5 +1,7 @@
 import type { Chapter } from '@/types/cms';
 
+export const READING_POSITION_CHANGE_EVENT = 'reading-position-change';
+
 export interface StoredReadingPosition {
   progress: number;
   scrollY: number;
@@ -62,6 +64,11 @@ export function writeReadingPosition(
         progress: clampProgress(position.progress),
         scrollY: Math.max(position.scrollY, 0),
       } satisfies StoredReadingPosition)
+    );
+    window.dispatchEvent(
+      new CustomEvent(READING_POSITION_CHANGE_EVENT, {
+        detail: { bookId, chapterId },
+      })
     );
   } catch {
     // Ignore storage failures.

@@ -28,6 +28,7 @@ export function ChapterList({ chapters, bookId, bookSlug, readingProgressByChapt
           <li key={`${chapter.slug}-${chapter.order}`}>
             <SSRPrefetchLink
               href={buildChapterHref(bookId, bookSlug, chapter.slug)}
+              prefetch={false}
               className="flex items-center justify-between rounded border border-gray-200 px-3 py-2 hover:border-gray-300"
             >
               <span className="min-w-0 flex-1 text-sm font-medium text-gray-900">
