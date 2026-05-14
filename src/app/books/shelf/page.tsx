@@ -23,11 +23,11 @@ export default async function BooksShelfPage() {
 
   if (!sessionToken) {
     return (
-      <Layout className="flex flex-col items-center" isAuthenticated={false}>
+      <Layout className="flex flex-col items-center">
         <Container className="my-4 w-full md:px-20">
           <div className="mx-auto w-full md:w-2/3">
             <Text text="Bookshelf" />
-          <p className="mt-4 text-gray-600">Please sign in to view your bookmarks.</p>
+            <p className="mt-4 text-gray-600">Please sign in to view your bookmarks.</p>
           </div>
         </Container>
       </Layout>
@@ -54,52 +54,52 @@ export default async function BooksShelfPage() {
   const hasAny = visibleBookBookmarks.length > 0 || visibleChapterBookmarks.length > 0;
 
   return (
-    <Layout className="flex flex-col items-center" isAuthenticated>
+    <Layout className="flex flex-col items-center">
       <Container className="my-4 w-full md:px-20">
         <div className="mx-auto w-full md:w-2/3">
           <Text text="Bookshelf" />
-        {!hasAny ? (
-          <p className="mt-4 text-gray-600">No bookmarks yet.</p>
-        ) : (
+          {!hasAny ? (
+            <p className="mt-4 text-gray-600">No bookmarks yet.</p>
+          ) : (
             <div className="mt-4 space-y-8">
-            {visibleBookBookmarks.length > 0 ? (
-              <section>
-                <BooksGrid
-                  books={(visibleBookBookmarks.map((bm) => bm.book).filter(Boolean) as Book[]).map(
-                    (book) => ({
-                      ...book,
-                      isBookmarked: true,
-                    })
-                  )}
-                  isAuthenticated
-                />
-              </section>
-            ) : null}
-            {visibleChapterBookmarks.length > 0 ? (
-              <section>
-                <Text text="Chapters" />
-                <ul className="mt-3 space-y-2">
-                  {visibleChapterBookmarks.map((bm) => {
-                    const chapter = bm.chapter;
-                    const book = chapter?.book;
+              {visibleBookBookmarks.length > 0 ? (
+                <section>
+                  <BooksGrid
+                    books={(visibleBookBookmarks.map((bm) => bm.book).filter(Boolean) as Book[]).map(
+                      (book) => ({
+                        ...book,
+                        isBookmarked: true,
+                      })
+                    )}
+                    isAuthenticated
+                  />
+                </section>
+              ) : null}
+              {visibleChapterBookmarks.length > 0 ? (
+                <section>
+                  <Text text="Chapters" />
+                  <ul className="mt-3 space-y-2">
+                    {visibleChapterBookmarks.map((bm) => {
+                      const chapter = bm.chapter;
+                      const book = chapter?.book;
 
-                    return chapter ? (
-                      <li key={bm.id}>
-                        {book ? (
-                          <TextLink href={buildChapterHref(book.id, book.slug, chapter.slug)}>
-                            {chapter.title} <span className="text-gray-500">in {book.title}</span>
-                          </TextLink>
-                        ) : (
-                          <span>{chapter.title}</span>
-                        )}
-                      </li>
-                    ) : null;
-                  })}
-                </ul>
-              </section>
-            ) : null}
-          </div>
-        )}
+                      return chapter ? (
+                        <li key={bm.id}>
+                          {book ? (
+                            <TextLink href={buildChapterHref(book.id, book.slug, chapter.slug)}>
+                              {chapter.title} <span className="text-gray-500">in {book.title}</span>
+                            </TextLink>
+                          ) : (
+                            <span>{chapter.title}</span>
+                          )}
+                        </li>
+                      ) : null;
+                    })}
+                  </ul>
+                </section>
+              ) : null}
+            </div>
+          )}
         </div>
       </Container>
     </Layout>

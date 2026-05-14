@@ -42,6 +42,10 @@ interface HomePageResponse {
   User: Author | null;
 }
 
+interface HomepageHeaderResponse {
+  Homepage: Pick<Homepage, 'header'> | null;
+}
+
 async function fetchHomeData({
   limit,
   categoryId,
@@ -201,4 +205,23 @@ export async function getDataForHome(
 ): Promise<GetDataForHomeResult> {
   const normalizedOptions = normalizeHomeOptions(options);
   return fetchHomeData(normalizedOptions);
+}
+
+export async function getHomepageHeader(
+  options: Pick<FetchApiOptions, 'cache'> = {}
+): Promise<Pick<Homepage, 'header'> | null> {
+  const data = await fetchAPI<HomepageHeaderResponse>(
+    `#graphql
+      query HomepageHeader {
+        Homepage {
+          header
+        }
+      }
+    `,
+    {
+      cache: options.cache,
+    }
+  );
+
+  return data?.Homepage ?? null;
 }

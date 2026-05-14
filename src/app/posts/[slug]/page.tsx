@@ -59,12 +59,7 @@ export default async function PostPage({ params }: PostPageProps) {
   ).catch(() => null);
 
   return (
-    <Layout
-      header={data.homepage?.header || ''}
-      className="flex flex-col items-center"
-      isDraftMode={preview.isEnabled}
-      isAuthenticated={Boolean(sessionToken)}
-    >
+    <Layout className="flex flex-col items-center" isDraftMode={preview.isEnabled}>
       <article className="flex w-full flex-col items-center">
         <PostHeader
           header={data.post.title ?? ''}

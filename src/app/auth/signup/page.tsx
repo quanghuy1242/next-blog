@@ -40,7 +40,7 @@ export default async function BlogAuthSignupPage({ searchParams }: SignupPagePro
   }
 
   return (
-    <Layout header="Blog" className="flex flex-col items-center">
+    <Layout className="flex flex-col items-center">
       <Container className="my-4 w-full md:px-20">
         <CenteredPanel>
           <p className="text-sm font-semibold uppercase tracking-wide text-blue">

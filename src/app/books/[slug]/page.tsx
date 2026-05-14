@@ -142,12 +142,7 @@ export default async function BookPage({ params }: BookPageProps) {
   });
 
   return (
-    <Layout
-      header={data.homepage?.header}
-      className="flex flex-col items-center"
-      isAuthenticated={data.isAuthenticated}
-      isDraftMode={data.isDraftMode}
-    >
+    <Layout className="flex flex-col items-center" isDraftMode={data.isDraftMode}>
       <Container className="my-4 w-full md:px-20">
         <div className="mx-auto w-full md:w-2/3">
           <div className="mb-4 flex items-start justify-between gap-4">

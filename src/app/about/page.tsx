@@ -25,7 +25,7 @@ export default async function AboutPage() {
   const data = await getAboutPageData();
 
   return (
-    <Layout header={data.homepage?.header} className="flex flex-col items-center">
+    <Layout className="flex flex-col items-center">
       <Container className="my-4 flex flex-col items-center px-4 md:px-20">
         <h1 className="mb-6 text-4xl font-bold">{data.author?.fullName}</h1>
         <div className="w-full max-w-4xl">

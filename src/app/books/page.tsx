@@ -24,11 +24,7 @@ export default async function BooksPage() {
   });
 
   return (
-    <Layout
-      header={data.homepage?.header}
-      className="flex flex-col items-center"
-      isAuthenticated={Boolean(sessionToken)}
-    >
+    <Layout className="flex flex-col items-center">
       <BooksPageClient
         initialBooks={data.books}
         initialHasMore={data.hasMore}

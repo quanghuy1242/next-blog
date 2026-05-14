@@ -21,10 +21,8 @@ export async function generateMetadata() {
 }
 
 export default async function CategoriesPage() {
-  const { data } = await getCategoriesPageData();
-
   return (
-    <Layout header={data.homepage?.header}>
+    <Layout>
       <Container className="flex flex-col md:flex-row md:px-20">
         <NotYetImplemented />
       </Container>

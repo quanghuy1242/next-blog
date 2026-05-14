@@ -4,6 +4,8 @@ import type { ReactNode } from 'react';
 
 import { Providers } from './providers';
 import { GA_TRACKING_ID } from '@/lib/analytics/gtag';
+import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
+import { getHomepageHeader } from '@/lib/payload/index';
 import '@/styles/index.css';
 
 export const metadata: Metadata = {
@@ -27,7 +29,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const homepage = await getHomepageHeader({ cache: ONE_HOUR_PAYLOAD_CACHE });
+
   return (
     <html lang="en">
       <body>
@@ -47,7 +51,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             });
           `}
         </Script>
-        <Providers>{children}</Providers>
+        <Providers headerText={homepage?.header}>{children}</Providers>
       </body>
     </html>
   );

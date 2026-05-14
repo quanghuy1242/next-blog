@@ -66,7 +66,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const data = await loadHomePageData(await searchParams);
 
   return (
-    <Layout header={data.homepage?.header} className="flex flex-col items-center">
+    <Layout className="flex flex-col items-center">
       <HomePageClient {...data} />
     </Layout>
   );

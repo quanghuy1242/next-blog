@@ -1,7 +1,6 @@
 'use client';
 
 import cn from 'classnames';
-import { useAppContext } from '@/context/state';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -76,29 +75,15 @@ interface HeaderProps {
 }
 
 export function Header({ text, isAuthenticated }: HeaderProps) {
-  const {
-    authState: contextAuthState,
-    header,
-    setAuthState: setContextAuthState,
-  } = useAppContext();
   const pathname = usePathname();
-  const [authState, setAuthState] = useState<boolean | null>(
-    typeof isAuthenticated === 'boolean' ? isAuthenticated : contextAuthState
-  );
+  const [authState, setAuthState] = useState<boolean | null>(isAuthenticated ?? null);
   const [returnTo, setReturnTo] = useState(pathname || '/');
 
   useEffect(() => {
     if (typeof isAuthenticated === 'boolean') {
       setAuthState(isAuthenticated);
-      setContextAuthState(isAuthenticated);
     }
-  }, [isAuthenticated, setContextAuthState]);
-
-  useEffect(() => {
-    if (typeof isAuthenticated !== 'boolean' && contextAuthState !== null) {
-      setAuthState(contextAuthState);
-    }
-  }, [contextAuthState, isAuthenticated]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (window.location.pathname === pathname) {
@@ -130,7 +115,6 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
 
         if (!cancelled && typeof data.isAuthenticated === 'boolean') {
           setAuthState(data.isAuthenticated);
-          setContextAuthState(data.isAuthenticated);
         }
       } catch {
         // Keep the current UI state when the auth probe fails.
@@ -157,7 +141,7 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleWindowFocus);
     };
-  }, [pathname, setContextAuthState]);
+  }, [pathname]);
 
   const authItems = authState
     ? [
@@ -199,7 +183,7 @@ export function Header({ text, isAuthenticated }: HeaderProps) {
         'bg-blue shadow-dark'
       )}
     >
-      <HeaderTitle text={text || header} link="/" />
+      <HeaderTitle text={text || 'Birdless Sky'} link="/" />
       <div className="flex-grow" />
       <Option items={authItems} />
     </div>

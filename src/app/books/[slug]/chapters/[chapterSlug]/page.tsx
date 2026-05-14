@@ -126,12 +126,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const data = await getCachedChapterPageData(resolvedParams.slug, resolvedParams.chapterSlug);
 
   return (
-    <Layout
-      header={data.homepage?.header}
-      className="flex flex-col items-center"
-      isAuthenticated={data.isAuthenticated}
-      isDraftMode={data.isDraftMode}
-    >
+    <Layout className="flex flex-col items-center" isDraftMode={data.isDraftMode}>
       <ChapterReaderClient {...data} />
     </Layout>
   );
