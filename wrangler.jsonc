@@ -3,8 +3,8 @@
   "name": "next-blog-payloadcms",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-04-21",
-  "workers_dev": true,
-  "preview_urls": true,
+  "workers_dev": false,
+  "preview_urls": false,
   "routes": [
     {
       "pattern": "blog.quanghuy.dev",
@@ -50,5 +50,33 @@
         "DOQueueHandler"
       ]
     }
-  ]
+  ],
+  "env": {
+    "preview": {
+      "name": "next-blog-payloadcms-preview",
+      "workers_dev": true,
+      "preview_urls": true,
+      "routes": [],
+      "services": [
+        {
+          "binding": "WORKER_SELF_REFERENCE",
+          "service": "next-blog-payloadcms-preview"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "NEXT_INC_CACHE_R2_BUCKET",
+          "bucket_name": "next-blog-incremental-cache"
+        }
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "NEXT_CACHE_DO_QUEUE",
+            "class_name": "DOQueueHandler"
+          }
+        ]
+      }
+    }
+  }
 }

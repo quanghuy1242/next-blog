@@ -119,7 +119,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: 4.91.0
-          command: versions upload
+          command: deploy --env preview
           preCommands: pnpm exec opennextjs-cloudflare build
           secrets: |
             AUTH_BASE_URL
