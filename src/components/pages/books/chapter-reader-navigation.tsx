@@ -1,6 +1,6 @@
 import type { Chapter } from '@/types/cms';
 import { buildChapterHref } from '@/lib/domain/books/routes';
-import { TextLink } from '@/components/shared/ui/text-link';
+import { TextLink } from '@/components/ui/aria/link';
 
 interface ChapterReaderNavigationProps {
   bookId: number;

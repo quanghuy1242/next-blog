@@ -1,8 +1,8 @@
 import { getAboutPageData } from '@/lib/server/about/page-data';
 import { getCoverImageUrl } from '@/lib/shared/image';
 import { buildMetadata } from '@/lib/shared/metadata';
-import { Container } from '@/components/core/container';
-import { Layout } from '@/components/core/layout';
+import { PageSection } from '@/components/layout/page-section';
+import { PageShell } from '@/components/layout/page-shell';
 import { LexicalRenderer } from '@/components/shared/lexical-renderer';
 
 export const revalidate = 3600;
@@ -21,17 +21,15 @@ export default async function AboutPage() {
   const data = await getAboutPageData();
 
   return (
-    <Layout className="flex flex-col items-center">
-      <Container className="my-4 flex flex-col items-center px-4 md:px-20">
+    <PageShell className="flex flex-col items-center">
+      <PageSection width="wide" className="flex flex-col items-center px-4 md:px-20">
         <h1 className="mb-6 text-4xl font-bold">{data.author?.fullName}</h1>
-        <div className="w-full max-w-4xl">
-          <LexicalRenderer
-            data={data.author?.bio}
-            className="max-w-none"
-            fallback={<div className="italic text-gray-500">No bio available.</div>}
-          />
-        </div>
-      </Container>
-    </Layout>
+        <LexicalRenderer
+          data={data.author?.bio}
+          className="max-w-none"
+          fallback={<div className="italic text-gray-500">No bio available.</div>}
+        />
+      </PageSection>
+    </PageShell>
   );
 }

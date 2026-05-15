@@ -1,5 +1,9 @@
 # Blog UI Shared Style Plan
 
+> Superseded on 2026-05-15 by `docs/ui-architecture.md` and `docs/react-aria-daisyui-ui-migration-plan.md`.
+> The old `src/components/shared/ui/**` primitive layer described below has been removed.
+> New app code should use `src/components/ui/aria/**`, `src/components/ui/surface/**`, and `src/components/layout/**`.
+
 ## Scope
 
 This plan covers the style mismatch on `pages/auth/signup.tsx` and the duplicated button, card, and form styling found in the books flow.

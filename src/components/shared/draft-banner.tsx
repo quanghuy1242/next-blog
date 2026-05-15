@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { TextLink } from '@/components/ui/aria/link';
 
 interface DraftBannerProps {
   exitHref?: string;
@@ -6,15 +6,15 @@ interface DraftBannerProps {
 
 export function DraftBanner({ exitHref = '/api/draft-exit' }: DraftBannerProps) {
   return (
-    <div className="fixed inset-x-0 top-0 z-50 border-b border-yellow-400 bg-yellow-50 px-4 py-2 text-center text-sm text-yellow-800">
+    <div className="alert alert-warning fixed inset-x-0 top-0 z-50 justify-center rounded-none px-4 py-2 text-center text-sm">
       <p>
         <strong>Draft Mode</strong> — You are viewing an unpublished draft.{' '}
-        <Link
+        <TextLink
           href={exitHref}
-          className="underline hover:text-yellow-900"
+          className="text-warning-content underline hover:text-warning-content"
         >
           Exit draft mode
-        </Link>
+        </TextLink>
       </p>
     </div>
   );

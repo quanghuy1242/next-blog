@@ -1,7 +1,7 @@
 import { cache } from 'react';
 
-import { Container } from '@/components/core/container';
-import { Layout } from '@/components/core/layout';
+import { PageSection } from '@/components/layout/page-section';
+import { PageShell } from '@/components/layout/page-shell';
 import { BookPageClient } from '@/components/pages/books/book-page-client';
 import { getBookPageData, getBookPageMetadataData } from '@/lib/server/books/page-data';
 import { getCoverImageUrl } from '@/lib/shared/image';
@@ -31,16 +31,14 @@ export default async function BookPage({ params }: BookPageProps) {
   const data = await getCachedBookPageData((await params).slug);
 
   return (
-    <Layout className="flex flex-col items-center" isDraftMode={data.isDraftMode}>
-      <Container className="my-4 w-full md:px-20">
-        <div className="mx-auto w-full md:w-2/3">
-          <BookPageClient
-            book={data.book}
-            chapters={data.chapters}
-            isAuthenticated={data.isAuthenticated}
-          />
-        </div>
-      </Container>
-    </Layout>
+    <PageShell className="flex flex-col items-center" isDraftMode={data.isDraftMode}>
+      <PageSection width="content">
+        <BookPageClient
+          book={data.book}
+          chapters={data.chapters}
+          isAuthenticated={data.isAuthenticated}
+        />
+      </PageSection>
+    </PageShell>
   );
 }

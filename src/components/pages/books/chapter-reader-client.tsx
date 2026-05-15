@@ -11,7 +11,8 @@ import type {
   ReadingProgressRecord,
 } from '@/types/cms';
 import { useReadingProgress } from '@/hooks/useReadingProgress';
-import { Container } from '@/components/core/container';
+import { PageSection } from '@/components/layout/page-section';
+import { ReaderLayout } from '@/components/layout/reader-layout';
 import { ChapterContent } from '@/components/pages/books/chapter-content';
 import { ChapterPasswordGate } from '@/components/pages/books/chapter-password-gate';
 import { ChapterReaderHeader } from '@/components/pages/books/chapter-reader-header';
@@ -112,62 +113,60 @@ export function ChapterReaderClient({
   );
 
   return (
-    <Container className="my-4 w-full md:px-20">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start lg:gap-10">
-        <ChapterReaderTocSidebar
+    <PageSection>
+      <ReaderLayout
+        toc={
+          <ChapterReaderTocSidebar
+            book={book}
+            chapter={chapter}
+            chapters={chapters}
+            readingProgressByChapterId={chapterProgressForDisplay}
+          />
+        }
+      >
+        <ChapterReaderHeader
           book={book}
           chapter={chapter}
-          chapters={chapters}
-          readingProgressByChapterId={chapterProgressForDisplay}
+          isAuthenticated={isAuthenticated}
+          shouldRenderChapterTitle={shouldRenderChapterTitle}
+          viewerBookmark={viewerBookmark}
+          viewerStateLoaded={viewerStateLoaded}
+          onOpenToc={openToc}
         />
 
-        <article className="min-w-0 lg:col-span-9 lg:self-start xl:col-span-10">
-          <div className="mx-auto max-w-3xl">
-            <ChapterReaderHeader
-              book={book}
-              chapter={chapter}
-              isAuthenticated={isAuthenticated}
-              shouldRenderChapterTitle={shouldRenderChapterTitle}
-              viewerBookmark={viewerBookmark}
-              viewerStateLoaded={viewerStateLoaded}
-              onOpenToc={openToc}
-            />
+        <ReadingProgressBar progress={currentReadingProgress} />
 
-            <ReadingProgressBar progress={currentReadingProgress} />
-
-            {isChapterLocked ? (
-              <ChapterPasswordGate
-                chapterId={chapter.id}
-                onUnlocked={handleChapterUnlocked}
-              />
-            ) : (
-              <div ref={chapterContentRef}>
-                <ChapterContent
-                  content={chapter.content}
-                  bookId={book.id}
-                  bookSlug={book.slug}
-                  chapters={chapters}
-                />
-              </div>
-            )}
-
-            {!isChapterLocked ? (
-              <CommentsSection
-                chapterId={String(chapter.id)}
-                initialData={initialComments}
-                refreshOnMount={initialComments == null}
-              />
-            ) : null}
-
-            <ChapterReaderNavigation
+        {isChapterLocked ? (
+          <ChapterPasswordGate
+            chapterId={chapter.id}
+            onUnlocked={handleChapterUnlocked}
+          />
+        ) : (
+          <div ref={chapterContentRef}>
+            <ChapterContent
+              content={chapter.content}
               bookId={book.id}
               bookSlug={book.slug}
-              previousChapter={previousChapter}
-              nextChapter={nextChapter}
+              chapters={chapters}
             />
           </div>
-        </article>
-      </div>
+        )}
+
+        {!isChapterLocked ? (
+          <CommentsSection
+            chapterId={String(chapter.id)}
+            initialData={initialComments}
+            refreshOnMount={initialComments == null}
+          />
+        ) : null}
+
+        <ChapterReaderNavigation
+          bookId={book.id}
+          bookSlug={book.slug}
+          previousChapter={previousChapter}
+          nextChapter={nextChapter}
+        />
+      </ReaderLayout>
 
       <ChapterReaderTocDrawer
         book={book}
@@ -177,6 +176,6 @@ export function ChapterReaderClient({
         onClose={closeToc}
         readingProgressByChapterId={chapterProgressForDisplay}
       />
-    </Container>
+    </PageSection>
   );
 }

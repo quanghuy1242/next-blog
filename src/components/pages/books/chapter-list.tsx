@@ -1,8 +1,9 @@
 import React from 'react';
-import Link from 'next/link';
 import type { Chapter } from '@/types/cms';
 import { buildChapterHref } from '@/lib/domain/books/routes';
 import { ChapterLockBadge } from './chapter-lock-badge';
+import { TextLink } from '@/components/ui/aria/link';
+import { Badge } from '@/components/ui/surface/badge';
 
 interface ChapterListProps {
   chapters: Chapter[];
@@ -26,23 +27,23 @@ export function ChapterList({ chapters, bookId, bookSlug, readingProgressByChapt
         const progress = readingProgressByChapterId?.[chapter.id];
         return (
           <li key={`${chapter.slug}-${chapter.order}`}>
-            <Link
+            <TextLink
               href={buildChapterHref(bookId, bookSlug, chapter.slug)}
               prefetch={false}
-              className="flex items-center justify-between rounded border border-gray-200 px-3 py-2 hover:border-gray-300"
+              className="flex items-center justify-between rounded border border-base-300 px-3 py-2 text-base-content no-underline hover:border-base-content/30 hover:no-underline"
             >
               <span className="min-w-0 flex-1 text-sm font-medium text-gray-900">
                 {chapter.title}
               </span>
               <span className="flex shrink-0 items-center gap-2">
                 {progress != null && progress > 0 ? (
-                  <span className="text-xs font-semibold tabular-nums text-gray-500">
+                  <Badge variant="outline" className="text-xs font-semibold tabular-nums text-base-content/60">
                     {formatProgress(progress)}
-                  </span>
+                  </Badge>
                 ) : null}
                 {chapter.hasPassword ? <ChapterLockBadge className="ml-3" /> : null}
               </span>
-            </Link>
+            </TextLink>
           </li>
         );
       })}

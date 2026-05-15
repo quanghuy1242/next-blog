@@ -1,4 +1,4 @@
-import { Layout } from '@/components/core/layout';
+import { PageShell } from '@/components/layout/page-shell';
 import { BooksPageClient } from '@/components/pages/books/books-page-client';
 import { getBooksListPageData } from '@/lib/server/books/list-data';
 import { buildMetadata } from '@/lib/shared/metadata';
@@ -17,12 +17,12 @@ export default async function BooksPage() {
   const data = await getBooksListPageData();
 
   return (
-    <Layout className="flex flex-col items-center">
+    <PageShell className="flex flex-col items-center">
       <BooksPageClient
         initialBooks={data.books}
         initialHasMore={data.hasMore}
         isAuthenticated={data.isAuthenticated}
       />
-    </Layout>
+    </PageShell>
   );
 }

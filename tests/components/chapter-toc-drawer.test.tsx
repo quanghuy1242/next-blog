@@ -69,9 +69,9 @@ describe('ChapterTocDrawer component', () => {
       </ChapterTocDrawer>
     );
 
-    const panel = screen.getByRole('dialog').querySelector('[tabindex="-1"]');
+    const panel = document.querySelector('.modal-box');
 
-    expect(panel).toHaveStyle({ height: '80vh' });
+    expect(panel).toHaveClass('h-[80vh]');
     expect(panel).toHaveClass('overflow-hidden');
   });
 });

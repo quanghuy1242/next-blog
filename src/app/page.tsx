@@ -1,6 +1,6 @@
 import { getHomePageData } from '@/lib/server/home/page-data';
 import { buildMetadata } from '@/lib/shared/metadata';
-import { Layout } from '@/components/core/layout';
+import { PageShell } from '@/components/layout/page-shell';
 import { HomePageClient } from '@/components/pages/index/home-page-client';
 
 interface HomePageProps {
@@ -21,8 +21,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const data = await getHomePageData(await searchParams);
 
   return (
-    <Layout className="flex flex-col items-center">
+    <PageShell className="flex flex-col items-center">
       <HomePageClient {...data} />
-    </Layout>
+    </PageShell>
   );
 }

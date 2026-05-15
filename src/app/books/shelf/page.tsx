@@ -1,5 +1,5 @@
-import { Container } from '@/components/core/container';
-import { Layout } from '@/components/core/layout';
+import { PageSection } from '@/components/layout/page-section';
+import { PageShell } from '@/components/layout/page-shell';
 import { BooksShelfContent } from '@/components/pages/books/books-shelf-content';
 import { getBooksShelfData } from '@/lib/server/books/shelf-data';
 import { getAuthTokenFromAppRequest } from '@/lib/server/app-request';
@@ -21,16 +21,14 @@ export default async function BooksShelfPage() {
     : { visibleBookBookmarks: [], visibleChapterBookmarks: [] };
 
   return (
-    <Layout className="flex flex-col items-center">
-      <Container className="my-4 w-full md:px-20">
-        <div className="mx-auto w-full md:w-2/3">
-          <BooksShelfContent
-            isAuthenticated={Boolean(sessionToken)}
-            visibleBookBookmarks={shelfData.visibleBookBookmarks}
-            visibleChapterBookmarks={shelfData.visibleChapterBookmarks}
-          />
-        </div>
-      </Container>
-    </Layout>
+    <PageShell className="flex flex-col items-center">
+      <PageSection width="content">
+        <BooksShelfContent
+          isAuthenticated={Boolean(sessionToken)}
+          visibleBookBookmarks={shelfData.visibleBookBookmarks}
+          visibleChapterBookmarks={shelfData.visibleChapterBookmarks}
+        />
+      </PageSection>
+    </PageShell>
   );
 }

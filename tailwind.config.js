@@ -1,10 +1,11 @@
 module.exports = {
   content: [
-    './app/**/*.{js,jsx,ts,tsx}',
-    './pages/**/*.{js,jsx,ts,tsx}',
-    './components/**/*.{js,jsx,ts,tsx}',
-    './common/**/*.{js,jsx,ts,tsx}',
-    './hooks/**/*.{js,jsx,ts,tsx}',
+    './src/app/**/*.{js,jsx,ts,tsx}',
+    './src/components/**/*.{js,jsx,ts,tsx}',
+    './src/hooks/**/*.{js,jsx,ts,tsx}',
+    './src/lib/**/*.{js,jsx,ts,tsx}',
+    './src/types/**/*.{js,jsx,ts,tsx}',
+    './tests/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
     extend: {

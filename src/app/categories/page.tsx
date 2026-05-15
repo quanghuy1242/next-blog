@@ -1,7 +1,7 @@
 import { getCategoriesPageData } from '@/lib/server/categories/page-data';
 import { buildMetadata } from '@/lib/shared/metadata';
-import { Container } from '@/components/core/container';
-import { Layout } from '@/components/core/layout';
+import { PageSection } from '@/components/layout/page-section';
+import { PageShell } from '@/components/layout/page-shell';
 import { Categories } from '@/components/shared/categories';
 import { Text } from '@/components/shared/text';
 
@@ -21,13 +21,11 @@ export default async function CategoriesPage() {
   const data = await getCategoriesPageData();
 
   return (
-    <Layout>
-      <Container className="my-4 w-full md:px-20">
-        <div className="mx-auto w-full md:w-2/3">
-          <Text text="Categories" />
-          <Categories categories={data.allCategories} />
-        </div>
-      </Container>
-    </Layout>
+    <PageShell>
+      <PageSection width="content">
+        <Text text="Categories" />
+        <Categories categories={data.allCategories} />
+      </PageSection>
+    </PageShell>
   );
 }

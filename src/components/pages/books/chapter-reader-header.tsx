@@ -1,8 +1,9 @@
 import type { Book, BookmarkRecord, Chapter } from '@/types/cms';
+import { List } from 'lucide-react';
 import { buildBookHref } from '@/lib/domain/books/routes';
 import { BookmarkButton } from '@/components/shared/bookmark-button';
-import { Button } from '@/components/shared/ui/button';
-import { TextLink } from '@/components/shared/ui/text-link';
+import { Button } from '@/components/ui/aria/button';
+import { TextLink } from '@/components/ui/aria/link';
 
 interface ChapterReaderHeaderProps {
   book: Book;
@@ -59,11 +60,11 @@ export function ChapterReaderHeader({
       <div className="flex shrink-0 items-center gap-2 self-start">
         <Button
           type="button"
-          onClick={onOpenToc}
+          onPress={onOpenToc}
           variant="secondary"
           className="gap-2 px-3 lg:hidden"
         >
-          <TocIcon />
+          <List aria-hidden className="h-4 w-4 text-base-content/60" />
           <span>Table of contents</span>
         </Button>
         <BookmarkButton
@@ -75,21 +76,5 @@ export function ChapterReaderHeader({
         />
       </div>
     </div>
-  );
-}
-
-function TocIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-4 w-4 text-gray-500">
-      <circle cx="3.5" cy="5" r="1.25" fill="currentColor" />
-      <circle cx="3.5" cy="10" r="1.25" fill="currentColor" />
-      <circle cx="3.5" cy="15" r="1.25" fill="currentColor" />
-      <path
-        d="M7 5h9M7 10h9M7 15h9"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
   );
 }

@@ -1,8 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
 import cn from 'classnames';
+import { Bookmark } from 'lucide-react';
 import type { Media } from '@/types/cms';
 import { ResponsiveImageMarkup } from './responsive-image-markup';
+import { TextLink } from '@/components/ui/aria/link';
+import { Badge } from '@/components/ui/surface/badge';
 
 const BOOK_COVER_WIDTH = 1026;
 const BOOK_COVER_HEIGHT = 1500;
@@ -57,27 +59,17 @@ export function BookCover({
     <div className="relative">
       {cover}
       {typeof readingProgressPct === 'number' && readingProgressPct > 0 ? (
-        <span className="pointer-events-none absolute left-2 top-2 inline-flex min-w-11 items-center justify-center rounded-full bg-white/95 px-2 py-1 text-[11px] font-semibold tabular-nums text-gray-800 shadow-small">
+        <Badge className="pointer-events-none absolute left-2 top-2 min-w-11 justify-center bg-base-100/95 px-2 py-1 text-[11px] font-semibold tabular-nums text-base-content shadow-small">
           {readingProgressPct}%
-        </span>
+        </Badge>
       ) : null}
       {isBookmarked ? (
-        <span className="pointer-events-none absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue text-white shadow-small">
-          <svg
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            stroke="currentColor"
-            strokeWidth={1.5}
-            className="h-4 w-4"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-            />
-          </svg>
-        </span>
+        <Badge
+          variant="primary"
+          className="pointer-events-none absolute right-2 top-2 h-8 w-8 justify-center rounded-full p-0 shadow-small"
+        >
+          <Bookmark aria-hidden className="h-4 w-4 fill-current" />
+        </Badge>
       ) : null}
     </div>
   );
@@ -87,8 +79,8 @@ export function BookCover({
   }
 
   return (
-    <Link href={href} prefetch={false} className="block">
+    <TextLink href={href} prefetch={false} className="block no-underline hover:no-underline">
       {coverWithIndicator}
-    </Link>
+    </TextLink>
   );
 }

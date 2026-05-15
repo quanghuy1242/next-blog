@@ -1,9 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
 import cn from 'classnames';
 import type { Chapter } from '@/types/cms';
 import { buildChapterHref } from '@/lib/domain/books/routes';
 import { ChapterLockBadge } from './chapter-lock-badge';
+import { TextLink } from '@/components/ui/aria/link';
+import { Badge } from '@/components/ui/surface/badge';
 
 interface ChapterTocProps {
   chapters: Chapter[];
@@ -28,30 +29,30 @@ export function ChapterToc({
 }: ChapterTocProps) {
   return (
     <nav aria-label="Chapter table of contents">
-      <ul className="space-y-2">
+      <ul className="menu space-y-1 p-0">
         {chapters.map((chapter) => {
           const progress = readingProgressByChapterId?.[chapter.id];
           return (
             <li key={`${chapter.slug}-${chapter.order}`}>
-              <Link
+              <TextLink
                 href={buildChapterHref(bookId, bookSlug, chapter.slug)}
                 prefetch={false}
                 onClick={onNavigate}
                 className={cn(
-                  'flex items-center gap-2 text-sm text-gray-700 hover:underline',
+                  'flex items-center gap-2 rounded text-sm text-base-content/70 no-underline hover:no-underline',
                   chapter.slug === currentChapterSlug
-                    ? 'font-semibold text-gray-900'
+                    ? 'font-semibold text-base-content'
                     : ''
                 )}
               >
                 <span className="break-words relative -top-[2px]">{chapter.title}</span>
                 {progress != null && progress > 0 ? (
-                  <span className="shrink-0 text-[11px] font-semibold tabular-nums text-gray-400">
+                  <Badge variant="outline" className="shrink-0 text-[11px] font-semibold tabular-nums text-base-content/50">
                     {formatProgress(progress)}
-                  </span>
+                  </Badge>
                 ) : null}
                 {chapter.hasPassword ? <ChapterLockBadge compact className="ml-1 align-text-bottom" /> : null}
-              </Link>
+              </TextLink>
             </li>
           );
         })}

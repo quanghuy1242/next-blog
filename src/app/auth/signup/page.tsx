@@ -1,10 +1,10 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { Container } from '@/components/core/container';
-import { Layout } from '@/components/core/layout';
-import { ButtonLink } from '@/components/shared/ui/button';
-import { CenteredPanel } from '@/components/shared/ui/panel';
+import { PageSection } from '@/components/layout/page-section';
+import { PageShell } from '@/components/layout/page-shell';
+import { ButtonLink } from '@/components/ui/aria/button';
+import { CenteredPanel } from '@/components/ui/surface/card';
 import { createBlogSignupIntent } from '@/lib/domain/auth/signup';
 import { normalizeReturnTo } from '@/lib/domain/auth/oauth';
 
@@ -40,10 +40,10 @@ export default async function BlogAuthSignupPage({ searchParams }: SignupPagePro
   }
 
   return (
-    <Layout className="flex flex-col items-center">
-      <Container className="my-4 w-full md:px-20">
+    <PageShell className="flex flex-col items-center">
+      <PageSection width="full">
         <CenteredPanel>
-          <p className="text-sm font-semibold uppercase tracking-wide text-blue">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">
             Account access
           </p>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
@@ -66,7 +66,7 @@ export default async function BlogAuthSignupPage({ searchParams }: SignupPagePro
             </ButtonLink>
           </div>
         </CenteredPanel>
-      </Container>
-    </Layout>
+      </PageSection>
+    </PageShell>
   );
 }
