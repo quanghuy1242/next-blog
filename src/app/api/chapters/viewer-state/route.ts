@@ -3,6 +3,12 @@ import { NextRequest } from 'next/server';
 import { getChapterViewerState } from '@/lib/payload/book-viewer-state';
 import { getAuthTokenFromNextRequest, methodNotAllowed, noStoreJson } from '@/lib/server/http';
 
+/**
+ * Mutable authenticated state endpoint for the reader chrome.
+ *
+ * Chapter content is served by the route loader; this endpoint only supplies live
+ * bookmark/progress data that can hydrate after the article is already visible.
+ */
 export async function GET(request: NextRequest) {
   const sessionToken = getAuthTokenFromNextRequest(request);
   const bookIdResult = parsePositiveInteger(request.nextUrl.searchParams.get('bookId'), 'bookId');

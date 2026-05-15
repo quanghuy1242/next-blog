@@ -35,6 +35,12 @@ interface BooksViewerStateResponse {
   books?: BookCardViewerState[];
 }
 
+/**
+ * Book cards render from base server data first, then hydrate bookmark/progress badges.
+ *
+ * Keep this separate from `/api/books`: list pagination should stay content-focused,
+ * while `/api/books/viewer-state` supplies mutable per-user state after render.
+ */
 export function BooksPageClient({
   initialBooks,
   initialHasMore,
@@ -75,6 +81,7 @@ export function BooksPageClient({
     [booksState.books, viewerStateByBookId]
   );
 
+  // Replay the last known state before paint so repeat visits do not flash empty badges.
   useLayoutEffect(() => {
     if (!isAuthenticated || visibleBookIds.length === 0) {
       return;
@@ -90,6 +97,7 @@ export function BooksPageClient({
     }
   }, [isAuthenticated, visibleBookIdsKey, visibleBookIds]);
 
+  // Refresh badges in the background; the local snapshot only smooths perceived latency.
   const refreshViewerState = useCallback(async (force = false) => {
     if (!isAuthenticated || visibleBookIds.length === 0) {
       return;

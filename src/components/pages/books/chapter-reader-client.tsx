@@ -46,6 +46,13 @@ interface ChapterReaderClientProps {
   initialBookmark?: BookmarkRecord | null;
 }
 
+/**
+ * Reader content should not wait for per-user state.
+ *
+ * The page loader provides the chapter body and table of contents. This client layer
+ * replays cached viewer state immediately, then refreshes bookmark/progress from
+ * `/api/chapters/viewer-state`. Comments also load below the article after mount.
+ */
 export function ChapterReaderClient({
   book,
   chapter,
@@ -79,6 +86,8 @@ export function ChapterReaderClient({
         : undefined,
     [viewerReadingProgress]
   );
+
+  // Preserve compatibility with callers that still pass initial viewer state.
   useEffect(() => {
     if (isAuthenticated && initialBookmark === undefined && readingProgress.length === 0) {
       return;
@@ -94,6 +103,8 @@ export function ChapterReaderClient({
   useEffect(() => {
     viewerReadingProgressRef.current = viewerReadingProgress;
   }, [viewerReadingProgress]);
+
+  // Synchronous local snapshot prevents TOC/bookmark empty-state flicker on repeat visits.
   useLayoutEffect(() => {
     if (!isAuthenticated) {
       return;
@@ -114,6 +125,8 @@ export function ChapterReaderClient({
       setViewerStateLoaded(true);
     }
   }, [book.id, chapter.id, isAuthenticated]);
+
+  // The network refresh is still required for cross-device state and cache correction.
   useEffect(() => {
     if (!isAuthenticated) {
       return;
@@ -185,6 +198,8 @@ export function ChapterReaderClient({
       controller.abort();
     };
   }, [book.id, book.totalWordCount, chapter.id, chapters, isAuthenticated]);
+
+  // Browser reading position is an immediate hint while persisted server progress loads.
   useEffect(() => {
     function syncLocalProgress() {
       setLocalProgressByChapterId(readReadingProgressByChapterId(book.id, chapters));

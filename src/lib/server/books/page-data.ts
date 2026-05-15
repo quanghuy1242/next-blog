@@ -62,6 +62,14 @@ export interface ChapterPageData {
   readingProgress: ReadingProgressRecord[];
 }
 
+/**
+ * Book and chapter page loaders intentionally return base content only.
+ *
+ * Authenticated viewer state such as bookmarks, reading progress, continue-reading,
+ * and comments is fetched after render by the client-side viewer-state layer. Do not
+ * move those live reads back into these loaders unless the route truly cannot render
+ * without them; doing so makes signed-in readers wait on mutable per-user roundtrips.
+ */
 export async function getBookPageMetadataData(slugParam: string): Promise<{ book: Book }> {
   const requestContext = await getPageRequestContext();
   const parsedBookRoute = parseBookRouteSegment(slugParam);
@@ -83,6 +91,10 @@ export async function getBookPageMetadataData(slugParam: string): Promise<{ book
   return { book };
 }
 
+/**
+ * Returns the cache-friendly book shell. Viewer-specific fields stay empty on purpose
+ * and are hydrated by `BookPageClient` from local snapshots plus `/api/books/viewer-state`.
+ */
 export async function getBookPageData(slugParam: string): Promise<BookPageData> {
   const requestContext = await getPageRequestContext();
   const parsedBookRoute = parseBookRouteSegment(slugParam);
@@ -115,6 +127,10 @@ export async function getBookPageData(slugParam: string): Promise<BookPageData> 
   };
 }
 
+/**
+ * Metadata can still use the base chapter payload because SEO data is content-owned,
+ * not viewer-owned.
+ */
 export async function getChapterPageMetadataData(
   bookSlugParam: string,
   chapterSlug: string
@@ -139,6 +155,10 @@ export async function getChapterPageMetadataData(
   return { book, chapter };
 }
 
+/**
+ * Returns chapter content without waiting for bookmark/progress/comment state.
+ * `ChapterReaderClient` owns those live reads so the article body can appear first.
+ */
 export async function getChapterPageData(
   bookSlugParam: string,
   chapterSlug: string

@@ -10,6 +10,13 @@ import { getAuthTokenFromNextRequest, methodNotAllowed, noStoreJson } from '@/li
 
 const MAX_BOOK_IDS = 50;
 
+/**
+ * Mutable authenticated state endpoint for book UI.
+ *
+ * Keep this no-store and separate from `/api/books`. The list/detail pages should
+ * render base content first, then call this endpoint for per-user badges, bookmarks,
+ * whole-book progress, and continue-reading data.
+ */
 export async function GET(request: NextRequest) {
   const sessionToken = getAuthTokenFromNextRequest(request);
   const parsedBookIds = parseBookIds(request.nextUrl.searchParams);

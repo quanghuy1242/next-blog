@@ -6,6 +6,14 @@ const BOOK_DETAIL_PREFIX = 'book-viewer-state:detail:';
 const BOOK_CARD_PREFIX = 'book-viewer-state:card:';
 const CHAPTER_BOOKMARK_PREFIX = 'book-viewer-state:chapter-bookmark:';
 
+/**
+ * Browser-only UX cache for authenticated book viewer state.
+ *
+ * This is not an authorization or data-consistency layer. It only replays the last
+ * successful bookmark/progress payload before paint so repeat navigations do not flash
+ * from empty state to hydrated state. Fresh no-store viewer-state requests still run
+ * after render and remain the cross-device source of truth.
+ */
 export interface CachedBookCardViewerState {
   bookId: number;
   isBookmarked: boolean;

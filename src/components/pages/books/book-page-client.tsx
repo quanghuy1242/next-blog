@@ -43,6 +43,13 @@ interface BooksViewerStateResponse {
   detail?: BookDetailViewerState | null;
 }
 
+/**
+ * Hydrates live book viewer state after the server has already rendered content.
+ *
+ * This is intentionally client-owned: the server route returns the book/chapter shell
+ * fast, this component uses the last local snapshot to avoid flicker, then refreshes
+ * from `/api/books/viewer-state` for cross-device correctness.
+ */
 export function BookPageClient({
   book,
   chapters,
@@ -76,6 +83,7 @@ export function BookPageClient({
     setViewerStateLoaded(false);
   }, [book.id, isAuthenticated]);
 
+  // Local reading positions are instant hints; server progress still wins when it arrives.
   useEffect(() => {
     if (!isAuthenticated) {
       return;
@@ -93,6 +101,7 @@ export function BookPageClient({
     };
   }, [book.id, chapters, isAuthenticated]);
 
+  // Always refresh in the background. The local snapshot is a UX cache, not authority.
   useEffect(() => {
     if (!isAuthenticated) {
       setViewerState(null);

@@ -68,6 +68,12 @@ export interface ChapterViewerState {
   readingProgressByChapterId?: Record<number, number>;
 }
 
+/**
+ * Server-side aggregation for live book-card state.
+ *
+ * This helper intentionally returns only UI-ready viewer fields. It is called by
+ * no-store route handlers after the page shell renders, not by the main page loaders.
+ */
 export async function getBookCardsViewerState(
   bookIds: number[],
   options: {
@@ -117,6 +123,10 @@ export async function getBookCardsViewerState(
   });
 }
 
+/**
+ * Builds the detail-page viewer state that used to block `/books/[slug]`.
+ * Keep this behind `/api/books/viewer-state?detail=1` so content rendering stays fast.
+ */
 export async function getBookDetailViewerState(
   book: Pick<Book, 'id' | 'totalWordCount'>,
   chapters: Array<Pick<Chapter, 'id' | 'slug' | 'chapterWordCount'>>,
@@ -145,6 +155,11 @@ export async function getBookDetailViewerState(
   };
 }
 
+/**
+ * Builds the reader-specific viewer state that used to block chapter pages.
+ * Comments are intentionally not included; they load through the comments client below
+ * the article content.
+ */
 export async function getChapterViewerState(
   bookId: number,
   chapterId: number,

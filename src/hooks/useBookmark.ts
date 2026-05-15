@@ -150,6 +150,8 @@ export function useBookmark({
   };
 }
 
+// Keep optimistic bookmark mutations in sync with the viewer-state snapshot cache.
+// Otherwise the next navigation can replay stale bookmark UI until the refresh returns.
 function persistCachedBookmarkState(
   contentType: 'chapter' | 'book',
   contentId: number,
