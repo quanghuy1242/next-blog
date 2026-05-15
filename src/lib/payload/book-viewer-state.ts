@@ -6,8 +6,15 @@ import type {
   Chapter,
   ReadingProgressRecord,
 } from '@/types/cms';
+import type {
+  BookCardViewerState,
+  BookDetailViewerState,
+  ChapterViewerState,
+} from '@/types/book-viewer-state';
 import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
+import { progressByChapterIdFromRecords } from '@/lib/reading/progress-maps';
 import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
+import { uniquePositiveIntegers } from '@/lib/utils/number';
 import { fetchAPIWithAuthToken } from './base';
 import { fetchBookPageViewerPayload } from './book-pages';
 import { getChapterProgressMetadataByBookIds } from './chapters';
@@ -46,28 +53,6 @@ interface BookmarksByBookIdsResponse {
   } | null;
 }
 
-export interface BookCardViewerState {
-  bookId: number;
-  isBookmarked: boolean;
-  bookmarkId: number | null;
-  readingProgressPct: number;
-}
-
-export interface BookDetailViewerState {
-  bookId: number;
-  bookmark: BookmarkRecord | null;
-  readingProgress: ReadingProgressRecord[];
-  readingProgressByChapterId?: Record<number, number>;
-  continueReadingChapterSlug: string | null;
-  wholeBookProgress: number;
-}
-
-export interface ChapterViewerState {
-  bookmark: BookmarkRecord | null;
-  readingProgress: ReadingProgressRecord[];
-  readingProgressByChapterId?: Record<number, number>;
-}
-
 /**
  * Server-side aggregation for live book-card state.
  *
@@ -82,7 +67,7 @@ export async function getBookCardsViewerState(
     draftMode?: boolean;
   } = {}
 ): Promise<BookCardViewerState[]> {
-  const uniqueBookIds = normalizeIds(bookIds);
+  const uniqueBookIds = uniquePositiveIntegers(bookIds);
 
   if (!options.authToken || uniqueBookIds.length === 0) {
     return [];
@@ -145,7 +130,7 @@ export async function getBookDetailViewerState(
     bookId: book.id,
     bookmark: viewerPayload.bookmark,
     readingProgress,
-    readingProgressByChapterId: buildReadingProgressByChapterId(readingProgress),
+    readingProgressByChapterId: progressByChapterIdFromRecords(readingProgress),
     continueReadingChapterSlug: getContinueReadingChapterSlug(chapters, readingProgress),
     wholeBookProgress: calculateWholeBookProgress({
       chapters,
@@ -212,7 +197,7 @@ export async function getChapterViewerState(
   return {
     bookmark: data?.Bookmarks?.docs?.[0] ?? null,
     readingProgress,
-    readingProgressByChapterId: buildReadingProgressByChapterId(readingProgress),
+    readingProgressByChapterId: progressByChapterIdFromRecords(readingProgress),
   };
 }
 
@@ -249,24 +234,6 @@ async function getBookBookmarksByBookIds(
   );
 
   return data?.Bookmarks?.docs ?? [];
-}
-
-function normalizeIds(ids: number[]): number[] {
-  return Array.from(
-    new Set(ids.filter((id) => Number.isInteger(id) && id > 0))
-  );
-}
-
-function buildReadingProgressByChapterId(records: ReadingProgressRecord[]) {
-  if (!records.length) {
-    return undefined;
-  }
-
-  return Object.fromEntries(
-    records
-      .filter((record) => record.chapterId != null && record.progress != null)
-      .map((record) => [Number(record.chapterId!), record.progress!])
-  );
 }
 
 function emptyBookDetailViewerState(bookId: number): BookDetailViewerState {

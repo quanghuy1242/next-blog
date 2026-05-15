@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { Providers } from './providers';
 import { GA_TRACKING_ID } from '@/lib/analytics/gtag';
 import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
-import { getHomepageHeader } from '@/lib/payload/index';
+import { getHomepageHeader } from '@/lib/payload/home-page-shell';
 import '@/styles/index.css';
 
 export const metadata: Metadata = {

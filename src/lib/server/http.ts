@@ -43,20 +43,6 @@ export async function parseJsonBody<T extends Record<string, unknown>>(request: 
   }
 }
 
-export function getSearchParam(url: URL, key: string) {
-  const value = url.searchParams.get(key);
-  const normalized = value?.trim();
-
-  return normalized ? normalized : null;
-}
-
-export function getAllSearchParams(url: URL, key: string) {
-  return url.searchParams
-    .getAll(key)
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0);
-}
-
 export function getAuthTokenFromNextRequest(request: NextRequest) {
   return getBetterAuthTokenFromRequest({
     cookies: Object.fromEntries(request.cookies.getAll().map((cookie) => [cookie.name, cookie.value])),

@@ -1,5 +1,5 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useBooksFeed } from '@/hooks/useBooksFeed';
+import { useBooksFeed } from '@/hooks/books/useBooksFeed';
 import type { Book } from '@/types/cms';
 import { vi } from 'vitest';
 

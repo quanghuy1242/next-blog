@@ -11,9 +11,9 @@ import { ChapterList } from '@/components/pages/books/chapter-list';
 import {
   mergeProgressByChapterId,
   recordsFromProgressMap,
-} from '@/components/pages/books/chapter-reader-progress';
-import { useBookDetailViewerState } from '@/components/pages/books/use-book-detail-viewer-state';
-import { useLocalChapterProgress } from '@/components/pages/books/use-local-chapter-progress';
+} from '@/lib/reading/progress-maps';
+import { useBookDetailViewerState } from '@/hooks/books/useBookDetailViewerState';
+import { useLocalChapterProgress } from '@/hooks/books/useLocalChapterProgress';
 import { BookmarkButton } from '@/components/shared/bookmark-button';
 import { Text } from '@/components/shared/text';
 import { ButtonLink } from '@/components/shared/ui/button';

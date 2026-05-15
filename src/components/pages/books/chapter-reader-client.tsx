@@ -16,14 +16,14 @@ import { ChapterContent } from '@/components/pages/books/chapter-content';
 import { ChapterPasswordGate } from '@/components/pages/books/chapter-password-gate';
 import { ChapterReaderHeader } from '@/components/pages/books/chapter-reader-header';
 import { ChapterReaderNavigation } from '@/components/pages/books/chapter-reader-navigation';
-import { mergeReaderProgressForDisplay } from '@/components/pages/books/chapter-reader-progress';
+import { mergeReaderProgressForDisplay } from '@/lib/reading/progress-maps';
 import {
   ChapterReaderTocDrawer,
   ChapterReaderTocSidebar,
 } from '@/components/pages/books/chapter-reader-toc';
-import { useChapterNavigation } from '@/components/pages/books/use-chapter-navigation';
-import { useChapterViewerState } from '@/components/pages/books/use-chapter-viewer-state';
-import { useLocalChapterProgress } from '@/components/pages/books/use-local-chapter-progress';
+import { useChapterNavigation } from '@/hooks/books/useChapterNavigation';
+import { useChapterViewerState } from '@/hooks/books/useChapterViewerState';
+import { useLocalChapterProgress } from '@/hooks/books/useLocalChapterProgress';
 import { CommentsSection } from '@/components/shared/comments/CommentsSection';
 import { ReadingProgressBar } from '@/components/shared/reading-progress-bar';
 

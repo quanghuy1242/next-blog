@@ -1,14 +1,20 @@
 import { cache } from 'react';
 
-import { getHomePageShell } from '@/lib/payload/index';
+import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
+import { getHomePageShell } from '@/lib/payload/home-page-shell';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
-import { NotYetImplemented } from '@/components/core/not-yet-implemented';
+import { Categories } from '@/components/shared/categories';
+import { Text } from '@/components/shared/text';
 
 export const revalidate = 60;
 
-const getCategoriesPageData = cache(getHomePageShell);
+const getCategoriesPageData = cache(() =>
+  getHomePageShell({
+    cache: ONE_HOUR_PAYLOAD_CACHE,
+  })
+);
 
 export async function generateMetadata() {
   const data = await getCategoriesPageData();
@@ -21,10 +27,15 @@ export async function generateMetadata() {
 }
 
 export default async function CategoriesPage() {
+  const data = await getCategoriesPageData();
+
   return (
     <Layout>
-      <Container className="flex flex-col md:flex-row md:px-20">
-        <NotYetImplemented />
+      <Container className="my-4 w-full md:px-20">
+        <div className="mx-auto w-full md:w-2/3">
+          <Text text="Categories" />
+          <Categories categories={data.allCategories} />
+        </div>
       </Container>
     </Layout>
   );

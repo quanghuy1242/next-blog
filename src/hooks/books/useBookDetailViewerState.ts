@@ -2,19 +2,11 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-import type { BookmarkRecord, ReadingProgressRecord } from '@/types/cms';
+import type { BookDetailViewerState } from '@/types/book-viewer-state';
 import {
   readCachedBookDetailViewerState,
   writeCachedBookDetailViewerState,
 } from '@/lib/browser/book-viewer-state-cache';
-
-export interface BookDetailViewerState {
-  bookmark: BookmarkRecord | null;
-  readingProgress: ReadingProgressRecord[];
-  readingProgressByChapterId?: Record<number, number>;
-  continueReadingChapterSlug: string | null;
-  wholeBookProgress: number;
-}
 
 interface BooksViewerStateResponse {
   detail?: BookDetailViewerState | null;

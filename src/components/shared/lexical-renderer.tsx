@@ -3,7 +3,7 @@
  *
  * Renders Lexical editor state (from PayloadCMS) as React JSX.
  * Uses the official @payloadcms/richtext-lexical package with custom converters
- * for upload nodes (images) to use our custom ResponsiveImage component.
+ * for upload nodes (images) to use shared responsive image markup.
  *
  * @see https://payloadcms.com/docs/rich-text/lexical
  */

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { useHomePosts } from '@/hooks/useHomePosts';
+import { useHomePosts } from '@/hooks/posts/useHomePosts';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';
 import type { Category, Homepage, Post } from '@/types/cms';

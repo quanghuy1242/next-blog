@@ -138,14 +138,3 @@ export function createPostsWhere(
     AND: conditions,
   };
 }
-
-/**
- * Legacy function name for backwards compatibility
- * @deprecated Use createPostsWhere instead
- */
-export function createPostsFilter(
-  categoryId: string | null | undefined,
-  tags: string[] | null | undefined
-): Record<string, unknown> {
-  return createPostsWhere(categoryId, tags);
-}

@@ -6,6 +6,7 @@ import {
   writeHomeFeedSnapshot,
   type HomeFeedStateSnapshot,
 } from '@/lib/browser/home-feed-snapshot';
+import { appendUniqueBy } from '@/lib/utils/collection';
 import { areStringArraysEqual } from '@/lib/utils/query';
 
 interface UseHomePostsParams {
@@ -245,7 +246,7 @@ export function useHomePosts({
           return previous;
         }
 
-        const mergedPosts = mergePosts(previous.posts, payload.posts ?? []);
+        const mergedPosts = appendUniqueBy(previous.posts, payload.posts ?? [], (post) => post.slug);
         const nextOffset = Math.max(
           payload.nextOffset ?? previous.offset,
           mergedPosts.length
@@ -279,24 +280,6 @@ export function useHomePosts({
     loadMorePosts,
     refetchCurrentFilters,
   };
-}
-
-function mergePosts(current: Post[], incoming: Post[]): Post[] {
-  if (!incoming.length) {
-    return current;
-  }
-
-  const seen = new Set(current.map((post) => post.slug));
-  const merged = [...current];
-
-  for (const post of incoming) {
-    if (!seen.has(post.slug)) {
-      seen.add(post.slug);
-      merged.push(post);
-    }
-  }
-
-  return merged;
 }
 
 function filtersMatch(

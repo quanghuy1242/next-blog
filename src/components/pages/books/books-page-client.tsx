@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type { Book } from '@/types/cms';
-import { useBooksFeed } from '@/hooks/useBooksFeed';
+import type { BookCardViewerState } from '@/types/book-viewer-state';
+import { useBooksFeed } from '@/hooks/books/useBooksFeed';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { Container } from '@/components/core/container';
 import {
@@ -23,13 +24,6 @@ interface BooksPageClientProps {
 
 const BOOKS_PAGE_SIZE = 6;
 const VIEWER_STATE_REFRESH_INTERVAL_MS = 30 * 1000;
-
-interface BookCardViewerState {
-  bookId: number;
-  isBookmarked: boolean;
-  bookmarkId: number | null;
-  readingProgressPct: number;
-}
 
 interface BooksViewerStateResponse {
   books?: BookCardViewerState[];

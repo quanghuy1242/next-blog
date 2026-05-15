@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useMemo } from 'react';
 import type { Category, Media } from '@/types/cms';

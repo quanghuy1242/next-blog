@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import cn from 'classnames';
 import { CoverImage } from '@/components/shared/cover-image';

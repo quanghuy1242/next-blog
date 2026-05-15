@@ -1,4 +1,5 @@
 import type { Book, Chapter, ChapterSlugData } from '@/types/cms';
+import { uniquePositiveIntegers } from '@/lib/utils/number';
 import { fetchAPI, fetchAPIWithAuthToken } from './base';
 import {
   buildChapterPasswordProofCacheKey,
@@ -183,7 +184,7 @@ export async function getChapterProgressMetadataByBookIds(
   bookIds: number[],
   options: ChapterFetchOptions = {}
 ): Promise<Record<number, Array<Pick<Chapter, 'id' | 'chapterWordCount'>>>> {
-  const uniqueBookIds = [...new Set(bookIds.filter((bookId) => Number.isInteger(bookId) && bookId > 0))];
+  const uniqueBookIds = uniquePositiveIntegers(bookIds);
 
   if (!uniqueBookIds.length) {
     return {};

@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 
 import { getChapterViewerState } from '@/lib/payload/book-viewer-state';
 import { getAuthTokenFromNextRequest, methodNotAllowed, noStoreJson } from '@/lib/server/http';
+import { parsePositiveInteger } from '@/lib/utils/number';
 
 /**
  * Mutable authenticated state endpoint for the reader chrome.
@@ -46,17 +47,4 @@ export async function GET(request: NextRequest) {
 
 export function POST() {
   return methodNotAllowed(['GET']);
-}
-
-function parsePositiveInteger(
-  value: string | null,
-  name: string
-): { ok: true; value: number } | { ok: false; error: string } {
-  const parsedValue = value == null ? Number.NaN : Number.parseInt(value, 10);
-
-  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
-    return { ok: false, error: `${name} must be a positive integer.` };
-  }
-
-  return { ok: true, value: parsedValue };
 }

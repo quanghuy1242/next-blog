@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type { Book, BookmarkRecord, Chapter, ReadingProgressRecord } from '@/types/cms';
+import type { ChapterViewerState } from '@/types/book-viewer-state';
 import {
   readCachedBookDetailViewerState,
   readCachedChapterBookmark,
@@ -10,8 +11,8 @@ import {
   writeCachedChapterBookmark,
 } from '@/lib/browser/book-viewer-state-cache';
 import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
+import { progressByChapterIdFromRecords } from '@/lib/reading/progress-maps';
 import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
-import { progressByChapterIdFromRecords } from './chapter-reader-progress';
 
 interface UseChapterViewerStateOptions {
   book: Book;
@@ -20,11 +21,6 @@ interface UseChapterViewerStateOptions {
   isAuthenticated: boolean;
   initialBookmark?: BookmarkRecord | null;
   initialReadingProgress: ReadingProgressRecord[];
-}
-
-interface ChapterViewerStateResponse {
-  bookmark?: BookmarkRecord | null;
-  readingProgress?: ReadingProgressRecord[];
 }
 
 /**
@@ -118,7 +114,7 @@ export function useChapterViewerState({
           throw new Error(`Request failed with status ${response.status}`);
         }
 
-        const payload = (await response.json()) as ChapterViewerStateResponse;
+        const payload = (await response.json()) as Partial<ChapterViewerState>;
         const nextBookmark = payload.bookmark ?? null;
         const nextReadingProgress = payload.readingProgress ?? [];
 

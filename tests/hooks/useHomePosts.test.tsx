@@ -1,5 +1,5 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useHomePosts, type HomePostsState } from '@/hooks/useHomePosts';
+import { useHomePosts, type HomePostsState } from '@/hooks/posts/useHomePosts';
 import {
   readHomeFeedSnapshot,
   writeHomeFeedSnapshot,

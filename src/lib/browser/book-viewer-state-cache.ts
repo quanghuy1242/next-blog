@@ -1,4 +1,8 @@
-import type { BookmarkRecord, ReadingProgressRecord } from '@/types/cms';
+import type { BookmarkRecord } from '@/types/cms';
+import type {
+  BookCardViewerState,
+  BookDetailViewerState,
+} from '@/types/book-viewer-state';
 
 const CACHE_VERSION = 1;
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
@@ -14,21 +18,8 @@ const CHAPTER_BOOKMARK_PREFIX = 'book-viewer-state:chapter-bookmark:';
  * from empty state to hydrated state. Fresh no-store viewer-state requests still run
  * after render and remain the cross-device source of truth.
  */
-export interface CachedBookCardViewerState {
-  bookId: number;
-  isBookmarked: boolean;
-  bookmarkId: number | null;
-  readingProgressPct: number;
-}
-
-export interface CachedBookDetailViewerState {
-  bookId: number;
-  bookmark: BookmarkRecord | null;
-  readingProgress: ReadingProgressRecord[];
-  readingProgressByChapterId?: Record<number, number>;
-  continueReadingChapterSlug: string | null;
-  wholeBookProgress: number;
-}
+export type CachedBookCardViewerState = BookCardViewerState;
+export type CachedBookDetailViewerState = BookDetailViewerState;
 
 interface CacheEnvelope<T> {
   version: number;

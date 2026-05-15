@@ -1,4 +1,5 @@
 import type { ReadingProgressResult } from '@/types/cms';
+import { uniquePositiveIntegers } from '@/lib/utils/number';
 import { fetchAPIWithAuthToken } from './base';
 import type { PayloadCacheSettings } from './cache';
 
@@ -76,9 +77,7 @@ export async function getReadingProgressByBookIds(
   bookIds: number[],
   options: { authToken?: string | null } = {}
 ): Promise<Map<number, ReadingProgressRecords>> {
-  const uniqueBookIds = Array.from(
-    new Set(bookIds.filter((bookId) => Number.isInteger(bookId) && bookId > 0))
-  );
+  const uniqueBookIds = uniquePositiveIntegers(bookIds);
 
   if (!options.authToken || uniqueBookIds.length === 0) {
     return new Map();

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Book } from '@/types/cms';
+import { appendUniqueBy } from '@/lib/utils/collection';
 
 interface UseBooksFeedParams {
   initialBooks: Book[];
@@ -86,7 +87,7 @@ export function useBooksFeed({
       const payload = (await response.json()) as PaginatedBooksApiResponse;
 
       setBooksState((previous) => {
-        const mergedBooks = mergeBooks(previous.books, payload.books ?? []);
+        const mergedBooks = appendUniqueBy(previous.books, payload.books ?? [], (book) => book.slug);
 
         return {
           books: mergedBooks,
@@ -156,22 +157,4 @@ export function useBooksFeed({
     retryLoadMore,
     refreshBooks,
   };
-}
-
-function mergeBooks(current: Book[], incoming: Book[]): Book[] {
-  if (!incoming.length) {
-    return current;
-  }
-
-  const seen = new Set(current.map((book) => book.slug));
-  const merged = [...current];
-
-  for (const book of incoming) {
-    if (!seen.has(book.slug)) {
-      seen.add(book.slug);
-      merged.push(book);
-    }
-  }
-
-  return merged;
 }

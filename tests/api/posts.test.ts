@@ -69,7 +69,7 @@ describe('GET /api/posts', () => {
       limit: 50,
       skip: 0,
       categoryId: null,
-      tags: null,
+      tags: [],
     });
 
     expect(response.status).toBe(200);

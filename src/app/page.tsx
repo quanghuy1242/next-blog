@@ -2,7 +2,7 @@ import { cache } from 'react';
 
 import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
 import { getHomeFeedPage } from '@/lib/payload/home-feed';
-import { getHomePageShell } from '@/lib/payload/index';
+import { getHomePageShell } from '@/lib/payload/home-page-shell';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';
 import { Layout } from '@/components/core/layout';
