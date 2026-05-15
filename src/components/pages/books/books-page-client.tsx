@@ -10,7 +10,7 @@ import { Container } from '@/components/core/container';
 import {
   readCachedBookCardViewerStates,
   writeCachedBookCardViewerStates,
-} from '@/lib/browser/book-viewer-state-cache';
+} from '@/lib/client/books/viewer-state-cache';
 import { BooksGrid } from '@/components/shared/books-grid';
 import { Text } from '@/components/shared/text';
 import { Button } from '@/components/shared/ui/button';

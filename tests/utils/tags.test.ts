@@ -1,4 +1,4 @@
-import { normalizePostTags } from '@/lib/utils/tags';
+import { normalizePostTags } from '@/lib/domain/posts/tags';
 
 describe('normalizePostTags', () => {
   test('handles comma-delimited strings', () => {

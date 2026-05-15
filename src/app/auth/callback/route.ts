@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   clearBlogAuthStateCookie,
   setBlogAuthTokenCookies,
-} from '@/lib/auth/app-auth-cookies';
+} from '@/lib/domain/auth/next-cookies';
 import {
   BLOG_AUTH_STATE_COOKIE,
   decodeBlogAuthStatePayload,
   exchangeAuthorizationCode,
   getTokenCookieMaxAgeSeconds,
   isBlogAuthStateExpired,
-} from '@/lib/auth/blog-auth';
+} from '@/lib/domain/auth/oauth';
 
 export async function GET(request: NextRequest) {
   const fallbackDestination = '/';

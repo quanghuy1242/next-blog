@@ -3,15 +3,15 @@
 import { useMemo } from 'react';
 
 import type { Book, Chapter } from '@/types/cms';
-import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
-import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
-import { buildBookHref } from '@/lib/routes/book-route';
+import { getContinueReadingChapterSlug } from '@/lib/domain/books/continue-reading';
+import { calculateWholeBookProgress } from '@/lib/domain/books/reading-progress';
+import { buildBookHref } from '@/lib/domain/books/routes';
 import { BookHeader } from '@/components/pages/books/book-header';
 import { ChapterList } from '@/components/pages/books/chapter-list';
 import {
   mergeProgressByChapterId,
   recordsFromProgressMap,
-} from '@/lib/reading/progress-maps';
+} from '@/lib/domain/books/progress-maps';
 import { useBookDetailViewerState } from '@/hooks/books/useBookDetailViewerState';
 import { useLocalChapterProgress } from '@/hooks/books/useLocalChapterProgress';
 import { BookmarkButton } from '@/components/shared/bookmark-button';

@@ -5,9 +5,9 @@ import {
   readHomeFeedSnapshot,
   writeHomeFeedSnapshot,
   type HomeFeedStateSnapshot,
-} from '@/lib/browser/home-feed-snapshot';
-import { appendUniqueBy } from '@/lib/utils/collection';
-import { areStringArraysEqual } from '@/lib/utils/query';
+} from '@/lib/client/home/feed-snapshot';
+import { appendUniqueBy } from '@/lib/shared/collection';
+import { areStringArraysEqual } from '@/lib/shared/query';
 
 interface UseHomePostsParams {
   initialPosts: Post[];

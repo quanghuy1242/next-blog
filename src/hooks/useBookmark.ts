@@ -6,7 +6,7 @@ import {
   writeCachedBookCardViewerStates,
   writeCachedBookDetailViewerState,
   writeCachedChapterBookmark,
-} from '@/lib/browser/book-viewer-state-cache';
+} from '@/lib/client/books/viewer-state-cache';
 
 interface UseBookmarkOptions {
   contentType: 'chapter' | 'book';

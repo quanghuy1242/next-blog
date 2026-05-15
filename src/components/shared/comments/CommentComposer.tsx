@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { COMMENT_MAX_LENGTH } from '@/lib/constants/comments';
+import { COMMENT_MAX_LENGTH } from '@/lib/domain/comments/constants';
 import { Button } from '@/components/shared/ui/button';
 import { getInputClassName } from '@/components/shared/ui/form-control';
 

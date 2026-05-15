@@ -1,14 +1,14 @@
 import { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { BLOG_AUTH_STATE_COOKIE } from '@/lib/auth/blog-auth';
+import { BLOG_AUTH_STATE_COOKIE } from '@/lib/domain/auth/oauth';
 
 const exchangeAuthorizationCodeMock = vi.hoisted(() => vi.fn());
 
-vi.mock('@/lib/auth/blog-auth', async () => {
+vi.mock('@/lib/domain/auth/oauth', async () => {
   const actual =
-    await vi.importActual<typeof import('@/lib/auth/blog-auth')>(
-      '@/lib/auth/blog-auth'
+    await vi.importActual<typeof import('@/lib/domain/auth/oauth')>(
+      '@/lib/domain/auth/oauth'
     );
 
   return {
@@ -89,7 +89,7 @@ describe('blog auth routes', () => {
 
   test('/auth/callback exchanges code, stores auth cookies, and redirects back', async () => {
     const { createBlogAuthStatePayload, encodeBlogAuthStatePayload } = await import(
-      '@/lib/auth/blog-auth'
+      '@/lib/domain/auth/oauth'
     );
     const { GET } = await import('@/app/auth/callback/route');
     const pkceState = createBlogAuthStatePayload('/books');

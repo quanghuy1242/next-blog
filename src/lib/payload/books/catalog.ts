@@ -21,7 +21,7 @@ import {
   sortChapters,
 } from './chapters';
 import { getReadingProgressByBookIds } from './reading-progress';
-import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
+import { calculateWholeBookProgress } from '@/lib/domain/books/reading-progress';
 
 const AUTHOR_ID = 1; // quanghuy1242
 const DEFAULT_BOOKS_LIMIT = 6;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Book } from '@/types/cms';
-import { appendUniqueBy } from '@/lib/utils/collection';
+import { appendUniqueBy } from '@/lib/shared/collection';
 
 interface UseBooksFeedParams {
   initialBooks: Book[];

@@ -9,10 +9,10 @@ import {
   readCachedChapterBookmark,
   writeCachedBookDetailViewerState,
   writeCachedChapterBookmark,
-} from '@/lib/browser/book-viewer-state-cache';
-import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
-import { progressByChapterIdFromRecords } from '@/lib/reading/progress-maps';
-import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
+} from '@/lib/client/books/viewer-state-cache';
+import { getContinueReadingChapterSlug } from '@/lib/domain/books/continue-reading';
+import { progressByChapterIdFromRecords } from '@/lib/domain/books/progress-maps';
+import { calculateWholeBookProgress } from '@/lib/domain/books/reading-progress';
 
 interface UseChapterViewerStateOptions {
   book: Book;

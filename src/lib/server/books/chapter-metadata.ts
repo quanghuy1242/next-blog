@@ -1,6 +1,6 @@
 import type { Book, Chapter } from '@/types/cms';
-import { getCoverImageUrl } from '@/lib/utils/image';
-import { buildMetadata } from '@/lib/utils/next-metadata';
+import { getCoverImageUrl } from '@/lib/shared/image';
+import { buildMetadata } from '@/lib/shared/metadata';
 
 export function getChapterPageMetadata(book: Book, chapter: Chapter) {
   return buildMetadata({

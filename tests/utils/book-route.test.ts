@@ -4,7 +4,7 @@ import {
   buildBookRouteSegment,
   buildChapterHref,
   parseBookRouteSegment,
-} from '@/lib/routes/book-route';
+} from '@/lib/domain/books/routes';
 
 describe('book route helpers', () => {
   test('builds canonical book and chapter hrefs', () => {

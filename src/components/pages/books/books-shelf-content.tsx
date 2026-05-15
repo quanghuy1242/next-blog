@@ -1,7 +1,7 @@
 import { BooksGrid } from '@/components/shared/books-grid';
 import { Text } from '@/components/shared/text';
 import { TextLink } from '@/components/shared/ui/text-link';
-import { buildChapterHref } from '@/lib/routes/book-route';
+import { buildChapterHref } from '@/lib/domain/books/routes';
 import type { Book, BookmarkRecord } from '@/types/cms';
 
 interface BooksShelfContentProps {

@@ -3,7 +3,7 @@ import { Layout } from '@/components/core/layout';
 import { BooksShelfContent } from '@/components/pages/books/books-shelf-content';
 import { getBooksShelfData } from '@/lib/server/books/shelf-data';
 import { getAuthTokenFromAppRequest } from '@/lib/server/app-request';
-import { buildMetadata } from '@/lib/utils/next-metadata';
+import { buildMetadata } from '@/lib/shared/metadata';
 
 export const dynamic = 'force-dynamic';
 

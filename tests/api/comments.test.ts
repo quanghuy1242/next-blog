@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { createComment, getComments } from '@/lib/payload/comments/repository';
-import { COMMENT_MAX_LENGTH } from '@/lib/constants/comments';
-import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/auth/auth';
+import { COMMENT_MAX_LENGTH } from '@/lib/domain/comments/constants';
+import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/domain/auth/tokens';
 import { GET, POST } from '@/app/api/comments/route';
 
 vi.mock('@/lib/payload/comments/repository', () => ({

@@ -1,5 +1,5 @@
 import { getHomePageData } from '@/lib/server/home/page-data';
-import { buildMetadata } from '@/lib/utils/next-metadata';
+import { buildMetadata } from '@/lib/shared/metadata';
 import { Layout } from '@/components/core/layout';
 import { HomePageClient } from '@/components/pages/index/home-page-client';
 

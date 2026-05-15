@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { getPaginatedBooks } from '@/lib/payload/books/catalog';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/core/cache';
 import { getAuthTokenFromNextRequest, json, methodNotAllowed, noStoreJson } from '@/lib/server/http';
-import { normalizeLimit, normalizeOffset } from '@/lib/utils/number';
+import { normalizeLimit, normalizeOffset } from '@/lib/shared/number';
 
 const DEFAULT_LIMIT = 6;
 const MAX_LIMIT = 50;

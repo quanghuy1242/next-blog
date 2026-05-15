@@ -6,7 +6,7 @@ import type { Chapter } from '@/types/cms';
 import {
   READING_POSITION_CHANGE_EVENT,
   readReadingProgressByChapterId,
-} from '@/lib/browser/reading-position';
+} from '@/lib/client/books/reading-position';
 
 /**
  * Reads browser-only progress hints for the TOC while persisted server progress

@@ -26,7 +26,7 @@ describe('blog signup helpers', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    const { createBlogSignupIntent } = await import('@/lib/auth/blog-signup');
+    const { createBlogSignupIntent } = await import('@/lib/domain/auth/signup');
     const result = await createBlogSignupIntent({ returnTo: '/books' });
 
     expect(result).toEqual({
@@ -67,7 +67,7 @@ describe('blog signup helpers', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    const { createBlogSignupIntent } = await import('@/lib/auth/blog-signup');
+    const { createBlogSignupIntent } = await import('@/lib/domain/auth/signup');
 
     await expect(createBlogSignupIntent({ returnTo: 'https://evil.example.com' }))
       .rejects

@@ -28,7 +28,7 @@ vi.mock('@/components/pages/books/chapter-toc-drawer', () => ({
   ChapterTocDrawer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('@/lib/utils/image', () => ({
+vi.mock('@/lib/shared/image', () => ({
   getCoverImageUrl: () => 'https://example.com/cover.jpg',
 }));
 

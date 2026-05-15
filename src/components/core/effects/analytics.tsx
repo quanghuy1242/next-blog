@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-import * as gtag from '@/lib/analytics/gtag';
+import * as gtag from '@/lib/integrations/analytics/gtag';
 
 export function Analytics() {
   const pathname = usePathname();

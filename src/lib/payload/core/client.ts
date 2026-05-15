@@ -3,7 +3,7 @@ import {
   readThroughCloudflareCache,
   type PayloadCacheSettings,
 } from './cache';
-import { getAuthCacheSubjectFromToken } from '@/lib/auth/auth';
+import { getAuthCacheSubjectFromToken } from '@/lib/domain/auth/tokens';
 
 // PayloadCMS GraphQL API Configuration
 const PAYLOAD_BASE_URL = process.env.PAYLOAD_BASE_URL;

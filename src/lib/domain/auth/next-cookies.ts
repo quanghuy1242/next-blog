@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 import {
   PAYLOAD_ADMIN_TOKEN_COOKIE,
   PAYLOAD_BETTER_AUTH_TOKEN_COOKIE,
-} from '@/lib/auth/auth';
-import { BLOG_AUTH_STATE_COOKIE } from '@/lib/auth/blog-auth';
-import { deriveSharedCookieDomain } from '@/lib/auth/auth-cookies';
+} from '@/lib/domain/auth/tokens';
+import { BLOG_AUTH_STATE_COOKIE } from '@/lib/domain/auth/oauth';
+import { deriveSharedCookieDomain } from '@/lib/domain/auth/cookie-domain';
 
 const isProduction = process.env.NODE_ENV === 'production';
 

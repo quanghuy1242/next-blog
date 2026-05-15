@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/auth/auth';
+import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/domain/auth/tokens';
 import { getChapterViewerState } from '@/lib/payload/books/viewer-state';
 import { GET, POST } from '@/app/api/chapters/viewer-state/route';
 

@@ -16,7 +16,7 @@ import { ChapterContent } from '@/components/pages/books/chapter-content';
 import { ChapterPasswordGate } from '@/components/pages/books/chapter-password-gate';
 import { ChapterReaderHeader } from '@/components/pages/books/chapter-reader-header';
 import { ChapterReaderNavigation } from '@/components/pages/books/chapter-reader-navigation';
-import { mergeReaderProgressForDisplay } from '@/lib/reading/progress-maps';
+import { mergeReaderProgressForDisplay } from '@/lib/domain/books/progress-maps';
 import {
   ChapterReaderTocDrawer,
   ChapterReaderTocSidebar,

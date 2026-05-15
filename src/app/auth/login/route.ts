@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { setBlogAuthStateCookie } from '@/lib/auth/app-auth-cookies';
+import { setBlogAuthStateCookie } from '@/lib/domain/auth/next-cookies';
 import {
   BLOG_AUTH_COOKIE_MAX_AGE_SECONDS,
   buildAuthorizeUrl,
   createBlogAuthStatePayload,
   encodeBlogAuthStatePayload,
   normalizeReturnTo,
-} from '@/lib/auth/blog-auth';
+} from '@/lib/domain/auth/oauth';
 
 export async function GET(request: NextRequest) {
   const returnTo = normalizeReturnTo(request.nextUrl.searchParams.get('returnTo') ?? undefined);

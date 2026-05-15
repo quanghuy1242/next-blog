@@ -2,7 +2,7 @@ import { draftMode } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { methodNotAllowed, noStoreJson } from '@/lib/server/http';
-import { validatePreviewToken } from '@/lib/preview/preview';
+import { validatePreviewToken } from '@/lib/server/preview';
 
 function isSafeRedirectPath(value: string) {
   return value.startsWith('/') && !value.startsWith('//');

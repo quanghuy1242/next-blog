@@ -2,9 +2,9 @@ import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { getPostPageData } from '@/lib/server/posts/page-data';
-import { getCoverImageUrl } from '@/lib/utils/image';
-import { buildMetadata } from '@/lib/utils/next-metadata';
-import { normalizePostTags } from '@/lib/utils/tags';
+import { getCoverImageUrl } from '@/lib/shared/image';
+import { buildMetadata } from '@/lib/shared/metadata';
+import { normalizePostTags } from '@/lib/domain/posts/tags';
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
 import { PostContent } from '@/components/pages/posts/post-content';

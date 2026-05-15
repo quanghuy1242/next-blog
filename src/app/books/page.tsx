@@ -1,7 +1,7 @@
 import { Layout } from '@/components/core/layout';
 import { BooksPageClient } from '@/components/pages/books/books-page-client';
 import { getBooksListPageData } from '@/lib/server/books/list-data';
-import { buildMetadata } from '@/lib/utils/next-metadata';
+import { buildMetadata } from '@/lib/shared/metadata';
 
 export const dynamic = 'force-dynamic';
 

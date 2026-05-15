@@ -3,7 +3,7 @@ import Script from 'next/script';
 import type { ReactNode } from 'react';
 
 import { Providers } from './providers';
-import { GA_TRACKING_ID } from '@/lib/analytics/gtag';
+import { GA_TRACKING_ID } from '@/lib/integrations/analytics/gtag';
 import { getRootLayoutData } from '@/lib/server/layout-data';
 import '@/styles/index.css';
 

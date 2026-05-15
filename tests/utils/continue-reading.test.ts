@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
+import { getContinueReadingChapterSlug } from '@/lib/domain/books/continue-reading';
 import type { Chapter, ReadingProgressRecord } from '@/types/cms';
 
 function chapter(id: number, slug: string): Pick<Chapter, 'id' | 'slug'> {

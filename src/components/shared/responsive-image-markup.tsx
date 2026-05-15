@@ -3,7 +3,7 @@ import cn from 'classnames';
 import {
   generateResponsiveImage,
   getBlurPlaceholder,
-} from '@/lib/utils/image';
+} from '@/lib/shared/image';
 import type { Media } from '@/types/cms';
 
 export interface ResponsiveImageMarkupProps {

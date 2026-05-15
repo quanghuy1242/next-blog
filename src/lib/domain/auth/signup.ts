@@ -1,4 +1,4 @@
-import { getAuthBaseUrl, getRuntimeOrigin, normalizeReturnTo } from './blog-auth';
+import { getAuthBaseUrl, getRuntimeOrigin, normalizeReturnTo } from './oauth';
 
 interface RuntimeRequestLike {
   headers?: {

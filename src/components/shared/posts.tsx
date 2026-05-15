@@ -6,7 +6,7 @@ import { Tag, Tags } from '@/components/shared/tags';
 import Link from 'next/link';
 import type { LinkProps } from 'next/link';
 import type { Post as PostType } from '@/types/cms';
-import { normalizePostTags } from '@/lib/utils/tags';
+import { normalizePostTags } from '@/lib/domain/posts/tags';
 
 interface PostTitleProps {
   slug: string;

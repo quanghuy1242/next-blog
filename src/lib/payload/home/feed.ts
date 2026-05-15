@@ -1,7 +1,7 @@
 import type { PayloadCacheSettings } from '../core/cache';
 import { getCategoryIdBySlug } from '../taxonomy/categories';
 import { getPaginatedPosts } from '../posts/list';
-import { uniqueSortedStrings } from '@/lib/utils/query';
+import { uniqueSortedStrings } from '@/lib/shared/query';
 import type { Post } from '@/types/cms';
 
 export interface HomeFeedPageParams {

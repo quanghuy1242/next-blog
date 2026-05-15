@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import cn from 'classnames';
 import type { Chapter } from '@/types/cms';
-import { buildChapterHref } from '@/lib/routes/book-route';
+import { buildChapterHref } from '@/lib/domain/books/routes';
 import { ChapterLockBadge } from './chapter-lock-badge';
 
 interface ChapterTocProps {

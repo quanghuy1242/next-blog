@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatDate } from '@/lib/utils/date';
+import { formatDate } from '@/lib/shared/date';
 
 interface DateProps {
   dateString: string;

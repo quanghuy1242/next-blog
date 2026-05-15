@@ -1,5 +1,5 @@
 import type { ReadingProgressResult } from '@/types/cms';
-import { uniquePositiveIntegers } from '@/lib/utils/number';
+import { uniquePositiveIntegers } from '@/lib/shared/number';
 import { fetchAPIWithAuthToken } from '../core/client';
 
 const SAVE_READING_PROGRESS_MUTATION = `#graphql

@@ -1,5 +1,5 @@
 import type { Post } from '@/types/cms';
-import { uniqueSortedStrings } from '@/lib/utils/query';
+import { uniqueSortedStrings } from '@/lib/shared/query';
 
 const HOME_FEED_SNAPSHOT_PREFIX = 'home-feed:';
 const HOME_FEED_SNAPSHOT_VERSION = 1;

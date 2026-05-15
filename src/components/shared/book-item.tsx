@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Book } from '@/types/cms';
-import { buildBookHref } from '@/lib/routes/book-route';
+import { buildBookHref } from '@/lib/domain/books/routes';
 import { BookCover } from './book-cover';
 
 interface BookItemProps {

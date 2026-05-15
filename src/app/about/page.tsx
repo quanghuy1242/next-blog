@@ -1,6 +1,6 @@
 import { getAboutPageData } from '@/lib/server/about/page-data';
-import { getCoverImageUrl } from '@/lib/utils/image';
-import { buildMetadata } from '@/lib/utils/next-metadata';
+import { getCoverImageUrl } from '@/lib/shared/image';
+import { buildMetadata } from '@/lib/shared/metadata';
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
 import { LexicalRenderer } from '@/components/shared/lexical-renderer';

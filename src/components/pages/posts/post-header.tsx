@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { Date } from '@/components/shared/date';
 import { Tag } from '@/components/shared/tags';
-import { getMediaUrl } from '@/lib/utils/image';
+import { getMediaUrl } from '@/lib/shared/image';
 import type { Media } from '@/types/cms';
 
 interface PostHeaderProps {

@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 
 import { getChapterViewerState } from '@/lib/payload/books/viewer-state';
 import { getAuthTokenFromNextRequest, methodNotAllowed, noStoreJson } from '@/lib/server/http';
-import { parsePositiveInteger } from '@/lib/utils/number';
+import { parsePositiveInteger } from '@/lib/shared/number';
 
 /**
  * Mutable authenticated state endpoint for the reader chrome.

@@ -6,7 +6,7 @@ import type { BookDetailViewerState } from '@/types/book-viewer-state';
 import {
   readCachedBookDetailViewerState,
   writeCachedBookDetailViewerState,
-} from '@/lib/browser/book-viewer-state-cache';
+} from '@/lib/client/books/viewer-state-cache';
 
 interface BooksViewerStateResponse {
   detail?: BookDetailViewerState | null;

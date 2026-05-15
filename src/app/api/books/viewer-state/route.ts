@@ -7,7 +7,7 @@ import {
 } from '@/lib/payload/books/viewer-state';
 import { fetchPublicBookPagePayload } from '@/lib/payload/books/pages';
 import { getAuthTokenFromNextRequest, methodNotAllowed, noStoreJson } from '@/lib/server/http';
-import { parseDelimitedPositiveIntegers } from '@/lib/utils/number';
+import { parseDelimitedPositiveIntegers } from '@/lib/shared/number';
 
 const MAX_BOOK_IDS = 50;
 

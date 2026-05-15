@@ -5,8 +5,8 @@ import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
 import { ButtonLink } from '@/components/shared/ui/button';
 import { CenteredPanel } from '@/components/shared/ui/panel';
-import { createBlogSignupIntent } from '@/lib/auth/blog-signup';
-import { normalizeReturnTo } from '@/lib/auth/blog-auth';
+import { createBlogSignupIntent } from '@/lib/domain/auth/signup';
+import { normalizeReturnTo } from '@/lib/domain/auth/oauth';
 
 interface SignupPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

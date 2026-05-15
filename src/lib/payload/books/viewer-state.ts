@@ -11,10 +11,10 @@ import type {
   BookDetailViewerState,
   ChapterViewerState,
 } from '@/types/book-viewer-state';
-import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
-import { progressByChapterIdFromRecords } from '@/lib/reading/progress-maps';
-import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
-import { uniquePositiveIntegers } from '@/lib/utils/number';
+import { getContinueReadingChapterSlug } from '@/lib/domain/books/continue-reading';
+import { progressByChapterIdFromRecords } from '@/lib/domain/books/progress-maps';
+import { calculateWholeBookProgress } from '@/lib/domain/books/reading-progress';
+import { uniquePositiveIntegers } from '@/lib/shared/number';
 import { fetchAPIWithAuthToken } from '../core/client';
 import { fetchBookPageViewerPayload } from './pages';
 import { getChapterProgressMetadataByBookIds } from './chapters';

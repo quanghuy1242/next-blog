@@ -22,7 +22,7 @@ import { ResponsiveImageMarkup } from './responsive-image-markup';
 import {
   resolveEpubHref,
   type ChapterLinkTarget,
-} from '@/lib/utils/epub-link-resolver';
+} from '@/lib/domain/books/epub-link-resolver';
 import type { Media } from '@/types/cms';
 
 export interface LexicalRendererProps {

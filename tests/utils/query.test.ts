@@ -3,7 +3,7 @@ import {
   normalizeQueryParam,
   normalizeQueryParamList,
   uniqueSortedStrings,
-} from '@/lib/utils/query';
+} from '@/lib/shared/query';
 
 describe('normalizeQueryParam', () => {
   test('returns null for undefined values', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
+import { calculateWholeBookProgress } from '@/lib/domain/books/reading-progress';
 import type { ReadingProgressRecord } from '@/types/cms';
 
 function createRecord(

@@ -3,7 +3,7 @@ import type { ServerResponse } from 'node:http';
 import {
   PAYLOAD_ADMIN_TOKEN_COOKIE,
   PAYLOAD_BETTER_AUTH_TOKEN_COOKIE,
-} from './auth';
+} from './tokens';
 
 type CookieDomainRequestLike = {
   headers?: {

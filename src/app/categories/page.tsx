@@ -1,5 +1,5 @@
 import { getCategoriesPageData } from '@/lib/server/categories/page-data';
-import { buildMetadata } from '@/lib/utils/next-metadata';
+import { buildMetadata } from '@/lib/shared/metadata';
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
 import { Categories } from '@/components/shared/categories';

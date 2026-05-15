@@ -4,7 +4,7 @@ import {
   normalizeEpubPath,
   resolveEpubHref,
   splitEpubHref,
-} from '@/lib/utils/epub-link-resolver';
+} from '@/lib/domain/books/epub-link-resolver';
 
 const chapters = [
   {

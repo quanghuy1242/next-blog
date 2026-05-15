@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   clearBlogAuthStateCookie,
   clearBlogAuthTokenCookies,
-} from '@/lib/auth/app-auth-cookies';
-import { getBlogPostLogoutRedirectUri, normalizeReturnTo } from '@/lib/auth/blog-auth';
+} from '@/lib/domain/auth/next-cookies';
+import { getBlogPostLogoutRedirectUri, normalizeReturnTo } from '@/lib/domain/auth/oauth';
 
 export async function GET(request: NextRequest) {
   const requestedReturnTo = normalizeReturnTo(

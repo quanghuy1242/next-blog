@@ -4,8 +4,8 @@ import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
 import { BookPageClient } from '@/components/pages/books/book-page-client';
 import { getBookPageData, getBookPageMetadataData } from '@/lib/server/books/page-data';
-import { getCoverImageUrl } from '@/lib/utils/image';
-import { buildMetadata } from '@/lib/utils/next-metadata';
+import { getCoverImageUrl } from '@/lib/shared/image';
+import { buildMetadata } from '@/lib/shared/metadata';
 
 interface BookPageProps {
   params: Promise<{ slug: string }>;

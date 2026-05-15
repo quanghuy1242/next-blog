@@ -2,8 +2,8 @@ import { NextRequest } from 'next/server';
 
 import { getHomeFeedPage } from '@/lib/payload/home/feed';
 import { json, methodNotAllowed } from '@/lib/server/http';
-import { normalizeLimit, normalizeOffset } from '@/lib/utils/number';
-import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';
+import { normalizeLimit, normalizeOffset } from '@/lib/shared/number';
+import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/shared/query';
 
 const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 50;

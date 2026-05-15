@@ -1,5 +1,5 @@
 import type { Book, Chapter, ChapterSlugData } from '@/types/cms';
-import { uniquePositiveIntegers } from '@/lib/utils/number';
+import { uniquePositiveIntegers } from '@/lib/shared/number';
 import { fetchAPI, fetchAPIWithAuthToken } from '../core/client';
 import {
   buildChapterPasswordProofCacheKey,

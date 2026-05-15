@@ -2,7 +2,7 @@ import React from 'react';
 import cn from 'classnames';
 import Link from 'next/link';
 import { ResponsiveImageMarkup } from '@/components/shared/responsive-image-markup';
-import { getMediaUrl } from '@/lib/utils/image';
+import { getMediaUrl } from '@/lib/shared/image';
 import type { Media } from '@/types/cms';
 
 interface CoverImageProps {

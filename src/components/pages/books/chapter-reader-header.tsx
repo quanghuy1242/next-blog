@@ -1,5 +1,5 @@
 import type { Book, BookmarkRecord, Chapter } from '@/types/cms';
-import { buildBookHref } from '@/lib/routes/book-route';
+import { buildBookHref } from '@/lib/domain/books/routes';
 import { BookmarkButton } from '@/components/shared/bookmark-button';
 import { Button } from '@/components/shared/ui/button';
 import { TextLink } from '@/components/shared/ui/text-link';

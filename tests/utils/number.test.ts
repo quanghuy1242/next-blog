@@ -2,7 +2,7 @@ import {
   normalizeLimit,
   normalizeOffset,
   stringifyValue,
-} from '@/lib/utils/number';
+} from '@/lib/shared/number';
 
 describe('normalizeLimit', () => {
   const defaultLimit = 5;

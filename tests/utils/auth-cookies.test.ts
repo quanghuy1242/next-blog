@@ -2,7 +2,7 @@ import {
   clearBlogAuthTokenCookies,
   deriveSharedCookieDomain,
   setBlogAuthTokenCookies,
-} from '@/lib/auth/auth-cookies';
+} from '@/lib/domain/auth/cookie-domain';
 import { createMocks } from 'node-mocks-http';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 

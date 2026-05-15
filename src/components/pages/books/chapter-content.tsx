@@ -1,7 +1,7 @@
 import React from 'react';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import { LexicalRenderer } from '@/components/shared/lexical-renderer';
-import type { ChapterLinkTarget } from '@/lib/utils/epub-link-resolver';
+import type { ChapterLinkTarget } from '@/lib/domain/books/epub-link-resolver';
 
 interface ChapterContentProps {
   content: SerializedEditorState | null | undefined;

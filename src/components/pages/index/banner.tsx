@@ -1,6 +1,6 @@
 import React from 'react';
-import { PLACEHOLDER_BANNER_URL } from '@/lib/constants';
-import { getMediaUrl } from '@/lib/utils/image';
+import { PLACEHOLDER_BANNER_URL } from '@/lib/domain/home/constants';
+import { getMediaUrl } from '@/lib/shared/image';
 import type { Media } from '@/types/cms';
 import cn from 'classnames';
 

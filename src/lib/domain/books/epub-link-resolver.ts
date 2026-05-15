@@ -1,4 +1,4 @@
-import { buildChapterHref } from '@/lib/routes/book-route'
+import { buildChapterHref } from '@/lib/domain/books/routes'
 
 export interface ChapterLinkTarget {
   slug: string

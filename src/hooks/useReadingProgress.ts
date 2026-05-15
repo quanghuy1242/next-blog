@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   readReadingPosition,
   writeReadingPosition,
-} from '@/lib/browser/reading-position';
+} from '@/lib/client/books/reading-position';
 
 declare global {
   interface Window {

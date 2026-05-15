@@ -23,7 +23,7 @@ import {
   buildBookHref,
   buildChapterHref,
   parseBookRouteSegment,
-} from '@/lib/routes/book-route';
+} from '@/lib/domain/books/routes';
 import {
   getAuthTokenFromAppRequest,
   getChapterProofFromAppRequest,

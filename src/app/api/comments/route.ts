@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { COMMENT_MAX_LENGTH } from '@/lib/constants/comments';
+import { COMMENT_MAX_LENGTH } from '@/lib/domain/comments/constants';
 import { createComment, getComments } from '@/lib/payload/comments/repository';
 import {
   getAuthTokenFromNextRequest,

@@ -1,6 +1,6 @@
 import { cookies, headers } from 'next/headers';
 
-import { getBetterAuthTokenFromRequest } from '@/lib/auth/auth';
+import { getBetterAuthTokenFromRequest } from '@/lib/domain/auth/tokens';
 import { getChapterPasswordProofCookieValueFromRequest } from '@/lib/server/chapter-password-proof';
 
 async function getAppRequestCookiesRecord() {
