@@ -56,7 +56,12 @@
       "name": "next-blog-payloadcms-preview",
       "workers_dev": true,
       "preview_urls": true,
-      "routes": [],
+      "routes": [
+        {
+          "pattern": "blog-preview.quanghuy.dev",
+          "custom_domain": true
+        }
+      ],
       "services": [
         {
           "binding": "WORKER_SELF_REFERENCE",
