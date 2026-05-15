@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type {
@@ -10,30 +10,22 @@ import type {
   CommentsResult,
   ReadingProgressRecord,
 } from '@/types/cms';
-import {
-  READING_POSITION_CHANGE_EVENT,
-  readReadingProgressByChapterId,
-} from '@/lib/browser/reading-position';
-import {
-  readCachedBookDetailViewerState,
-  readCachedChapterBookmark,
-  writeCachedBookDetailViewerState,
-  writeCachedChapterBookmark,
-} from '@/lib/browser/book-viewer-state-cache';
-import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
-import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
-import { buildBookHref, buildChapterHref } from '@/lib/routes/book-route';
 import { useReadingProgress } from '@/hooks/useReadingProgress';
 import { Container } from '@/components/core/container';
 import { ChapterContent } from '@/components/pages/books/chapter-content';
 import { ChapterPasswordGate } from '@/components/pages/books/chapter-password-gate';
-import { ChapterToc } from '@/components/pages/books/chapter-toc';
-import { ChapterTocDrawer } from '@/components/pages/books/chapter-toc-drawer';
-import { BookmarkButton } from '@/components/shared/bookmark-button';
+import { ChapterReaderHeader } from '@/components/pages/books/chapter-reader-header';
+import { ChapterReaderNavigation } from '@/components/pages/books/chapter-reader-navigation';
+import { mergeReaderProgressForDisplay } from '@/components/pages/books/chapter-reader-progress';
+import {
+  ChapterReaderTocDrawer,
+  ChapterReaderTocSidebar,
+} from '@/components/pages/books/chapter-reader-toc';
+import { useChapterNavigation } from '@/components/pages/books/use-chapter-navigation';
+import { useChapterViewerState } from '@/components/pages/books/use-chapter-viewer-state';
+import { useLocalChapterProgress } from '@/components/pages/books/use-local-chapter-progress';
 import { CommentsSection } from '@/components/shared/comments/CommentsSection';
 import { ReadingProgressBar } from '@/components/shared/reading-progress-bar';
-import { Button } from '@/components/shared/ui/button';
-import { TextLink } from '@/components/shared/ui/text-link';
 
 interface ChapterReaderClientProps {
   book: Book;
@@ -49,9 +41,9 @@ interface ChapterReaderClientProps {
 /**
  * Reader content should not wait for per-user state.
  *
- * The page loader provides the chapter body and table of contents. This client layer
- * replays cached viewer state immediately, then refreshes bookmark/progress from
- * `/api/chapters/viewer-state`. Comments also load below the article after mount.
+ * This component now only coordinates reader layout. Viewer-state hydration,
+ * local progress hints, TOC controls, and chapter navigation live in focused
+ * hooks/components so the page does not turn into the state machine itself.
  */
 export function ChapterReaderClient({
   book,
@@ -63,164 +55,37 @@ export function ChapterReaderClient({
   initialBookmark,
 }: ChapterReaderClientProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
-  const [viewerBookmark, setViewerBookmark] = useState<BookmarkRecord | null>(initialBookmark ?? null);
-  const [viewerReadingProgress, setViewerReadingProgress] = useState<ReadingProgressRecord[]>(readingProgress);
-  const [viewerStateLoaded, setViewerStateLoaded] = useState(!isAuthenticated || initialBookmark !== undefined);
-  const [localProgressByChapterId, setLocalProgressByChapterId] = useState<Record<number, number>>({});
   const chapterContentRef = useRef<HTMLDivElement | null>(null);
-  const viewerBookmarkRef = useRef<BookmarkRecord | null>(viewerBookmark);
-  const viewerReadingProgressRef = useRef<ReadingProgressRecord[]>(viewerReadingProgress);
   const router = useRouter();
   const shouldRenderChapterTitle =
     (book.origin as string) !== 'epub_imported' &&
     (book.sourceType as string) !== 'epub_upload';
   const isChapterLocked = chapter.hasPassword === true && chapter.content == null;
-  const readingProgressByChapterId = useMemo(
-    () =>
-      viewerReadingProgress.length > 0
-        ? Object.fromEntries(
-            viewerReadingProgress
-              .filter((r) => r.chapterId != null && r.progress != null)
-              .map((r) => [Number(r.chapterId!), r.progress!])
-          )
-        : undefined,
-    [viewerReadingProgress]
-  );
-
-  // Preserve compatibility with callers that still pass initial viewer state.
-  useEffect(() => {
-    if (isAuthenticated && initialBookmark === undefined && readingProgress.length === 0) {
-      return;
-    }
-
-    setViewerBookmark(initialBookmark ?? null);
-    setViewerReadingProgress(readingProgress);
-    setViewerStateLoaded(!isAuthenticated || initialBookmark !== undefined);
-  }, [initialBookmark, isAuthenticated, readingProgress]);
-  useEffect(() => {
-    viewerBookmarkRef.current = viewerBookmark;
-  }, [viewerBookmark]);
-  useEffect(() => {
-    viewerReadingProgressRef.current = viewerReadingProgress;
-  }, [viewerReadingProgress]);
-
-  // Synchronous local snapshot prevents TOC/bookmark empty-state flicker on repeat visits.
-  useLayoutEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-
-    const cachedBookState = readCachedBookDetailViewerState(book.id);
-    const cachedChapterBookmark = readCachedChapterBookmark(chapter.id);
-
-    if (cachedBookState) {
-      viewerReadingProgressRef.current = cachedBookState.readingProgress;
-      setViewerReadingProgress(cachedBookState.readingProgress);
-      setViewerStateLoaded(true);
-    }
-
-    if (cachedChapterBookmark !== undefined) {
-      viewerBookmarkRef.current = cachedChapterBookmark;
-      setViewerBookmark(cachedChapterBookmark);
-      setViewerStateLoaded(true);
-    }
-  }, [book.id, chapter.id, isAuthenticated]);
-
-  // The network refresh is still required for cross-device state and cache correction.
-  useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-
-    const controller = new AbortController();
-
-    setViewerStateLoaded(
-      viewerBookmarkRef.current != null || viewerReadingProgressRef.current.length > 0
-    );
-
-    async function loadViewerState() {
-      try {
-        const params = new URLSearchParams({
-          bookId: String(book.id),
-          chapterId: String(chapter.id),
-        });
-        const response = await fetch(`/api/chapters/viewer-state?${params.toString()}`, {
-          credentials: 'include',
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-
-        const payload = (await response.json()) as {
-          bookmark?: BookmarkRecord | null;
-          readingProgress?: ReadingProgressRecord[];
-        };
-
-        const nextBookmark = payload.bookmark ?? null;
-        const nextReadingProgress = payload.readingProgress ?? [];
-
-        viewerBookmarkRef.current = nextBookmark;
-        viewerReadingProgressRef.current = nextReadingProgress;
-        setViewerBookmark(nextBookmark);
-        setViewerReadingProgress(nextReadingProgress);
-        writeCachedChapterBookmark(chapter.id, nextBookmark);
-        writeCachedBookDetailViewerState({
-          bookId: book.id,
-          bookmark: readCachedBookDetailViewerState(book.id)?.bookmark ?? null,
-          readingProgress: nextReadingProgress,
-          readingProgressByChapterId: buildProgressByChapterId(nextReadingProgress),
-          continueReadingChapterSlug: getContinueReadingChapterSlug(
-            chapters,
-            nextReadingProgress
-          ),
-          wholeBookProgress: calculateWholeBookProgress({
-            chapters,
-            records: nextReadingProgress,
-            totalWordCount: book.totalWordCount,
-          }),
-        });
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error('Failed to load chapter viewer state', error);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setViewerStateLoaded(true);
-        }
-      }
-    }
-
-    void loadViewerState();
-
-    return () => {
-      controller.abort();
-    };
-  }, [book.id, book.totalWordCount, chapter.id, chapters, isAuthenticated]);
-
-  // Browser reading position is an immediate hint while persisted server progress loads.
-  useEffect(() => {
-    function syncLocalProgress() {
-      setLocalProgressByChapterId(readReadingProgressByChapterId(book.id, chapters));
-    }
-
-    syncLocalProgress();
-    window.addEventListener(READING_POSITION_CHANGE_EVENT, syncLocalProgress);
-
-    return () => {
-      window.removeEventListener(READING_POSITION_CHANGE_EVENT, syncLocalProgress);
-    };
-  }, [book.id, chapter.id, chapters]);
-  const { previousChapter, nextChapter } = useMemo(() => {
-    const currentIndex = chapters.findIndex((candidate) => candidate.slug === chapter.slug);
-
-    return {
-      previousChapter: currentIndex > 0 ? chapters[currentIndex - 1] : null,
-      nextChapter:
-        currentIndex >= 0 && currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null,
-    };
-  }, [chapter.slug, chapters]);
+  const openToc = useCallback(() => {
+    setIsTocOpen(true);
+  }, []);
+  const closeToc = useCallback(() => {
+    setIsTocOpen(false);
+  }, []);
+  const handleChapterUnlocked = useCallback(async () => {
+    const currentUrl = `${window.location.pathname}${window.location.search}`;
+    router.replace(currentUrl || window.location.pathname);
+    router.refresh();
+  }, [router]);
+  const {
+    viewerBookmark,
+    viewerStateLoaded,
+    readingProgressByChapterId,
+  } = useChapterViewerState({
+    book,
+    chapter,
+    chapters,
+    isAuthenticated,
+    initialBookmark,
+    initialReadingProgress: readingProgress,
+  });
+  const localProgressByChapterId = useLocalChapterProgress(book.id, chapters, isAuthenticated);
+  const { previousChapter, nextChapter } = useChapterNavigation(chapters, chapter.slug);
   const shouldTrackProgress = isAuthenticated && !isChapterLocked;
   const currentReadingProgress = useReadingProgress({
     chapterId: chapter.id,
@@ -230,20 +95,12 @@ export function ChapterReaderClient({
     initialProgress: readingProgressByChapterId?.[chapter.id] ?? 0,
   });
   const chapterProgressForDisplay = useMemo(
-    () => ({
-      ...(readingProgressByChapterId ?? {}),
-      ...Object.fromEntries(
-        Object.entries(localProgressByChapterId).map(([chapterId, localProgress]) => [
-          chapterId,
-          Math.max(
-            readingProgressByChapterId?.[Number(chapterId)] ?? 0,
-            localProgress
-          ),
-        ])
-      ),
-      [chapter.id]: shouldTrackProgress
-        ? currentReadingProgress
-        : (readingProgressByChapterId?.[chapter.id] ?? 0),
+    () => mergeReaderProgressForDisplay({
+      chapterId: chapter.id,
+      currentReadingProgress,
+      localProgressByChapterId,
+      serverProgressByChapterId: readingProgressByChapterId,
+      shouldTrackProgress,
     }),
     [
       chapter.id,
@@ -257,94 +114,31 @@ export function ChapterReaderClient({
   return (
     <Container className="my-4 w-full md:px-20">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start lg:gap-10">
-        <aside
-          className="hidden lg:sticky lg:top-20 lg:col-span-3 lg:block lg:self-start lg:overflow-y-auto xl:col-span-2"
-          style={{ maxHeight: 'calc(100vh - 6rem)' }}
-        >
-          <p className="mb-3 text-sm font-semibold text-gray-900">Chapters</p>
-          <ChapterToc
-            chapters={chapters}
-            bookId={book.id}
-            bookSlug={book.slug}
-            currentChapterSlug={chapter.slug}
-            readingProgressByChapterId={chapterProgressForDisplay}
-          />
-        </aside>
+        <ChapterReaderTocSidebar
+          book={book}
+          chapter={chapter}
+          chapters={chapters}
+          readingProgressByChapterId={chapterProgressForDisplay}
+        />
 
         <article className="min-w-0 lg:col-span-9 lg:self-start xl:col-span-10">
           <div className="mx-auto max-w-3xl">
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0 flex-1">
-                <nav aria-label="Breadcrumb" className="mb-2">
-                  <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-gray-500 sm:text-sm">
-                    <li>
-                      <TextLink href="/books" medium>
-                        Books
-                      </TextLink>
-                    </li>
-                    <li aria-hidden="true" className="text-gray-400">
-                      &gt;
-                    </li>
-                    <li className="min-w-0">
-                      <TextLink
-                        href={buildBookHref(book.id, book.slug)}
-                        className="break-words"
-                        medium
-                        prefetch={false}
-                      >
-                        {book.title}
-                      </TextLink>
-                    </li>
-                    <li aria-hidden="true" className="text-gray-400">
-                      &gt;
-                    </li>
-                    <li className="min-w-0 break-words text-gray-500">{chapter.title}</li>
-                  </ol>
-                </nav>
-                {shouldRenderChapterTitle ? (
-                  <h1 className="text-3xl font-bold leading-tight">{chapter.title}</h1>
-                ) : null}
-              </div>
-              <div className="flex shrink-0 items-center gap-2 self-start">
-                <Button
-                  type="button"
-                  onClick={() => setIsTocOpen(true)}
-                  variant="secondary"
-                  className="gap-2 px-3 lg:hidden"
-                >
-                  <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-4 w-4 text-gray-500">
-                    <circle cx="3.5" cy="5" r="1.25" fill="currentColor" />
-                    <circle cx="3.5" cy="10" r="1.25" fill="currentColor" />
-                    <circle cx="3.5" cy="15" r="1.25" fill="currentColor" />
-                    <path
-                      d="M7 5h9M7 10h9M7 15h9"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <span>Table of contents</span>
-                </Button>
-                <BookmarkButton
-                  contentType="chapter"
-                  contentId={chapter.id}
-                  isAuthenticated={isAuthenticated}
-                  initialBookmark={viewerBookmark}
-                  initialStateLoaded={viewerStateLoaded}
-                />
-              </div>
-            </div>
+            <ChapterReaderHeader
+              book={book}
+              chapter={chapter}
+              isAuthenticated={isAuthenticated}
+              shouldRenderChapterTitle={shouldRenderChapterTitle}
+              viewerBookmark={viewerBookmark}
+              viewerStateLoaded={viewerStateLoaded}
+              onOpenToc={openToc}
+            />
 
             <ReadingProgressBar progress={currentReadingProgress} />
 
             {isChapterLocked ? (
               <ChapterPasswordGate
                 chapterId={chapter.id}
-                onUnlocked={async () => {
-                  const currentUrl = `${window.location.pathname}${window.location.search}`;
-                  router.replace(currentUrl || window.location.pathname);
-                  router.refresh();
-                }}
+                onUnlocked={handleChapterUnlocked}
               />
             ) : (
               <div ref={chapterContentRef}>
@@ -365,61 +159,24 @@ export function ChapterReaderClient({
               />
             ) : null}
 
-            <div className="mt-8 flex items-center justify-between gap-4 border-t border-gray-200 pt-4 text-sm">
-              <div>
-                {previousChapter ? (
-                  <TextLink
-                    href={buildChapterHref(book.id, book.slug, previousChapter.slug)}
-                    prefetch={false}
-                  >
-                    Previous: {previousChapter.title}
-                  </TextLink>
-                ) : null}
-              </div>
-              <div className="text-right">
-                {nextChapter ? (
-                  <TextLink
-                    href={buildChapterHref(book.id, book.slug, nextChapter.slug)}
-                    prefetch={false}
-                  >
-                    Next: {nextChapter.title}
-                  </TextLink>
-                ) : null}
-              </div>
-            </div>
+            <ChapterReaderNavigation
+              bookId={book.id}
+              bookSlug={book.slug}
+              previousChapter={previousChapter}
+              nextChapter={nextChapter}
+            />
           </div>
         </article>
       </div>
 
-      <ChapterTocDrawer
+      <ChapterReaderTocDrawer
+        book={book}
+        chapter={chapter}
+        chapters={chapters}
         isOpen={isTocOpen}
-        onClose={() => {
-          setIsTocOpen(false);
-        }}
-      >
-        <ChapterToc
-          chapters={chapters}
-          bookId={book.id}
-          bookSlug={book.slug}
-          currentChapterSlug={chapter.slug}
-          onNavigate={() => {
-            setIsTocOpen(false);
-          }}
-          readingProgressByChapterId={chapterProgressForDisplay}
-        />
-      </ChapterTocDrawer>
+        onClose={closeToc}
+        readingProgressByChapterId={chapterProgressForDisplay}
+      />
     </Container>
-  );
-}
-
-function buildProgressByChapterId(records: ReadingProgressRecord[]) {
-  if (!records.length) {
-    return undefined;
-  }
-
-  return Object.fromEntries(
-    records
-      .filter((record) => record.chapterId != null && record.progress != null)
-      .map((record) => [Number(record.chapterId!), record.progress!])
   );
 }
