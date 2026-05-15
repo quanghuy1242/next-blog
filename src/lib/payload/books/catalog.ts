@@ -5,7 +5,7 @@ import type {
   Chapter,
   PaginatedResponse,
 } from '@/types/cms';
-import { fetchAPI, fetchAPIWithAuthToken } from './base';
+import { fetchAPI, fetchAPIWithAuthToken } from '../core/client';
 import { getBookmarks } from './bookmarks';
 import {
   buildBookCacheTags,
@@ -13,8 +13,8 @@ import {
   buildBooksListCacheTags,
   buildBookSlugCacheTags,
   normalizeCacheTags,
-} from './cache';
-import type { PayloadCacheSettings } from './cache';
+} from '../core/cache';
+import type { PayloadCacheSettings } from '../core/cache';
 import {
   getChapterProgressMetadataByBookIds,
   getChaptersByBookId,

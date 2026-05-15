@@ -1,5 +1,5 @@
-import type { PayloadCacheSettings } from './cache';
-import { fetchAPI, fetchAPIWithAuthToken } from './base';
+import type { PayloadCacheSettings } from '../core/cache';
+import { fetchAPI, fetchAPIWithAuthToken } from '../core/client';
 import type {
   Book,
   BookmarkRecord,

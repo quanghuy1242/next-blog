@@ -1,5 +1,5 @@
 import type { BookmarkRecord } from '@/types/cms';
-import { getBookmarks } from '@/lib/payload/bookmarks';
+import { getBookmarks } from '@/lib/payload/books/bookmarks';
 
 export interface BooksShelfData {
   visibleBookBookmarks: BookmarkRecord[];

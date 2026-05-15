@@ -1,6 +1,6 @@
-import type { PayloadCacheSettings } from './cache';
-import { getCategoryIdBySlug } from './categories';
-import { getPaginatedPosts } from './posts';
+import type { PayloadCacheSettings } from '../core/cache';
+import { getCategoryIdBySlug } from '../taxonomy/categories';
+import { getPaginatedPosts } from '../posts/list';
 import { uniqueSortedStrings } from '@/lib/utils/query';
 import type { Post } from '@/types/cms';
 

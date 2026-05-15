@@ -1,12 +1,12 @@
 import type { Post, PostSlugData, SimilarPostsResult } from '@/types/cms';
-import { fetchAPI } from './base';
+import { fetchAPI } from '../core/client';
 import {
   buildPostDetailCacheTags,
   buildPostSlugCacheTags,
   buildSimilarPostsCacheTags,
   normalizeCacheTags,
   ONE_HOUR_PAYLOAD_CACHE,
-} from './cache';
+} from '../core/cache';
 
 interface PostFetchOptions {
   draftMode?: boolean;

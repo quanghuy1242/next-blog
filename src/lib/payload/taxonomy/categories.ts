@@ -1,5 +1,5 @@
-import { fetchAPI } from './base';
-import type { PayloadCacheSettings } from './cache';
+import { fetchAPI } from '../core/client';
+import type { PayloadCacheSettings } from '../core/cache';
 import type { Category } from '@/types/cms';
 
 interface CategoryBySlugResponse {

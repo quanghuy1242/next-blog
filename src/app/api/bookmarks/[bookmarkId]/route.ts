@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { deleteBookmark } from '@/lib/payload/bookmarks';
+import { deleteBookmark } from '@/lib/payload/books/bookmarks';
 import { getAuthTokenFromNextRequest, methodNotAllowed, noStoreJson } from '@/lib/server/http';
 
 export async function DELETE(

@@ -1,11 +1,11 @@
 import { NextRequest } from 'next/server';
 
-import { AUTH_PAYLOAD_CACHE } from '@/lib/payload/cache';
+import { AUTH_PAYLOAD_CACHE } from '@/lib/payload/core/cache';
 import {
   getBookCardsViewerState,
   getBookDetailViewerState,
-} from '@/lib/payload/book-viewer-state';
-import { fetchPublicBookPagePayload } from '@/lib/payload/book-pages';
+} from '@/lib/payload/books/viewer-state';
+import { fetchPublicBookPagePayload } from '@/lib/payload/books/pages';
 import { getAuthTokenFromNextRequest, methodNotAllowed, noStoreJson } from '@/lib/server/http';
 import { parseDelimitedPositiveIntegers } from '@/lib/utils/number';
 

@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { createBookmark, getBookmarks } from '@/lib/payload/bookmarks';
+import { createBookmark, getBookmarks } from '@/lib/payload/books/bookmarks';
 import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/auth/auth';
 import { GET, POST } from '@/app/api/bookmarks/route';
 
-vi.mock('@/lib/payload/bookmarks', () => ({
+vi.mock('@/lib/payload/books/bookmarks', () => ({
   createBookmark: vi.fn(),
   getBookmarks: vi.fn(),
 }));

@@ -4,8 +4,7 @@ import type { ReactNode } from 'react';
 
 import { Providers } from './providers';
 import { GA_TRACKING_ID } from '@/lib/analytics/gtag';
-import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
-import { getHomepageHeader } from '@/lib/payload/home-page-shell';
+import { getRootLayoutData } from '@/lib/server/layout-data';
 import '@/styles/index.css';
 
 export const metadata: Metadata = {
@@ -30,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const homepage = await getHomepageHeader({ cache: ONE_HOUR_PAYLOAD_CACHE });
+  const homepage = await getRootLayoutData();
 
   return (
     <html lang="en">

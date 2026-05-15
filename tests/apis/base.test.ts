@@ -69,7 +69,7 @@ describe('fetchAPI', () => {
 
     vi.stubGlobal('fetch', fetchMock);
 
-    const { fetchAPIWithAuthToken } = await import('@/lib/payload/base');
+    const { fetchAPIWithAuthToken } = await import('@/lib/payload/core/client');
 
     const result = await fetchAPIWithAuthToken<{ ok: boolean }>(
       'query Test { ok }'
@@ -99,7 +99,7 @@ describe('fetchAPI', () => {
 
     vi.stubGlobal('fetch', fetchMock);
 
-    const { fetchAPIWithAuthToken } = await import('@/lib/payload/base');
+    const { fetchAPIWithAuthToken } = await import('@/lib/payload/core/client');
 
     await fetchAPIWithAuthToken<{ ok: boolean }>('query Test { ok }', {
       authToken: 'token-123',
@@ -136,7 +136,7 @@ describe('fetchAPI', () => {
       default: cacheMock,
     });
 
-    const { fetchAPI } = await import('@/lib/payload/base');
+    const { fetchAPI } = await import('@/lib/payload/core/client');
 
     await fetchAPI<{ ok: boolean }>('query Test { ok }', {
       cache: {},
@@ -204,7 +204,7 @@ describe('fetchAPI', () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
 
-    const { fetchAPI } = await import('@/lib/payload/base');
+    const { fetchAPI } = await import('@/lib/payload/core/client');
     const result = await fetchAPI<{ title: string }>('query Test { title }', {
       cache: {},
     });
@@ -254,7 +254,7 @@ describe('fetchAPI', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    const { fetchAPI } = await import('@/lib/payload/base');
+    const { fetchAPI } = await import('@/lib/payload/core/client');
     const result = await fetchAPI<{ title: string }>('query Test { title }', {
       cache: {},
     });
@@ -296,7 +296,7 @@ describe('fetchAPI', () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
 
-    const { fetchAPIWithAuthToken } = await import('@/lib/payload/base');
+    const { fetchAPIWithAuthToken } = await import('@/lib/payload/core/client');
     const firstToken = createJwtToken({
       sub: 'user-123',
       exp: Math.floor(now / 1000) + 3_600,
@@ -381,7 +381,7 @@ describe('fetchAPI', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    const { fetchAPIWithAuthToken } = await import('@/lib/payload/base');
+    const { fetchAPIWithAuthToken } = await import('@/lib/payload/core/client');
     const expiredToken = createJwtToken({
       sub: 'user-123',
       exp: Math.floor(now / 1000) - 1,
@@ -418,7 +418,7 @@ describe('fetchAPI', () => {
 
     vi.stubGlobal('fetch', fetchMock);
 
-    const { fetchAPI } = await import('@/lib/payload/base');
+    const { fetchAPI } = await import('@/lib/payload/core/client');
     const result = await fetchAPI<{ ok: boolean }>('query Test { ok }', {
       cache: {},
     });

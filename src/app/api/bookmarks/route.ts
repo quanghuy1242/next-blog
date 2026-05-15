@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { createBookmark, getBookmarks } from '@/lib/payload/bookmarks';
+import { createBookmark, getBookmarks } from '@/lib/payload/books/bookmarks';
 import {
   getAuthTokenFromNextRequest,
   methodNotAllowed,

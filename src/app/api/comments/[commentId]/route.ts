@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 
 import { COMMENT_MAX_LENGTH } from '@/lib/constants/comments';
-import { deleteComment, updateComment } from '@/lib/payload/comments';
+import { deleteComment, updateComment } from '@/lib/payload/comments/repository';
 import {
   getAuthTokenFromNextRequest,
   getChapterProofFromNextRequest,

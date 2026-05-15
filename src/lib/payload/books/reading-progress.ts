@@ -1,6 +1,6 @@
 import type { ReadingProgressResult } from '@/types/cms';
 import { uniquePositiveIntegers } from '@/lib/utils/number';
-import { fetchAPIWithAuthToken } from './base';
+import { fetchAPIWithAuthToken } from '../core/client';
 
 const SAVE_READING_PROGRESS_MUTATION = `#graphql
   mutation SaveReadingProgress($chapterId: ID!, $bookId: ID!, $progress: Float!) {

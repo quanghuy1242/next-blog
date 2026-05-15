@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { getChapterViewerState } from '@/lib/payload/book-viewer-state';
+import { getChapterViewerState } from '@/lib/payload/books/viewer-state';
 import { getAuthTokenFromNextRequest, methodNotAllowed, noStoreJson } from '@/lib/server/http';
 import { parsePositiveInteger } from '@/lib/utils/number';
 

@@ -1,4 +1,4 @@
-import { fetchAPI } from './base';
+import { fetchAPI } from '../core/client';
 import type { Post, PaginatedResponse } from '@/types/cms';
 
 interface PaginatedPostsResponse {

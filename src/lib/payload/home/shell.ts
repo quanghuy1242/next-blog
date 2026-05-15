@@ -4,7 +4,7 @@ import type {
   HomePageShellData,
   Homepage,
 } from '@/types/cms';
-import { fetchAPI, type FetchApiOptions } from './base';
+import { fetchAPI, type FetchApiOptions } from '../core/client';
 
 const AUTHOR_ID = 1; // quanghuy1242
 

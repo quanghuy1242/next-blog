@@ -2,9 +2,9 @@ import 'server-only';
 
 import { cache } from 'react';
 
-import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
-import { getHomeFeedPage } from '@/lib/payload/home-feed';
-import { getHomePageShell } from '@/lib/payload/home-page-shell';
+import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/core/cache';
+import { getHomeFeedPage } from '@/lib/payload/home/feed';
+import { getHomePageShell } from '@/lib/payload/home/shell';
 import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';
 
 const POSTS_PAGE_SIZE = 5;

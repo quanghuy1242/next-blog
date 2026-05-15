@@ -1,5 +1,5 @@
 import type { BookmarksResult } from '@/types/cms';
-import { fetchAPIWithAuthToken } from './base';
+import { fetchAPIWithAuthToken } from '../core/client';
 
 const BOOKMARKS_QUERY = `#graphql
   query Bookmarks($where: Bookmark_where, $limit: Int, $page: Int) {

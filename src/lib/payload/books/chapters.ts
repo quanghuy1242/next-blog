@@ -1,6 +1,6 @@
 import type { Book, Chapter, ChapterSlugData } from '@/types/cms';
 import { uniquePositiveIntegers } from '@/lib/utils/number';
-import { fetchAPI, fetchAPIWithAuthToken } from './base';
+import { fetchAPI, fetchAPIWithAuthToken } from '../core/client';
 import {
   buildChapterPasswordProofCacheKey,
   normalizeChapterPasswordProofCookieValue,
@@ -11,8 +11,8 @@ import {
   buildChapterSlugCacheTags,
   buildChaptersByBookCacheTags,
   normalizeCacheTags,
-} from './cache';
-import type { PayloadCacheSettings } from './cache';
+} from '../core/cache';
+import type { PayloadCacheSettings } from '../core/cache';
 
 interface ChaptersResponse {
   Chapters: {

@@ -1,4 +1,4 @@
-import { sortChapters } from '@/lib/payload/chapters';
+import { sortChapters } from '@/lib/payload/books/chapters';
 import type { Chapter } from '@/types/cms';
 
 function createChapter(overrides: Partial<Chapter> = {}): Chapter {

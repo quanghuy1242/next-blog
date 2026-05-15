@@ -47,7 +47,7 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/payload/reading-progress', () => ({
+vi.mock('@/lib/payload/books/reading-progress', () => ({
   getReadingProgress: vi.fn().mockResolvedValue([]),
 }));
 

@@ -1,15 +1,15 @@
 import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { getCategoryIdBySlug } from '@/lib/payload/categories';
-import { getPaginatedPosts } from '@/lib/payload/posts';
+import { getCategoryIdBySlug } from '@/lib/payload/taxonomy/categories';
+import { getPaginatedPosts } from '@/lib/payload/posts/list';
 import type { Post } from '@/types/cms';
 import { GET, POST } from '@/app/api/posts/route';
 
-vi.mock('@/lib/payload/categories', () => ({
+vi.mock('@/lib/payload/taxonomy/categories', () => ({
   getCategoryIdBySlug: vi.fn(),
 }));
 
-vi.mock('@/lib/payload/posts', () => ({
+vi.mock('@/lib/payload/posts/list', () => ({
   getPaginatedPosts: vi.fn(),
 }));
 

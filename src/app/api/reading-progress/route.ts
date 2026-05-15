@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { saveReadingProgress } from '@/lib/payload/reading-progress';
+import { saveReadingProgress } from '@/lib/payload/books/reading-progress';
 import {
   getAuthTokenFromNextRequest,
   methodNotAllowed,

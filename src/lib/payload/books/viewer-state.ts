@@ -15,11 +15,11 @@ import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
 import { progressByChapterIdFromRecords } from '@/lib/reading/progress-maps';
 import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
 import { uniquePositiveIntegers } from '@/lib/utils/number';
-import { fetchAPIWithAuthToken } from './base';
-import { fetchBookPageViewerPayload } from './book-pages';
+import { fetchAPIWithAuthToken } from '../core/client';
+import { fetchBookPageViewerPayload } from './pages';
 import { getChapterProgressMetadataByBookIds } from './chapters';
 import { getReadingProgressByBookIds } from './reading-progress';
-import type { PayloadCacheSettings } from './cache';
+import type { PayloadCacheSettings } from '../core/cache';
 
 const BOOKMARK_RECORD_FIELDS = `
   id

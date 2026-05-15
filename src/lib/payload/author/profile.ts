@@ -1,5 +1,5 @@
 import type { AboutPageData, Author } from '@/types/cms';
-import { fetchAPI } from './base';
+import { fetchAPI } from '../core/client';
 
 const AUTHOR_ID = 1; // quanghuy1242
 

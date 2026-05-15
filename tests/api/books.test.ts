@@ -1,11 +1,11 @@
 import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { getPaginatedBooks } from '@/lib/payload/books';
-import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
+import { getPaginatedBooks } from '@/lib/payload/books/catalog';
+import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/core/cache';
 import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/auth/auth';
 import { GET, POST } from '@/app/api/books/route';
 
-vi.mock('@/lib/payload/books', () => ({
+vi.mock('@/lib/payload/books/catalog', () => ({
   getPaginatedBooks: vi.fn(),
 }));
 

@@ -1,5 +1,5 @@
 import type { CommentsResult, PublicComment } from '@/types/cms';
-import { fetchAPIWithAuthToken } from './base';
+import { fetchAPIWithAuthToken } from '../core/client';
 
 const COMMENTS_QUERY = `#graphql
   query Comments($chapterId: ID, $postId: ID) {

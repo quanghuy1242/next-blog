@@ -10,15 +10,15 @@ import type {
   CommentsResult,
   ReadingProgressRecord,
 } from '@/types/cms';
-import { getBookBySlug } from '@/lib/payload/books';
-import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE, type PayloadCacheSettings } from '@/lib/payload/cache';
-import { getChapterByBookAndSlug } from '@/lib/payload/chapters';
+import { getBookBySlug } from '@/lib/payload/books/catalog';
+import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE, type PayloadCacheSettings } from '@/lib/payload/core/cache';
+import { getChapterByBookAndSlug } from '@/lib/payload/books/chapters';
 import {
   fetchChapterPageBasePayload,
   fetchPublicBookPagePayload,
   type PayloadBookPageRequestOptions,
   type PayloadChapterPageRequestOptions,
-} from '@/lib/payload/book-pages';
+} from '@/lib/payload/books/pages';
 import {
   buildBookHref,
   buildChapterHref,

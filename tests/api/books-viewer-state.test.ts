@@ -2,20 +2,20 @@ import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { BETTER_AUTH_TOKEN_COOKIE } from '@/lib/auth/auth';
-import { AUTH_PAYLOAD_CACHE } from '@/lib/payload/cache';
+import { AUTH_PAYLOAD_CACHE } from '@/lib/payload/core/cache';
 import {
   getBookCardsViewerState,
   getBookDetailViewerState,
-} from '@/lib/payload/book-viewer-state';
-import { fetchPublicBookPagePayload } from '@/lib/payload/book-pages';
+} from '@/lib/payload/books/viewer-state';
+import { fetchPublicBookPagePayload } from '@/lib/payload/books/pages';
 import { GET, POST } from '@/app/api/books/viewer-state/route';
 
-vi.mock('@/lib/payload/book-viewer-state', () => ({
+vi.mock('@/lib/payload/books/viewer-state', () => ({
   getBookCardsViewerState: vi.fn(),
   getBookDetailViewerState: vi.fn(),
 }));
 
-vi.mock('@/lib/payload/book-pages', () => ({
+vi.mock('@/lib/payload/books/pages', () => ({
   fetchPublicBookPagePayload: vi.fn(),
 }));
 
