@@ -8,7 +8,8 @@
     "test:ci": "cross-env NODE_ENV=test vitest run",
     "test:watch": "vitest",
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "next build",
+    "build:webpack": "next build --webpack",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
@@ -16,11 +17,11 @@
     "start": "next start"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.19.4",
+    "@opennextjs/cloudflare": "^1.19.10",
     "@payloadcms/richtext-lexical": "^3.84.1",
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
-    "next": "16.2.4",
+    "next": "16.2.6",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "server-only": "^0.0.1"
@@ -38,13 +39,13 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "cross-env": "^10.1.0",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^16.2.4",
+    "eslint-config-next": "^16.2.6",
     "jsdom": "^29.0.2",
     "node-mocks-http": "^1.17.2",
     "postcss": "^8.4.45",
     "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5",
-    "wrangler": "^4.85.0"
+    "wrangler": "^4.91.0"
   }
 }
