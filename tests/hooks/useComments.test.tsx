@@ -67,6 +67,28 @@ describe('useComments', () => {
       expect(result.current.data?.viewerCanComment).toBe(true);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/comments?postId=10');
+    expect(global.fetch).toHaveBeenCalledWith('/api/comments?postId=10', { cache: 'no-store' });
+  });
+
+  test('refreshes stale comments when the tab regains focus', async () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(1_000);
+
+    renderHook(() =>
+      useComments({
+        postId: '10',
+        initialData,
+        refreshOnMount: false,
+      })
+    );
+
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+    expect(global.fetch).not.toHaveBeenCalled();
+
+    now.mockReturnValue(31_001);
+    window.dispatchEvent(new Event('focus'));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith('/api/comments?postId=10', { cache: 'no-store' });
+    });
   });
 });

@@ -3,11 +3,9 @@ import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
 import { getDataForPostSlug } from '@/lib/payload/posts.slug';
-import { getComments } from '@/lib/payload/comments';
 import { getCoverImageUrl } from '@/lib/utils/image';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { normalizePostTags } from '@/lib/utils/tags';
-import { getAuthTokenFromAppRequest } from '@/lib/server/app-request';
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
 import { PostContent } from '@/components/pages/posts_slugs/post-content';
@@ -43,7 +41,6 @@ export async function generateMetadata({ params }: PostPageProps) {
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
   const preview = await draftMode();
-  const sessionToken = await getAuthTokenFromAppRequest();
   const data = await getPostPageData(slug, preview.isEnabled);
 
   if (!data.post?.slug) {
@@ -53,10 +50,6 @@ export default async function PostPage({ params }: PostPageProps) {
   const categoryName =
     typeof data.post.category === 'string' ? data.post.category : data.post.category?.name || '';
   const tags = normalizePostTags(data.post.tags);
-  const initialComments = await getComments(
-    { postId: String(data.post.id) },
-    { authToken: sessionToken }
-  ).catch(() => null);
 
   return (
     <Layout className="flex flex-col items-center" isDraftMode={preview.isEnabled}>
@@ -74,11 +67,12 @@ export default async function PostPage({ params }: PostPageProps) {
       </article>
       <Container>
         <div className="mx-auto max-w-3xl">
-          <CommentsSection
-            postId={String(data.post.id)}
-            initialData={initialComments}
-            refreshOnMount={false}
-          />
+          {/*
+            Post content is cacheable and should not wait on live, viewer-scoped
+            comments. Comments hydrate through /api/comments after the article is
+            visible, matching the chapter-reader architecture.
+          */}
+          <CommentsSection postId={String(data.post.id)} />
         </div>
       </Container>
       <SectionSeparator />

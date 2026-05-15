@@ -9,6 +9,11 @@ interface CommentsSectionProps {
   refreshOnMount?: boolean;
 }
 
+/**
+ * Comments are intentionally a client-hydrated island for cached article and
+ * chapter routes. Passing no initialData keeps mutable viewer permissions and
+ * fresh comment lists out of the server render's critical path.
+ */
 export function CommentsSection({
   chapterId,
   postId,

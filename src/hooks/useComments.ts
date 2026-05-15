@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CommentsResult } from '@/types/cms';
+
+const COMMENT_FOCUS_REFRESH_INTERVAL_MS = 30_000;
 
 interface UseCommentsOptions {
   chapterId?: string;
@@ -23,6 +25,7 @@ export function useComments({
   initialData = null,
   refreshOnMount = true,
 }: UseCommentsOptions) {
+  const lastLoadedAtRef = useRef(0);
   const [state, setState] = useState<UseCommentsState>({
     data: initialData,
     loading: false,
@@ -41,12 +44,16 @@ export function useComments({
       if (chapterId) params.set('chapterId', chapterId);
       if (postId) params.set('postId', postId);
 
-      const response = await fetch(`/api/comments?${params}`);
+      // Comments are live social state, not page content. The route also sends
+      // no-store headers; this keeps browser fetch behavior aligned with that
+      // contract so newly created/approved comments are not replayed stale.
+      const response = await fetch(`/api/comments?${params}`, { cache: 'no-store' });
       if (!response.ok) {
         throw new Error('Failed to load comments');
       }
 
       const result: CommentsResult = await response.json();
+      lastLoadedAtRef.current = Date.now();
       setState({ data: result, loading: false, error: null, isSubmitting: false });
     } catch {
       setState((prev) => ({ ...prev, loading: false, error: 'Failed to load comments' }));
@@ -55,11 +62,41 @@ export function useComments({
 
   useEffect(() => {
     if (!refreshOnMount && initialData) {
+      lastLoadedAtRef.current = Date.now();
       return;
     }
 
     reload();
   }, [initialData, refreshOnMount, reload]);
+
+  useEffect(() => {
+    if (!enabled || (!chapterId && !postId)) {
+      return;
+    }
+
+    const refreshAfterTabReturn = () => {
+      if (document.visibilityState === 'hidden') {
+        return;
+      }
+
+      if (Date.now() - lastLoadedAtRef.current < COMMENT_FOCUS_REFRESH_INTERVAL_MS) {
+        return;
+      }
+
+      void reload();
+    };
+
+    // The API is no-store, but an already-open comment list still needs an
+    // explicit refresh to see comments created or approved from another tab or
+    // device. Focus/visibility keeps that fresh without adding polling.
+    window.addEventListener('focus', refreshAfterTabReturn);
+    document.addEventListener('visibilitychange', refreshAfterTabReturn);
+
+    return () => {
+      window.removeEventListener('focus', refreshAfterTabReturn);
+      document.removeEventListener('visibilitychange', refreshAfterTabReturn);
+    };
+  }, [chapterId, enabled, postId, reload]);
 
   const createComment = useCallback(async (
     input: { content: string; parentCommentId?: string }

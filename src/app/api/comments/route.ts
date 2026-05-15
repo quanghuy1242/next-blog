@@ -27,6 +27,9 @@ export async function GET(request: NextRequest) {
       { authToken: sessionToken, chapterPasswordProof }
     );
 
+    // Comment lists include viewer permissions and freshly created/pending
+    // comments, so this endpoint must stay live even when the parent page is
+    // cached by Payload/Next.
     return noStoreJson(result);
   } catch (error) {
     console.error('Failed to fetch comments', error);
