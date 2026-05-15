@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type {
   Book,
@@ -12,6 +12,10 @@ import {
   READING_POSITION_CHANGE_EVENT,
   readReadingProgressByChapterId,
 } from '@/lib/browser/reading-position';
+import {
+  readCachedBookDetailViewerState,
+  writeCachedBookDetailViewerState,
+} from '@/lib/browser/book-viewer-state-cache';
 import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
 import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
 import { buildBookHref } from '@/lib/routes/book-route';
@@ -47,6 +51,30 @@ export function BookPageClient({
   const [viewerState, setViewerState] = useState<BookDetailViewerState | null>(null);
   const [viewerStateLoaded, setViewerStateLoaded] = useState(!isAuthenticated);
   const [localProgressByChapterId, setLocalProgressByChapterId] = useState<Record<number, number>>({});
+  const viewerStateRef = useRef<BookDetailViewerState | null>(null);
+
+  useEffect(() => {
+    viewerStateRef.current = viewerState;
+  }, [viewerState]);
+
+  useLayoutEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    const cachedViewerState = readCachedBookDetailViewerState(book.id);
+
+    if (cachedViewerState) {
+      viewerStateRef.current = cachedViewerState;
+      setViewerState(cachedViewerState);
+      setViewerStateLoaded(true);
+      return;
+    }
+
+    viewerStateRef.current = null;
+    setViewerState(null);
+    setViewerStateLoaded(false);
+  }, [book.id, isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -74,7 +102,7 @@ export function BookPageClient({
 
     const controller = new AbortController();
 
-    setViewerStateLoaded(false);
+    setViewerStateLoaded(viewerStateRef.current != null);
 
     async function loadViewerState() {
       try {
@@ -92,7 +120,17 @@ export function BookPageClient({
         }
 
         const payload = (await response.json()) as BooksViewerStateResponse;
-        setViewerState(payload.detail ?? null);
+        const detail = payload.detail ?? null;
+
+        viewerStateRef.current = detail;
+        setViewerState(detail);
+
+        if (detail) {
+          writeCachedBookDetailViewerState({
+            ...detail,
+            bookId: book.id,
+          });
+        }
       } catch (error) {
         if (!controller.signal.aborted) {
           console.error('Failed to load book viewer state', error);

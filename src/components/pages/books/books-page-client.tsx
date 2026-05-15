@@ -1,11 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type { Book } from '@/types/cms';
 import { useBooksFeed } from '@/hooks/useBooksFeed';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { Container } from '@/components/core/container';
+import {
+  readCachedBookCardViewerStates,
+  writeCachedBookCardViewerStates,
+} from '@/lib/browser/book-viewer-state-cache';
 import { BooksGrid } from '@/components/shared/books-grid';
 import { Text } from '@/components/shared/text';
 import { Button } from '@/components/shared/ui/button';
@@ -23,6 +27,7 @@ const VIEWER_STATE_REFRESH_INTERVAL_MS = 30 * 1000;
 interface BookCardViewerState {
   bookId: number;
   isBookmarked: boolean;
+  bookmarkId: number | null;
   readingProgressPct: number;
 }
 
@@ -69,6 +74,22 @@ export function BooksPageClient({
       }),
     [booksState.books, viewerStateByBookId]
   );
+
+  useLayoutEffect(() => {
+    if (!isAuthenticated || visibleBookIds.length === 0) {
+      return;
+    }
+
+    const cachedViewerStateByBookId = readCachedBookCardViewerStates(visibleBookIds);
+
+    if (Object.keys(cachedViewerStateByBookId).length > 0) {
+      setViewerStateByBookId((previous) => ({
+        ...previous,
+        ...cachedViewerStateByBookId,
+      }));
+    }
+  }, [isAuthenticated, visibleBookIdsKey, visibleBookIds]);
+
   const refreshViewerState = useCallback(async (force = false) => {
     if (!isAuthenticated || visibleBookIds.length === 0) {
       return;
@@ -93,6 +114,7 @@ export function BooksPageClient({
       }
 
       const payload = (await response.json()) as BooksViewerStateResponse;
+      writeCachedBookCardViewerStates(payload.books ?? []);
       const nextViewerStateByBookId = Object.fromEntries(
         (payload.books ?? []).map((viewerState) => [viewerState.bookId, viewerState])
       );

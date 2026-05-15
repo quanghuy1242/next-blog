@@ -1,6 +1,6 @@
 # Book Viewer State UX Optimization
 
-> Status: implemented; targeted verification passed; full suite has one unrelated posts API assertion failure
+> Status: implemented with local viewer-state snapshot cache; targeted verification passed; full suite has one unrelated posts API assertion failure
 >
 > Date: 2026-05-15
 >
@@ -30,6 +30,7 @@
 > - Authenticated Payload GraphQL requests are cached per user where a cache setting is supplied and a stable `sub` claim is available.
 > - First-release work should not change the Payload backend schema.
 > - A short-lived neutral or locally inferred UI state is acceptable while server viewer state loads.
+> - The UI should use the last successful local viewer-state snapshot when available to avoid visible empty-to-hydrated flicker.
 
 ## Table Of Contents
 
@@ -281,6 +282,7 @@ Implementation tasks:
 - Preserve local progress hints where available.
 - Implemented `BookPageClient` to load bookmark/progress/continue-reading state after base content renders.
 - `getBookPageData` now returns base content without awaiting the live viewer payload.
+- `BookPageClient` reads and writes the local viewer-state snapshot so repeat visits can show bookmark/progress/TOC state before the background request finishes.
 
 Tests:
 
@@ -307,6 +309,7 @@ Implementation tasks:
 - `getChapterPageData` now returns base content without awaiting bookmark/progress/comment supplemental data.
 - `ChapterReaderClient` fetches bookmark/progress after render and lets comments fetch below content.
 - `useReadingProgress` no longer re-runs scroll restoration when delayed server progress arrives after mount; late state updates the displayed progress without forcing a late scroll jump.
+- `ChapterReaderClient` reads cached book progress and chapter bookmark state before the background refresh, reducing TOC and bookmark flicker.
 
 Tests:
 
@@ -345,6 +348,7 @@ Deployment is compatible with the current Payload schema. If viewer-state endpoi
 - Server progress newer than local progress from another device: server state overwrites or raises displayed progress when it arrives.
 - Bookmark mutation during stale viewer state: optimistic mutation remains immediate; later viewer refresh should reconcile to server state.
 - Locked chapter: do not fetch comments while locked; progress tracking remains disabled.
+- Missing local viewer-state snapshot: the UI may still show neutral state on first visit, after cache expiry, or after storage failure, then hydrate from server.
 
 ## 10. Implementation Backlog
 
@@ -373,6 +377,7 @@ Tests:
 Scope:
 
 - `src/lib/payload/book-viewer-state.ts`
+- `src/lib/browser/book-viewer-state-cache.ts`
 - `src/lib/payload/books.ts`
 - `src/lib/payload/book-pages.ts`
 
@@ -380,6 +385,7 @@ Tasks:
 
 - [x] Add helpers for list, book detail, and chapter viewer state.
 - [x] Keep old server-side supplemental functions available during migration.
+- [x] Add local viewer-state snapshot cache for book cards, book detail, and chapter reader.
 
 Acceptance criteria:
 
@@ -424,6 +430,7 @@ Tasks:
 - [x] Return base books without blocking on viewer attachments.
 - [x] Hydrate visible book-card progress/bookmark state.
 - [x] Refresh viewer state, not whole book content, on focus.
+- [x] Read cached book-card viewer state before background refresh.
 
 Acceptance criteria:
 
@@ -446,6 +453,7 @@ Tasks:
 
 - [x] Do not await book viewer payload in server route data.
 - [x] Hydrate bookmark/progress/continue-reading in client UI.
+- [x] Read cached book detail viewer state before background refresh.
 
 Acceptance criteria:
 
@@ -468,6 +476,7 @@ Tasks:
 - [x] Do not await authenticated supplemental payload for initial chapter render.
 - [x] Fetch bookmark/progress after render.
 - [x] Fetch comments on mount below chapter content.
+- [x] Read cached book progress and chapter bookmark state before background refresh.
 
 Acceptance criteria:
 
@@ -527,3 +536,5 @@ Verification results:
 ## 13. Final Model
 
 Book content remains server-rendered and cache-friendly. Authenticated personalization becomes an enhancement layer loaded after navigation through small no-store endpoints. Local reading position can make the UI feel immediate, but server viewer state remains the cross-device source of truth once it arrives.
+
+The enhancement layer now has two client-side tiers: a local viewer-state snapshot for repeat navigations and a fresh background request for cross-device correctness. First visits can still show neutral state briefly, but normal back-and-forth navigation should reuse the last successful bookmark/progress state instead of jumping from empty to hydrated.

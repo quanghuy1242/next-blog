@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type {
@@ -14,6 +14,14 @@ import {
   READING_POSITION_CHANGE_EVENT,
   readReadingProgressByChapterId,
 } from '@/lib/browser/reading-position';
+import {
+  readCachedBookDetailViewerState,
+  readCachedChapterBookmark,
+  writeCachedBookDetailViewerState,
+  writeCachedChapterBookmark,
+} from '@/lib/browser/book-viewer-state-cache';
+import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
+import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
 import { buildBookHref, buildChapterHref } from '@/lib/routes/book-route';
 import { useReadingProgress } from '@/hooks/useReadingProgress';
 import { Container } from '@/components/core/container';
@@ -53,6 +61,8 @@ export function ChapterReaderClient({
   const [viewerStateLoaded, setViewerStateLoaded] = useState(!isAuthenticated || initialBookmark !== undefined);
   const [localProgressByChapterId, setLocalProgressByChapterId] = useState<Record<number, number>>({});
   const chapterContentRef = useRef<HTMLDivElement | null>(null);
+  const viewerBookmarkRef = useRef<BookmarkRecord | null>(viewerBookmark);
+  const viewerReadingProgressRef = useRef<ReadingProgressRecord[]>(viewerReadingProgress);
   const router = useRouter();
   const shouldRenderChapterTitle =
     (book.origin as string) !== 'epub_imported' &&
@@ -70,10 +80,40 @@ export function ChapterReaderClient({
     [viewerReadingProgress]
   );
   useEffect(() => {
+    if (isAuthenticated && initialBookmark === undefined && readingProgress.length === 0) {
+      return;
+    }
+
     setViewerBookmark(initialBookmark ?? null);
     setViewerReadingProgress(readingProgress);
     setViewerStateLoaded(!isAuthenticated || initialBookmark !== undefined);
   }, [initialBookmark, isAuthenticated, readingProgress]);
+  useEffect(() => {
+    viewerBookmarkRef.current = viewerBookmark;
+  }, [viewerBookmark]);
+  useEffect(() => {
+    viewerReadingProgressRef.current = viewerReadingProgress;
+  }, [viewerReadingProgress]);
+  useLayoutEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    const cachedBookState = readCachedBookDetailViewerState(book.id);
+    const cachedChapterBookmark = readCachedChapterBookmark(chapter.id);
+
+    if (cachedBookState) {
+      viewerReadingProgressRef.current = cachedBookState.readingProgress;
+      setViewerReadingProgress(cachedBookState.readingProgress);
+      setViewerStateLoaded(true);
+    }
+
+    if (cachedChapterBookmark !== undefined) {
+      viewerBookmarkRef.current = cachedChapterBookmark;
+      setViewerBookmark(cachedChapterBookmark);
+      setViewerStateLoaded(true);
+    }
+  }, [book.id, chapter.id, isAuthenticated]);
   useEffect(() => {
     if (!isAuthenticated) {
       return;
@@ -81,7 +121,9 @@ export function ChapterReaderClient({
 
     const controller = new AbortController();
 
-    setViewerStateLoaded(false);
+    setViewerStateLoaded(
+      viewerBookmarkRef.current != null || viewerReadingProgressRef.current.length > 0
+    );
 
     async function loadViewerState() {
       try {
@@ -103,8 +145,29 @@ export function ChapterReaderClient({
           readingProgress?: ReadingProgressRecord[];
         };
 
-        setViewerBookmark(payload.bookmark ?? null);
-        setViewerReadingProgress(payload.readingProgress ?? []);
+        const nextBookmark = payload.bookmark ?? null;
+        const nextReadingProgress = payload.readingProgress ?? [];
+
+        viewerBookmarkRef.current = nextBookmark;
+        viewerReadingProgressRef.current = nextReadingProgress;
+        setViewerBookmark(nextBookmark);
+        setViewerReadingProgress(nextReadingProgress);
+        writeCachedChapterBookmark(chapter.id, nextBookmark);
+        writeCachedBookDetailViewerState({
+          bookId: book.id,
+          bookmark: readCachedBookDetailViewerState(book.id)?.bookmark ?? null,
+          readingProgress: nextReadingProgress,
+          readingProgressByChapterId: buildProgressByChapterId(nextReadingProgress),
+          continueReadingChapterSlug: getContinueReadingChapterSlug(
+            chapters,
+            nextReadingProgress
+          ),
+          wholeBookProgress: calculateWholeBookProgress({
+            chapters,
+            records: nextReadingProgress,
+            totalWordCount: book.totalWordCount,
+          }),
+        });
       } catch (error) {
         if (!controller.signal.aborted) {
           console.error('Failed to load chapter viewer state', error);
@@ -121,7 +184,7 @@ export function ChapterReaderClient({
     return () => {
       controller.abort();
     };
-  }, [book.id, chapter.id, isAuthenticated]);
+  }, [book.id, book.totalWordCount, chapter.id, chapters, isAuthenticated]);
   useEffect(() => {
     function syncLocalProgress() {
       setLocalProgressByChapterId(readReadingProgressByChapterId(book.id, chapters));
@@ -331,5 +394,17 @@ export function ChapterReaderClient({
         />
       </ChapterTocDrawer>
     </Container>
+  );
+}
+
+function buildProgressByChapterId(records: ReadingProgressRecord[]) {
+  if (!records.length) {
+    return undefined;
+  }
+
+  return Object.fromEntries(
+    records
+      .filter((record) => record.chapterId != null && record.progress != null)
+      .map((record) => [Number(record.chapterId!), record.progress!])
   );
 }

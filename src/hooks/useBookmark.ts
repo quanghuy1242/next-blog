@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { BookmarkRecord } from '@/types/cms';
+import {
+  readCachedBookCardViewerStates,
+  readCachedBookDetailViewerState,
+  writeCachedBookCardViewerStates,
+  writeCachedBookDetailViewerState,
+  writeCachedChapterBookmark,
+} from '@/lib/browser/book-viewer-state-cache';
 
 interface UseBookmarkOptions {
   contentType: 'chapter' | 'book';
@@ -77,9 +84,11 @@ export function useBookmark({
     try {
       if (previousBookmark) {
         setBookmark(null);
+        persistCachedBookmarkState(contentType, contentId, null);
         const response = await fetch(`/api/bookmarks/${previousBookmark.id}`, { method: 'DELETE' });
         if (!response.ok) {
           setBookmark(previousBookmark);
+          persistCachedBookmarkState(contentType, contentId, previousBookmark);
         }
       } else {
         const optimisticBookmark: BookmarkRecord = {
@@ -89,6 +98,7 @@ export function useBookmark({
           book: contentType === 'book' ? { id: contentId, title: '', slug: '' } : null,
         };
         setBookmark(optimisticBookmark);
+        persistCachedBookmarkState(contentType, contentId, optimisticBookmark);
 
         const body: Record<string, string> = { contentType };
         if (contentType === 'chapter') {
@@ -110,15 +120,22 @@ export function useBookmark({
               ...optimisticBookmark,
               id: data.bookmarkId,
             });
+            persistCachedBookmarkState(contentType, contentId, {
+              ...optimisticBookmark,
+              id: data.bookmarkId,
+            });
           } else {
             setBookmark(previousBookmark);
+            persistCachedBookmarkState(contentType, contentId, previousBookmark);
           }
         } else {
           setBookmark(previousBookmark);
+          persistCachedBookmarkState(contentType, contentId, previousBookmark);
         }
       }
     } catch {
       setBookmark(previousBookmark);
+      persistCachedBookmarkState(contentType, contentId, previousBookmark);
     } finally {
       setIsMutating(false);
     }
@@ -131,4 +148,35 @@ export function useBookmark({
     isMutating,
     toggle,
   };
+}
+
+function persistCachedBookmarkState(
+  contentType: 'chapter' | 'book',
+  contentId: number,
+  bookmark: BookmarkRecord | null
+) {
+  if (contentType === 'chapter') {
+    writeCachedChapterBookmark(contentId, bookmark);
+    return;
+  }
+
+  const cachedDetail = readCachedBookDetailViewerState(contentId);
+
+  if (cachedDetail) {
+    writeCachedBookDetailViewerState({
+      ...cachedDetail,
+      bookmark,
+    });
+  }
+
+  const cachedCard = readCachedBookCardViewerStates([contentId])[contentId];
+
+  writeCachedBookCardViewerStates([
+    {
+      bookId: contentId,
+      isBookmarked: bookmark != null,
+      bookmarkId: bookmark?.id ?? null,
+      readingProgressPct: cachedCard?.readingProgressPct ?? cachedDetail?.wholeBookProgress ?? 0,
+    },
+  ]);
 }
