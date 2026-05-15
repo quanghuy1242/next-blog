@@ -53,6 +53,7 @@ interface BookFetchOptions {
   authToken?: string | null;
   cache?: PayloadCacheSettings;
   draftMode?: boolean;
+  includeViewerState?: boolean;
 }
 
 const BOOK_LOOKUP_FIELDS = `
@@ -223,8 +224,10 @@ export async function getPaginatedBooks(
     }
   );
 
-  const booksWithProgress = await attachWholeBookProgress(data?.Books?.docs ?? [], options);
-  const books = await attachBookmarkState(booksWithProgress, options);
+  const baseBooks = data?.Books?.docs ?? [];
+  const books = options.includeViewerState === false
+    ? baseBooks
+    : await attachBookmarkState(await attachWholeBookProgress(baseBooks, options), options);
 
   return {
     books,
@@ -265,8 +268,10 @@ export async function getDataForBooksPage(
     }
   );
 
-  const booksWithProgress = await attachWholeBookProgress(data?.Books?.docs ?? [], options);
-  const books = await attachBookmarkState(booksWithProgress, options);
+  const baseBooks = data?.Books?.docs ?? [];
+  const books = options.includeViewerState === false
+    ? baseBooks
+    : await attachBookmarkState(await attachWholeBookProgress(baseBooks, options), options);
 
   return {
     books,

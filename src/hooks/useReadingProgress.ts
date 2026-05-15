@@ -36,15 +36,22 @@ export function useReadingProgress({
   const hasTrackedScroll = useRef(false);
   const hasRestoredPosition = useRef(false);
   const isRestoringPosition = useRef(false);
+  const initialProgressRef = useRef(clampedInitialProgress);
 
   useEffect(() => {
-    lastSentProgress.current = clampedInitialProgress;
+    initialProgressRef.current = clampedInitialProgress;
+    lastSentProgress.current = Math.max(lastSentProgress.current, clampedInitialProgress);
+    setCurrentProgress((previousProgress) => Math.max(previousProgress, clampedInitialProgress));
+  }, [clampedInitialProgress]);
+
+  useEffect(() => {
+    lastSentProgress.current = initialProgressRef.current;
     lastSentAt.current = 0;
     hasTrackedScroll.current = false;
     hasRestoredPosition.current = false;
     isRestoringPosition.current = false;
-    setCurrentProgress(clampedInitialProgress);
-  }, [bookId, chapterId, clampedInitialProgress]);
+    setCurrentProgress(initialProgressRef.current);
+  }, [bookId, chapterId]);
 
   const readStoredPosition = useCallback(
     () => readReadingPosition(bookId, chapterId),
@@ -221,12 +228,13 @@ export function useReadingProgress({
       hasRestoredPosition.current = true;
 
       const storedPosition = readStoredPosition();
+      const initialProgress = initialProgressRef.current;
       const shouldUseStoredPosition =
-        storedPosition != null && storedPosition.progress >= clampedInitialProgress;
+        storedPosition != null && storedPosition.progress >= initialProgress;
       const targetScrollY =
         (shouldUseStoredPosition ? storedPosition.scrollY : null) ??
-        (clampedInitialProgress > 0
-          ? computeScrollTargetForProgress(clampedInitialProgress)
+        (initialProgress > 0
+          ? computeScrollTargetForProgress(initialProgress)
           : null);
 
       if (targetScrollY == null) {
@@ -257,7 +265,6 @@ export function useReadingProgress({
       flushProgress();
     };
   }, [
-    clampedInitialProgress,
     computeScrollPercentage,
     computeScrollTargetForProgress,
     enabled,

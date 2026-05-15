@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Book } from '@/types/cms';
 import { useBooksFeed } from '@/hooks/useBooksFeed';
@@ -18,22 +18,93 @@ interface BooksPageClientProps {
 }
 
 const BOOKS_PAGE_SIZE = 6;
+const VIEWER_STATE_REFRESH_INTERVAL_MS = 30 * 1000;
+
+interface BookCardViewerState {
+  bookId: number;
+  isBookmarked: boolean;
+  readingProgressPct: number;
+}
+
+interface BooksViewerStateResponse {
+  books?: BookCardViewerState[];
+}
 
 export function BooksPageClient({
   initialBooks,
   initialHasMore,
   isAuthenticated,
 }: BooksPageClientProps) {
-  const { booksState, isFetching, error, loadMoreBooks, retryLoadMore, refreshBooks } =
+  const { booksState, isFetching, error, loadMoreBooks, retryLoadMore } =
     useBooksFeed({
       initialBooks,
       initialHasMore,
       pageSize: BOOKS_PAGE_SIZE,
     });
+  const [viewerStateByBookId, setViewerStateByBookId] = useState<Record<number, BookCardViewerState>>({});
+  const lastViewerStateRefreshAt = useRef(0);
   const { ref: loaderRef, isIntersecting } = useIntersectionObserver<HTMLDivElement>({
     rootMargin: '200px 0px',
     enabled: booksState.hasMore,
   });
+  const visibleBookIds = useMemo(
+    () => booksState.books.map((book) => book.id).filter((bookId) => Number.isInteger(bookId) && bookId > 0),
+    [booksState.books]
+  );
+  const visibleBookIdsKey = visibleBookIds.join(',');
+  const booksForDisplay = useMemo(
+    () =>
+      booksState.books.map((book) => {
+        const viewerState = viewerStateByBookId[book.id];
+
+        if (!viewerState) {
+          return book;
+        }
+
+        return {
+          ...book,
+          isBookmarked: viewerState.isBookmarked,
+          readingProgressPct: viewerState.readingProgressPct,
+        };
+      }),
+    [booksState.books, viewerStateByBookId]
+  );
+  const refreshViewerState = useCallback(async (force = false) => {
+    if (!isAuthenticated || visibleBookIds.length === 0) {
+      return;
+    }
+
+    const now = Date.now();
+
+    if (!force && now - lastViewerStateRefreshAt.current < VIEWER_STATE_REFRESH_INTERVAL_MS) {
+      return;
+    }
+
+    lastViewerStateRefreshAt.current = now;
+
+    try {
+      const params = new URLSearchParams({ bookIds: visibleBookIds.join(',') });
+      const response = await fetch(`/api/books/viewer-state?${params.toString()}`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const payload = (await response.json()) as BooksViewerStateResponse;
+      const nextViewerStateByBookId = Object.fromEntries(
+        (payload.books ?? []).map((viewerState) => [viewerState.bookId, viewerState])
+      );
+
+      setViewerStateByBookId((previous) => ({
+        ...previous,
+        ...nextViewerStateByBookId,
+      }));
+    } catch (viewerStateError) {
+      console.error('Failed to refresh books viewer state', viewerStateError);
+    }
+  }, [isAuthenticated, visibleBookIds]);
 
   useEffect(() => {
     if (isIntersecting && booksState.hasMore) {
@@ -42,18 +113,22 @@ export function BooksPageClient({
   }, [booksState.hasMore, isIntersecting, loadMoreBooks]);
 
   useEffect(() => {
+    void refreshViewerState(true);
+  }, [refreshViewerState, visibleBookIdsKey]);
+
+  useEffect(() => {
     if (!isAuthenticated) {
       return;
     }
 
     function handleVisibilityChange() {
       if (document.visibilityState === 'visible') {
-        void refreshBooks();
+        void refreshViewerState();
       }
     }
 
     function handleWindowFocus() {
-      void refreshBooks();
+      void refreshViewerState();
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -63,14 +138,14 @@ export function BooksPageClient({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleWindowFocus);
     };
-  }, [isAuthenticated, refreshBooks]);
+  }, [isAuthenticated, refreshViewerState]);
 
   return (
     <Container className="my-4 w-full md:px-20">
       <div className="mx-auto w-full md:w-2/3">
         <Text text="Books" />
         <BooksGrid
-          books={booksState.books}
+          books={booksForDisplay}
           isAuthenticated={isAuthenticated}
         />
 

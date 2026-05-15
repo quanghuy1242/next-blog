@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   try {
     const { books, hasMore } = await getPaginatedBooks(
       { limit, skip: offset },
-      { authToken: sessionToken, cache: payloadCache }
+      { authToken: sessionToken, cache: payloadCache, includeViewerState: false }
     );
 
     const payload = {

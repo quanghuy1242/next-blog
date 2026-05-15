@@ -21,6 +21,7 @@ export default async function BooksPage() {
   const data = await getDataForBooksPage(6, {
     authToken: sessionToken,
     cache: payloadCache,
+    includeViewerState: false,
   });
 
   return (

@@ -6,6 +6,7 @@ interface UseBookmarkOptions {
   contentId: number;
   enabled: boolean;
   initialBookmark?: BookmarkRecord | null;
+  refreshOnMount?: boolean;
 }
 
 interface UseBookmarkState {
@@ -20,6 +21,7 @@ export function useBookmark({
   contentId,
   enabled,
   initialBookmark = null,
+  refreshOnMount = false,
 }: UseBookmarkOptions): UseBookmarkState & {
   toggle: () => Promise<void>;
 } {
@@ -32,7 +34,7 @@ export function useBookmark({
   }, [contentType, contentId, initialBookmark]);
 
   useEffect(() => {
-    if (!enabled || !contentId) {
+    if (!enabled || !contentId || !refreshOnMount) {
       return;
     }
 
@@ -63,7 +65,7 @@ export function useBookmark({
     return () => {
       cancelled = true;
     };
-  }, [contentType, contentId, enabled]);
+  }, [contentType, contentId, enabled, refreshOnMount]);
 
   const toggle = useCallback(async () => {
     if (isMutating) return;

@@ -61,6 +61,7 @@ describe('GET /api/books', () => {
     }, {
       authToken: null,
       cache: ONE_HOUR_PAYLOAD_CACHE,
+      includeViewerState: false,
     });
 
     expect(response.status).toBe(200);
@@ -87,6 +88,7 @@ describe('GET /api/books', () => {
     }, {
       authToken: 'token-123',
       cache: AUTH_PAYLOAD_CACHE,
+      includeViewerState: false,
     });
 
     expect(response.headers.get('Cache-Control')).toBe('no-store, max-age=0');

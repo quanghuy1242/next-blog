@@ -14,21 +14,16 @@ import { getBookBySlug } from '@/lib/payload/books';
 import { AUTH_PAYLOAD_CACHE, ONE_HOUR_PAYLOAD_CACHE, type PayloadCacheSettings } from '@/lib/payload/cache';
 import { getChapterByBookAndSlug } from '@/lib/payload/chapters';
 import {
-  fetchAuthenticatedChapterPageSupplementalPayload,
-  fetchBookPageViewerPayload,
   fetchChapterPageBasePayload,
   fetchPublicBookPagePayload,
-  fetchPublicChapterCommentsPayload,
   type PayloadBookPageRequestOptions,
   type PayloadChapterPageRequestOptions,
 } from '@/lib/payload/book-pages';
-import { calculateWholeBookProgress } from '@/lib/reading/reading-progress';
 import {
   buildBookHref,
   buildChapterHref,
   parseBookRouteSegment,
 } from '@/lib/routes/book-route';
-import { getContinueReadingChapterSlug } from '@/lib/reading/continue-reading';
 import {
   getAuthTokenFromAppRequest,
   getChapterProofFromAppRequest,
@@ -47,7 +42,7 @@ interface ChapterPageRequestContext extends PageRequestContext {
 export interface BookPageData {
   book: Book;
   chapters: Chapter[];
-  initialBookmark: BookmarkRecord | null;
+  initialBookmark?: BookmarkRecord | null;
   isAuthenticated: boolean;
   isDraftMode: boolean;
   readingProgress: ReadingProgressRecord[];
@@ -61,7 +56,7 @@ export interface ChapterPageData {
   chapter: Chapter;
   chapters: Chapter[];
   initialComments: CommentsResult | null;
-  initialBookmark: BookmarkRecord | null;
+  initialBookmark?: BookmarkRecord | null;
   isAuthenticated: boolean;
   isDraftMode: boolean;
   readingProgress: ReadingProgressRecord[];
@@ -96,45 +91,27 @@ export async function getBookPageData(slugParam: string): Promise<BookPageData> 
     await redirectLegacyBookSlug(parsedBookRoute.bookSlug, requestContext);
   }
 
-  const [basePayload, viewerPayload] = await Promise.all([
-    fetchPublicBookPagePayload(
-      parsedBookRoute.bookId!,
-      toPayloadOptions(requestContext)
-    ),
-    requestContext.sessionToken
-      ? fetchBookPageViewerPayload(
-          parsedBookRoute.bookId!,
-          toLivePayloadOptions(requestContext)
-        )
-      : null,
-  ]);
+  const basePayload = await fetchPublicBookPagePayload(
+    parsedBookRoute.bookId!,
+    toPayloadOptions(requestContext)
+  );
   const book = basePayload.book;
   const chapters = basePayload.chapters;
-  const bookmark = viewerPayload?.bookmark ?? null;
-  const readingProgress = viewerPayload?.readingProgress ?? [];
 
   if (!book || book.slug !== parsedBookRoute.bookSlug) {
     notFound();
   }
 
-  const continueReadingChapterSlug = getContinueReadingChapterSlug(chapters, readingProgress);
-  const readingProgressByChapterId = buildReadingProgressByChapterId(readingProgress);
-  const wholeBookProgress = calculateWholeBookProgress({
-    chapters,
-    records: readingProgress,
-    totalWordCount: book.totalWordCount,
-  });
-
   return {
     book,
     chapters,
-    continueReadingChapterSlug,
-    initialBookmark: bookmark,
+    continueReadingChapterSlug: null,
+    initialBookmark: undefined,
     isAuthenticated: requestContext.sessionToken != null,
     isDraftMode: requestContext.isDraftMode,
-    readingProgress,
-    readingProgressByChapterId,
-    wholeBookProgress,
+    readingProgress: [],
+    readingProgressByChapterId: undefined,
+    wholeBookProgress: 0,
   };
 }
 
@@ -184,26 +161,15 @@ export async function getChapterPageData(
     notFound();
   }
 
-  const isChapterLocked = chapter.hasPassword === true && chapter.content == null;
-  const supplemental = await fetchChapterPageSupplementalData(
-    book.id,
-    chapter.id,
-    requestContext,
-    {
-      includeComments: !isChapterLocked,
-      includeViewerData: requestContext.sessionToken != null,
-    }
-  );
-
   return {
     book,
     chapter,
     chapters,
-    initialComments: supplemental.comments,
-    initialBookmark: supplemental.bookmark,
+    initialComments: null,
+    initialBookmark: undefined,
     isAuthenticated: requestContext.sessionToken != null,
     isDraftMode: requestContext.isDraftMode,
-    readingProgress: supplemental.readingProgress,
+    readingProgress: [],
   };
 }
 
@@ -258,45 +224,6 @@ async function fetchChapterPageBaseData(
   );
 }
 
-async function fetchChapterPageSupplementalData(
-  bookId: number,
-  chapterId: number,
-  requestContext: ChapterPageRequestContext,
-  options: {
-    includeComments: boolean;
-    includeViewerData: boolean;
-  }
-) {
-  if (options.includeViewerData) {
-    return fetchAuthenticatedChapterPageSupplementalPayload(
-      bookId,
-      chapterId,
-      {
-        ...toPayloadChapterOptions(requestContext),
-        cache: undefined,
-        includeComments: options.includeComments,
-      }
-    );
-  }
-
-  if (!options.includeComments) {
-    return {
-      comments: null,
-      bookmark: null,
-      readingProgress: [],
-    };
-  }
-
-  return {
-    comments: await fetchPublicChapterCommentsPayload(
-      chapterId,
-      toPayloadChapterOptions(requestContext)
-    ),
-    bookmark: null,
-    readingProgress: [],
-  };
-}
-
 async function redirectLegacyBookSlug(
   bookSlug: string,
   requestContext: PageRequestContext
@@ -349,29 +276,10 @@ async function redirectLegacyChapterRoute(
   );
 }
 
-function buildReadingProgressByChapterId(records: ReadingProgressRecord[]) {
-  if (!records.length) {
-    return undefined;
-  }
-
-  return Object.fromEntries(
-    records
-      .filter((record) => record.chapterId != null && record.progress != null)
-      .map((record) => [Number(record.chapterId!), record.progress!])
-  );
-}
-
 function toPayloadOptions(requestContext: PageRequestContext): PayloadBookPageRequestOptions {
   return {
     authToken: requestContext.sessionToken,
     cache: requestContext.payloadCache,
-    draftMode: requestContext.isDraftMode,
-  };
-}
-
-function toLivePayloadOptions(requestContext: PageRequestContext): PayloadBookPageRequestOptions {
-  return {
-    authToken: requestContext.sessionToken,
     draftMode: requestContext.isDraftMode,
   };
 }

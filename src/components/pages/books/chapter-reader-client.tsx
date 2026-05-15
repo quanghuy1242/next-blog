@@ -45,9 +45,12 @@ export function ChapterReaderClient({
   isAuthenticated,
   readingProgress,
   initialComments = null,
-  initialBookmark = null,
+  initialBookmark,
 }: ChapterReaderClientProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const [viewerBookmark, setViewerBookmark] = useState<BookmarkRecord | null>(initialBookmark ?? null);
+  const [viewerReadingProgress, setViewerReadingProgress] = useState<ReadingProgressRecord[]>(readingProgress);
+  const [viewerStateLoaded, setViewerStateLoaded] = useState(!isAuthenticated || initialBookmark !== undefined);
   const [localProgressByChapterId, setLocalProgressByChapterId] = useState<Record<number, number>>({});
   const chapterContentRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
@@ -57,15 +60,68 @@ export function ChapterReaderClient({
   const isChapterLocked = chapter.hasPassword === true && chapter.content == null;
   const readingProgressByChapterId = useMemo(
     () =>
-      readingProgress.length > 0
+      viewerReadingProgress.length > 0
         ? Object.fromEntries(
-            readingProgress
+            viewerReadingProgress
               .filter((r) => r.chapterId != null && r.progress != null)
               .map((r) => [Number(r.chapterId!), r.progress!])
           )
         : undefined,
-    [readingProgress]
+    [viewerReadingProgress]
   );
+  useEffect(() => {
+    setViewerBookmark(initialBookmark ?? null);
+    setViewerReadingProgress(readingProgress);
+    setViewerStateLoaded(!isAuthenticated || initialBookmark !== undefined);
+  }, [initialBookmark, isAuthenticated, readingProgress]);
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    setViewerStateLoaded(false);
+
+    async function loadViewerState() {
+      try {
+        const params = new URLSearchParams({
+          bookId: String(book.id),
+          chapterId: String(chapter.id),
+        });
+        const response = await fetch(`/api/chapters/viewer-state?${params.toString()}`, {
+          credentials: 'include',
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const payload = (await response.json()) as {
+          bookmark?: BookmarkRecord | null;
+          readingProgress?: ReadingProgressRecord[];
+        };
+
+        setViewerBookmark(payload.bookmark ?? null);
+        setViewerReadingProgress(payload.readingProgress ?? []);
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error('Failed to load chapter viewer state', error);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setViewerStateLoaded(true);
+        }
+      }
+    }
+
+    void loadViewerState();
+
+    return () => {
+      controller.abort();
+    };
+  }, [book.id, chapter.id, isAuthenticated]);
   useEffect(() => {
     function syncLocalProgress() {
       setLocalProgressByChapterId(readReadingProgressByChapterId(book.id, chapters));
@@ -195,7 +251,8 @@ export function ChapterReaderClient({
                   contentType="chapter"
                   contentId={chapter.id}
                   isAuthenticated={isAuthenticated}
-                  initialBookmark={initialBookmark}
+                  initialBookmark={viewerBookmark}
+                  initialStateLoaded={viewerStateLoaded}
                 />
               </div>
             </div>
@@ -226,7 +283,7 @@ export function ChapterReaderClient({
               <CommentsSection
                 chapterId={String(chapter.id)}
                 initialData={initialComments}
-                refreshOnMount={false}
+                refreshOnMount={initialComments == null}
               />
             ) : null}
 
