@@ -1,7 +1,7 @@
 import type { BookmarkRecord } from '@/types/cms';
 import { BookmarkButtonClient } from './bookmark-button-client';
 import { BookmarkIcon } from './bookmark-icon';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/aria/button';
 
 interface BookmarkButtonProps {
   contentType: 'chapter' | 'book';
@@ -26,7 +26,7 @@ export function BookmarkButton({
     return (
       <Button
         type="button"
-        disabled
+        isDisabled
         variant="secondary"
         size="lg"
         className="gap-1.5"

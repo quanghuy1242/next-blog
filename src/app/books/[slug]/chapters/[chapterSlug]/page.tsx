@@ -1,6 +1,6 @@
 import { cache } from 'react';
 
-import { Layout } from '@/components/core/layout';
+import { PageShell } from '@/components/layout/page-shell';
 import { ChapterReaderClient } from '@/components/pages/books/chapter-reader-client';
 import {
   getChapterPageData,
@@ -32,8 +32,8 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const data = await getCachedChapterPageData(resolvedParams.slug, resolvedParams.chapterSlug);
 
   return (
-    <Layout className="flex flex-col items-center" isDraftMode={data.isDraftMode}>
+    <PageShell className="flex flex-col items-center" isDraftMode={data.isDraftMode}>
       <ChapterReaderClient {...data} />
-    </Layout>
+    </PageShell>
   );
 }

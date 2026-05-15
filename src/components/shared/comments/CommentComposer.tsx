@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { COMMENT_MAX_LENGTH } from '@/lib/domain/comments/constants';
-import { Button } from '@/components/shared/ui/button';
-import { getInputClassName } from '@/components/shared/ui/form-control';
+import { Button } from '@/components/ui/aria/button';
+import { TextAreaField } from '@/components/ui/aria/text-field';
 
 interface CommentComposerProps {
   onSubmit: (content: string) => Promise<void>;
@@ -36,14 +36,14 @@ export function CommentComposer({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-      <textarea
+      <TextAreaField
+        aria-label="Comment"
         value={content}
-        onChange={(e) => setContent(e.target.value)}
+        onChange={setContent}
         placeholder={placeholder}
-        disabled={disabled || submitting}
+        isDisabled={disabled || submitting}
         rows={3}
         maxLength={COMMENT_MAX_LENGTH}
-        className={getInputClassName()}
       />
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs text-gray-500">
@@ -51,16 +51,17 @@ export function CommentComposer({
         </span>
         <Button
           type="submit"
-          disabled={!content.trim() || disabled || submitting}
+          isDisabled={!content.trim() || disabled}
+          isPending={submitting}
           size="sm"
           className="px-4"
         >
-          {submitting ? 'Posting...' : 'Post'}
+          Post
         </Button>
         {onCancel ? (
           <Button
             type="button"
-            onClick={onCancel}
+            onPress={onCancel}
             variant="ghost"
             size="sm"
             className="px-4"

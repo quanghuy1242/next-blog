@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/shared/ui/button';
-import { FieldError, getInputClassName } from '@/components/shared/ui/form-control';
-import { CenteredPanel } from '@/components/shared/ui/panel';
+import { Eye, EyeOff, Lock } from 'lucide-react';
+import { Button } from '@/components/ui/aria/button';
+import { TextField } from '@/components/ui/aria/text-field';
+import { CenteredPanel } from '@/components/ui/surface/card';
 
 interface ChapterPasswordGateProps {
   chapterId: number | string;
@@ -13,74 +14,6 @@ type UnlockChapterPasswordResponse = {
   expiresAt: string;
   proof: string;
 };
-
-function PasswordIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-8 w-8 text-blue">
-      <rect
-        x="5.25"
-        y="10.25"
-        width="13.5"
-        height="9.5"
-        rx="2.25"
-        stroke="currentColor"
-        strokeWidth="1.75"
-      />
-      <path
-        d="M8.5 10.25V8.5a3.5 3.5 0 0 1 7 0v1.75"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-      <path
-        d="M12 13.5v2"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function EyeIcon({ isOpen }: { isOpen: boolean }) {
-  return isOpen ? (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-      <path
-        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-      <circle cx="12" cy="12" r="2.75" stroke="currentColor" strokeWidth="1.6" />
-    </svg>
-  ) : (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-      <path
-        d="M4 5l16 14"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M9.3 9.6a3 3 0 0 1 4.2 4.2"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M10.5 4.9A10.8 10.8 0 0 1 12 4.5c6 0 9.5 6 9.5 6a16.7 16.7 0 0 1-4.1 4.8"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M6.2 7.8C3.3 10.2 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 export function ChapterPasswordGate({
   chapterId,
@@ -156,7 +89,7 @@ export function ChapterPasswordGate({
     <CenteredPanel>
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center">
-          <PasswordIcon />
+          <Lock aria-hidden className="h-8 w-8 text-primary" />
         </div>
 
         <h2 className="mt-3 text-center text-2xl font-semibold tracking-tight text-slate-900">
@@ -168,76 +101,53 @@ export function ChapterPasswordGate({
         </p>
 
         <form className="mt-5 w-full max-w-md space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-1.5">
-            <label
-              htmlFor={`chapter-password-${chapterId}`}
-              className="text-sm font-medium text-slate-700"
-            >
-              Password
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-blue/70">
-                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5">
-                  <rect
-                    x="4.25"
-                    y="8.25"
-                    width="11.5"
-                    height="7.5"
-                    rx="1.75"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M6.5 8.25V6.75a3.5 3.5 0 0 1 7 0v1.5"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
-
-              <input
-                id={`chapter-password-${chapterId}`}
-                autoComplete="current-password"
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck={false}
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                  if (error) {
-                    setError(null);
-                  }
-                }}
-                placeholder="Enter password"
-                className={getInputClassName({
-                  hasError: Boolean(error),
-                  className: 'h-11 rounded-xl pl-9 pr-10 text-slate-900 placeholder:text-slate-400',
-                })}
-              />
-
-              <button
+          <TextField
+            label="Password"
+            name="chapter-password"
+            autoComplete="current-password"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck="false"
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(nextPassword) => {
+              setPassword(nextPassword);
+              if (error) {
+                setError(null);
+              }
+            }}
+            placeholder="Enter password"
+            isInvalid={Boolean(error)}
+            errorMessage={error ?? undefined}
+            inputClassName="h-11 rounded-xl text-slate-900 placeholder:text-slate-400"
+            startAdornment={<Lock aria-hidden className="h-3.5 w-3.5" />}
+            endAdornment={
+              <Button
                 type="button"
-                onClick={() => setShowPassword((current) => !current)}
-                className="absolute inset-y-0 right-2 flex items-center rounded-full px-2 text-slate-400 transition hover:text-slate-700"
+                onPress={() => setShowPassword((current) => !current)}
+                variant="ghost"
+                size="icon"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                disabled={isSubmitting}
+                isDisabled={isSubmitting}
+                className="text-slate-400 hover:text-slate-700"
               >
-                <EyeIcon isOpen={showPassword} />
-              </button>
-            </div>
-          </div>
-
-          <FieldError>{error}</FieldError>
+                {showPassword ? (
+                  <EyeOff aria-hidden className="h-4 w-4" />
+                ) : (
+                  <Eye aria-hidden className="h-4 w-4" />
+                )}
+              </Button>
+            }
+          />
 
           <Button
             type="submit"
-            disabled={!canSubmit}
+            isDisabled={!canSubmit}
+            isPending={isSubmitting}
             size="lg"
             fullWidth
           >
-            {isSubmitting ? 'Unlocking...' : 'Unlock and read'}
+            Unlock and read
           </Button>
         </form>
 

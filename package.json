@@ -22,10 +22,14 @@
     "@payloadcms/richtext-lexical": "^3.84.1",
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
+    "lucide-react": "^1.16.0",
     "next": "16.2.6",
     "react": "^19.2.5",
+    "react-aria-components": "^1.17.0",
     "react-dom": "^19.2.5",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^3.6.0",
+    "tailwind-variants": "^3.2.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.4",
@@ -40,12 +44,14 @@
     "@vitest/coverage-v8": "^4.1.5",
     "babel-plugin-react-compiler": "^1.0.0",
     "cross-env": "^10.1.0",
+    "daisyui": "^5.5.19",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.6",
     "jsdom": "^29.0.2",
     "node-mocks-http": "^1.17.2",
     "postcss": "^8.4.45",
     "tailwindcss": "^4.2.4",
+    "tailwindcss-react-aria-components": "^2.1.0",
     "typescript": "6.0.3",
     "vitest": "^4.1.5",
     "wrangler": "^4.91.0"

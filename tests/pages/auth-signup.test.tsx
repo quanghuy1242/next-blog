@@ -24,7 +24,7 @@ vi.mock('@/components/core/container', () => ({
   Container: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('@/components/shared/ui/panel', () => ({
+vi.mock('@/components/ui/surface/card', () => ({
   CenteredPanel: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 

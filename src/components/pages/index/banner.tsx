@@ -2,7 +2,7 @@ import React from 'react';
 import { PLACEHOLDER_BANNER_URL } from '@/lib/domain/home/constants';
 import { getMediaUrl } from '@/lib/shared/image';
 import type { Media } from '@/types/cms';
-import cn from 'classnames';
+import { MediaHero } from '@/components/layout/media-hero';
 
 interface BannerProps {
   header?: string | null;
@@ -23,49 +23,15 @@ export function Banner({
   const lowResUrl = imageBanner?.lowResUrl;
 
   return (
-    <div
-      className={cn(
-        'flex flex-col justify-center items-center',
-        'h-banner',
-        'text-white text-center',
-        'relative overflow-hidden',
-        className
-      )}
-    >
-      {/* Background image - use optimizedUrl directly with CSS */}
-      {lowResUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={lowResUrl}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover object-top"
-          style={{
-            filter: 'blur(20px)',
-            transform: 'scale(1.1)',
-            aspectRatio: '2 / 1', // Mimic 2000x1000 (2:1) wide effect
-          }}
-        />
-      )}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={bannerUrl}
-        alt={bannerAlt}
-        loading="eager"
-        fetchPriority="high"
-        className="absolute inset-0 w-full h-full object-cover object-top"
-        style={{
-          aspectRatio: '2000 / 800',
-        }}
-      />
-
-      {/* Content overlay */}
-      <div className="z-10 relative">
-        <h1 className="text-7xl font-thin" style={{ lineHeight: '3.5rem' }}>
-          {header}
-        </h1>
-        <p className="mt-8 m-3">{subHeader}</p>
-      </div>
-    </div>
+    <MediaHero
+      title={header}
+      subtitle={subHeader ? <p className="m-3 mt-8">{subHeader}</p> : null}
+      imageUrl={bannerUrl}
+      imageAlt={bannerAlt}
+      lowResUrl={lowResUrl}
+      objectPosition="object-top"
+      className={className}
+      overlay={false}
+    />
   );
 }

@@ -3,10 +3,11 @@ import cn from 'classnames';
 import { CoverImage } from '@/components/shared/cover-image';
 import { Date } from '@/components/shared/date';
 import { Tag, Tags } from '@/components/shared/tags';
-import Link from 'next/link';
 import type { LinkProps } from 'next/link';
 import type { Post as PostType } from '@/types/cms';
 import { normalizePostTags } from '@/lib/domain/posts/tags';
+import { TextLink } from '@/components/ui/aria/link';
+import { Card } from '@/components/ui/surface/card';
 
 interface PostTitleProps {
   slug: string;
@@ -15,9 +16,9 @@ interface PostTitleProps {
 
 const PostTitle = ({ slug, title }: PostTitleProps) => (
   <h3 className="text-2xl leading-snug">
-    <Link href={`/posts/${slug}`} className="hover:underline">
+    <TextLink href={`/posts/${slug}`} className="text-base-content">
       {title}
-    </Link>
+    </TextLink>
   </h3>
 );
 
@@ -67,7 +68,7 @@ function Post({
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    <Card as="article" className="border-0 bg-transparent shadow-none" bodyClassName="gap-1 p-0">
       <CoverImage
         slug={slug}
         title={title}
@@ -91,7 +92,7 @@ function Post({
         />
       </div>
       <p className="text-base leading-relaxed">{excerpt ?? ''}</p>
-    </div>
+    </Card>
   );
 }
 

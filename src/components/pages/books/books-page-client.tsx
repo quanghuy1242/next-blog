@@ -6,15 +6,15 @@ import type { Book } from '@/types/cms';
 import type { BookCardViewerState } from '@/types/book-viewer-state';
 import { useBooksFeed } from '@/hooks/books/useBooksFeed';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import { Container } from '@/components/core/container';
+import { PageSection } from '@/components/layout/page-section';
 import {
   readCachedBookCardViewerStates,
   writeCachedBookCardViewerStates,
 } from '@/lib/client/books/viewer-state-cache';
 import { BooksGrid } from '@/components/shared/books-grid';
 import { Text } from '@/components/shared/text';
-import { Button } from '@/components/shared/ui/button';
-import { LoadingSpinner } from '@/components/shared/ui/loading-spinner';
+import { Button } from '@/components/ui/aria/button';
+import { LoadingSpinner } from '@/components/ui/aria/progress';
 
 interface BooksPageClientProps {
   initialBooks: Book[];
@@ -165,8 +165,7 @@ export function BooksPageClient({
   }, [isAuthenticated, refreshViewerState]);
 
   return (
-    <Container className="my-4 w-full md:px-20">
-      <div className="mx-auto w-full md:w-2/3">
+    <PageSection width="content">
         <Text text="Books" />
         <BooksGrid
           books={booksForDisplay}
@@ -187,10 +186,10 @@ export function BooksPageClient({
 
         {error ? (
           <div className="mt-4 flex flex-col items-center text-center">
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-error">{error}</p>
             <Button
               type="button"
-              onClick={() => {
+              onPress={() => {
                 void retryLoadMore();
               }}
               variant="secondary"
@@ -206,7 +205,6 @@ export function BooksPageClient({
             You&apos;ve reached the end.
           </p>
         ) : null}
-      </div>
-    </Container>
+    </PageSection>
   );
 }

@@ -4,6 +4,7 @@ import type { CommentsResult } from '@/types/cms';
 import { useComments } from '@/hooks/useComments';
 import { CommentComposer } from './CommentComposer';
 import { CommentThread } from './CommentThread';
+import { StatusText } from '@/components/ui/surface/status';
 
 interface CommentsSectionClientProps {
   chapterId?: string;
@@ -59,11 +60,11 @@ export function CommentsSectionClient({
       ) : null}
 
       {loading && comments.length === 0 ? (
-        <p className="mt-6 text-sm text-gray-500">Loading comments...</p>
+        <StatusText className="mt-6">Loading comments...</StatusText>
       ) : error && comments.length === 0 ? (
-        <p className="mt-6 text-sm text-red-500">{error}</p>
+        <StatusText variant="error" className="mt-6">{error}</StatusText>
       ) : comments.length === 0 ? (
-        <p className="mt-6 text-sm text-gray-500">No comments yet.</p>
+        <StatusText className="mt-6">No comments yet.</StatusText>
       ) : (
         <div className="mt-6 space-y-6">
           <CommentThread

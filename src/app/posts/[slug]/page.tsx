@@ -5,8 +5,9 @@ import { getPostPageData } from '@/lib/server/posts/page-data';
 import { getCoverImageUrl } from '@/lib/shared/image';
 import { buildMetadata } from '@/lib/shared/metadata';
 import { normalizePostTags } from '@/lib/domain/posts/tags';
-import { Container } from '@/components/core/container';
-import { Layout } from '@/components/core/layout';
+import { Container } from '@/components/layout/container';
+import { ContentColumn } from '@/components/layout/content-column';
+import { PageShell } from '@/components/layout/page-shell';
 import { PostContent } from '@/components/pages/posts/post-content';
 import { PostHeader } from '@/components/pages/posts/post-header';
 import { CommentsSection } from '@/components/shared/comments/CommentsSection';
@@ -47,7 +48,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const tags = normalizePostTags(data.post.tags);
 
   return (
-    <Layout className="flex flex-col items-center" isDraftMode={preview.isEnabled}>
+    <PageShell className="flex flex-col items-center" isDraftMode={preview.isEnabled}>
       <article className="flex w-full flex-col items-center">
         <PostHeader
           header={data.post.title ?? ''}
@@ -61,26 +62,26 @@ export default async function PostPage({ params }: PostPageProps) {
         </Container>
       </article>
       <Container>
-        <div className="mx-auto max-w-3xl">
+        <ContentColumn width="article">
           {/*
             Post content is cacheable and should not wait on live, viewer-scoped
             comments. Comments hydrate through /api/comments after the article is
             visible, matching the chapter-reader architecture.
           */}
           <CommentsSection postId={String(data.post.id)} />
-        </div>
+        </ContentColumn>
       </Container>
       <SectionSeparator />
       <Container>
-        <div className="mx-auto max-w-2xl">
+        <ContentColumn width="narrow">
           {data.morePosts.length > 0 ? (
             <>
               <Text text="More posts" />
               <Posts posts={data.morePosts} />
             </>
           ) : null}
-        </div>
+        </ContentColumn>
       </Container>
-    </Layout>
+    </PageShell>
   );
 }

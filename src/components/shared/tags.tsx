@@ -1,7 +1,7 @@
 import React from 'react';
 import cn from 'classnames';
-import Link from 'next/link';
 import type { LinkProps } from 'next/link';
+import { BadgeLink } from '@/components/ui/aria/link';
 
 export interface TagItem {
   name: string;
@@ -22,20 +22,17 @@ export function Tag({
   primary = false,
 }: TagProps) {
   return (
-    <Link
+    <BadgeLink
       href={href}
       prefetch={false}
+      primary={primary}
       className={cn(
-        'inline-block p-1 px-2 text-xs rounded',
-        {
-          'bg-gray-300 hover:bg-gray-400': !primary,
-          'bg-blue text-white': primary,
-        },
+        'text-xs',
         className || ''
       )}
     >
       {text}
-    </Link>
+    </BadgeLink>
   );
 }
 

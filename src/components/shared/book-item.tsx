@@ -1,8 +1,8 @@
 import React from 'react';
-import Link from 'next/link';
 import type { Book } from '@/types/cms';
 import { buildBookHref } from '@/lib/domain/books/routes';
 import { BookCover } from './book-cover';
+import { TextLink } from '@/components/ui/aria/link';
 
 interface BookItemProps {
   book: Book;
@@ -27,9 +27,9 @@ export function BookItem({
       />
 
       <h3 className="text-sm font-medium leading-snug sm:text-base">
-        <Link href={buildBookHref(book.id, book.slug)} prefetch={false} className="hover:underline">
+        <TextLink href={buildBookHref(book.id, book.slug)} prefetch={false} className="text-base-content">
           {book.title}
-        </Link>
+        </TextLink>
       </h3>
 
       {book.author && <p className="text-xs text-gray-700">{book.author}</p>}

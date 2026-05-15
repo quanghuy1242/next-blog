@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import type { PublicComment } from '@/types/cms';
 import { CommentComposer } from './CommentComposer';
-import { TextActionButton } from '@/components/shared/ui/button';
+import { TextActionButton } from '@/components/ui/aria/button';
+import { Card } from '@/components/ui/surface/card';
+import { Badge } from '@/components/ui/surface/badge';
 
 interface CommentItemProps {
   comment: PublicComment;
@@ -29,8 +31,9 @@ function formatDateTime(dateStr: string | null): string {
 
 function PendingCommentBadge() {
   return (
-    <span
-      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-amber-300 bg-amber-50 text-amber-700"
+    <Badge
+      variant="warning"
+      className="h-5 min-h-0 w-5 shrink-0 rounded-full p-0"
       title="Pending moderation"
       aria-label="Pending moderation"
     >
@@ -43,7 +46,7 @@ function PendingCommentBadge() {
           strokeLinecap="round"
         />
       </svg>
-    </span>
+    </Badge>
   );
 }
 
@@ -79,7 +82,7 @@ export function CommentItem({
 
   return (
     <div className="py-3">
-      <div className="rounded border border-gray-200 bg-white px-4 py-3">
+      <Card className="rounded" bodyClassName="px-4 py-3">
         {isEditing ? (
           <CommentComposer
             onSubmit={async (content) => {
@@ -113,7 +116,7 @@ export function CommentItem({
             <div className="mt-2 flex flex-wrap items-center gap-3">
               {showReply ? (
                 <TextActionButton
-                  onClick={() => {
+                  onPress={() => {
                     setIsReplying((value) => !value);
                     setIsConfirmingDelete(false);
                     setIsEditing(false);
@@ -124,7 +127,7 @@ export function CommentItem({
               ) : null}
               {showEdit ? (
                 <TextActionButton
-                  onClick={() => {
+                  onPress={() => {
                     setIsEditing(true);
                     setIsReplying(false);
                     setIsConfirmingDelete(false);
@@ -138,7 +141,7 @@ export function CommentItem({
                   <>
                     <TextActionButton
                       variant="danger"
-                      onClick={async () => {
+                      onPress={async () => {
                         await onDelete(comment.id);
                         setIsConfirmingDelete(false);
                       }}
@@ -146,14 +149,14 @@ export function CommentItem({
                       Confirm delete
                     </TextActionButton>
                     <TextActionButton
-                      onClick={() => setIsConfirmingDelete(false)}
+                      onPress={() => setIsConfirmingDelete(false)}
                     >
                       Cancel
                     </TextActionButton>
                   </>
                 ) : (
                   <TextActionButton
-                    onClick={() => {
+                    onPress={() => {
                       setIsConfirmingDelete(true);
                       setIsReplying(false);
                       setIsEditing(false);
@@ -180,7 +183,7 @@ export function CommentItem({
             />
           </div>
         ) : null}
-      </div>
+      </Card>
     </div>
   );
 }

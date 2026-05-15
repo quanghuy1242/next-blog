@@ -1,3 +1,5 @@
+import { ProgressBar } from '@/components/ui/aria/progress';
+
 interface ReadingProgressBarProps {
   progress: number;
 }
@@ -8,8 +10,11 @@ export function ReadingProgressBar({ progress }: ReadingProgressBarProps) {
   if (clampedProgress <= 0) return null;
 
   return (
-    <p className="mb-6 text-sm font-medium tabular-nums text-gray-500">
-      Reading progress: {clampedProgress}%
-    </p>
+    <div className="mb-6">
+      <div className="mb-1 text-sm font-medium tabular-nums text-gray-500">
+        Reading progress: {clampedProgress}%
+      </div>
+      <ProgressBar aria-label="Reading progress" value={clampedProgress} />
+    </div>
   );
 }

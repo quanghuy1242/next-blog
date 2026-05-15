@@ -16,7 +16,8 @@ import { useBookDetailViewerState } from '@/hooks/books/useBookDetailViewerState
 import { useLocalChapterProgress } from '@/hooks/books/useLocalChapterProgress';
 import { BookmarkButton } from '@/components/shared/bookmark-button';
 import { Text } from '@/components/shared/text';
-import { ButtonLink } from '@/components/shared/ui/button';
+import { ButtonLink } from '@/components/ui/aria/button';
+import { Badge } from '@/components/ui/surface/badge';
 
 interface BookPageClientProps {
   book: Book;
@@ -74,9 +75,9 @@ export function BookPageClient({
       {shouldShowProgress || continueReadingChapterSlug ? (
         <div className="mb-4 flex flex-wrap items-center gap-3">
           {shouldShowProgress ? (
-            <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-medium tabular-nums text-gray-700">
+            <Badge variant="outline" className="px-3 py-1 text-sm font-medium tabular-nums">
               Progress: {wholeBookProgress}%
-            </span>
+            </Badge>
           ) : null}
           {continueReadingChapterSlug ? (
             <ButtonLink

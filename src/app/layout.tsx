@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const homepage = await getRootLayoutData();
 
   return (
-    <html lang="en">
+    <html lang="en" data-theme="birdless">
       <body>
         <Script
           async

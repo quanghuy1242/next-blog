@@ -3,10 +3,10 @@
 import React from 'react';
 import cn from 'classnames';
 import { CoverImage } from '@/components/shared/cover-image';
-import Link from 'next/link';
 import { useState } from 'react';
 import type { LinkProps } from 'next/link';
 import type { Category as CategoryData } from '@/types/cms';
+import { TextLink } from '@/components/ui/aria/link';
 
 export interface CategoryCardProps {
   name: string;
@@ -75,7 +75,7 @@ export function CategoryCard({
   );
 
   const commonProps = {
-    className: cn(className, 'block relative mb-2'),
+    className: cn(className, 'card relative mb-2 block overflow-hidden no-underline hover:no-underline'),
     onMouseEnter: () => setShow(true),
     onMouseLeave: () => setShow(false),
     onFocus: () => setShow(true),
@@ -83,9 +83,9 @@ export function CategoryCard({
   };
 
   return (
-    <Link href={href} prefetch={prefetch} {...commonProps}>
+    <TextLink href={href} prefetch={prefetch} {...commonProps}>
       {cardContent}
-    </Link>
+    </TextLink>
   );
 }
 
