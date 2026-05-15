@@ -12,7 +12,9 @@ const config = defineCloudflareConfig({
   queue: doQueue,
 });
 
-export default {
+const openNextConfig = {
   ...config,
   buildCommand: 'pnpm exec next build --turbopack',
 };
+
+export default openNextConfig;

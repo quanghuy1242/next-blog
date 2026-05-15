@@ -4,6 +4,7 @@
   "packageManager": "pnpm@10.33.2",
   "scripts": {
     "lint": "eslint && tsc --noEmit",
+    "typecheck:tsgo": "tsgo --noEmit -p tsconfig.tsgo.json",
     "test": "vitest run",
     "test:ci": "cross-env NODE_ENV=test vitest run",
     "test:watch": "vitest",
@@ -34,6 +35,7 @@
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^4.1.5",
     "babel-plugin-react-compiler": "^1.0.0",
@@ -44,7 +46,7 @@
     "node-mocks-http": "^1.17.2",
     "postcss": "^8.4.45",
     "tailwindcss": "^4.2.4",
-    "typescript": "^6.0.3",
+    "typescript": "6.0.3",
     "vitest": "^4.1.5",
     "wrangler": "^4.91.0"
   }
