@@ -3,7 +3,7 @@
   "name": "next-blog-payloadcms",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-04-21",
-  "workers_dev": false,
+  "workers_dev": true,
   "preview_urls": true,
   "routes": [
     {
