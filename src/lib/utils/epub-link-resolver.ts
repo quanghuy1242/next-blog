@@ -73,7 +73,7 @@ export function normalizeEpubPath(path: string): string {
   return normalizedSegments.join('/').toLowerCase()
 }
 
-export function chapterSourceKeyToSpineHref(chapterSourceKey: string): string | null {
+function chapterSourceKeyToSpineHref(chapterSourceKey: string): string | null {
   const trimmedKey = chapterSourceKey.trim()
 
   if (!trimmedKey) {

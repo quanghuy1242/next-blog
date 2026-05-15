@@ -1,7 +1,7 @@
 import { Suspense, type ReactNode } from 'react';
 
-import { Analytics } from '@/components/app/analytics';
-import { ScrollRestoration } from '@/components/app/scroll-restoration';
+import { Analytics } from '@/components/core/effects/analytics';
+import { ScrollRestoration } from '@/components/core/effects/scroll-restoration';
 import { Header } from '@/components/core/header';
 
 export function Providers({

@@ -25,7 +25,7 @@ export function getMediaUrl(media: Media | null | undefined): string {
   return media.optimizedUrl || media.url || '';
 }
 
-export interface ImageTransformOptions {
+interface ImageTransformOptions {
   width?: number;
   height?: number;
   format?: 'webp' | 'jpeg' | 'jpg' | 'png' | 'auto';
@@ -47,7 +47,7 @@ export interface ImageTransformOptions {
  * transformImage('https://example.com/image-optimized.webp', { width: 640, format: 'webp' })
  * // Returns: 'https://example.com/image-640x320.webp'
  */
-export function transformImage(
+function transformImage(
   url: string | undefined | null,
   options: ImageTransformOptions = {}
 ): string {
@@ -94,7 +94,7 @@ export function transformImage(
  * Generate a srcSet string for responsive images using native storage variants
  * Maintains aspect ratio when both width and height are provided in options
  */
-export function generateSrcSet(
+function generateSrcSet(
   url: string | undefined | null,
   widths: number[],
   options: Omit<ImageTransformOptions, 'width'> = {},
@@ -200,25 +200,6 @@ export function generateResponsiveImage(
 }
 
 /**
- * Get optimized thumbnail URL
- * Uses native storage variant
- */
-export function getThumbnailUrl(
-  urlOrMedia: string | Media | undefined | null
-): string {
-  // Extract the URL to use (prefer optimizedUrl)
-  const url =
-    typeof urlOrMedia === 'string' ? urlOrMedia : getMediaUrl(urlOrMedia);
-
-  // Use smallest available variant for thumbnails
-  return transformImage(url, {
-    width: 480,
-    format: 'webp',
-    fit: 'cover',
-  });
-}
-
-/**
  * Get cover image URL
  * Returns the optimizedUrl directly (no transformation needed)
  */
@@ -266,45 +247,3 @@ export function getBlurPlaceholder(
     fit: 'cover',
   });
 }
-
-/**
- * Get optimized image URLs for Next.js Image with blur placeholder
- * This provides the full-quality image URL and a blurred placeholder URL
- */
-export interface ImageWithPlaceholder {
-  src: string;
-  blurDataURL: string;
-  width?: number | null;
-  height?: number | null;
-  alt?: string | null;
-}
-
-export function getImageWithPlaceholder(
-  url: string | undefined | null,
-  options: {
-    width?: number;
-    height?: number;
-    quality?: number;
-    alt?: string | null;
-  } = {}
-): ImageWithPlaceholder | null {
-  if (!url) {
-    return null;
-  }
-
-  const { width = 2000, height = 1000, alt = null } = options;
-
-  return {
-    src: getCoverImageUrl(url),
-    blurDataURL: getBlurPlaceholder(url),
-    width,
-    height,
-    alt,
-  };
-}
-
-/**
- * Default placeholder image for missing avatars
- */
-export const DEFAULT_AVATAR_PLACEHOLDER =
-  'https://ui-avatars.com/api/?name=User&size=200&background=random';

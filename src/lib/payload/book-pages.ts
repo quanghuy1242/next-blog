@@ -4,7 +4,6 @@ import type {
   Book,
   BookmarkRecord,
   Chapter,
-  CommentsResult,
   ReadingProgressRecord,
 } from '@/types/cms';
 
@@ -92,34 +91,6 @@ const BOOKMARK_RECORD_FIELDS = `
   }
 `;
 
-const COMMENT_FIELDS = `
-  id
-  content
-  status
-  createdAt
-  updatedAt
-  parentCommentId
-  chapterId
-  postId
-  isOwnPending
-  isDeleted
-  viewerCanEdit
-  viewerCanDelete
-  editWindowEndsAt
-  author {
-    id
-    fullName
-    avatar {
-      id
-      url
-      thumbnailURL
-      optimizedUrl
-      lowResUrl
-      alt
-    }
-  }
-`;
-
 export interface PayloadBookPageRequestOptions {
   authToken?: string | null;
   cache?: PayloadCacheSettings;
@@ -156,20 +127,6 @@ interface ChapterPageBaseResponse {
   ChaptersByBook: {
     docs: Chapter[];
   };
-}
-
-interface ChapterPageSupplementalResponse {
-  readingProgress: {
-    records: ReadingProgressRecord[];
-  } | null;
-  Bookmarks: {
-    docs: BookmarkRecord[];
-  } | null;
-  comments: CommentsResult | null;
-}
-
-interface ChapterCommentsResponse {
-  comments: CommentsResult | null;
 }
 
 export async function fetchBookPageViewerPayload(
@@ -332,94 +289,6 @@ export async function fetchChapterPageBasePayload(
   };
 }
 
-export async function fetchAuthenticatedChapterPageSupplementalPayload(
-  bookId: number,
-  chapterId: number,
-  options: PayloadChapterPageRequestOptions & {
-    includeComments: boolean;
-  }
-) {
-  const data = await fetchAPIWithAuthToken<ChapterPageSupplementalResponse>(
-    `#graphql
-      query ChapterPageSupplemental(
-        $readingProgressBookId: ID!
-        $bookmarkWhere: Bookmark_where
-        $commentsChapterId: ID
-      ) {
-        readingProgress(bookId: $readingProgressBookId) {
-          records {
-            ${READING_PROGRESS_FIELDS}
-          }
-        }
-
-        Bookmarks(where: $bookmarkWhere, limit: 1) {
-          docs {
-            ${BOOKMARK_RECORD_FIELDS}
-          }
-        }
-
-        comments(chapterId: $commentsChapterId) {
-          docs {
-            ${COMMENT_FIELDS}
-          }
-          totalDocs
-          viewerCanComment
-        }
-      }
-    `,
-    {
-      variables: {
-        readingProgressBookId: String(bookId),
-        bookmarkWhere: {
-          AND: [
-            { contentType: { equals: 'chapter' } },
-            { chapter: { equals: String(chapterId) } },
-          ],
-        },
-        commentsChapterId: options.includeComments ? String(chapterId) : undefined,
-      },
-      authToken: options.authToken!,
-      requestHeaders: buildChapterProofHeaders(options.chapterPasswordProof),
-    }
-  );
-
-  return {
-    comments: options.includeComments
-      ? (data?.comments ?? emptyCommentsResult())
-      : null,
-    bookmark: data?.Bookmarks?.docs?.[0] ?? null,
-    readingProgress: data?.readingProgress?.records ?? [],
-  };
-}
-
-export async function fetchPublicChapterCommentsPayload(
-  chapterId: number,
-  options: PayloadChapterPageRequestOptions
-) {
-  const data = await fetchAPIWithAuthToken<ChapterCommentsResponse>(
-    `#graphql
-      query ChapterPageComments($commentsChapterId: ID!) {
-        comments(chapterId: $commentsChapterId) {
-          docs {
-            ${COMMENT_FIELDS}
-          }
-          totalDocs
-          viewerCanComment
-        }
-      }
-    `,
-    {
-      variables: {
-        commentsChapterId: String(chapterId),
-      },
-      requestHeaders: buildChapterProofHeaders(options.chapterPasswordProof),
-      cache: options.cache,
-    }
-  );
-
-  return data?.comments ?? emptyCommentsResult();
-}
-
 function selectPayloadFetcher(
   options: PayloadBookPageRequestOptions | PayloadChapterPageRequestOptions
 ) {
@@ -464,12 +333,4 @@ function sortChaptersForPage(chapters: Chapter[]): Chapter[] {
 
     return first.id - second.id;
   });
-}
-
-function emptyCommentsResult(): CommentsResult {
-  return {
-    docs: [],
-    totalDocs: 0,
-    viewerCanComment: false,
-  };
 }

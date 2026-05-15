@@ -1,7 +1,4 @@
-import { cache } from 'react';
-
-import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
-import { getHomePageShell } from '@/lib/payload/home-page-shell';
+import { getCategoriesPageData } from '@/lib/server/categories/page-data';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
@@ -9,12 +6,6 @@ import { Categories } from '@/components/shared/categories';
 import { Text } from '@/components/shared/text';
 
 export const revalidate = 60;
-
-const getCategoriesPageData = cache(() =>
-  getHomePageShell({
-    cache: ONE_HOUR_PAYLOAD_CACHE,
-  })
-);
 
 export async function generateMetadata() {
   const data = await getCategoriesPageData();

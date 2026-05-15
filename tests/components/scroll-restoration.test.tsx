@@ -1,6 +1,6 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { ScrollRestoration } from '@/components/app/scroll-restoration';
+import { ScrollRestoration } from '@/components/core/effects/scroll-restoration';
 
 const navigationState = vi.hoisted(() => ({
   pathname: '/',

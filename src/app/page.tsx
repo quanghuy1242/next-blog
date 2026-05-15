@@ -1,54 +1,14 @@
-import { cache } from 'react';
-
-import { ONE_HOUR_PAYLOAD_CACHE } from '@/lib/payload/cache';
-import { getHomeFeedPage } from '@/lib/payload/home-feed';
-import { getHomePageShell } from '@/lib/payload/home-page-shell';
+import { getHomePageData } from '@/lib/server/home/page-data';
 import { buildMetadata } from '@/lib/utils/next-metadata';
-import { normalizeQueryParam, normalizeQueryParamList } from '@/lib/utils/query';
 import { Layout } from '@/components/core/layout';
 import { HomePageClient } from '@/components/pages/index/home-page-client';
-
-const POSTS_PAGE_SIZE = 5;
 
 interface HomePageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-async function loadHomePageData(searchParams: Record<string, string | string[] | undefined>) {
-  const initialCategory = normalizeQueryParam(searchParams.category);
-  const initialTags = normalizeQueryParamList(searchParams.tag);
-  return loadHomePageDataForFilters(initialCategory, initialTags.join('\u0000'));
-}
-
-const loadHomePageDataForFilters = cache(async (
-  initialCategory: string | null,
-  initialTagsKey: string
-) => {
-  const initialTags = initialTagsKey ? initialTagsKey.split('\u0000') : [];
-  const [shell, feedPage] = await Promise.all([
-    getHomePageShell({
-      cache: ONE_HOUR_PAYLOAD_CACHE,
-    }),
-    getHomeFeedPage({
-      limit: POSTS_PAGE_SIZE,
-      category: initialCategory,
-      tags: initialTags,
-      cache: ONE_HOUR_PAYLOAD_CACHE,
-    }),
-  ]);
-
-  return {
-    allCategories: shell.allCategories,
-    homepage: shell.homepage,
-    initialCategory: feedPage.category,
-    initialHasMore: feedPage.hasMore,
-    initialPosts: feedPage.posts,
-    initialTags: feedPage.tags,
-  };
-});
-
 export async function generateMetadata({ searchParams }: HomePageProps) {
-  const data = await loadHomePageData(await searchParams);
+  const data = await getHomePageData(await searchParams);
 
   return buildMetadata({
     title: data.homepage?.meta?.title || data.homepage?.header || 'Blog',
@@ -58,7 +18,7 @@ export async function generateMetadata({ searchParams }: HomePageProps) {
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const data = await loadHomePageData(await searchParams);
+  const data = await getHomePageData(await searchParams);
 
   return (
     <Layout className="flex flex-col items-center">

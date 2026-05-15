@@ -2,11 +2,11 @@ import { cache } from 'react';
 
 import { Layout } from '@/components/core/layout';
 import { ChapterReaderClient } from '@/components/pages/books/chapter-reader-client';
-import { getChapterPageMetadata } from '@/lib/metadata/chapter-page';
 import {
   getChapterPageData,
   getChapterPageMetadataData,
 } from '@/lib/server/books/page-data';
+import { getChapterPageMetadata } from '@/lib/server/books/chapter-metadata';
 
 interface ChapterPageProps {
   params: Promise<{ slug: string; chapterSlug: string }>;

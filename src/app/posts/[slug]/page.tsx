@@ -1,15 +1,14 @@
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
-import { cache } from 'react';
 
-import { getDataForPostSlug } from '@/lib/payload/posts.slug';
+import { getPostPageData } from '@/lib/server/posts/page-data';
 import { getCoverImageUrl } from '@/lib/utils/image';
 import { buildMetadata } from '@/lib/utils/next-metadata';
 import { normalizePostTags } from '@/lib/utils/tags';
 import { Container } from '@/components/core/container';
 import { Layout } from '@/components/core/layout';
-import { PostContent } from '@/components/pages/posts_slugs/post-content';
-import { PostHeader } from '@/components/pages/posts_slugs/post-header';
+import { PostContent } from '@/components/pages/posts/post-content';
+import { PostHeader } from '@/components/pages/posts/post-header';
 import { CommentsSection } from '@/components/shared/comments/CommentsSection';
 import { Posts } from '@/components/shared/posts';
 import { SectionSeparator } from '@/components/shared/section-separator';
@@ -20,10 +19,6 @@ export const revalidate = 60;
 interface PostPageProps {
   params: Promise<{ slug: string }>;
 }
-
-const getPostPageData = cache((slug: string, isDraftMode: boolean) =>
-  getDataForPostSlug(slug, { draftMode: isDraftMode })
-);
 
 export async function generateMetadata({ params }: PostPageProps) {
   const { slug } = await params;

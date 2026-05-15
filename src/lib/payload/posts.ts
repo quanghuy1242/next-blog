@@ -99,7 +99,7 @@ export async function getPaginatedPosts({
   };
 }
 
-export function createPostsWhere(
+function createPostsWhere(
   categoryId: string | null | undefined,
   tags: string[] | null | undefined
 ): Record<string, unknown> {

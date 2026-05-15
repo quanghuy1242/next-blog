@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getBetterAuthTokenFromRequest } from '@/lib/auth/auth';
 import { getChapterPasswordProofCookieValueFromRequest } from '@/lib/server/chapter-password-proof';
 
-export function noStoreHeaders() {
+function noStoreHeaders() {
   return {
     'Cache-Control': 'no-store, max-age=0',
   };

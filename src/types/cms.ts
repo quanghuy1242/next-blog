@@ -208,13 +208,6 @@ export interface ChapterSlugData {
   chapters: Chapter[];
 }
 
-// Meta Tags Generation (replacement for react-datocms renderMetaTags)
-export interface MetaTag {
-  tag: string;
-  attributes?: Record<string, string>;
-  content?: string | null;
-}
-
 // Utility type for normalized tags (converting PostTag[] to string[])
 export type NormalizedTags = string[];
 

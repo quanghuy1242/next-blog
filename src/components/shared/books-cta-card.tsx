@@ -3,7 +3,7 @@ import cn from 'classnames';
 import type { Media } from '@/types/cms';
 import { CategoryCard } from './categories';
 
-export const BOOKS_CTA_IMAGE_URL =
+const BOOKS_CTA_IMAGE_URL =
   'https://payload-cdn.quanghuy.dev/rey-seven-_nm_mZ4Cs2I-unsplash.jpg?2026-04-13T06%3A28%3A42.300Z';
 
 export const BOOKS_CTA_MEDIA: Media = {

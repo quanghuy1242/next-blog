@@ -171,7 +171,7 @@ function selectBookFetcher(options: BookFetchOptions) {
   return fetchAPIWithAuthToken;
 }
 
-export function createBooksWhere(): Record<string, unknown> {
+function createBooksWhere(): Record<string, unknown> {
   return {
     AND: [
       {

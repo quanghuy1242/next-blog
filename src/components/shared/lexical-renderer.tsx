@@ -385,5 +385,3 @@ export function LexicalRenderer({
     </div>
   );
 }
-
-export default LexicalRenderer;

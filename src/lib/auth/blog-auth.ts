@@ -1,10 +1,10 @@
 import crypto from 'node:crypto';
 
 export const BLOG_AUTH_STATE_COOKIE = 'blogAuthState' as const;
-export const BLOG_AUTH_SCOPE = 'openid email profile' as const;
+const BLOG_AUTH_SCOPE = 'openid email profile' as const;
 export const BLOG_AUTH_COOKIE_MAX_AGE_SECONDS = 10 * 60;
-export const BLOG_TOKEN_COOKIE_MAX_AGE_SECONDS = 2 * 24 * 60 * 60;
-export const BLOG_AUTH_THEME = 'blog' as const;
+const BLOG_TOKEN_COOKIE_MAX_AGE_SECONDS = 2 * 24 * 60 * 60;
+const BLOG_AUTH_THEME = 'blog' as const;
 
 export interface BlogAuthStatePayload {
   createdAt: number;
@@ -47,7 +47,7 @@ export const getAuthBaseUrl = (): string => {
   return value.replace(/\/+$/, '');
 };
 
-export const getBlogClientId = (): string => {
+const getBlogClientId = (): string => {
   const value = process.env.BLOG_CLIENT_ID?.trim();
 
   if (!value) {
@@ -57,7 +57,7 @@ export const getBlogClientId = (): string => {
   return value;
 };
 
-export const getBlogRedirectUri = (): string => {
+const getBlogRedirectUri = (): string => {
   const value = process.env.BLOG_REDIRECT_URI?.trim();
 
   if (!value) {
@@ -99,11 +99,11 @@ export const normalizeReturnTo = (value: string | string[] | undefined): string 
   return trimmed.length > 0 ? trimmed : '/';
 };
 
-export const createCodeVerifier = (): string => {
+const createCodeVerifier = (): string => {
   return crypto.randomBytes(32).toString('base64url');
 };
 
-export const createCodeChallenge = (verifier: string): string => {
+const createCodeChallenge = (verifier: string): string => {
   return crypto.createHash('sha256').update(verifier).digest('base64url');
 };
 

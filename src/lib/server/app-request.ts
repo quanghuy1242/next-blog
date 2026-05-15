@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers';
 import { getBetterAuthTokenFromRequest } from '@/lib/auth/auth';
 import { getChapterPasswordProofCookieValueFromRequest } from '@/lib/server/chapter-password-proof';
 
-export async function getAppRequestCookiesRecord() {
+async function getAppRequestCookiesRecord() {
   const cookieStore = await cookies();
   const result: Record<string, string> = {};
 
@@ -14,7 +14,7 @@ export async function getAppRequestCookiesRecord() {
   return result;
 }
 
-export async function getAppRequestHeadersRecord() {
+async function getAppRequestHeadersRecord() {
   const headerStore = await headers();
 
   return {

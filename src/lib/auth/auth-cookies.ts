@@ -4,7 +4,6 @@ import {
   PAYLOAD_ADMIN_TOKEN_COOKIE,
   PAYLOAD_BETTER_AUTH_TOKEN_COOKIE,
 } from './auth';
-import { BLOG_AUTH_STATE_COOKIE } from './blog-auth';
 
 type CookieDomainRequestLike = {
   headers?: {
@@ -132,28 +131,6 @@ const createBaseCookieOptions = (domain?: string): CookieOptions => ({
   sameSite: 'lax',
   secure: isProduction,
 });
-
-export const setBlogAuthStateCookie = (
-  res: ServerResponse,
-  value: string,
-  maxAgeSeconds: number
-): void => {
-  appendCookies(res, [
-    serializeCookie(BLOG_AUTH_STATE_COOKIE, value, {
-      ...createBaseCookieOptions(),
-      maxAge: maxAgeSeconds,
-    }),
-  ]);
-};
-
-export const clearBlogAuthStateCookie = (res: ServerResponse): void => {
-  appendCookies(res, [
-    serializeCookie(BLOG_AUTH_STATE_COOKIE, '', {
-      ...createBaseCookieOptions(),
-      maxAge: 0,
-    }),
-  ]);
-};
 
 export const setBlogAuthTokenCookies = ({
   maxAgeSeconds,

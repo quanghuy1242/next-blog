@@ -1,20 +1,6 @@
 import type { ReadingProgressResult } from '@/types/cms';
 import { uniquePositiveIntegers } from '@/lib/utils/number';
 import { fetchAPIWithAuthToken } from './base';
-import type { PayloadCacheSettings } from './cache';
-
-const READING_PROGRESS_QUERY = `#graphql
-  query ReadingProgress($bookId: ID!) {
-    readingProgress(bookId: $bookId) {
-      records {
-        chapterId
-        progress
-        completedAt
-        updatedAt
-      }
-    }
-  }
-`;
 
 const SAVE_READING_PROGRESS_MUTATION = `#graphql
   mutation SaveReadingProgress($chapterId: ID!, $bookId: ID!, $progress: Float!) {
@@ -29,10 +15,6 @@ const SAVE_READING_PROGRESS_MUTATION = `#graphql
     }
   }
 `;
-
-interface ReadingProgressResponse {
-  readingProgress: ReadingProgressResult | null;
-}
 
 type ReadingProgressRecords = ReadingProgressResult['records'];
 
@@ -51,26 +33,6 @@ interface SaveReadingProgressResponse {
       updatedAt: string | null;
     } | null;
   } | null;
-}
-
-export async function getReadingProgress(
-  bookId: string,
-  options: { authToken?: string | null; cache?: PayloadCacheSettings } = {}
-): Promise<ReadingProgressResult['records']> {
-  if (!options.authToken) {
-    return [];
-  }
-
-  const data = await fetchAPIWithAuthToken<ReadingProgressResponse>(
-    READING_PROGRESS_QUERY,
-    {
-      variables: { bookId },
-      authToken: options.authToken,
-      cache: options.cache,
-    }
-  );
-
-  return data?.readingProgress?.records ?? [];
 }
 
 export async function getReadingProgressByBookIds(

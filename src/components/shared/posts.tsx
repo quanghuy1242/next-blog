@@ -21,7 +21,7 @@ const PostTitle = ({ slug, title }: PostTitleProps) => (
   </h3>
 );
 
-export interface PostProps {
+interface PostProps {
   title: string;
   coverImage: PostType['coverImage'];
   date: string;
@@ -33,7 +33,7 @@ export interface PostProps {
   activeTags?: string[];
 }
 
-export function Post({
+function Post({
   title,
   coverImage,
   date,

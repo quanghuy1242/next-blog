@@ -101,7 +101,7 @@ interface CategoryProps {
   className?: string;
 }
 
-export function Category({
+function Category({
   name,
   image,
   description = '',

@@ -1,4 +1,4 @@
-import type { PostTag, NormalizedTags } from '@/types/cms';
+import type { PostTag } from '@/types/cms';
 
 /**
  * Normalizes tags from various formats to string array.
@@ -49,24 +49,4 @@ function splitTags(tags: string): string[] {
     .split(',')
     .map((tag) => tag.trim())
     .filter((tag) => tag.length > 0);
-}
-
-/**
- * Normalize tags from PayloadCMS PostTag[] format to string[]
- */
-export function normalizeTags(
-  tags:
-    | Array<PostTag | string | null | undefined>
-    | string
-    | null
-    | undefined
-): NormalizedTags {
-  return normalizePostTags(tags);
-}
-
-/**
- * Get unique sorted tags from an array of tags
- */
-export function uniqueSortedTags(tags: string[]): string[] {
-  return [...new Set(tags)].sort();
 }

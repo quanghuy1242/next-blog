@@ -33,15 +33,15 @@ const getRequiredServerEnv = (name: string): string => {
   return value;
 };
 
-export const getBlogSignupFlowSlug = (): string => {
+const getBlogSignupFlowSlug = (): string => {
   return getRequiredServerEnv('BLOG_SIGNUP_FLOW_SLUG');
 };
 
-export const getBlogSignupAuthorizationSpaceId = (): string => {
+const getBlogSignupAuthorizationSpaceId = (): string => {
   return getRequiredServerEnv('BLOG_SIGNUP_AUTHORIZATION_SPACE_ID');
 };
 
-export const getBlogSignupTriggerKind = (): 'oauth_client' | 'resource_server' => {
+const getBlogSignupTriggerKind = (): 'oauth_client' | 'resource_server' => {
   const value = process.env.BLOG_SIGNUP_TRIGGER_KIND?.trim() || 'oauth_client';
 
   if (value !== 'oauth_client' && value !== 'resource_server') {
@@ -51,7 +51,7 @@ export const getBlogSignupTriggerKind = (): 'oauth_client' | 'resource_server' =
   return value;
 };
 
-export const getBlogSignupTriggerClientId = (): string => {
+const getBlogSignupTriggerClientId = (): string => {
   return getRequiredServerEnv('BLOG_SIGNUP_TRIGGER_CLIENT_ID');
 };
 
@@ -59,7 +59,7 @@ const getBlogSignupTriggerClientSecret = (): string => {
   return getRequiredServerEnv('BLOG_SIGNUP_TRIGGER_CLIENT_SECRET');
 };
 
-export const getBlogSignupIntentTtlSeconds = (): number | undefined => {
+const getBlogSignupIntentTtlSeconds = (): number | undefined => {
   const value = process.env.BLOG_SIGNUP_INTENT_TTL_SECONDS?.trim();
 
   if (!value) {
@@ -75,7 +75,7 @@ export const getBlogSignupIntentTtlSeconds = (): number | undefined => {
   return Math.floor(parsed);
 };
 
-export const getBlogSignupRequestedGrants = (): RequestedSignupGrant[] | undefined => {
+const getBlogSignupRequestedGrants = (): RequestedSignupGrant[] | undefined => {
   const entityTypeId = process.env.BLOG_SIGNUP_REQUESTED_ENTITY_TYPE_ID?.trim();
   const relation = process.env.BLOG_SIGNUP_REQUESTED_RELATION?.trim();
   const entityId = process.env.BLOG_SIGNUP_REQUESTED_ENTITY_ID?.trim();
@@ -99,7 +99,7 @@ export const getBlogSignupRequestedGrants = (): RequestedSignupGrant[] | undefin
   ];
 };
 
-export const buildBlogSignupContinuationUrl = (
+const buildBlogSignupContinuationUrl = (
   returnTo: string,
   req?: RuntimeRequestLike
 ): string => {
