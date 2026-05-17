@@ -50,6 +50,23 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             });
           `}
         </Script>
+        <Script id="scroll-restore" strategy="beforeInteractive">
+          {`
+            (function() {
+              try {
+                var key = 'scroll-pos:' + window.location.pathname + window.location.search;
+                var raw = window.sessionStorage.getItem(key);
+                if (raw) {
+                  var pos = JSON.parse(raw);
+                  if (typeof pos.x === 'number' && typeof pos.y === 'number') {
+                    window.scrollTo(pos.x, pos.y);
+                    window.__historyScrollRestoredFor = window.location.pathname + window.location.search;
+                  }
+                }
+              } catch (e) {}
+            })();
+          `}
+        </Script>
         <Providers headerText={homepage?.header}>{children}</Providers>
       </body>
     </html>

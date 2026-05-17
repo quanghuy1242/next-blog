@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 declare global {
@@ -26,7 +26,7 @@ export function ScrollRestoration() {
   const saveFrameRef = useRef<number | null>(null);
   const cancelRestoreRef = useRef<(() => void) | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof window === 'undefined') {
       return;
     }
@@ -269,7 +269,7 @@ function restoreWhenReady(url: string, x: number, y: number) {
   let frameId: number | null = null;
   let cancelled = false;
   const maxAttempts = 600;
-  const minRestoreFrames = 30;
+  const minRestoreFrames = 2;
 
   const cancel = () => {
     cancelled = true;
@@ -284,13 +284,7 @@ function restoreWhenReady(url: string, x: number, y: number) {
 
   addUserCancelListeners(cancel);
 
-  const tryRestore = () => {
-    if (cancelled) {
-      return;
-    }
-
-    attempts += 1;
-
+  const scrollToTarget = () => {
     const scrollHeight = Math.max(
       document.body.scrollHeight,
       document.documentElement.scrollHeight
@@ -298,12 +292,45 @@ function restoreWhenReady(url: string, x: number, y: number) {
     const viewportHeight = window.innerHeight;
     const maxScrollableY = Math.max(scrollHeight - viewportHeight, 0);
     const targetY = Math.min(Math.max(y, 0), maxScrollableY);
-    const hasEnoughHeight = maxScrollableY >= y;
 
-    if (hasEnoughHeight || attempts >= maxAttempts) {
+    window.__historyScrollRestoredFor = url;
+    window.scrollTo(x, targetY);
+  };
+
+  const hasEnoughHeight = () => {
+    const scrollHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight
+    );
+    const viewportHeight = window.innerHeight;
+    const maxScrollableY = Math.max(scrollHeight - viewportHeight, 0);
+    return maxScrollableY >= y;
+  };
+
+  // Fast path: restore synchronously before paint (runs in useLayoutEffect).
+  if (hasEnoughHeight()) {
+    scrollToTarget();
+    frameId = window.requestAnimationFrame(() => {
+      scrollToTarget();
+      frameId = window.requestAnimationFrame(() => {
+        scrollToTarget();
+        cancel();
+      });
+    });
+    return cancel;
+  }
+
+  // Slow path: poll until lazy content loads and the page is tall enough.
+  const tryRestore = () => {
+    if (cancelled) {
+      return;
+    }
+
+    attempts += 1;
+
+    if (hasEnoughHeight() || attempts >= maxAttempts) {
       restoreFrames += 1;
-      window.__historyScrollRestoredFor = url;
-      window.scrollTo(x, targetY);
+      scrollToTarget();
 
       if (restoreFrames >= minRestoreFrames || attempts >= maxAttempts) {
         cancel();
@@ -314,9 +341,7 @@ function restoreWhenReady(url: string, x: number, y: number) {
     frameId = window.requestAnimationFrame(tryRestore);
   };
 
-  frameId = window.requestAnimationFrame(() => {
-    frameId = window.requestAnimationFrame(tryRestore);
-  });
+  frameId = window.requestAnimationFrame(tryRestore);
 
   return cancel;
 }
