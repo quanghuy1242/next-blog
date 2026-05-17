@@ -1,5 +1,26 @@
 @import 'tailwindcss';
-@config "../../tailwind.config.cjs";
+
+@theme {
+  --color-accent-1: #FAFAFA;
+  --color-accent-2: #EAEAEA;
+  --color-accent-7: #333;
+  --color-success: #0070f3;
+  --color-cyan: #79FFE1;
+  --color-blue: #416275;
+  --color-darkBlue: #3a5a6b;
+  --spacing-28: 7rem;
+  --tracking-tighter: -.04em;
+  --leading-tight: 1.2;
+  --text-5xl: 2.5rem;
+  --text-6xl: 2.75rem;
+  --text-7xl: 4.5rem;
+  --text-8xl: 6.25rem;
+  --shadow-small: 0 5px 10px rgba(0, 0, 0, 0.12);
+  --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-dark: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+  --height-banner: 20rem;
+  --width-searchBar: 450px;
+}
 
 /* Lexical rendered content styles - match PayloadCMS admin editor */
 .lexical-content {
