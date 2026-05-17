@@ -7,7 +7,7 @@
   "preview_urls": false,
   "routes": [
     {
-      "pattern": "blog-vinext.quanghuy.dev",
+      "pattern": "blog.quanghuy.dev",
       "custom_domain": true
     }
   ],
