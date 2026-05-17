@@ -11,23 +11,24 @@
     "dev": "next dev",
     "build": "next build",
     "build:webpack": "next build --webpack",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-    "start": "next start"
+    "cf-typegen": "wrangler types",
+    "start": "next start",
+    "dev:vinext": "vinext dev --port 3001",
+    "build:vinext": "vinext build",
+    "start:vinext": "vinext start",
+    "deploy:vinext": "vinext deploy"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.19.10",
     "@payloadcms/richtext-lexical": "^3.84.1",
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
     "next": "16.2.6",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.37.1",
     "@tailwindcss/postcss": "^4.2.4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -37,6 +38,7 @@
     "@types/react-dom": "^19.2.3",
     "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-rsc": "^0.5.26",
     "@vitest/coverage-v8": "^4.1.5",
     "babel-plugin-react-compiler": "^1.0.0",
     "cross-env": "^10.1.0",
@@ -45,9 +47,13 @@
     "jsdom": "^29.0.2",
     "node-mocks-http": "^1.17.2",
     "postcss": "^8.4.45",
+    "react-server-dom-webpack": "^19.2.6",
     "tailwindcss": "^4.2.4",
     "typescript": "6.0.3",
+    "vinext": "^0.0.50",
+    "vite": "^8.0.13",
     "vitest": "^4.1.5",
-    "wrangler": "^4.91.0"
-  }
+    "wrangler": "^4.92.0"
+  },
+  "type": "module"
 }

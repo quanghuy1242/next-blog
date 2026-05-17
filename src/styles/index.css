@@ -1,5 +1,5 @@
-@config "../../tailwind.config.js";
 @import 'tailwindcss';
+@config "../../tailwind.config.cjs";
 
 /* Lexical rendered content styles - match PayloadCMS admin editor */
 .lexical-content {

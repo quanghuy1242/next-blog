@@ -1,4 +1,4 @@
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { getRequestExecutionContext } from 'vinext/shims/request-context';
 
 const DEFAULT_FRESH_TTL_SECONDS = 60 * 60;
 const DEFAULT_STALE_TTL_SECONDS = 24 * 60 * 60;
@@ -340,7 +340,7 @@ async function parseCachedPayload<T>(
 
 async function getWaitUntil(): Promise<WaitUntilContext | null> {
   try {
-    const { ctx } = await getCloudflareContext({ async: true });
+    const ctx = getRequestExecutionContext();
 
     if (ctx && typeof ctx.waitUntil === 'function') {
       return ctx as WaitUntilContext;

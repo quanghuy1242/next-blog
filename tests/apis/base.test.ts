@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 const PAYLOAD_BASE_URL = 'https://payload.example.com';
 
-const { getCloudflareContextMock } = vi.hoisted(() => ({
-  getCloudflareContextMock: vi.fn(),
+const { getRequestExecutionContextMock } = vi.hoisted(() => ({
+  getRequestExecutionContextMock: vi.fn(),
 }));
 
-vi.mock('@opennextjs/cloudflare', () => ({
-  getCloudflareContext: getCloudflareContextMock,
+vi.mock('vinext/shims/request-context', () => ({
+  getRequestExecutionContext: getRequestExecutionContextMock,
 }));
 
 function createCacheMock() {
@@ -52,7 +52,7 @@ describe('fetchAPI', () => {
     vi.stubEnv('PAYLOAD_BASE_URL', PAYLOAD_BASE_URL);
     vi.stubEnv('PAYLOAD_API_KEY', 'payload-api-key');
     vi.unstubAllGlobals();
-    getCloudflareContextMock.mockReset();
+    getRequestExecutionContextMock.mockReset();
   });
 
   afterEach(() => {
@@ -222,12 +222,8 @@ describe('fetchAPI', () => {
     vi.spyOn(Date, 'now').mockReturnValue(now);
 
     const waitUntil = vi.fn();
-    getCloudflareContextMock.mockResolvedValue({
-      ctx: {
-        waitUntil,
-      },
-      env: {},
-      cf: undefined,
+    getRequestExecutionContextMock.mockReturnValue({
+      waitUntil,
     });
 
     const cacheMock = createCacheMock();

@@ -6,3 +6,4 @@
 *.tsbuildinfo
 node_modules/
 .wrangler/
+/dist/

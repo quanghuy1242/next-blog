@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: path.resolve(__dirname, 'setupTests.ts'),
+    setupFiles: path.resolve(import.meta.dirname, 'setupTests.ts'),
     passWithNoTests: true,
     coverage: {
       reporter: ['text', 'lcov'],
@@ -15,7 +15,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(import.meta.dirname, 'src'),
     },
   },
 });
